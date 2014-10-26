@@ -1,0 +1,38 @@
+import scala.scalajs.sbtplugin.ScalaJSPlugin._
+import ScalaJSKeys._
+
+lazy val api = project.in(file("api"))
+                       .settings(
+    libraryDependencies ++= Seq(
+      "com.lihaoyi" %% "utest" % "0.2.4",
+      "com.scalatags" %% "scalatags" % "0.4.2",
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+      "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
+      compilerPlugin("org.scalamacros" % s"paradise" % "2.0.0" cross CrossVersion.full)
+    ) ++ (
+      if (scalaVersion.value startsWith "2.11.") Nil
+      else Seq("org.scalamacros" %% s"quasiquotes" % "2.0.0")
+    ),
+    addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
+    testFrameworks += new TestFramework("utest.runner.JvmFramework")
+  )
+
+lazy val book = Project(
+  id = "book",
+  base = file("book"),
+  dependencies = Seq(api)
+).settings(
+  libraryDependencies += "org.webjars" % "highlightjs" % "8.2-1",
+  (resources in Compile) += {
+    (fastOptJS in (examples, Compile)).value
+    (artifactPath in (examples, Compile, fastOptJS)).value
+  }
+)
+lazy val examples = project.in(file("examples")).settings(scalaJSSettings:_*).settings(
+  name := "Example",
+  version := "0.1-SNAPSHOT",
+  scalaVersion := "2.11.1",
+  libraryDependencies ++= Seq(
+    "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"
+  )
+)

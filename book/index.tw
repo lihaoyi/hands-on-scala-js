@@ -1,0 +1,31 @@
+
+@raw("<!doctype html>")
+@html
+    @head
+        @meta(charset:="utf-8")
+        @meta(name:="viewport", content:="width=device-width, initial-scale=1.0")
+        @tags2.title("Hands-on Scala.js")
+        @Utils.includes
+        @script("hljs.initHighlightingOnLoad();")
+
+    @div(id:="layout")
+        @a(href:="#menu", id:="menuLink", cls:="menu-link")
+            @span
+
+        @div(id:="menu")
+            @div(cls:="pure-menu pure-menu-open")
+                @a(cls:="pure-menu-heading", href:="#") Contents
+                @Book.contentBar
+
+        @div(id:="main")
+            @div(cls:="header")
+                @h1 Hands-on Scala.js
+                @h2 Writing client-side web applications in Scala
+
+            @div(cls:="content")
+                @Book.intro
+
+
+
+
+
