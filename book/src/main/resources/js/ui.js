@@ -1,4 +1,5 @@
-(function (window, document) {
+document.addEventListener("DOMContentLoaded", function(){
+    console.log("HIGHLIGHTING")
 
     var layout   = document.getElementById('layout'),
         menu     = document.getElementById('menu'),
@@ -32,4 +33,11 @@
         toggleClass(menuLink, active);
     };
 
-}(this, this.document));
+
+    var snippets = document.getElementsByClassName("highlight-me");
+    for(var i = 0; i < snippets.length; i++){
+        console.log("highlighting", snippets[i])
+        hljs.highlightBlock(snippets[i])
+    }
+
+});

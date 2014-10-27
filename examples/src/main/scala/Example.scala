@@ -8,26 +8,38 @@ object Example extends scalajs.js.JSApp{
          .getElementById("example-canvas")
          .asInstanceOf[dom.HTMLCanvasElement]
 
+    def clear() = {
+      canvas.width = canvas.parentElement.clientWidth
+      canvas.height = canvas.parentElement.clientHeight
+    }
+    clear()
+
     val renderer =
       canvas.getContext("2d")
             .asInstanceOf[dom.CanvasRenderingContext2D]
 
-    val (h, w) = (canvas.height, canvas.width)
+    def h = canvas.height
+    def w = canvas.width
+
+    /*example*/
     var x = 0.0
-    val graphs = Seq[(String, Double => Double)](
+    type Graph = (String, Double => Double)
+    val graphs = Seq[Graph](
       ("red", sin),
-      ("green", x => 2 - abs(x % 8 - 4)),
-      ("blue", x => 3 * pow(sin(x / 12), 2) * sin(x))
+      ("green", x => 1 - abs(x % 4 - 2)),
+      ("blue", x => pow(sin(x/12), 2) * sin(x))
     ).zipWithIndex
-    dom.setInterval(() => {
+    def run() = {
       x = (x + 1) % w
-      if (x == 0) renderer.clearRect(0, 0, w, h)
-      else for (((color, func), i) <- graphs) {
-        val y = func(x/w * 75) * h/40 + h/3 * (i+0.5)
+      if (x == 0) clear()
+      else for (((color, f), i) <- graphs) {
+        val offset = h / 3 * (i + 0.5)
+        val y = f(x / w * 75) * h / 40
         renderer.fillStyle = color
-        renderer.fillRect(x, y, 3, 3)
+        renderer.fillRect(x, y + offset, 3, 3)
       }
-    }, 10)
+    }
+    dom.setInterval(run _, 20)
 
   }
 }

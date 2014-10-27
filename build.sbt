@@ -22,7 +22,12 @@ lazy val book = Project(
   base = file("book"),
   dependencies = Seq(api)
 ).settings(
-  libraryDependencies += "org.webjars" % "highlightjs" % "8.2-1",
+  libraryDependencies ++= Seq(
+    "org.webjars" % "highlightjs" % "8.2-1",
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+    "org.scala-lang" % "scala-compiler" % scalaVersion.value,
+    "org.eclipse.jgit" % "org.eclipse.jgit" % "3.5.1.201410131835-r"
+  ),
   (resources in Compile) += {
     (fastOptJS in (examples, Compile)).value
     (artifactPath in (examples, Compile, fastOptJS)).value

@@ -12,13 +12,20 @@ object Utils{
     "META-INF/resources/webjars/highlightjs/8.2-1/languages/scala.min.js",
     "META-INF/resources/webjars/highlightjs/8.2-1/languages/javascript.min.js",
     "META-INF/resources/webjars/highlightjs/8.2-1/languages/bash.min.js",
+    "META-INF/resources/webjars/highlightjs/8.2-1/languages/diff.min.js",
+    "META-INF/resources/webjars/highlightjs/8.2-1/languages/xml.min.js",
     "css/pure-min.css",
+    "css/grids-responsive-min.css",
     "css/layouts/side-menu.css",
     "js/ui.js"
   )
   
   val manualResources = Seq(
     "images/javascript-the-good-parts-the-definitive-guide.jpg",
+    "images/Hello World.png",
+    "images/Hello World White.png",
+    "images/Hello World Console.png",
+    "images/IntelliJ Hello.png",
     "example-fastopt.js"
   )
   

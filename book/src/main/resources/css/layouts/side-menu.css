@@ -236,3 +236,8 @@ Hides the menu at `48em`, but modify this based on your app's needs.
         left: 250px;
     }
 }
+
+/*Workaround for bug in highlight.js IDEA theme*/
+.hljs-tag{
+    background: none;
+}

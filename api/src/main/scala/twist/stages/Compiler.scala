@@ -38,6 +38,7 @@ object Compiler{
           val skeleton: Tree = c.parse(first + s"{$fresh}").asInstanceOf[Apply]
 //          println("FIRST " + first)
           skeleton.foreach{x =>
+            x
             if (x.pos != NoPosition) x.pos = posFor(x.pos.point + fragPos.point + 1)
           }
           val b = content.map(compileTree(_))
@@ -101,7 +102,7 @@ object Compiler{
                 }
                 res.pos = newPos
 
-                println(Position.formatMessage(newPos.asInstanceOf[scala.reflect.internal.util.Position], "", true))
+//                println(Position.formatMessage(newPos.asInstanceOf[scala.reflect.internal.util.Position], "", true))
                 res
               }
 

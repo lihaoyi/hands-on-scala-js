@@ -6,7 +6,7 @@
         @meta(name:="viewport", content:="width=device-width, initial-scale=1.0")
         @tags2.title("Hands-on Scala.js")
         @Utils.includes
-        @script("hljs.initHighlightingOnLoad();")
+        @script()
 
     @div(id:="layout")
         @a(href:="#menu", id:="menuLink", cls:="menu-link")
@@ -24,6 +24,7 @@
 
             @div(cls:="content")
                 @Book.intro
+                @Book.gettingStarted
 
 
 
