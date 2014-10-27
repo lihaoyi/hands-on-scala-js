@@ -16,17 +16,21 @@ object Book {
   val intro = twf("book/intro.tw")
   val gettingStarted = twf("book/getting-started.tw")
   val contentBar = {
-    def rec(current: Node, depth: Int): Frag = {
-      div(
-        marginLeft := s"${depth * 5}px",
-        a(current.name, href:="#"+Utils.munge(current.name)),
-        current.children.map(
-          rec(_, depth + 1)
+    def rec(current: Node, depth: Int): Seq[Frag] = Seq(
+      li(
+        a(
+          current.name,
+          href:="#"+Utils.munge(current.name),
+          paddingLeft := s"${depth * 5}px",
+          cls := "menu-item"
         )
       )
-    }
+    ) ++ current.children.flatMap(
+      rec(_, depth + 1)
+    )
+
     //    @li(cls:="menu-item-divided pure-menu-selected")
-    ul(rec(Utils.structure, 0))
+    rec(Utils.structure, 0)
   }
 
 

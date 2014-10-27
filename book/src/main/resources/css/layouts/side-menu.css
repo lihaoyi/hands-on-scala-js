@@ -2,6 +2,13 @@ body {
     color: #777;
 }
 
+#main{
+    position: fixed;
+
+    right: 0px;
+    height: 100%;
+    overflow-y: scroll
+}
 .pure-img-responsive {
     max-width: 100%;
     height: auto;
@@ -92,6 +99,7 @@ appears on the left side of the page.
     z-index: 1000; /* so the menu or its navicon stays above all content */
     background: #191818;
     overflow-y: auto;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
 }
     /*
@@ -221,6 +229,9 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     #layout {
         padding-left: 250px; /* left col width "#menu" */
         left: 0;
+    }
+    #main{
+        left: 250px;
     }
     #menu {
         left: 250px;

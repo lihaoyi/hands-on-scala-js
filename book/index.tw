@@ -14,13 +14,17 @@
 
         @div(id:="menu")
             @div(cls:="pure-menu pure-menu-open")
-                @a(cls:="pure-menu-heading", href:="#") Contents
-                @Book.contentBar
+                @a(cls:="pure-menu-heading", href:="#")
+                    Contents
+                @ul(cls:="menu-item-list")
+                    @Book.contentBar
 
         @div(id:="main")
             @div(cls:="header")
-                @h1 Hands-on Scala.js
-                @h2 Writing client-side web applications in Scala
+                @h1(id:=Utils.munge("Hands-on Scala.js"))
+                    Hands-on Scala.js
+                @h2
+                    Writing client-side web applications in Scala
 
             @div(cls:="content")
                 @Book.intro

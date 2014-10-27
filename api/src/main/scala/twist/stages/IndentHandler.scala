@@ -50,7 +50,7 @@ object IndentHandler extends (String => String){
 
       val declRemainder = successRemainder(Parser.parse(current.trim, _.templateDeclaration()))
 
-      val exprRemainder = successRemainder(Parser.parse(current.trim, _.expression()))
+      val exprRemainder = successRemainder(Parser.parse(current.trim, _.expression())).filter(_ == current.trim)
 
 
       /**
