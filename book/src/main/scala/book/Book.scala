@@ -59,7 +59,11 @@ object Book {
           )
         )
       ),
-      div(id:="main", txt)
+      div(id:="main",
+        div(id:="main-box")(
+          txt
+        )
+      )
     )
   ).render
   object hli{

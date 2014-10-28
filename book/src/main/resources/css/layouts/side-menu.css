@@ -4,8 +4,9 @@ body {
 
 #main{
     position: fixed;
-
+    max-width: 100%;
     right: 0px;
+    left: 0px;
     height: 100%;
     overflow-y: scroll
 }
@@ -218,7 +219,7 @@ small screens.
 /*
 Hides the menu at `48em`, but modify this based on your app's needs.
 */
-@media (min-width: 48em) {
+@media (min-width: 72em) {
 
     .header,
     .content {
