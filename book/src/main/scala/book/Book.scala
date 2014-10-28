@@ -10,7 +10,6 @@ import scalatags.Text.all._
  * Created by haoyi on 10/26/14.
  */
 object Book {
-
   import Utils.sect
 
   val intro = twf("book/intro.tw")
@@ -21,13 +20,11 @@ object Book {
         a(
           current.name,
           href:="#"+Utils.munge(current.name),
-          paddingLeft := s"${depth * 5}px",
-          cls := "menu-item"
+          paddingLeft := s"${depth * 10 + 10}px",
+          cls := "menu-item" + (if (depth == 1) " menu-item-divided " else "")
         )
       )
-    ) ++ current.children.flatMap(
-      rec(_, depth + 1)
-    )
+    ) ++ current.children.flatMap(rec(_, depth + 1))
 
     //    @li(cls:="menu-item-divided pure-menu-selected")
     rec(Utils.structure, 0)

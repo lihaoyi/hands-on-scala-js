@@ -39,7 +39,7 @@ object Utils{
   }
   println(includes)
   var indent = 1
-  val headers = Seq(h1, h2, h3, h4, h5, h6)
+  val headers = Seq(h1, h1, h2, h3, h4, h5, h6)
   val structure = Node("Hands-on Scala.js", mutable.Buffer.empty)
   var current = structure
   case class sect(name: String){

@@ -76,7 +76,6 @@ document.addEventListener("DOMContentLoaded", function(){
 
         // Get id of current scroll item
         for(var i = scrollItems.length - 1; i >= 0; i--){
-            console.log(scrollHeaders[i].offsetTop, fromTop)
             if (scrollHeaders[i].offsetTop < fromTop + 15 /*fudge factor*/){
                 if (lastId != i) {
                     if (lastId != -1) {

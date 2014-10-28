@@ -1,16 +1,5 @@
 
 @sect{Intro to Scala.js}
-  @div(cls:="pure-g")
-    @div(cls:="pure-u-1 pure-u-md-13-24")
-      @hl.ref("examples/src/main/scala/Example.scala", "/*example*/", false)
-
-    @div(cls:="pure-u-1 pure-u-md-11-24")
-      @canvas(id:="example-canvas", display:="block")
-      @script(src:="example-fastopt.js")
-      @script("Example().main('example-canvas')")
-
-  @p
-    @a("Scala.js", href:="http://www.scala-js.org/") is a compiler that compiles Scala source code to equivalent Javascript code. That lets you write Scala code that you can run in a web browser, or other environments (Chrome plugins, Node.js, etc.) where Javascript is supported.
 
   @p
     Traditionally, Scala has been a language which runs on the JVM. This eliminates it from consideration in many cases, e.g. when you need to build interactive web apps, you need to fall back to Javascript to run your client-side code, at a great loss in terms of toolability and maintainability. Scala.js lets you to develop web applications with the safety and toolability that comes with a statically typed language:
