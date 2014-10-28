@@ -38,27 +38,46 @@ object Utils{
       raw("")
   }
   println(includes)
-  var indent = 1
-  val headers = Seq(h1, h1, h2, h3, h4, h5, h6)
-  val structure = Node("Hands-on Scala.js", mutable.Buffer.empty)
-  var current = structure
+  var indent = 0
+
+
+  val headers = Seq[(String => scalatags.Text.Tag, Option[Frag => Frag])](
+    (h => div(cls:="header")(
+      h1(h),
+      h2("Writing client-side web applications in Scala")
+    ), Some(f => div(cls:="content", f))),
+    (h => div(cls:="header")(
+      h1(id:=Utils.munge(h), h),
+      br
+    ), None),
+    (h1(_), None),
+    (h2(_), None),
+    (h3(_), None),
+    (h4(_), None),
+    (h5(_), None),
+    (h6(_), None)
+  )
+
+  var structure: Node = null
   case class sect(name: String){
     indent += 1
     val newNode = Node(name, mutable.Buffer.empty)
-    current.children.append(newNode)
-    val prev = current
-    current = newNode
+    val (headerWrap, contentWrap) = headers(indent-1)
+    if (structure!= null) structure.children.append(newNode)
+    val prev = structure
+    structure = newNode
     def apply(args: Frag*) = {
-      val res = Seq(
-        headers(indent-1)(cls:="content-subhead", id:=munge(name), name) +: args:_*
+      val wrappedContents = contentWrap.getOrElse((x: Frag) => x)(args)
+      val res = Seq[Frag](
+        headerWrap(name)(cls:="content-subhead", id:=munge(name)),
+        wrappedContents
       )
       indent -= 1
-      current = prev
+      if (prev != null) structure = prev
       res
     }
   }
   def munge(name: String) = {
     name.replace(" ", "")
   }
-
 }

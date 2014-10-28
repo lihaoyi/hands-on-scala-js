@@ -32,7 +32,7 @@ object Main {
 //       .call()
 
 
-    write(Book.txt, "output/index.html")
+    write(Book.site, "output/index.html")
 
     for(res <- Utils.autoResources ++ Utils.manualResources) {
       copy(getClass.getResourceAsStream("/" + res), "output/" + res)

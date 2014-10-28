@@ -1,49 +1,22 @@
 
-@raw("<!doctype html>")
-@html
-    @head
-        @meta(charset:="utf-8")
-        @meta(name:="viewport", content:="width=device-width, initial-scale=1.0")
-        @tags2.title("Hands-on Scala.js")
-        @Utils.includes
-        @script()
+@sect("Hands-on Scala.js")
+    @div(cls:="pure-g")
+        @div(cls:="pure-u-1 pure-u-md-13-24")
+          @hl.ref("examples/src/main/scala/Example.scala", "/*example*/", false)
 
-    @div(id:="layout")
-        @a(href:="#menu", id:="menuLink", cls:="menu-link")
-            @span
+        @div(cls:="pure-u-1 pure-u-md-11-24")
+          @canvas(id:="example-canvas", display:="block")
+          @script(src:="example-fastopt.js")
+          @script("Example().main('example-canvas')")
 
-        @div(id:="menu")
-            @div(cls:="pure-menu pure-menu-open")
-                @a(cls:="pure-menu-heading", href:="#")
-                    Contents
-                @ul(cls:="menu-item-list")
-                    @Book.contentBar
+    @p
+        @a("Scala.js", href:="http://www.scala-js.org/") is a compiler that compiles Scala source code to equivalent Javascript code. That lets you write Scala code that you can run in a web browser, or other environments (Chrome plugins, Node.js, etc.) where Javascript is supported.
 
-        @div(id:="main")
-            @div(cls:="header")
-                @h1(id:=Utils.munge("Hands-on Scala.js"))
-                    Hands-on Scala.js
-                @h2
-                    Writing client-side web applications in Scala
+    @p
+        This book contains something for all levels of experience with Scala.js: beginners can get started with the Introduction and Hands-on tutorial, people who have used it before can skip ahead to the later parts of the tutorial, and even experienced users will find the In-depth Documention useful.
 
-            @div(cls:="content")
-                @div(cls:="pure-g")
-                    @div(cls:="pure-u-1 pure-u-md-13-24")
-                      @hl.ref("examples/src/main/scala/Example.scala", "/*example*/", false)
-
-                    @div(cls:="pure-u-1 pure-u-md-11-24")
-                      @canvas(id:="example-canvas", display:="block")
-                      @script(src:="example-fastopt.js")
-                      @script("Example().main('example-canvas')")
-
-                @p
-                    @a("Scala.js", href:="http://www.scala-js.org/") is a compiler that compiles Scala source code to equivalent Javascript code. That lets you write Scala code that you can run in a web browser, or other environments (Chrome plugins, Node.js, etc.) where Javascript is supported.
-
-                @p
-                    This book contains something for all levels of experience with Scala.js: beginners can get started with the Introduction and Hands-on tutorial, people who have used it before can skip ahead to the later parts of the tutorial, and even experienced users will find the In-depth Documention useful.
-
-                @Book.intro
-                @Book.gettingStarted
+    @Book.intro
+    @Book.gettingStarted
 
 
 

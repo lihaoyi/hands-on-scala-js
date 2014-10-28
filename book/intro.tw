@@ -1,114 +1,112 @@
 
-@sect{Intro to Scala.js}
+@p
+  Traditionally, Scala has been a language which runs on the JVM. This eliminates it from consideration in many cases, e.g. when you need to build interactive web apps, you need to fall back to Javascript to run your client-side code, at a great loss in terms of toolability and maintainability. Scala.js lets you to develop web applications with the safety and toolability that comes with a statically typed language:
+
+@ul
+  @li 
+    Typo-safety due to its compiler which catches many silly errors before the code is run
+  @li 
+    In-editor support for autocomplete, error-highlighting, refactors, and intelligent navigation
+  @li 
+    Very small compiled executables, in the 100-400kb range
+  @li 
+    Source-maps for ease of debugging
+
+@p
+  The value proposition is that due to the superior language and tooling, writing a web application in Scala.js will result in a codebase that is more flexible and robust than an equivalent application written in Javascript.
+
+@sect{Who this book is for}
+  @p
+    This book is targeted at people who have some experience in both Scala and Javascript, as well as web development in general. You do not need to be an expert, but I will skim over basic concepts in to cut to the Scala.js specific points, though I will leave links whenever I introduce a new concept so you can read up if necssary.
 
   @p
-    Traditionally, Scala has been a language which runs on the JVM. This eliminates it from consideration in many cases, e.g. when you need to build interactive web apps, you need to fall back to Javascript to run your client-side code, at a great loss in terms of toolability and maintainability. Scala.js lets you to develop web applications with the safety and toolability that comes with a statically typed language:
+    Furthermore, this book aims to only give an overview of the main steps you need to perform (and ideas you need to understand) to get started using Scala.js. It isn't a comprehensive guide, so if you want to know something this book doesn't cover, feel free to ask on the @a("mailing list", href:="https://groups.google.com/forum/#!forum/scala-js").
 
-  @ul
-    @li 
-      Typo-safety due to its compiler which catches many silly errors before the code is run
-    @li 
-      In-editor support for autocomplete, error-highlighting, refactors, and intelligent navigation
-    @li 
-      Very small compiled executables, in the 100-400kb range
-    @li 
-      Source-maps for ease of debugging
+@sect{Why Scala.js}
+  @p
+    Javascript is the language supported by web browsers, and is the only language available if you wish to write interactive web applications. As more and more activity moves online, the importance of web apps will only increase over time. 
+
+  @sect{Javascript-the-language}
+    @p
+      However, Javascript is not an easy language to work in. Apart from being untyped (which some people don't mind) Javascript is also extremely verbose, has a lot of surprising behavior, and has a culture that make even the simplest of patterns (e.g. instantiating an object) a debate between a dozen different and equally-bad options.
+    @p
+      To work in Javascript, you need the discipline to limit yourself to the sane subset of the language, avoiding all the pitfalls along the way:
+
+    @img(src:="images/javascript-the-good-parts-the-definitive-guide.jpg")
+
+  @sect{Javascript-the-platform}
+    @p
+      However, even as Javascript-the-language sucks, Javascript-the-platform has some very nice properties that make it a good target for application developers:
+
+    @ul
+      @li 
+        Zero-install distribution: just go to a URL and have the application downloaded and ready to use.
+      @li 
+        Hyperlinks: being able to link to a particular page or item within a web app is a feature other platforms lack, and makes it much easier to cross-reference between different systems
+      @li 
+        Sandboxed security: before the advent of mobile apps, web apps were the most secure runtime available, offering none of the risk or worry that comes with installing desktop software
+
+    @p
+      These features are all very nice to have, and together have made the web platform the success it is today.
+
+  @hr
 
   @p
-    The value proposition is that due to the superior language and tooling, writing a web application in Scala.js will result in a codebase that is more flexible and robust than an equivalent application written in Javascript.
+    This is where Scala.js comes in. As developers we want Javascript-the-platform, with its ease-of-distribution, hyperlinks and security characteristics. We do not want Javascript-the-language, with its propensity for bugs, verbosity, and fragility. With Scala.js, you can cross compile your Scala code to a Javascript executable that can run on all major web browsers, thus saving you from the endless stream of gotcha's like the one below:
 
-  @sect{Who this book is for}
+  @hl.javascript
+    javascript> ["10", "10", "10", "10"].map(parseInt)
+    [10, NaN, 2, 3] // WTF
+
+  @hl.scala
+    scala> List("10", "10", "10", "10").map(parseInt)
+    List(10, 10, 10, 10) // Yay!
+
+  @p 
+    Scala.js allows you to take advantage of the Javascript platform while still enjoying all the benefits of a concise, safe, modern language. The benefits of Scala are well documented, and I will not make a case here for Scala vs. some other language. Suffice to say, I believe it's a considerable improvement over programming in Javascript, and with Scala.js we can bring this improvement in development speed and happiness from the backend systems (where Scala has traditionally been used) to the front-end web application.
+
+@sect{The Agenda}
+
+  @p
+    This book will be roughly divided into three sections. These sections can be read in any order. Although the later chapters will make references to earlier chapters, there'll be hyperlinks so you can quickly go back and catch up on what you missed skipping over ,
+
+  @sect{Hands On}
     @p
-      This book is targeted at people who have some experience in both Scala and Javascript, as well as web development in general. You do not need to be an expert, but I will skim over basic concepts in to cut to the Scala.js specific points, though I will leave links whenever I introduce a new concept so you can read up if necssary.
+      A whirlwind tour of the various things that Scala.js can be used for. We will cover:
 
+    @ul
+      @li 
+        Your first Scala.js application: setting up your development environment, cloning the example repository, debugging and finally publishing your first toy application
+      @li 
+        An interactive web app using Scala.js: how you interact with the HTML DOM, how you utilize Ajax calls and other browser APIs that are common in Javascript-heavy applications
+      @li 
+        A Scala.js library: how to write a module that can be depended on by applications both your own and by others, and be used both with Scala.js and Scala-on-the-JVM
+      @li 
+        Client-Server integration: We will build a simple web application with a Scala server and Scala.js client. In the process, we'll explore how to share code between client and server, how to get compiler-checked/boilerplate-free Ajax calls between client and server, and many other long-standing holy-grails of web development
+    
+    @p 
+      After going through this chapter and following along with the exercises, you should have a good sense of how Scala.js works and how it feels building things in Scala.js. You would not be an expert, but you'll know where to get started if you decide to try out Scala.js for your next project.
+
+  @sect{Scala.js in Depth}
     @p
-      Furthermore, this book aims to only give an overview of the main steps you need to perform (and ideas you need to understand) to get started using Scala.js. It isn't a comprehensive guide, so if you want to know something this book doesn't cover, feel free to ask on the @a("mailing list", href:="https://groups.google.com/forum/#!forum/scala-js").
-
-  @sect{Why Scala.js}
-    @p
-      Javascript is the language supported by web browsers, and is the only language available if you wish to write interactive web applications. As more and more activity moves online, the importance of web apps will only increase over time. 
-
-    @sect{Javascript-the-language}
-      @p
-        However, Javascript is not an easy language to work in. Apart from being untyped (which some people don't mind) Javascript is also extremely verbose, has a lot of surprising behavior, and has a culture that make even the simplest of patterns (e.g. instantiating an object) a debate between a dozen different and equally-bad options.
-      @p
-        To work in Javascript, you need the discipline to limit yourself to the sane subset of the language, avoiding all the pitfalls along the way:
-
-      @img(src:="images/javascript-the-good-parts-the-definitive-guide.jpg")
-
-    @sect{Javascript-the-platform}
-      @p
-        However, even as Javascript-the-language sucks, Javascript-the-platform has some very nice properties that make it a good target for application developers:
-
-      @ul
-        @li 
-          Zero-install distribution: just go to a URL and have the application downloaded and ready to use.
-        @li 
-          Hyperlinks: being able to link to a particular page or item within a web app is a feature other platforms lack, and makes it much easier to cross-reference between different systems
-        @li 
-          Sandboxed security: before the advent of mobile apps, web apps were the most secure runtime available, offering none of the risk or worry that comes with installing desktop software
-
-      @p
-        These features are all very nice to have, and together have made the web platform the success it is today.
-
-    @hr
-
-    @p
-      This is where Scala.js comes in. As developers we want Javascript-the-platform, with its ease-of-distribution, hyperlinks and security characteristics. We do not want Javascript-the-language, with its propensity for bugs, verbosity, and fragility. With Scala.js, you can cross compile your Scala code to a Javascript executable that can run on all major web browsers, thus saving you from the endless stream of gotcha's like the one below:
-
-    @hl.javascript
-      javascript> ["10", "10", "10", "10"].map(parseInt)
-      [10, NaN, 2, 3] // WTF
-
-    @hl.scala
-      scala> List("10", "10", "10", "10").map(parseInt)
-      List(10, 10, 10, 10) // Yay!
+      This section of the book will cover lots of content that does not fit in the earlier Hands-On portion of the book. Things that aren't immediately necessary to get something up and running, things that only advanced users would care about, things that you probably don't need to know but you'd like to know out of intellectual curiosity.
 
     @p 
-      Scala.js allows you to take advantage of the Javascript platform while still enjoying all the benefits of a concise, safe, modern language. The benefits of Scala are well documented, and I will not make a case here for Scala vs. some other language. Suffice to say, I believe it's a considerable improvement over programming in Javascript, and with Scala.js we can bring this improvement in development speed and happiness from the backend systems (where Scala has traditionally been used) to the front-end web application.
+      In general, this section of the book will go much deeper into Scala.js, much more than is necessary to get your first applications built. We will talk about the small number of semantic differences between Scala.js and Scala, details of the foreign-function-interface with Javascript, the various optimization levels and what they do. Nothing pressing or urgently needed, but all very interesting, and worth reading if you want to really understand Scala.js in depth.
 
-  @sect{The Agenda}
+  @sect{Why}
+    @p
+      Why should you care about Scala.js in the first place? Why not just write Javascript? As a new, barely-a-year-old project, what does it provide that other more mature compile-to-javascript langauges don't?
 
     @p
-      This book will be roughly divided into three sections. These sections can be read in any order. Although the later chapters will make references to earlier chapters, there'll be hyperlinks so you can quickly go back and catch up on what you missed skipping over ,
+      In this section of the book, we will examine the reasons which got me first interested in Scala.js. We'll talk at length about the deficiencies of Javascript, the ubiquity of the browser as an application platform, and the technical characteristics that make this the case.
 
-    @sect{Hands On}
-      @p
-        A whirlwind tour of the various things that Scala.js can be used for. We will cover:
-
-      @ul
-        @li 
-          Your first Scala.js application: setting up your development environment, cloning the example repository, debugging and finally publishing your first toy application
-        @li 
-          An interactive web app using Scala.js: how you interact with the HTML DOM, how you utilize Ajax calls and other browser APIs that are common in Javascript-heavy applications
-        @li 
-          A Scala.js library: how to write a module that can be depended on by applications both your own and by others, and be used both with Scala.js and Scala-on-the-JVM
-        @li 
-          Client-Server integration: We will build a simple web application with a Scala server and Scala.js client. In the process, we'll explore how to share code between client and server, how to get compiler-checked/boilerplate-free Ajax calls between client and server, and many other long-standing holy-grails of web development
-      
-      @p 
-        After going through this chapter and following along with the exercises, you should have a good sense of how Scala.js works and how it feels building things in Scala.js. You would not be an expert, but you'll know where to get started if you decide to try out Scala.js for your next project.
-
-    @sect{Scala.js in Depth}
-      @p
-        This section of the book will cover lots of content that does not fit in the earlier Hands-On portion of the book. Things that aren't immediately necessary to get something up and running, things that only advanced users would care about, things that you probably don't need to know but you'd like to know out of intellectual curiosity.
-
-      @p 
-        In general, this section of the book will go much deeper into Scala.js, much more than is necessary to get your first applications built. We will talk about the small number of semantic differences between Scala.js and Scala, details of the foreign-function-interface with Javascript, the various optimization levels and what they do. Nothing pressing or urgently needed, but all very interesting, and worth reading if you want to really understand Scala.js in depth.
-
-    @sect{Why}
-      @p
-        Why should you care about Scala.js in the first place? Why not just write Javascript? As a new, barely-a-year-old project, what does it provide that other more mature compile-to-javascript langauges don't?
-
-      @p
-        In this section of the book, we will examine the reasons which got me first interested in Scala.js. We'll talk at length about the deficiencies of Javascript, the ubiquity of the browser as an application platform, and the technical characteristics that make this the case.
-
-      @p
-        Lastly, we will explore the solution space. Scala.js isn't the only game in town, and there are hundreds of over attempts at covering the same ground the Scala.js now attempts to cover. We'll compare and contrast the different approaches to see what Scala.js can bring to the table that other approaches cannot.
-
-    @hr
-    
     @p
-      As mentioned earlier, these chapters can be read in any order. In keeping with the spirit of the book, we'll jump right into the Hands On to give you the experience, and save the talking and philosophizing for later. Let's go!
+      Lastly, we will explore the solution space. Scala.js isn't the only game in town, and there are hundreds of over attempts at covering the same ground the Scala.js now attempts to cover. We'll compare and contrast the different approaches to see what Scala.js can bring to the table that other approaches cannot.
+
+  @hr
+  
+  @p
+    As mentioned earlier, these chapters can be read in any order. In keeping with the spirit of the book, we'll jump right into the Hands On to give you the experience, and save the talking and philosophizing for later. Let's go!
 
 

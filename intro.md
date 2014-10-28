@@ -8,8 +8,15 @@ Hands-On Scala.js
 		Why
 		Where
 
-	Tutorial
-		A HTML5 Canvas Application
+	Hands On
+		Getting Started
+      Opening the Project
+      The Application Code
+      The Project Code
+      Publishing
+
+    Making an HTML5 Canvas Game
+
 			Accessing DOM APIs
 				Using js.Dynamic
 				Using scala-js-dom for type-safety
@@ -18,7 +25,7 @@ Hands-On Scala.js
 			Publishing
 			Looking through the generated code
 
-		Interactive Web Pages
+		Interactive Web Apps
 			Managing HTML using the DOM
 			Managing HTML using Scalatags
 			Wiring up DOM events and interactions
@@ -45,6 +52,8 @@ Hands-On Scala.js
 			Deployment
 
 	Reference
+    The Scala.js File Encoding
+    
 		Javascript Interop
 			Calling Javascript from Scala.js
 			Writing your own FFI facades
@@ -55,22 +64,7 @@ Hands-On Scala.js
 
 		Differences from Scala/JVM
 
-		Compilation Pipeline
+		Internals
 			Optimization Phases
 
 
-
-Intro to Intro to Scala.js
-
-	Scala.js is a compiler that compiles Scala source code to equivalent Javascript code. That lets you write Scala code that you can run in a web browser, or other environments (Chrome plugins, Node.js, etc.) where Javascript is supported.
-
-	This book is targeted at people who have some experience in both Scala and Javascript. You do not need to be an expert in both, but I will skim over basic concepts in both languages to cut to the Scala.js specific points.
-
-	Scala.js on its own allows you to develop web applications with the safety and toolability that comes with a statically typed language. 
-	
-	- Typo-safety due to its compiler which catches many silly errors before the code is run
-	- In-editor support for autocomplete, error-highlighting, refactors, and intelligent navigation
-	- Very small compiled executables, in the 170-400kb range
-	- Source-maps for ease of debugging
-
-	In general, the development experience is on

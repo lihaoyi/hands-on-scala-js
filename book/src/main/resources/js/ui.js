@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
         // Get id of current scroll item
         for(var i = scrollItems.length - 1; i >= 0; i--){
-            if (scrollHeaders[i].offsetTop < fromTop + 15 /*fudge factor*/){
+            if (scrollHeaders[i].offsetTop < fromTop + 100 /*fudge factor*/){
                 if (lastId != i) {
                     if (lastId != -1) {
                         scrollItems[lastId].parentElement.className = scrollItems[lastId].parentElement.className.replace(

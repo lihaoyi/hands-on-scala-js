@@ -12,27 +12,56 @@ import scalatags.Text.all._
 object Book {
   import Utils.sect
 
-  val intro = twf("book/intro.tw")
-  val gettingStarted = twf("book/getting-started.tw")
+  lazy val intro = sect("Intro to Scala.js")(twf("book/intro.tw"))
+  lazy val gettingStarted = sect("Getting Started")(twf("book/getting-started.tw"))
+  val txt = twf("book/index.tw")
   val contentBar = {
-    def rec(current: Node, depth: Int): Seq[Frag] = Seq(
-      li(
-        a(
-          current.name,
-          href:="#"+Utils.munge(current.name),
-          paddingLeft := s"${depth * 10 + 10}px",
-          cls := "menu-item" + (if (depth == 1) " menu-item-divided " else "")
+    def rec(current: Node, depth: Int): Seq[Frag] = {
+      println("\t"*depth + current.name)
+      Seq(
+        li(
+          a(
+            current.name,
+            href:="#"+Utils.munge(current.name),
+            paddingLeft := s"${depth * 10 + 10}px",
+            cls := "menu-item" + (if (depth == 1) " menu-item-divided " else "")
+          )
         )
-      )
-    ) ++ current.children.flatMap(rec(_, depth + 1))
+      ) ++ current.children.flatMap(rec(_, depth + 1))
+    }
 
-    //    @li(cls:="menu-item-divided pure-menu-selected")
+    println("TABLE OF CONTENTS")
     rec(Utils.structure, 0)
   }
+  val site = Seq(
+    raw("<!doctype html>"),
+    html(
+      head(
+        meta(charset:="utf-8"),
+        meta(name:="viewport", content:="width=device-width, initial-scale=1.0"),
+        tags2.title("Hands-on Scala.js"),
+        Utils.includes
+      ),
 
+      div(id:="layout")(
+        a(href:="#menu", id:="menuLink", cls:="menu-link")(
+          span
+        ),
 
-  val txt = twf("book/index.tw").render
-
+        div(id:="menu")(
+          div(cls:="pure-menu pure-menu-open")(
+            a(cls:="pure-menu-heading", href:="#")(
+              "Contents"
+            ),
+            ul(cls:="menu-item-list")(
+              contentBar
+            )
+          )
+        )
+      ),
+      div(id:="main", txt)
+    )
+  ).render
   object hli{
     def javascript(code: String*) = hl.highlight(code, "javascript", inline=true)
     def scala(code: String*) = hl.highlight(code, "scala", inline=true)
@@ -47,8 +76,6 @@ object Book {
       if (inline){
         code(cls:=lang + " highlight-me", lines(0), padding:=0, display:="inline")
       }else{
-        println("LINES " + lines.toList)
-        println(snippet)
         val minIndent = lines.map(_.takeWhile(_ == ' ').length)
           .filter(_ > 0)
           .min
@@ -114,15 +141,11 @@ object Book {
             firstCharIndex == -1 || firstCharIndex >= whitespace + (if (indented) 1 else 0)
           }
 
-        things.foreach(println)
         val stuff =
           if (!indented) {
-            println("NOT INDENTED " + things)
             things
-          }
-          else {
+          } else {
             val last = lines(firstLine + things.length + 1)
-//            println("LAST: " + last)
             if (last.trim.toSet subsetOf "}])".toSet) {
               lines(firstLine) +: things :+ last
             } else {
@@ -131,7 +154,6 @@ object Book {
           }
         stuff.map(_.drop(whitespace)).mkString("\n")
       }
-      println(blob)
 
       pre(code(cls:=lang + " highlight-me", blob))
     }
