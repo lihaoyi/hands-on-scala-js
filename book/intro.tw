@@ -23,6 +23,9 @@
       });
 
 @p
+  As you can see, both of the above programs do identical things: it's just that the one on the left is written in Scala and the one on the right is in Javascript. 
+
+@p
   Traditionally, Scala has been a language which runs on the JVM. This eliminates it from consideration in many cases, e.g. when you need to build interactive web apps, you need to fall back to Javascript to run your client-side code, at a great loss in terms of toolability and maintainability. Scala.js lets you to develop web applications with the safety and toolability that comes with a statically typed language:
 
 @ul

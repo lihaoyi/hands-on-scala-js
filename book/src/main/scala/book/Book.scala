@@ -123,9 +123,9 @@ object Book {
      * }
      */
 
-    def ref(filepath: String, identifier: String = "", end: String = "", indented: Boolean = true) = {
+    def ref(filepath: String, start: String = "", end: String = "\n") = {
 
-      val lang = filepath.split('.').last match{
+      val lang = filepath.split('.').last match {
         case "js" => "javascript"
         case "scala" => "scala"
         case "sbt" => "scala"
@@ -138,35 +138,25 @@ object Book {
 
       val lines = io.Source.fromFile(filepath).getLines().toVector
 
-      val blob = if (identifier == ""){
-        lines.mkString("\n")
-      }else {
-        val firstLine = lines.indexWhere(_.contains(identifier))
-        val whitespace = lines(firstLine).indexWhere(!_.isWhitespace)
-        val things =
-          lines.drop(firstLine + 1)
-               .takeWhile{ x =>
-                  if (end == "") {
-                    val firstCharIndex = x.indexWhere(!_.isWhitespace)
-                    firstCharIndex == -1 || firstCharIndex >= whitespace + (if (indented) 1 else 0)
-                  }else{
-                    !x.contains(end)
-                  }
-               }
+      def indent(line: String) = line.takeWhile(_.isWhitespace).length
+      println(lines)
+      println(start)
 
-        val stuff =
-          if (!indented) {
-            things
-          } else {
-            val last = lines(firstLine + things.length + 1)
-            if (last.trim.toSet subsetOf "}])".toSet) {
-              lines(firstLine) +: things :+ last
-            } else {
-              lines(firstLine) +: things
-            }
-          }
-        stuff.map(_.drop(whitespace)).mkString("\n")
+      val startLine = lines.indexWhere(_.contains(start))
+      if (startLine == -1){
+        throw new Exception("Can't find marker: " + start)
       }
+      val whitespace = indent(lines(startLine))
+      val endLine = lines.indexWhere(
+        line => line.contains(end) || (indent(line) < whitespace && line.trim != ""),
+        startLine
+      )
+      val sliced =
+        if (endLine == -1) lines.drop(startLine)
+        else lines.slice(startLine, endLine)
+      val blob = sliced.map(_.drop(whitespace)).mkString("\n")
+
+
       pre(code(cls:=lang + " highlight-me", blob))
     }
   }

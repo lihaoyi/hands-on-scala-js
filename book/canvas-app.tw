@@ -1,0 +1,212 @@
+@p
+  By this point, you've already cloned and got your hands dirty fiddling around with the toy @a("workbench-example-app", href:="https://github.com/lihaoyi/workbench-example-app"). You have your editor set up, SBT installed, and have published the example application in a way you can host online for other people to see. Maybe you've even made some changes to the application to see what happens. Hopefully you're curious, and want to learn more.
+
+@p 
+  In this section of the book, we will walk through making a small canvas application. This will expose you to important concepts like:
+
+@ul
+  @li
+    Taking input with Javascript event handlers
+  @li
+    Writing your application logic in Scala
+  @li
+    Using a timer to drive periodic actions
+
+@p
+  In general, while the previous chapter was mostly set-up and exploring the Scala.js project, this chapter will walk you through actually writing a non-trivial, self-contained Scala.js application. Throughout this chapter, we will only be making modifications to @code{ScalaJSExample.scala}; the rest of the project will remain unchanged.
+
+@sect{Making a Sketchpad using Mouse Input}
+
+  @p
+    To begin with, lets remove all the existing stuff in our @code{.scala} file and leave only the @hli.scala{object} and the @hli.scala{main} method. Let's start off with some necessary boilerplate:
+
+  @hl.ref("examples/src/main/scala/ScratchPad.scala", "/*setup*/", end = "/*code*/")
+
+  @p
+    As described earlier, this code uses the @hli.javascript{document.getElementById} function to fish out the @code{canvas} element that we interested in from the DOM. It then gets a rendering context from that @code{canvas}, and sets the height and width of the canvas to completely fill its containing element. Lastly, it fills out the canvas light-gray, so that we can see it on the page.
+
+  @p
+    Next, let's set some event handlers on the canvas:
+
+  @div(cls:="pure-g")
+    @div(cls:="pure-u-1 pure-u-md-13-24")
+      @hl.ref("examples/src/main/scala/ScratchPad.scala", "/*code*/")
+
+    @div(cls:="pure-u-1 pure-u-md-11-24")
+      @canvas(id:="canvas2", display:="block")
+      @script("ScratchPad().main(document.getElementById('canvas2'))")
+
+  @p
+    This code sets up the @code{mousedown} and @code{mouseup} events to keep track of whether or not the mouse has currently been clicked. It then draws black squares any time you move the mouse while the button is down. This lets you basically click-and-drag to draw pictures on the canvas. Try it out!
+
+  @p
+    In general, you have access to all the DOM APIs through the @hli.scala{dom} package as well as through Javascript objects such as the @hli.scala{dom.HTMLCanvasElement}. Setting the @code{onmouseXXX} callbacks is just one way of interacting with the DOM. With Scala.js, you also get a very handy autocomplete in the editor, which you can use to browse the various other APIs that are available for use:
+
+  @img(src:="images/Dropdown.png", maxWidth:="100%") 
+
+  @p
+    Apart from mouse events, keyboard events, scroll events, input events, etc. are all usable from Scala.js as you'd expect
+
+@sect{Making a Clock using setInterval}
+  
+  @p
+    You've already seen this in the previous example, but @hli.scala{dom.setInterval} can be used to schedule recurring, periodic events in your program. Common use cases include running the event loop for a game, making smooth animations, and other tasks of that sort which require some work to happen over a period of time.
+
+  @p
+    Again, we need roughly the same boilerplate as just now to set up the canvas:
+
+  @hl.ref("examples/src/main/scala/Clock.scala", "/*setup*/", "/*code*/")
+
+  @p
+    The only thing unusual here is that I'm going to create a @hli.scala{linearGradient} in order to make the stopwatch look pretty. This is by no means necessary, and you could simply make the @hli.scala{fillStyle} @hli.scala{"black"} if you want to keep things simple.
+
+  @p
+    Once that's done, it's only a few lines of code to set up a nice, live clock:
+
+  @div(cls:="pure-g")
+    @div(cls:="pure-u-1 pure-u-md-13-24")
+      @hl.ref("examples/src/main/scala/Clock.scala", "/*code*/")
+
+    @div(cls:="pure-u-1 pure-u-md-11-24")
+      @canvas(id:="canvas3", display:="block")
+      @script("Clock().main(document.getElementById('canvas3'))")
+
+  @p
+    As you can see, we're using more @a("Canvas APIs", href:="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D"), in this case dealing with rendering text on the canvas. Another thing we're using is the Javascript @a("Date", href:="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date") class, in Scala.js under the fully name @hli.scala{scala.scalajs.js.Date}, here imported as @hli.scala{js.Date}.
+
+@sect{Tying it together: Flappy Box}
+
+  @p
+    You've just seen two examples of how to use Scala.js, together with the Javascript DOM APIs, to make simple applications. However, we've only used the "Scala" in Scala.js in the most rudimentary fashion: setting a few primitives here and there, defining some methods, mainly just gluing together a few Javascript APIs
+
+  @p
+    In this example we will make a spiritual clone of the popular @a("Flappy Bird", href:="http://en.wikipedia.org/wiki/Flappy_Bird") video game. This game involves a few simple rules
+
+  @ul
+    @li 
+      Your character starts in the middle of the screen
+    @li
+      Gravity pulls your character down
+    @li
+      Clicking/tapping the screen makes your character jump up
+    @li
+      There are obstacles that approach your character from the right side of the screen, and you have to make sure you go through the hole in each obstacle to avoid hitting it
+    @li
+      Don't go out of bounds!
+
+  @p
+    It's a relatively simple game, but there should be enough "business logic" in here that we won't be simply gluing together APIs. Let's start!
+
+  @sect{Setting Up the Canvas}
+    @hl.ref("examples/src/main/scala/FlappyLine.scala", "/*setup*/", end="/*variables*/")
+
+    @p
+      This section of the code is peripherally necessary, but not core to the implementation or logic of Flappy Box. We see the same @hli.scala{canvas}/@hli.scala{renderer} logic we've seen in all our examples, along with some logic to make the canvas a reasonable size, and some configuration of how we will render text to the canvas.
+
+    @p
+      In general, code like this will usually end up being necessary in a Scala.js program: the Javascript APIs that the browser provides to do things often ends up being somewhat roundabout and verbose. It's somewhat annoying to have to do for a small program such as this one, but in a larger application, the cost is both spread out over thousands of lines of code and also typically hidden away in some helpers, so you don't have to mess with this stuff unless you really want to.
+
+  @sect{Defining our State}
+    @hl.ref("examples/src/main/scala/FlappyLine.scala", "/*variables*/", end="def runDead")
+
+    @p
+      This is where we start defining things that are relevant to Flappy Box. There are roughly two groups of values here: immutable constants in the top group, and mutable variables in the bottom. The rough meaning of each variable is documented in the comments, and we'll see exactly how we use them later. 
+
+    @p
+      One notable thing is that we're using a @hli.scala{collection.mutable.Queue} to store the list of obstacles. This is defined in the Scala standard library; in general, all the collections in the Scala standard library can be used without issue in Scala.js.
+
+  @sect{Game Logic}
+    @hl.ref("examples/src/main/scala/FlappyLine.scala", "def runLive", "def runDead")    
+
+    @p
+      The @hli.scala{runLive} function is the meat of Flappy Box. In it, we
+
+    @ul
+      @li
+        Clear the canvas
+      @li
+        Generate new obstacles
+      @li
+        Apply velocity and acceleration to the player
+      @li
+        Check for collisions or out-of-bounds, killing the player if it happens
+      @li
+        Rendering everything, including the player as the namesake box
+
+    @p    
+      This function basically contains all the game logic, from motion, to collision-detection, to rendering, so it's pretty large. Not that large though! And entirely understandable, even if it takes a few moments to read through.
+
+    @hl.ref("examples/src/main/scala/FlappyLine.scala", "def runDead", end="def run")    
+
+    @p
+      This is the function that handles what happens when you're dead. Essentially, we reset all the mutable variables to their initial state, and just count down the @hli.scala{dead} counter until it reaches zero and we're considered alive again.
+
+  @sect{A Working Product}
+    @hl.ref("examples/src/main/scala/FlappyLine.scala", "def run")    
+
+    @p
+      And finally, this is the code that kicks everything off: we define the @hli.scala{run} function to swap between @hli.scala{runLive} and @hli.scala{runDead}, register an @hli.scala{canvas.onclick} handler to make the player jump by tweaking his velocity, and we call @code{setInterval} to run the @hli.scala{run} function every 20 milliseconds.
+
+    @p
+      At almost 100 lines of code, this is quite a meaty example! Nonetheless, when all is said and done, you will find that the example actually works! Try it out!
+
+    @div
+      @canvas(id:="canvas4", display:="block")
+    @script("FlappyLine().main(document.getElementById('canvas4'))")
+
+@sect{Canvas Recap}
+  @p
+    We've now gone through the workings of building a handful of toy applications using Scala.js. What have we learnt in the process?
+
+  @sect{Development Speed}
+    @p
+      We've by now written a good chunk of Scala.js code, and perhaps debugged some mysterious errors, and tried some new things. One thing you've probably noticed is the efficiency of the process: you make a change in your editor, the browser reloads itself, and life goes on. There is a compile cycle, but after a few runs the compiler warms up and the compilation cycle drops to less than a second.
+    @p
+      Apart from the compilation/reload speed, you've probably noticed the benefit of tooling around Scala.js. Unlike Javascript editors, your existin Scala IDEs like IntelliJ or Eclipse can give very useful help when you're working with Scala.js. Autocomplete, error-highlighting, jump-to-definition, and a myriad other modern conveniences that are missing when working in dynamically-typed languages are present when working in Scala.js. This makes the code much less mysterious: you're no longer trying to guess what methods a value has, or what a method returns: it's all laid out in front of you in plain sight.
+
+  @sect{Full Scala}
+    @p
+      All of the examples so far have been very self-contained: they do not touch the HTML DOM, they do not make Ajax calls, or try to access web services. They don't push the limits of the browser's API.
+
+    @p
+      Nevertheless, these examples have exercised a good amount of the Scala language. List comprehensions, collections, the math library, and more. In general, most of the Scala standard library works under Scala.js, as well as a large number of third-party libraries. Unlike many other compile-to-Javascript languages out there, this isn't a language-that-looks-like-Scala: it is Scala through and through, with a tiny number of semantic differences.
+
+  @sect{Seamless Javascript Interop}
+    @p
+      Even if we take some time to read through the code we've written, it is not immediately obvious which bits of code are Scala and which bits are Javascript! It all kind of meshes together, for example if we take the Flappy Box source code:
+
+    @ul
+      @li
+        @hli.scala{obstacles} is a Scala @hli.scala{mutable.Queue}, as we defined it earlier, and all the methods on it are Scala method calls
+      @li
+        @hli.scala{renderer} is a Javascript @hli.javascript{CanvasRenderingContext2D}, and all the methods on it are Javascript method calls directly on the Javascript object
+      @li 
+        @hli.scala{frame} is a Scala @hli.scala{Int}, and obeys Scala semantics, though it is implemented as a Javascript @hli.javascript{Number} under the hood.
+      @li 
+        @hli.scala{playerY} and @hli.scala{playerV} are Scala @hli.scala{Double}s, implemented directly as Javascript @hli.javascript{Number}s
+
+    @p
+      This reveals something pretty interesting about Scala.js: even though Scala at-first-glance is a very different language from Javascript, the interoperation with Javascript is so seamless that you can't even tell from the code which values/methods are defined in Scala and which values/methods come from Javascript! 
+    @p  
+      These two classes of values/methods are treated very differently by the compiler when it comes to emitting the executable Javascript blob, but the compiler does not need extra syntax telling it which things belong to Scala and which to Javascript: the types are sufficient. @hli.scala{renderer}, for example is of type @hli.scala{dom.CanvasRenderContext2D} which is a subtype of @hli.scala{scalajs.js.Object}, indicating to the compiler that it needs special treatment. Primitives like @hli.scala{Double}s and @hli.scala{Int}s have similar treatment
+
+    @p
+      Overall, this seamless mix of Scala and Javascript values/methods/functions is a common theme in Scala.js applications, so you should expect to see more of it in later chapters of the book.
+
+  @hr
+
+  @p
+    You've now had some experience building small canvas applications in Scala.js. Why not try exercising your new-found skills? Here are some possibilities:
+
+  @ul
+    @li
+      Make more video games! I have a set of @a("retro-games ported to Scala.js", href:="http://lihaoyi.github.io/scala-js-games/"). Maybe re-make one of them without looking at the source, or maybe port some other game you're familiar with and enjoy playing. Even just drawing things on canvas, games can get @a("pretty elaborate", href:="http://lihaoyi.github.io/roll/").
+
+    @li
+      Explore the APIs! We've touched on a small number of Javascript APIs here, mainly for dealign with the canvas, but modern browsers offer a whole @a("zoo of functionality", href:="https://developer.mozilla.org/en-US/docs/Web/API"). Try making an application that uses @a("localStorage", href:="https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Storage") to save state even when you close the tab, or an application that works with the HTML DOM.
+
+    @li
+      Draw something pretty! We have a working canvas, a nice programming language, and a way to easily publish the results online. @a("Various", href:="http://www.scala-js-fiddle.com/gist/77a3840678d154257ca1/KochSnowflake.scala") @a("fractals", href:="http://www.scala-js-fiddle.com/gist/77a3840678d154257ca1/KochCurve.scala"), or @a("colorful visualizations", href:="http://www.scala-js-fiddle.com/gist/9443f8e0ecc68d1058ad/RayTracer.scala") are all possibilities.
+
+  @p  
+    By this point you've some experience building stand-alone, single-canvas Scala.js applications, which has hopefully given you a feel for how Scala.js works. The problem is that few web applications satisfy the criteria of being stand-alone single-page canvas applications! Most web applications need to deal with the DOM of the HTML page, need to fetch data from web services, and generally need to do a lot of other messy things. We'll go into that in the next chapter

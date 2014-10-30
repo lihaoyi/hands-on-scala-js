@@ -4,7 +4,7 @@ import org.scalajs.dom
 import scala.scalajs.js.annotation.JSExport
 
 @JSExport
-object Example extends{
+object Splash extends{
   @JSExport
   def main(canvas: dom.HTMLCanvasElement) = {
 
@@ -21,7 +21,6 @@ object Example extends{
     def h = canvas.height
     def w = canvas.width
 
-    /*example*/
     var x = 0.0
     type Graph = (String, Double => Double)
     val graphs = Seq[Graph](

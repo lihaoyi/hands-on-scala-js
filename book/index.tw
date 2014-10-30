@@ -2,11 +2,11 @@
 @sect("Hands-on Scala.js")
     @div(cls:="pure-g")
         @div(cls:="pure-u-1 pure-u-md-13-24")
-          @hl.ref("examples/src/main/scala/Example.scala", "/*example*/", indented=false)
+          @hl.ref("examples/src/main/scala/Splash.scala", "var x")
 
         @div(cls:="pure-u-1 pure-u-md-11-24")
           @canvas(id:="canvas1", display:="block")
-          @script("Example().main(document.getElementById('canvas1'))")
+          @script("Splash().main(document.getElementById('canvas1'))")
 
     @p
         @a("Scala.js", href:="http://www.scala-js.org/") is a compiler that compiles Scala source code to equivalent Javascript code. That lets you write Scala code that you can run in a web browser, or other environments (Chrome plugins, Node.js, etc.) where Javascript is supported.
