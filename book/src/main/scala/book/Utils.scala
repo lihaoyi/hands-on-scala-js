@@ -17,7 +17,8 @@ object Utils{
     "css/pure-min.css",
     "css/grids-responsive-min.css",
     "css/layouts/side-menu.css",
-    "js/ui.js"
+    "js/ui.js",
+    "example-fastopt.js"
   )
   
   val manualResources = Seq(
@@ -26,7 +27,8 @@ object Utils{
     "images/Hello World White.png",
     "images/Hello World Console.png",
     "images/IntelliJ Hello.png",
-    "example-fastopt.js"
+    "images/Dropdown.png",
+    "images/Scalatags Downloads.png"
   )
   
   val includes = for(res <- Utils.autoResources) yield {

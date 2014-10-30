@@ -1,12 +1,12 @@
 import Math._
 import org.scalajs.dom
 
-object Example extends scalajs.js.JSApp{
-  def main() = {
-    val canvas =
-      dom.document
-         .getElementById("example-canvas")
-         .asInstanceOf[dom.HTMLCanvasElement]
+import scala.scalajs.js.annotation.JSExport
+
+@JSExport
+object Example extends{
+  @JSExport
+  def main(canvas: dom.HTMLCanvasElement) = {
 
     def clear() = {
       canvas.width = canvas.parentElement.clientWidth

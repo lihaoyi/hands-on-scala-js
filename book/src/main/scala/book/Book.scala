@@ -14,6 +14,7 @@ object Book {
 
   lazy val intro = sect("Intro to Scala.js")(twf("book/intro.tw"))
   lazy val gettingStarted = sect("Getting Started")(twf("book/getting-started.tw"))
+  lazy val canvasApp = sect("Canvas App")(twf("book/canvas-app.tw"))
   val txt = twf("book/index.tw")
   val contentBar = {
     def rec(current: Node, depth: Int): Seq[Frag] = {
@@ -66,6 +67,7 @@ object Book {
       )
     )
   ).render
+
   object hli{
     def javascript(code: String*) = hl.highlight(code, "javascript", inline=true)
     def scala(code: String*) = hl.highlight(code, "scala", inline=true)
@@ -73,6 +75,7 @@ object Book {
     def diff(code: String*) = hl.highlight(code, "diff", inline=true)
     def html(code: String*) = hl.highlight(code, "xml", inline=true)
   }
+
   object hl{
     def highlight(snippet: Seq[String], lang: String, inline: Boolean) = {
       val string = snippet.mkString
@@ -120,7 +123,7 @@ object Book {
      * }
      */
 
-    def ref(filepath: String, identifier: String = "", indented: Boolean = true) = {
+    def ref(filepath: String, identifier: String = "", end: String = "", indented: Boolean = true) = {
 
       val lang = filepath.split('.').last match{
         case "js" => "javascript"
@@ -132,7 +135,9 @@ object Book {
           println("??? " + x)
           ???
       }
+
       val lines = io.Source.fromFile(filepath).getLines().toVector
+
       val blob = if (identifier == ""){
         lines.mkString("\n")
       }else {
@@ -140,10 +145,14 @@ object Book {
         val whitespace = lines(firstLine).indexWhere(!_.isWhitespace)
         val things =
           lines.drop(firstLine + 1)
-            .takeWhile{ x =>
-            val firstCharIndex = x.indexWhere(!_.isWhitespace)
-            firstCharIndex == -1 || firstCharIndex >= whitespace + (if (indented) 1 else 0)
-          }
+               .takeWhile{ x =>
+                  if (end == "") {
+                    val firstCharIndex = x.indexWhere(!_.isWhitespace)
+                    firstCharIndex == -1 || firstCharIndex >= whitespace + (if (indented) 1 else 0)
+                  }else{
+                    !x.contains(end)
+                  }
+               }
 
         val stuff =
           if (!indented) {
@@ -158,10 +167,7 @@ object Book {
           }
         stuff.map(_.drop(whitespace)).mkString("\n")
       }
-
       pre(code(cls:=lang + " highlight-me", blob))
     }
   }
-
-
 }
