@@ -20,7 +20,7 @@
   @p
     To begin with, lets remove all the existing stuff in our @code{.scala} file and leave only the @hli.scala{object} and the @hli.scala{main} method. Let's start off with some necessary boilerplate:
 
-  @hl.ref("examples/src/main/scala/ScratchPad.scala", "/*setup*/", end = "/*code*/")
+  @hl.ref("examples/src/main/scala/canvasapp/ScratchPad.scala", "/*setup*/", end = "/*code*/")
 
   @p
     As described earlier, this code uses the @hli.javascript{document.getElementById} function to fish out the @code{canvas} element that we interested in from the DOM. It then gets a rendering context from that @code{canvas}, and sets the height and width of the canvas to completely fill its containing element. Lastly, it fills out the canvas light-gray, so that we can see it on the page.
@@ -30,7 +30,7 @@
 
   @div(cls:="pure-g")
     @div(cls:="pure-u-1 pure-u-md-13-24")
-      @hl.ref("examples/src/main/scala/ScratchPad.scala", "/*code*/")
+      @hl.ref("examples/src/main/scala/canvasapp/ScratchPad.scala", "/*code*/")
 
     @div(cls:="pure-u-1 pure-u-md-11-24")
       @canvas(id:="canvas2", display:="block")
@@ -55,7 +55,7 @@
   @p
     Again, we need roughly the same boilerplate as just now to set up the canvas:
 
-  @hl.ref("examples/src/main/scala/Clock.scala", "/*setup*/", "/*code*/")
+  @hl.ref("examples/src/main/scala/canvasapp/Clock.scala", "/*setup*/", "/*code*/")
 
   @p
     The only thing unusual here is that I'm going to create a @hli.scala{linearGradient} in order to make the stopwatch look pretty. This is by no means necessary, and you could simply make the @hli.scala{fillStyle} @hli.scala{"black"} if you want to keep things simple.
@@ -65,7 +65,7 @@
 
   @div(cls:="pure-g")
     @div(cls:="pure-u-1 pure-u-md-13-24")
-      @hl.ref("examples/src/main/scala/Clock.scala", "/*code*/")
+      @hl.ref("examples/src/main/scala/canvasapp/Clock.scala", "/*code*/")
 
     @div(cls:="pure-u-1 pure-u-md-11-24")
       @canvas(id:="canvas3", display:="block")
@@ -98,7 +98,7 @@
     It's a relatively simple game, but there should be enough "business logic" in here that we won't be simply gluing together APIs. Let's start!
 
   @sect{Setting Up the Canvas}
-    @hl.ref("examples/src/main/scala/FlappyLine.scala", "/*setup*/", end="/*variables*/")
+    @hl.ref("examples/src/main/scala/canvasapp/FlappyLine.scala", "/*setup*/", end="/*variables*/")
 
     @p
       This section of the code is peripherally necessary, but not core to the implementation or logic of Flappy Box. We see the same @hli.scala{canvas}/@hli.scala{renderer} logic we've seen in all our examples, along with some logic to make the canvas a reasonable size, and some configuration of how we will render text to the canvas.
@@ -107,7 +107,7 @@
       In general, code like this will usually end up being necessary in a Scala.js program: the Javascript APIs that the browser provides to do things often ends up being somewhat roundabout and verbose. It's somewhat annoying to have to do for a small program such as this one, but in a larger application, the cost is both spread out over thousands of lines of code and also typically hidden away in some helpers, so you don't have to mess with this stuff unless you really want to.
 
   @sect{Defining our State}
-    @hl.ref("examples/src/main/scala/FlappyLine.scala", "/*variables*/", end="def runDead")
+    @hl.ref("examples/src/main/scala/canvasapp/FlappyLine.scala", "/*variables*/", end="def runDead")
 
     @p
       This is where we start defining things that are relevant to Flappy Box. There are roughly two groups of values here: immutable constants in the top group, and mutable variables in the bottom. The rough meaning of each variable is documented in the comments, and we'll see exactly how we use them later. 
@@ -116,7 +116,7 @@
       One notable thing is that we're using a @hli.scala{collection.mutable.Queue} to store the list of obstacles. This is defined in the Scala standard library; in general, all the collections in the Scala standard library can be used without issue in Scala.js.
 
   @sect{Game Logic}
-    @hl.ref("examples/src/main/scala/FlappyLine.scala", "def runLive", "def runDead")    
+    @hl.ref("examples/src/main/scala/canvasapp/FlappyLine.scala", "def runLive", "def runDead")    
 
     @p
       The @hli.scala{runLive} function is the meat of Flappy Box. In it, we
@@ -136,13 +136,13 @@
     @p    
       This function basically contains all the game logic, from motion, to collision-detection, to rendering, so it's pretty large. Not that large though! And entirely understandable, even if it takes a few moments to read through.
 
-    @hl.ref("examples/src/main/scala/FlappyLine.scala", "def runDead", end="def run")    
+    @hl.ref("examples/src/main/scala/canvasapp/FlappyLine.scala", "def runDead", end="def run")    
 
     @p
       This is the function that handles what happens when you're dead. Essentially, we reset all the mutable variables to their initial state, and just count down the @hli.scala{dead} counter until it reaches zero and we're considered alive again.
 
   @sect{A Working Product}
-    @hl.ref("examples/src/main/scala/FlappyLine.scala", "def run")    
+    @hl.ref("examples/src/main/scala/canvasapp/FlappyLine.scala", "def run")    
 
     @p
       And finally, this is the code that kicks everything off: we define the @hli.scala{run} function to swap between @hli.scala{runLive} and @hli.scala{runDead}, register an @hli.scala{canvas.onclick} handler to make the player jump by tweaking his velocity, and we call @code{setInterval} to run the @hli.scala{run} function every 20 milliseconds.

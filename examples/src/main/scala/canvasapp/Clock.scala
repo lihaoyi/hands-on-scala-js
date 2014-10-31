@@ -1,7 +1,10 @@
+package canvasapp
+
 
 import org.scalajs.dom
+
+import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
-import scalajs.js
 @JSExport
 object Clock extends{
   @JSExport

@@ -1,3 +1,5 @@
+package canvasapp
+
 
 import org.scalajs.dom
 

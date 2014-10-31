@@ -1,4 +1,5 @@
-import Math._
+import java.lang.Math._
+
 import org.scalajs.dom
 
 import scala.scalajs.js.annotation.JSExport

@@ -1,8 +1,10 @@
+package canvasapp
+
 
 import org.scalajs.dom
+
 import scala.scalajs.js.annotation.JSExport
 import scala.util.Random
-import scalajs.js
 
 @JSExport
 object FlappyLine extends{

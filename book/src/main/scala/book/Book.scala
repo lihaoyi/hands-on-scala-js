@@ -15,6 +15,7 @@ object Book {
   lazy val intro = sect("Intro to Scala.js")(twf("book/intro.tw"))
   lazy val gettingStarted = sect("Getting Started")(twf("book/getting-started.tw"))
   lazy val canvasApp = sect("Canvas App")(twf("book/canvas-app.tw"))
+  lazy val webPage = sect("Interactive Web Pages")(twf("book/web-page.tw"))
   val txt = twf("book/index.tw")
   val contentBar = {
     def rec(current: Node, depth: Int): Seq[Frag] = {

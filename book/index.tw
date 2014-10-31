@@ -17,7 +17,7 @@
     @Book.intro
     @Book.gettingStarted
     @Book.canvasApp
-
+    @Book.webPage
 
 
 

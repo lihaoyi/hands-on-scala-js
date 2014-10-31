@@ -33,11 +33,4 @@ lazy val book = Project(
     (artifactPath in (examples, Compile, fastOptJS)).value
   }
 )
-lazy val examples = project.in(file("examples")).settings(scalaJSSettings:_*).settings(
-  name := "Example",
-  version := "0.1-SNAPSHOT",
-  scalaVersion := "2.11.1",
-  libraryDependencies ++= Seq(
-    "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"
-  )
-)
+lazy val examples = project.in(file("examples"))
