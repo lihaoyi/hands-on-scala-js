@@ -74,13 +74,11 @@ object BasicTests extends TestSuite{
       'attributes{
         check(
           tw("""
-          @div(id:="my-id") omg
           @div(id:="my-id"){ omg }
           @div(id:="my-id")
             omg
               """),
           """
-          <divid="my-id">omg</div>
           <divid="my-id">omg</div>
           <divid="my-id">omg</div>
           """
@@ -134,11 +132,12 @@ object BasicTests extends TestSuite{
 
           check(
             tw("""
-              @h1 Hello World
-              @h2 hello
-                  @world
+              @h1
+                Hello World
+              @h2
+                hello @world
               @h3
-                  Cow
+                Cow
             """),
             """
               <h1>HelloWorld</h1>
@@ -157,9 +156,9 @@ object BasicTests extends TestSuite{
                   @div Cow
             """),
             """
-              <h1><span></span><a></a>HelloWorld</h1>
-              <h2><span></span><a></a>hello<b>world</b></h2>
-              <h3><i></i><div>Cow</div></h3>
+              <h1></h1><span></span><a></a>HelloWorld
+              <h2></h2><span></span><a></a>hello<b></b>world
+              <h3></h3><i></i><div></div>Cow
             """
           )
         }
@@ -213,7 +212,7 @@ object BasicTests extends TestSuite{
             <div>
               Hello
               <div>
-                <h1>WORLD<b>!!!</b>lol</h1>
+                <h1></h1>WORLD<b>!!!</b>lol
                 <p><h2>Header2</h2></p>
               </div>
             </div>
@@ -227,13 +226,15 @@ object BasicTests extends TestSuite{
           tw("""
             @ul
               @things.map { x =>
-                @li @x
+                @li
+                  @x
               }
           """),
-          tw("""
+          Internals.twDebug("""
             @ul
-              @things.map  x =>
-                @li @x
+              @things.map x =>
+                @li
+                  @x
 
           """),
           """
@@ -319,7 +320,8 @@ object BasicTests extends TestSuite{
           tw("""
             @if(false)
               Hello
-            @else lols
+            @else
+              lols
             @p
           """),
           "lols<p></p>"
@@ -330,7 +332,8 @@ object BasicTests extends TestSuite{
             @div
               @if(true)
                 Hello
-              @else lols
+              @else
+                lols
           """),
           "<div>Hello</div>"
         )
@@ -338,15 +341,19 @@ object BasicTests extends TestSuite{
         * - check(
           tw("""
             @div
-              @if(true) Hello
-              @else lols
+              @if(true)
+                Hello
+              @else
+                lols
           """),
           "<div>Hello</div>"
         )
         * - check(
           tw("""
-            @if(false) Hello
-            @else lols
+            @if(false)
+              Hello
+            @else
+              lols
           """),
           "lols"
         )

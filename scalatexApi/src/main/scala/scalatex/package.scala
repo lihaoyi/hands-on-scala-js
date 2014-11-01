@@ -15,11 +15,13 @@ package object scalatex {
   def twf(filename: String): Frag = macro Internals.applyMacroFile
   object Internals {
 
+    def twRuntimeErrors(expr: String): Frag = macro applyMacroRuntimeErrors
     def twDebug(expr: String): Frag = macro applyMacroDebug
 
-    def applyMacro(c: Context)(expr: c.Expr[String]): c.Expr[Frag] = applyMacroFull(c)(expr, false)
+    def applyMacro(c: Context)(expr: c.Expr[String]): c.Expr[Frag] = applyMacroFull(c)(expr, false, false)
+    def applyMacroDebug(c: Context)(expr: c.Expr[String]): c.Expr[Frag] = applyMacroFull(c)(expr, false, true)
 
-    def applyMacroDebug(c: Context)(expr: c.Expr[String]): c.Expr[Frag] = applyMacroFull(c)(expr, true)
+    def applyMacroRuntimeErrors(c: Context)(expr: c.Expr[String]): c.Expr[Frag] = applyMacroFull(c)(expr, true, false)
 
     def applyMacroFile(c: Context)(filename: c.Expr[String]): c.Expr[Frag] = {
       import c.universe._
@@ -34,34 +36,46 @@ package object scalatex {
         txt.toCharArray
       )
 
-      compileThing(c)(txt, sourceFile, 0, false)
+      compileThing(c)(txt, sourceFile, 0, false, false)
     }
 
     case class DebugFailure(msg: String, pos: String) extends Exception(msg)
 
-    private[this] def applyMacroFull(c: Context)(expr: c.Expr[String], runtimeErrors: Boolean): c.Expr[Frag] = {
+    private[this] def applyMacroFull(c: Context)
+                      (expr: c.Expr[String],
+                       runtimeErrors: Boolean,
+                       debug: Boolean)
+                      : c.Expr[Frag] = {
       import c.universe._
       val s = expr.tree
-        .asInstanceOf[Literal]
-        .value
-        .value
-        .asInstanceOf[String]
+                  .asInstanceOf[Literal]
+                  .value
+                  .value
+                  .asInstanceOf[String]
       val stringStart =
         expr.tree
           .pos
           .lineContent
           .drop(expr.tree.pos.column)
           .take(2)
+      val indented = s |> stages.IndentHandler
+      if (debug) println(indented)
       compileThing(c)(
-        s |> stages.IndentHandler,
+        indented,
         expr.tree.pos.source,
         expr.tree.pos.point + (if (stringStart == "\"\"") 1 else -1),
-        runtimeErrors
+        runtimeErrors,
+        debug
       )
     }
   }
 
-  def compileThing(c: Context)(s: String, source: SourceFile, point: Int, runtimeErrors: Boolean) = {
+  def compileThing(c: Context)
+                  (s: String,
+                   source: SourceFile,
+                   point: Int,
+                   runtimeErrors: Boolean,
+                   debug: Boolean) = {
     import c.universe._
     def compile(s: String): c.Tree = {
       val realPos = new OffsetPosition(source, point).asInstanceOf[c.universe.Position]
@@ -71,13 +85,15 @@ package object scalatex {
 
     import c.Position
     try {
-      c.Expr(c.typeCheck(compile(s)))
+      val compiled = compile(s)
+      if (debug) println(compiled)
+      c.Expr[Frag](c.typeCheck(compiled))
     } catch {
       case e@TypecheckException(pos: Position, msg) =>
         if (!runtimeErrors) c.abort(pos, msg)
         else {
           val posMsg = pos.lineContent + "\n" + (" " * pos.column) + "^"
-          c.Expr( q"""throw twist.Internals.DebugFailure($msg, $posMsg)""")
+          c.Expr( q"""throw scalatex.Internals.DebugFailure($msg, $posMsg)""")
         }
     }
 

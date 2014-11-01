@@ -49,8 +49,15 @@ object IndentHandler extends (String => String){
 //      println(spaces, current)
 
       val declRemainder = successRemainder(Parser.parse(current.trim, _.templateDeclaration()))
-
-      val exprRemainder = successRemainder(Parser.parse(current.trim, _.expression())).filter(_ == current.trim)
+//      println("::::::" + current.trim)
+//      println(successRemainder(Parser.parse(current.trim, _.expression())))
+      val exprRemainder = successRemainder(Parser.parse(current.trim, _.expression())).filter {
+        // Either it takes up the entire line or the line ends with a =>, in which case
+        // we assume the guy wanted to pass a lambda
+        x =>
+//          println(x)
+          x == current.trim || current.trim.endsWith("=>")
+      }
 
 
       /**
@@ -81,13 +88,12 @@ object IndentHandler extends (String => String){
           val newFirst =
             if (!before.startsWith("@else")) before
             else before.dropRight("@else".length)+ "} else"
-
+          println(before, after, delta)
           if (delta > 0 && noBraceLine(after)) newFirst + "{" + after
           else if (delta <= 0 && noBraceLine(after) && after.trim != "") newFirst + "{" + after + "}" * (1 - elseCorrection)
           else current
-
-
       }
+
 
       val closing = "}" * (-delta - elseCorrection)
 

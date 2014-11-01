@@ -3,7 +3,7 @@ package scalatex
 import utest._
 import scalatex.stages._
 import scalatags.Text.all._
-import scalatex.Internals.{DebugFailure, twDebug}
+import scalatex.Internals.{DebugFailure, twRuntimeErrors}
 
 /**
 * Created by haoyi on 7/14/14.
@@ -31,109 +31,109 @@ object ErrorTests extends TestSuite{
 
 
     'simple - check(
-      twDebug("omg @notInScope lol"),
+      twRuntimeErrors("omg @notInScope lol"),
       """not found: value notInScope""",
       """
-      twDebug("omg @notInScope lol"),
-                   ^
+      twRuntimeErrors("omg @notInScope lol"),
+                           ^
       """
     )
 
     'chained{
       'properties {
         * - check(
-          twDebug("omg @math.lol lol"),
+          twRuntimeErrors("omg @math.lol lol"),
           """object lol is not a member of package math""",
           """
-          twDebug("omg @math.lol lol"),
-                            ^
+          twRuntimeErrors("omg @math.lol lol"),
+                                    ^
           """
         )
 
         * - check(
-          twDebug("omg @math.E.lol lol"),
+          twRuntimeErrors("omg @math.E.lol lol"),
           """value lol is not a member of Double""",
           """
-          twDebug("omg @math.E.lol lol"),
-                              ^
+          twRuntimeErrors("omg @math.E.lol lol"),
+                                      ^
           """
         )
         * - check(
-          twDebug("omg @_root_.scala.math.lol lol"),
+          twRuntimeErrors("omg @_root_.scala.math.lol lol"),
           """object lol is not a member of package math""",
           """
-          twDebug("omg @_root_.scala.math.lol lol"),
-                                         ^
+          twRuntimeErrors("omg @_root_.scala.math.lol lol"),
+                                                 ^
           """
         )
         * - check(
-          twDebug("omg @_root_.scala.gg.lol lol"),
+          twRuntimeErrors("omg @_root_.scala.gg.lol lol"),
           """object gg is not a member of package scala""",
           """
-          twDebug("omg @_root_.scala.gg.lol lol"),
-                                    ^
+          twRuntimeErrors("omg @_root_.scala.gg.lol lol"),
+                                            ^
           """
         )
         * - check(
-          twDebug("omg @_root_.ggnore.math.lol lol"),
+          twRuntimeErrors("omg @_root_.ggnore.math.lol lol"),
           """object ggnore is not a member of package <root>""",
           """
-          twDebug("omg @_root_.ggnore.math.lol lol"),
-                              ^
+          twRuntimeErrors("omg @_root_.ggnore.math.lol lol"),
+                                      ^
           """
         )
       }
       'calls{
         * - check(
-          twDebug("@scala.QQ.abs(-10).tdo(10).sum.z"),
+          twRuntimeErrors("@scala.QQ.abs(-10).tdo(10).sum.z"),
           """object QQ is not a member of package scala""",
           """
-          twDebug("@scala.QQ.abs(-10).tdo(10).sum.z"),
-                         ^
+          twRuntimeErrors("@scala.QQ.abs(-10).tdo(10).sum.z"),
+                                 ^
           """
         )
         * - check(
-          twDebug("@scala.math.abs(-10).tdo(10).sum.z"),
+          twRuntimeErrors("@scala.math.abs(-10).tdo(10).sum.z"),
           "value tdo is not a member of Int",
           """
-          twDebug("@scala.math.abs(-10).tdo(10).sum.z"),
-                                       ^
+          twRuntimeErrors("@scala.math.abs(-10).tdo(10).sum.z"),
+                                               ^
           """
         )
         * - check(
-          twDebug("@scala.math.abs(-10).to(10).sum.z"),
+          twRuntimeErrors("@scala.math.abs(-10).to(10).sum.z"),
           "value z is not a member of Int",
           """
-          twDebug("@scala.math.abs(-10).to(10).sum.z"),
-                                                  ^
+          twRuntimeErrors("@scala.math.abs(-10).to(10).sum.z"),
+                                                          ^
           """
         )
         * - check(
-          twDebug("@scala.math.abs(-10).to(10).sum.z()"),
+          twRuntimeErrors("@scala.math.abs(-10).to(10).sum.z()"),
           "value z is not a member of Int",
           """
-          twDebug("@scala.math.abs(-10).to(10).sum.z()"),
-                                                  ^
+          twRuntimeErrors("@scala.math.abs(-10).to(10).sum.z()"),
+                                                          ^
           """
         )
         * - check(
-          twDebug("@scala.math.abs(-10).cow.sum.z"),
+          twRuntimeErrors("@scala.math.abs(-10).cow.sum.z"),
           "value cow is not a member of Int",
           """
-          twDebug("@scala.math.abs(-10).cow.sum.z"),
-                                       ^
+          twRuntimeErrors("@scala.math.abs(-10).cow.sum.z"),
+                                               ^
           """
         )
         * - check(
-          twDebug("@scala.smath.abs.cow.sum.z"),
+          twRuntimeErrors("@scala.smath.abs.cow.sum.z"),
           "object smath is not a member of package scala",
           """
-          twDebug("@scala.smath.abs.cow.sum.z"),
-                         ^
+          twRuntimeErrors("@scala.smath.abs.cow.sum.z"),
+                                 ^
           """
         )
         * - check(
-          twDebug("""
+          twRuntimeErrors("""
             I am cow hear me moo
             @scala.math.abs(-10).tdo(10).sum.z
             I weigh twice as much as you
@@ -147,20 +147,20 @@ object ErrorTests extends TestSuite{
       }
       'callContents{
         * - check(
-          twDebug("@scala.math.abs((1, 2).wtf)"),
+          twRuntimeErrors("@scala.math.abs((1, 2).wtf)"),
           "value wtf is not a member of (Int, Int)",
           """
-          twDebug("@scala.math.abs((1, 2).wtf)"),
-                                         ^
+          twRuntimeErrors("@scala.math.abs((1, 2).wtf)"),
+                                                 ^
           """
         )
 
         * - check(
-          twDebug("@scala.math.abs((1, 2).swap._1.toString().map(_.toString.wtf))"),
+          twRuntimeErrors("@scala.math.abs((1, 2).swap._1.toString().map(_.toString.wtf))"),
           "value wtf is not a member of String",
           """
-          twDebug("@scala.math.abs((1, 2).swap._1.toString().map(_.toString.wtf))"),
-                                                                           ^
+          twRuntimeErrors("@scala.math.abs((1, 2).swap._1.toString().map(_.toString.wtf))"),
+                                                                                   ^
           """
         )
       }
@@ -168,33 +168,33 @@ object ErrorTests extends TestSuite{
     'ifElse{
       'oneLine {
         * - check(
-          twDebug("@if(math > 10){ 1 }else{ 2 }"),
+          twRuntimeErrors("@if(math > 10){ 1 }else{ 2 }"),
           "object > is not a member of package math",
           """
-          twDebug("@if(math > 10){ 1 }else{ 2 }"),
-                            ^
+          twRuntimeErrors("@if(math > 10){ 1 }else{ 2 }"),
+                                    ^
           """
         )
         * - check(
-          twDebug("@if(true){ (@math.pow(10)) * 10  }else{ 2 }"),
+          twRuntimeErrors("@if(true){ (@math.pow(10)) * 10  }else{ 2 }"),
           "Unspecified value parameter y",
           """
-          twDebug("@if(true){ (@math.pow(10)) * 10  }else{ 2 }"),
-                                       ^
+          twRuntimeErrors("@if(true){ (@math.pow(10)) * 10  }else{ 2 }"),
+                                               ^
           """
         )
         * - check(
-          twDebug("@if(true){ * 10  }else{ @math.sin(3, 4, 5) }"),
+          twRuntimeErrors("@if(true){ * 10  }else{ @math.sin(3, 4, 5) }"),
           "too many arguments for method sin: (x: Double)Double",
           """
-          twDebug("@if(true){ * 10  }else{ @math.sin(3, 4, 5) }"),
-                                                   ^
+          twRuntimeErrors("@if(true){ * 10  }else{ @math.sin(3, 4, 5) }"),
+                                                           ^
           """
         )
       }
       'multiLine{
         * - check(
-          twDebug("""
+          twRuntimeErrors("""
             Ho Ho Ho
 
             @if(math != 10)
@@ -210,7 +210,7 @@ object ErrorTests extends TestSuite{
           """
         )
         * - check(
-          twDebug("""
+          twRuntimeErrors("""
             Ho Ho Ho
 
             @if(4 != 10)
@@ -226,7 +226,7 @@ object ErrorTests extends TestSuite{
           """
         )
         * - check(
-          twDebug("""
+          twRuntimeErrors("""
             Ho Ho Ho
 
             @if(12 != 10)
@@ -246,26 +246,26 @@ object ErrorTests extends TestSuite{
     'forLoop{
       'oneLine{
         'header - check(
-          twDebug("omg @for(x <- (0 + 1 + 2) omglolol (10 + 11 + 2)){ hello }"),
+          twRuntimeErrors("omg @for(x <- (0 + 1 + 2) omglolol (10 + 11 + 2)){ hello }"),
           """value omglolol is not a member of Int""",
           """
-          twDebug("omg @for(x <- (0 + 1 + 2) omglolol (10 + 11 + 2)){ hello }"),
-                                              ^
+          twRuntimeErrors("omg @for(x <- (0 + 1 + 2) omglolol (10 + 11 + 2)){ hello }"),
+                                                      ^
           """
         )
 
         'body - check(
-          twDebug("omg @for(x <- 0 until 10){ @((x, 2) + (1, 2)) }"),
+          twRuntimeErrors("omg @for(x <- 0 until 10){ @((x, 2) + (1, 2)) }"),
           """too many arguments for method +""",
           """
-          twDebug("omg @for(x <- 0 until 10){ @((x, 2) + (1, 2)) }"),
-                                                       ^
+          twRuntimeErrors("omg @for(x <- 0 until 10){ @((x, 2) + (1, 2)) }"),
+                                                               ^
           """
         )
       }
       'multiLine{
         'body - check(
-          twDebug("""
+          twRuntimeErrors("""
             omg
             @for(x <- 0 until 10)
               I am cow hear me moo
@@ -281,7 +281,7 @@ object ErrorTests extends TestSuite{
     }
     'multiLine{
       'missingVar - check(
-        twDebug("""
+        twRuntimeErrors("""
         omg @notInScope lol
         """),
         """not found: value notInScope""",
@@ -291,7 +291,7 @@ object ErrorTests extends TestSuite{
         """
       )
       'wrongType - check(
-        twDebug("""
+        twRuntimeErrors("""
         omg @{() => ()} lol
         """),
         """type mismatch""",
@@ -302,7 +302,7 @@ object ErrorTests extends TestSuite{
       )
 
       'bigExpression - check(
-        twDebug("""
+        twRuntimeErrors("""
           @{
             val x = 1 + 2
             val y = new Object()

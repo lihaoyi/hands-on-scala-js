@@ -1,3 +1,5 @@
+
+
 @p
   Most web applications aren't neat little games which live on a single canvas: they are large, structured HTML pages, which involve displaying data (whether from the user or from the web) in multiple ways, while allowing the user to make changes to the data that can be saved back to whatever remote web-service/database it came from.
 
@@ -16,6 +18,7 @@
     @div(cls:="pure-u-1 pure-u-md-11-24")
       @div(id:="div1")
       @script("HelloWorld0().main(document.getElementById('div1'))")
+
 
   @p
     This approach works, as the above example shows, but has a couple of disadvantages:
@@ -125,8 +128,5 @@
   @p
     Now that you've gotten a quick overview of the kinds of things you can do with Scalatags, let's move on to the next section of our hands-on tutorial...
 
-@sect{Using Web Services} 
-  
-  @p
-    One half of the web application faces forwards towards the user, managing and rendering HTML or Canvas for the user to view and interact with. Another half faces backwards, talking to various web-services or databases which turn the application from a standalone-widget into part of a greater whole. We've already seen how to make the front half, let's now talk about working with the back half.
+@sect{Using Web Services}
 

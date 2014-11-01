@@ -75,6 +75,7 @@ object Compiler{
           q"if($cond){ Seq[$fragType](..$b1): $fragType } else { Seq[$fragType](..$b2): $fragType }"
 
         case xx @ WN.ScalaExp(WN.Simple(first, _) +: rest, offset) =>
+
           val firstTree = c.parse(first)
 
           firstTree.foreach{x =>
