@@ -170,8 +170,16 @@ object ErrorTests extends TestSuite{
             """
           twRuntimeErrors("@Nil.map{(x: Int, y: String) => omg}"),
                                                 ^
-            """
-          )
+          """
+        )
+        * - check(
+          twRuntimeErrors("@Nil.map{ omg}"),
+          "too many arguments for method map",
+          """
+          twRuntimeErrors("@Nil.map{ omg}"),
+                                    ^
+          """
+        )
       }
       'callContents{
         * - check(
