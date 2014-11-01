@@ -130,3 +130,6 @@
 
 @sect{Using Web Services}
 
+  @p
+    One half of the web application faces forwards towards the user, managing and rendering HTML or Canvas for the user to view and interact with. Another half faces backwards, talking to various web-services or databases which turn the application from a standalone-widget into part of a greater whole. We've already seen how to make the front half, let's now talk about working with the back half.
+

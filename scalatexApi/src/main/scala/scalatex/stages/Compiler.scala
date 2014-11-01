@@ -22,15 +22,26 @@ object Compiler{
       ).asInstanceOf[c.universe.Position]
     }
     def compileTree(frag: WN.TemplateTree): Tree = {
-      println(frag)
+
 //      println(frag)
       val fragPos = posFor(literalPos.point + frag.offset)
-      def fragPosFor(offset: Int) = posFor(fragPos.point + offset)
-      def atFragPos(t: Tree, offset: Int) = atPos(fragPosFor(offset))(t)
+      def fragPosFor(offset: Int) = {
+        println(posFor(fragPos.point + offset))
+        posFor(fragPos.point + offset)
+      }
+      def atFragPos(t: Tree, offset: Int) = {
+        println(t)
+        atPos(fragPosFor(offset))(t)
+      }
+      def setFragPos(t: Tree, offset: Int) = {
+        println(t)
+        c.internal.setPos(t, fragPosFor(offset))
+        t
+      }
 //      println(s"${frag.offset}\n${literalPos.point}\n${pos.point}\n$frag\n")
 
       val f: Tree = frag match {
-        case WN.Plain(text, offset) => q"$text"
+        case WN.Plain(text, offset) => atPos(fragPos)(q"$text")
         case WN.Display(exp, offset) => compileTree(exp)
         case WN.Comment(msg, offset) => q""
         case WN.ScalaExp(Seq(WN.Simple(first, _), WN.Block(ws, args, content, _)), offset)
@@ -40,24 +51,20 @@ object Compiler{
 //          println("FIRST " + first)
           skeleton.foreach{x =>
             x
-            if (x.pos != NoPosition) c.internal.setPos(x, fragPosFor(x.pos.point + 1))
+            if (x.pos != NoPosition) setFragPos(x, x.pos.point + 1)
           }
           val b = content.map(compileTree(_))
           def rec(t: Tree): Tree = t match {
             case a @ Apply(fun, List(f @ Function(vparams, body))) =>
               val f2 = Function(vparams, rec(body))
               val a2 = Apply(fun, List(f2))
-              c.internal.setPos(a2, a.pos)
-              c.internal.setPos(f2, f.pos)
+              atPos(a.pos)(a2)
+              atPos(f.pos)(f2)
               a2
             case Ident(x: TermName) if x.decoded == fresh =>
               q"Seq[$fragType](..$b)"
           }
-
-          val out = rec(skeleton)
-
-
-          out
+          rec(skeleton)
 
         case WN.ScalaExp(WN.Simple(first, _) +: WN.Block(_, None, content1, _) +: rest, offset)
           if first.startsWith("if(") =>
@@ -65,7 +72,7 @@ object Compiler{
           val b1 = content1.map(compileTree(_))
           val tree = c.parse(first + "{}").asInstanceOf[If]
           tree.foreach{x =>
-            c.internal.setPos(x, fragPosFor(x.pos.point + 1))
+            setFragPos(x, x.pos.point + 1)
           }
           val If(cond, _, _) = tree
           val b2 = rest match{
@@ -76,11 +83,11 @@ object Compiler{
           q"if($cond){ Seq[$fragType](..$b1): $fragType } else { Seq[$fragType](..$b2): $fragType }"
 
         case xx @ WN.ScalaExp(WN.Simple(first, _) +: rest, offset) =>
-          println("xx " + xx)
+
           val firstTree = c.parse(first)
 
           firstTree.foreach{x =>
-            c.internal.setPos(x, fragPosFor(x.pos.point))
+            setFragPos(x, x.pos.point)
           }
 
           val s = rest.foldLeft[Tree](firstTree) {
@@ -92,35 +99,28 @@ object Compiler{
               val skeleton = c.parse(snippet)
 
               def rec(t: Tree): Tree = {
-                val newPos = fragPosFor(t.pos.point + first.length - fresh.length)
+
                 val res = t match {
                   case Apply(fun, args) =>
                     for(arg <- args; tree <- arg if tree.pos != NoPosition){
-                      c.internal.setPos(tree, posFor(tree.pos.point + newPos.point - t.pos.point))
+                      c.internal.setPos(tree, posFor(tree.pos.point - first.length + fresh.length))
                     }
 
                     Apply(rec(fun), args)
                   case Select(qualifier, name) => Select(rec(qualifier), name)
                   case Ident(x: TermName) if x.decoded == fresh => l
                 }
-                c.internal.setPos(res, newPos)
-                println("CC " + res)
+                atFragPos(res, t.pos.point + first.length - fresh.length)
 //                println(Position.formatMessage(newPos.asInstanceOf[scala.reflect.internal.util.Position], "", true))
                 res
               }
+              rec(skeleton)
 
+            case (l, WN.Block(ws, None, content, offset)) =>
+              val contentTrees = content.map(compileTree(_))
+              atFragPos(q"$l(..$contentTrees)", offset)
 
-              val res = rec(skeleton)
-              res
-
-            case (l, b @ WN.Block(ws, None, content, _)) =>
-              val contentTrees = content.map( c =>
-                atPos(fragPosFor(c.offset))(compileTree(c))
-              )
-              val res = atPos(fragPosFor(b.offset))(q"$l(..$contentTrees)")
-              res
-
-            case (l, b @ WN.Block(ws, Some(args), content, _)) =>
+            case (l, WN.Block(ws, Some(args), content, offset)) =>
 
               val snippet = s"{$args ()}"
               val skeleton = c.parse(snippet)
@@ -128,30 +128,20 @@ object Compiler{
               val Function(vparams, body) = skeleton
 
               vparams.map(_.foreach { t =>
-                println(t + "\t" + t.pos)
                 if (t.pos != NoPosition)
-                  c.internal.setPos(t, fragPosFor(t.pos.point))
+                  setFragPos(t, t.pos.point)
               })
-              val contentTrees = content.map{t =>
-                val tree = compileTree(t)
-                c.internal.setPos(tree, fragPosFor(t.offset))
-                tree
-              }
+              val contentTrees = content.map{compileTree(_)}
 
               val func = Function(vparams, q"Seq[$fragType](..$contentTrees)")
-              c.internal.setPos(func, fragPosFor(skeleton.pos.point))
+              atFragPos(func, skeleton.pos.point)
               val res = q"$l($func)"
-              c.internal.setPos(res, fragPosFor(b.offset))
+              atFragPos(res, offset)
               res
           }
 
           s
       }
-
-//      f.foreach(_.pos = pos)
-
-//      println("XXX " + f.pos)
-//      println("F " + f)
       f
     }
 
@@ -168,7 +158,6 @@ object Compiler{
       val innerDefs = subs.map(compileTemplate(_))
 
       val body = atPos(literalPos)(q"""{
-        import scalatags.Text.all._
         ..${topImports.map(i => c.parse(i.code))}
         ..$innerDefs
 
