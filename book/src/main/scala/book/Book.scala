@@ -1,6 +1,6 @@
 package book
 
-import twist._
+import scalatex._
 
 import scalatags.Text.tags2
 import scala.collection.mutable
@@ -12,11 +12,7 @@ import scalatags.Text.all._
 object Book {
   import Utils.sect
 
-  lazy val intro = sect("Intro to Scala.js")(twf("book/intro.tw"))
-  lazy val gettingStarted = sect("Getting Started")(twf("book/getting-started.tw"))
-  lazy val canvasApp = sect("Canvas App")(twf("book/canvas-app.tw"))
-  lazy val webPage = sect("Interactive Web Pages")(twf("book/web-page.tw"))
-  val txt = twf("book/index.tw")
+  val txt = Index.template
   val contentBar = {
     def rec(current: Node, depth: Int): Seq[Frag] = {
       println("\t"*depth + current.name)
@@ -69,19 +65,11 @@ object Book {
     )
   ).render
 
-  object hli{
-    def javascript(code: String*) = hl.highlight(code, "javascript", inline=true)
-    def scala(code: String*) = hl.highlight(code, "scala", inline=true)
-    def bash(code: String*) = hl.highlight(code, "bash", inline=true)
-    def diff(code: String*) = hl.highlight(code, "diff", inline=true)
-    def html(code: String*) = hl.highlight(code, "xml", inline=true)
-  }
-
   object hl{
-    def highlight(snippet: Seq[String], lang: String, inline: Boolean) = {
+    def highlight(snippet: Seq[String], lang: String) = {
       val string = snippet.mkString
       val lines = string.split("\n", -1)
-      if (inline){
+      if (lines.length == 1){
         code(cls:=lang + " highlight-me", lines(0), padding:=0, display:="inline")
       }else{
         val minIndent = lines.map(_.takeWhile(_ == ' ').length)
@@ -95,34 +83,11 @@ object Book {
       }
     }
 
-    def javascript(code: String*) = highlight(code, "javascript", inline=false)
-    def scala(code: String*) = highlight(code, "scala", inline=false)
-    def bash(code: String*) = highlight(code, "bash", inline=false)
-    def diff(code: String*) = highlight(code, "diff", inline=false)
-    def html(code: String*) = highlight(code, "xml", inline=false)
-
-    /**
-     * Kinds of refs:
-     *
-     * Rule: Starting from a line, keep consuming until
-     * the identation drops below the start
-     *
-     * def main = {
-     *   /*example*/
-     *   i am a cow
-     *   hear me moo
-     * }
-     *
-     * Rule: Starting from a line, keep consuming until
-     * the indentation becomes equivalent to the current. If
-     * it's a cosing brace, keep it.
-     * val x = omg
-     * val y = zzz
-     *
-     * class C{
-     *
-     * }
-     */
+    def javascript(code: String*) = highlight(code, "javascript")
+    def scala(code: String*) = highlight(code, "scala")
+    def bash(code: String*) = highlight(code, "bash")
+    def diff(code: String*) = highlight(code, "diff")
+    def html(code: String*) = highlight(code, "xml")
 
     def ref(filepath: String, start: String = "", end: String = "\n") = {
 
@@ -140,8 +105,6 @@ object Book {
       val lines = io.Source.fromFile(filepath).getLines().toVector
 
       def indent(line: String) = line.takeWhile(_.isWhitespace).length
-      println(lines)
-      println(start)
 
       val startLine = lines.indexWhere(_.contains(start))
       if (startLine == -1){
