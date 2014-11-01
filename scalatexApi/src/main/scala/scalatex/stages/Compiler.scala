@@ -25,7 +25,8 @@ object Compiler{
       println(frag)
 //      println(frag)
       val fragPos = posFor(literalPos.point + frag.offset)
-
+      def fragPosFor(offset: Int) = posFor(fragPos.point + offset)
+      def atFragPos(t: Tree, offset: Int) = atPos(fragPosFor(offset))(t)
 //      println(s"${frag.offset}\n${literalPos.point}\n${pos.point}\n$frag\n")
 
       val f: Tree = frag match {
@@ -39,7 +40,7 @@ object Compiler{
 //          println("FIRST " + first)
           skeleton.foreach{x =>
             x
-            if (x.pos != NoPosition) c.internal.setPos(x, posFor(x.pos.point + fragPos.point + 1))
+            if (x.pos != NoPosition) c.internal.setPos(x, fragPosFor(x.pos.point + 1))
           }
           val b = content.map(compileTree(_))
           def rec(t: Tree): Tree = t match {
@@ -64,7 +65,7 @@ object Compiler{
           val b1 = content1.map(compileTree(_))
           val tree = c.parse(first + "{}").asInstanceOf[If]
           tree.foreach{x =>
-            c.internal.setPos(x, posFor(x.pos.point + fragPos.point + 1))
+            c.internal.setPos(x, fragPosFor(x.pos.point + 1))
           }
           val If(cond, _, _) = tree
           val b2 = rest match{
@@ -79,7 +80,7 @@ object Compiler{
           val firstTree = c.parse(first)
 
           firstTree.foreach{x =>
-            c.internal.setPos(x, posFor(x.pos.point + fragPos.point))
+            c.internal.setPos(x, fragPosFor(x.pos.point))
           }
 
           val s = rest.foldLeft[Tree](firstTree) {
@@ -91,7 +92,7 @@ object Compiler{
               val skeleton = c.parse(snippet)
 
               def rec(t: Tree): Tree = {
-                val newPos = posFor(fragPos.point + t.pos.point + first.length - fresh.length)
+                val newPos = fragPosFor(t.pos.point + first.length - fresh.length)
                 val res = t match {
                   case Apply(fun, args) =>
                     for(arg <- args; tree <- arg if tree.pos != NoPosition){
@@ -110,15 +111,13 @@ object Compiler{
 
 
               val res = rec(skeleton)
-              println(";;;")
-              println(showCode(res, printPositions = true))
               res
 
             case (l, b @ WN.Block(ws, None, content, _)) =>
               val contentTrees = content.map( c =>
-                atPos(posFor(fragPos.point + c.offset))(compileTree(c))
+                atPos(fragPosFor(c.offset))(compileTree(c))
               )
-              val res = atPos(posFor(fragPos.point + b.offset))(q"$l(..$contentTrees)")
+              val res = atPos(fragPosFor(b.offset))(q"$l(..$contentTrees)")
               res
 
             case (l, b @ WN.Block(ws, Some(args), content, _)) =>
@@ -127,29 +126,22 @@ object Compiler{
               val skeleton = c.parse(snippet)
 
               val Function(vparams, body) = skeleton
-              println("XXXXX")
-              println(snippet)
-              println("XXXXX")
-              println(vparams.map(showCode(_, printPositions = true)))
+
               vparams.map(_.foreach { t =>
                 println(t + "\t" + t.pos)
                 if (t.pos != NoPosition)
-                  c.internal.setPos(t, posFor(fragPos.point + t.pos.point))
+                  c.internal.setPos(t, fragPosFor(t.pos.point))
               })
-              println(vparams.map(showCode(_, printPositions = true)))
-              println("XXXXX")
               val contentTrees = content.map{t =>
                 val tree = compileTree(t)
-                c.internal.setPos(tree, posFor(fragPos.point + t.offset))
+                c.internal.setPos(tree, fragPosFor(t.offset))
                 tree
               }
 
               val func = Function(vparams, q"Seq[$fragType](..$contentTrees)")
-              c.internal.setPos(func, posFor(fragPos.point + skeleton.pos.point))
+              c.internal.setPos(func, fragPosFor(skeleton.pos.point))
               val res = q"$l($func)"
-              c.internal.setPos(res, posFor(fragPos.point + b.offset))
-              println(showCode(res, printPositions = true))
-              println("XXXXX")
+              c.internal.setPos(res, fragPosFor(b.offset))
               res
           }
 
