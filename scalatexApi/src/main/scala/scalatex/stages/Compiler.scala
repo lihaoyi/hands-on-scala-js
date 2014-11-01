@@ -121,16 +121,35 @@ object Compiler{
               val res = atPos(posFor(fragPos.point + b.offset))(q"$l(..$contentTrees)")
               res
 
-            case (l, WN.Block(ws, Some(args), content, _)) =>
+            case (l, b @ WN.Block(ws, Some(args), content, _)) =>
+
               val snippet = s"{$args ()}"
               val skeleton = c.parse(snippet)
-              val Function(vparamss, body) = skeleton
 
-              val func = Function(vparamss, q"Seq[$fragType](..${content.map(compileTree(_))})")
+              val Function(vparams, body) = skeleton
+              println("XXXXX")
+              println(snippet)
+              println("XXXXX")
+              println(vparams.map(showCode(_, printPositions = true)))
+              vparams.map(_.foreach { t =>
+                println(t + "\t" + t.pos)
+                if (t.pos != NoPosition)
+                  c.internal.setPos(t, posFor(fragPos.point + t.pos.point))
+              })
+              println(vparams.map(showCode(_, printPositions = true)))
+              println("XXXXX")
+              val contentTrees = content.map{t =>
+                val tree = compileTree(t)
+                c.internal.setPos(tree, posFor(fragPos.point + t.offset))
+                tree
+              }
+
+              val func = Function(vparams, q"Seq[$fragType](..$contentTrees)")
               c.internal.setPos(func, posFor(fragPos.point + skeleton.pos.point))
               val res = q"$l($func)"
-              c.internal.setPos(res, fragPos)
-              println("BB " + res)
+              c.internal.setPos(res, posFor(fragPos.point + b.offset))
+              println(showCode(res, printPositions = true))
+              println("XXXXX")
               res
           }
 
