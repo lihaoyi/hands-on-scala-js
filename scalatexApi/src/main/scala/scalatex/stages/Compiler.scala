@@ -24,24 +24,28 @@ object Compiler{
     def compileTree(frag: WN.TemplateTree): Tree = {
 
 //      println(frag)
-      val fragPos = posFor(literalPos.point + frag.offset)
-      def fragPosFor(offset: Int) = {
-        println(posFor(fragPos.point + offset))
-        posFor(fragPos.point + offset)
+      object fragPos{
+        private val fragPos = posFor(literalPos.point + frag.offset)
+        private def fragPosFor(offset: Int) = {
+          println(posFor(fragPos.point + offset))
+          posFor(fragPos.point + offset)
+        }
+        def at(t: Tree, offset: Int) = {
+          println(t)
+          atPos(fragPosFor(offset))(t)
+        }
+        def set(t: Tree, offset: Int) = {
+          println(t)
+          c.internal.setPos(t, fragPosFor(offset))
+          t
+        }
       }
-      def atFragPos(t: Tree, offset: Int) = {
-        println(t)
-        atPos(fragPosFor(offset))(t)
-      }
-      def setFragPos(t: Tree, offset: Int) = {
-        println(t)
-        c.internal.setPos(t, fragPosFor(offset))
-        t
-      }
+      
+      
 //      println(s"${frag.offset}\n${literalPos.point}\n${pos.point}\n$frag\n")
 
       val f: Tree = frag match {
-        case WN.Plain(text, offset) => atPos(fragPos)(q"$text")
+        case WN.Plain(text, offset) => fragPos.at(q"$text", 0)
         case WN.Display(exp, offset) => compileTree(exp)
         case WN.Comment(msg, offset) => q""
         case WN.ScalaExp(Seq(WN.Simple(first, _), WN.Block(ws, args, content, _)), offset)
@@ -51,7 +55,7 @@ object Compiler{
 //          println("FIRST " + first)
           skeleton.foreach{x =>
             x
-            if (x.pos != NoPosition) setFragPos(x, x.pos.point + 1)
+            if (x.pos != NoPosition) fragPos.set(x, x.pos.point + 1)
           }
           val b = content.map(compileTree(_))
           def rec(t: Tree): Tree = t match {
@@ -72,7 +76,7 @@ object Compiler{
           val b1 = content1.map(compileTree(_))
           val tree = c.parse(first + "{}").asInstanceOf[If]
           tree.foreach{x =>
-            setFragPos(x, x.pos.point + 1)
+            fragPos.set(x, x.pos.point + 1)
           }
           val If(cond, _, _) = tree
           val b2 = rest match{
@@ -87,7 +91,7 @@ object Compiler{
           val firstTree = c.parse(first)
 
           firstTree.foreach{x =>
-            setFragPos(x, x.pos.point)
+            fragPos.set(x, x.pos.point)
           }
 
           val s = rest.foldLeft[Tree](firstTree) {
@@ -103,14 +107,14 @@ object Compiler{
                 val res = t match {
                   case Apply(fun, args) =>
                     for(arg <- args; tree <- arg if tree.pos != NoPosition){
-                      c.internal.setPos(tree, fragPosFor(tree.pos.point + first.length - fresh.length))
+                      fragPos.set(tree, tree.pos.point + first.length - fresh.length)
                     }
 
                     Apply(rec(fun), args)
                   case Select(qualifier, name) => Select(rec(qualifier), name)
                   case Ident(x: TermName) if x.decoded == fresh => l
                 }
-                atFragPos(res, t.pos.point + first.length - fresh.length)
+                fragPos.at(res, t.pos.point + first.length - fresh.length)
 //                println(Position.formatMessage(newPos.asInstanceOf[scala.reflect.internal.util.Position], "", true))
                 res
               }
@@ -118,7 +122,7 @@ object Compiler{
 
             case (l, WN.Block(ws, None, content, offset)) =>
               val contentTrees = content.map(compileTree(_))
-              atFragPos(q"$l(..$contentTrees)", offset)
+              fragPos.at(q"$l(..$contentTrees)", offset)
 
             case (l, WN.Block(ws, Some(args), content, offset)) =>
 
@@ -129,14 +133,14 @@ object Compiler{
 
               vparams.map(_.foreach { t =>
                 if (t.pos != NoPosition)
-                  setFragPos(t, t.pos.point)
+                  fragPos.set(t, t.pos.point)
               })
               val contentTrees = content.map{compileTree(_)}
 
               val func = Function(vparams, q"Seq[$fragType](..$contentTrees)")
-              atFragPos(func, skeleton.pos.point)
+              fragPos.at(func, skeleton.pos.point)
               val res = q"$l($func)"
-              atFragPos(res, offset)
+              fragPos.at(res, offset)
               res
           }
 
