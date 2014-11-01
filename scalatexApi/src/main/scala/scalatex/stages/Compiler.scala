@@ -18,7 +18,7 @@ object Compiler{
     def posFor(offset: Int) = {
       new OffsetPosition(
         literalPos.source,
-        offset
+        math.min(offset, literalPos.source.length - 1)
       ).asInstanceOf[c.universe.Position]
     }
     def compileTree(frag: WN.TemplateTree): Tree = {
@@ -27,16 +27,20 @@ object Compiler{
       object fragPos{
         private val fragPos = posFor(literalPos.point + frag.offset)
         private def fragPosFor(offset: Int) = {
-          println(posFor(fragPos.point + offset))
-          posFor(fragPos.point + offset)
+          val res = posFor(fragPos.point + offset)
+          println(res.lineContent)
+          res
         }
         def at(t: Tree, offset: Int) = {
           println(t)
-          atPos(fragPosFor(offset))(t)
+          val res = atPos(fragPosFor(offset))(t)
+          println("-")
+          res
         }
         def set(t: Tree, offset: Int) = {
           println(t)
           c.internal.setPos(t, fragPosFor(offset))
+          println("+")
           t
         }
       }
