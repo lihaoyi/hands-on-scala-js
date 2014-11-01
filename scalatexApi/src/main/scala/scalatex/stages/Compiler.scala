@@ -22,7 +22,7 @@ object Compiler{
       ).asInstanceOf[c.universe.Position]
     }
     def compileTree(frag: WN.TemplateTree): Tree = {
-
+      println(frag)
 //      println(frag)
       val fragPos = posFor(literalPos.point + frag.offset)
 
@@ -75,7 +75,7 @@ object Compiler{
           q"if($cond){ Seq[$fragType](..$b1): $fragType } else { Seq[$fragType](..$b2): $fragType }"
 
         case xx @ WN.ScalaExp(WN.Simple(first, _) +: rest, offset) =>
-
+          println("xx " + xx)
           val firstTree = c.parse(first)
 
           firstTree.foreach{x =>
@@ -84,6 +84,7 @@ object Compiler{
 
           val s = rest.foldLeft[Tree](firstTree) {
             case (l, WN.Simple(code, _)) =>
+
               val fresh = c.fresh()
 
               val snippet = s"$fresh$code"
@@ -102,16 +103,23 @@ object Compiler{
                   case Ident(x: TermName) if x.decoded == fresh => l
                 }
                 c.internal.setPos(res, newPos)
-
+                println("CC " + res)
 //                println(Position.formatMessage(newPos.asInstanceOf[scala.reflect.internal.util.Position], "", true))
                 res
               }
 
 
-              rec(skeleton)
+              val res = rec(skeleton)
+              println(";;;")
+              println(showCode(res, printPositions = true))
+              res
 
-            case (l, WN.Block(ws, None, content, _)) =>
-              q"$l(..${content.map(compileTree(_))})"
+            case (l, b @ WN.Block(ws, None, content, _)) =>
+              val contentTrees = content.map( c =>
+                atPos(posFor(fragPos.point + c.offset))(compileTree(c))
+              )
+              val res = atPos(posFor(fragPos.point + b.offset))(q"$l(..$contentTrees)")
+              res
 
             case (l, WN.Block(ws, Some(args), content, _)) =>
               val snippet = s"{$args ()}"
@@ -120,7 +128,10 @@ object Compiler{
 
               val func = Function(vparamss, q"Seq[$fragType](..${content.map(compileTree(_))})")
               c.internal.setPos(func, posFor(fragPos.point + skeleton.pos.point))
-              q"$l($func)"
+              val res = q"$l($func)"
+              c.internal.setPos(res, fragPos)
+              println("BB " + res)
+              res
           }
 
           s
