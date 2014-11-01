@@ -43,7 +43,7 @@
   @p
     In general, you have access to all the DOM APIs through the @hl.scala{dom} package as well as through Javascript objects such as the @hl.scala{dom.HTMLCanvasElement}. Setting the @code{onmouseXXX} callbacks is just one way of interacting with the DOM. With Scala.js, you also get a very handy autocomplete in the editor, which you can use to browse the various other APIs that are available for use:
 
-  @img(src:="images/Dropdown.png", maxWidth:="100%") 
+  @img(src:="images/Dropdown.png", maxWidth:="100%")
 
   @p
     Apart from mouse events, keyboard events, scroll events, input events, etc. are all usable from Scala.js as you'd expect

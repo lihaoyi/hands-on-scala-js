@@ -15,32 +15,27 @@ object Compiler{
 
     import c.universe._
     def fragType = tq"scalatags.Text.all.Frag"
-    def posFor(offset: Int) = {
-      new OffsetPosition(
-        literalPos.source,
-        math.min(offset, literalPos.source.length - 1)
-      ).asInstanceOf[c.universe.Position]
-    }
+
     def compileTree(frag: WN.TemplateTree): Tree = {
 
 //      println(frag)
       object fragPos{
+        def posFor(offset: Int) = {
+          new OffsetPosition(
+            literalPos.source,
+            math.min(offset, literalPos.source.length - 1)
+          ).asInstanceOf[c.universe.Position]
+        }
         private val fragPos = posFor(literalPos.point + frag.offset)
         private def fragPosFor(offset: Int) = {
-          val res = posFor(fragPos.point + offset)
-          println(res.lineContent)
-          res
+          posFor(fragPos.point + offset)
         }
         def at(t: Tree, offset: Int) = {
-          println(t)
           val res = atPos(fragPosFor(offset))(t)
-          println("-")
           res
         }
         def set(t: Tree, offset: Int) = {
-          println(t)
           c.internal.setPos(t, fragPosFor(offset))
-          println("+")
           t
         }
       }

@@ -88,7 +88,7 @@ object IndentHandler extends (String => String){
           val newFirst =
             if (!before.startsWith("@else")) before
             else before.dropRight("@else".length)+ "} else"
-          println(before, after, delta)
+//          println(before, after, delta)
           if (delta > 0 && noBraceLine(after)) newFirst + "{" + after
           else if (delta <= 0 && noBraceLine(after) && after.trim != "") newFirst + "{" + after + "}" * (1 - elseCorrection)
           else current

@@ -230,7 +230,7 @@ object BasicTests extends TestSuite{
                   @x
               }
           """),
-          Internals.twDebug("""
+          tw("""
             @ul
               @things.map x =>
                 @li
