@@ -1,0 +1,132 @@
+@p
+  Most web applications aren't neat little games which live on a single canvas: they are large, structured HTML pages, which involve displaying data (whether from the user or from the web) in multiple ways, while allowing the user to make changes to the data that can be saved back to whatever remote web-service/database it came from.
+
+@p
+  At this point, you are already competent at using Scala.js to make basic, self-contained canvas applications. In this chapter, we will cover how to use Scala.js to build the sort of interactive-web-pages that make up the bulk of the modern-day internet. We'll cover how to use powerful libraries that turn front-end development form the typical fragile-mess into a structured, robust piece of software.
+
+@sect{Hello World: HTML}
+
+  @p
+    The most basic way of building interactive web pages using Scala.js is to use the Javascript APIs to blat HTML strings directly into some container div, often @code{document.body}. This approach works, as the following code snippet demonstrates:
+
+  @div(cls:="pure-g")
+    @div(cls:="pure-u-1 pure-u-md-13-24")
+      @hl.ref("examples/src/main/scala/webpage/HelloWorld0.scala")
+
+    @div(cls:="pure-u-1 pure-u-md-11-24")
+      @div(id:="div1")
+      @script("HelloWorld0().main(document.getElementById('div1'))")
+
+  @p
+    This approach works, as the above example shows, but has a couple of disadvantages:
+
+  @ul
+    @li
+      It is untyped: it is easy to accidentally mistype something, and result in malformed HTML. A typo such as @hl.html{<dvi>} would go un-noticed at build-time. Depending on where the typo happens, it could go un-noticed until the application is deployed, causing subtle bugs that only get resolved much later.
+    @li
+      It is insecure: @a("Cross-site Scripting", href:="http://en.wikipedia.org/wiki/Cross-site_scripting") is a real thing, and it is easy to forget to escape the values you are putting into your HTML strings. Above they're constants like @hl.scala{"dog"}, but if they're user-defined, you may not notice there is a problem until something like @hl.scala{"<script>...</script>"} sneaks through and your users' accounts & data is compromised.
+
+  @p
+    There are more, but we won't go deep into the intricacies of these problems. Suffice to say it makes mistakes easy to make and hard to catch, and we have something better...
+
+@sect{Scalatags}
+  @p
+    @a("Scalatags", href:="https://github.com/lihaoyi/scalatags") is a cross-platform Scala.js/Scala-JVM library that is designed to generate HTML. To use Scalatags, you need to add it as a dependency to your Scala.js SBT project, in the @code{build.sbt} file:
+
+  @hl.ref("examples/build.sbt", "com.scalatags")
+
+  @p
+    With that, the above snippet of code re-written using Scalatags looks as follows:
+
+  @div(cls:="pure-g") 
+    @div(cls:="pure-u-1 pure-u-md-13-24")
+      @hl.ref("examples/src/main/scala/webpage/HelloWorld1.scala")
+
+    @div(cls:="pure-u-1 pure-u-md-11-24")
+      @div(id:="div2")
+      @script("HelloWorld1().main(document.getElementById('div2'))")
+
+  @p
+    Scalatags has some nice advantages over plain HTML: it's type-safe, so typos like @hl.scala{dvi} get caught at compile-time. It's also secure, such that you don't need to worry about script-tags in strings or similar. The @a("Scalatags Readme", href:="https://github.com/lihaoyi/scalatags#scalatags") elaborates on these points and other advantages. As you can see, it takes just 1 import at the top of the file to bring it in scope, and then you can use all of Scalatags' functionality.
+
+  @p
+    The Scalatags github page has @a("comprehensive documentation", href:="https://github.com/lihaoyi/scalatags#hello-world") on how to express all manner of HTML fragments using Scalatags, so anyone who's familiar with how HTML works can quickly get up to speed. Instead of a detailed listing, we'll walk through some interactive examples to show Scalatags in action!
+
+  @sect{User Input}
+    @div(cls:="pure-g") 
+      @div(cls:="pure-u-1 pure-u-md-13-24")
+        @hl.ref("examples/src/main/scala/webpage/Inputs.scala", "val box")
+
+      @div(cls:="pure-u-1 pure-u-md-11-24")
+        @div(id:="div3")
+        @script("Inputs().main(document.getElementById('div3'))")
+
+    @p
+      In Scalatags, you build up fragments of type @hl.scala{Frag} using functions like @hl.scala{div}, @hl.scala{h1}, etc., and call @hl.scala{.render} on it to turn it into a real @hl.scala{dom.Element}. Different fragments render to different things: e.g. @hl.scala{input.render} gives you a @hl.scala{dom.HTMLInputElement}, @hl.scala{span.render} gives you a @hl.scala{dom.HTMLSpanElement}. You can then access the properties of these elements: adding callbacks, checking their value, anything you want.
+
+    @p
+      In this example, we render and @hl.scala{input} element and a @hl.scala{span}, wire up the input to set the value of the span whenever you press a key in the input, and then stuff both of them into a larger HTML fragment that forms the contents of our @hl.scala{target} element.
+
+  @sect{Re-rendering}
+    @p
+      Let's look at a slightly longer example. While above we spliced small snippets of text into the DOM, here we are going to re-render entire sections of HTML! The goal of this little exercise is to make a filtering search-box: starting from a default list of items, narrow it down as the user enters text into the box.
+
+    @p
+      To begin with, let's define our list of items: Fruits!
+    
+    @hl.ref("examples/src/main/scala/webpage/Search0.scala", "val listings", "def")
+
+    @p
+      Next, let's think about how we want to render these fruits. One natural way would be as a list, which in HTML is represented by a @hl.html{<ul>} with @hl.html{<li>}s inside of it if we wanted the list to be unordered. We'll make it a @hl.scala{def}, because we know up-front we're going to need to re-render this listing as the search query changes. Lastly, we know we want 1 list item for each fruit, but only if the fruit starts with the search query.
+
+    @hl.ref("examples/src/main/scala/webpage/Search0.scala", "def renderListings", "lazy val")
+
+    @p
+      Using a @hl.scala{for}-loop with a filter inside the Scalatags fragment is just normal Scala, since you can nest arbitrary Scala expressions inside a Scalatags snippet. In this case, we're converting both the fruit and the search query to lower case so we can compare them case-insensitively.
+
+    @p
+      Lastly, we just need to define the input box and output-container (as we did earlier), set the @hl.scala{onkeyup} event handler, and place it in a larger fragment, and then into our target:
+
+    @div(cls:="pure-g") 
+      @div(cls:="pure-u-1 pure-u-md-13-24")
+        @hl.ref("examples/src/main/scala/webpage/Search0.scala", "val output")
+
+      @div(cls:="pure-u-1 pure-u-md-11-24")
+        @div(id:="div4")
+        @script("Search0().main(document.getElementById('div4'))")
+
+    @p
+      And there you have it! A working search box. This is a relatively self-contained example: all the items its searching are available locally, no Ajax calls, and there's no fancy handling of the searched items. If we want to, for example, highlght the matched section of each fruit's name, we can modify the @hl.scala{def renderListings} call to do so:
+
+    @div(cls:="pure-g") 
+      @div(cls:="pure-u-1 pure-u-md-13-24")
+        @hl.ref("examples/src/main/scala/webpage/Search1.scala", "def renderListings", "lazy val")
+
+      @div(cls:="pure-u-1 pure-u-md-11-24")
+        @div(id:="div5")
+        @script("Search1().main(document.getElementById('div5'))")
+
+    @p
+      Here, instead of sticking the name of the matched fruits directly into the @hl.scala{li}, we instead first split off the part which matches the query, and then highlght the first section yellow. Easy!
+
+  @hr
+
+  @p
+    Hopefully this has given you a good overview of how to do things using Scala.js and Scalatags. I won't go too deep into the various ways you can use Scalatags: the @a("documentation", href:="https://github.com/lihaoyi/scalatags") should cover most of it. Now that you've gone through this experience, it's worth re-iterating a few things you've probably already noticed about Scalatags
+
+  @ul
+    @li
+      It's safe! If you make a trivial syntactic mistake, the compiler will catch it, because Scalatags is plain Scala
+    @li
+      It's composable! You can easily define fragments and assign them to variables, to be used later. You can break apart large Scalatags fragments the same way you break apart normal code, avoiding the huge monolithic HTML templates that are common in other templating systems.
+    @li
+      It's Scala! You have the full power of the Scala language to write your fragments. No need to learn special syntax/cases for conditionals or repetitions: you can use plain-old-scala if-elses, for-loops, etc.
+
+  @p
+    Now that you've gotten a quick overview of the kinds of things you can do with Scalatags, let's move on to the next section of our hands-on tutorial...
+
+@sect{Using Web Services} 
+  
+  @p
+    One half of the web application faces forwards towards the user, managing and rendering HTML or Canvas for the user to view and interact with. Another half faces backwards, talking to various web-services or databases which turn the application from a standalone-widget into part of a greater whole. We've already seen how to make the front half, let's now talk about working with the back half.
+
