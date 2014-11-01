@@ -103,7 +103,7 @@ object Compiler{
                 val res = t match {
                   case Apply(fun, args) =>
                     for(arg <- args; tree <- arg if tree.pos != NoPosition){
-                      c.internal.setPos(tree, posFor(tree.pos.point - first.length + fresh.length))
+                      c.internal.setPos(tree, fragPosFor(tree.pos.point + first.length - fresh.length))
                     }
 
                     Apply(rec(fun), args)
