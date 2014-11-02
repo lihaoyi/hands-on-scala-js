@@ -37,11 +37,11 @@ lazy val book = Project(
     "org.eclipse.jgit" % "org.eclipse.jgit" % "3.5.1.201410131835-r"
   ),
   (resources in Compile) += {
-    (fastOptJS in (examples, Compile)).value
-    (artifactPath in (examples, Compile, fastOptJS)).value
+    (fastOptJS in (demos, Compile)).value
+    (artifactPath in (demos, Compile, fastOptJS)).value
   },
   (unmanagedResourceDirectories in Compile) ++=
-    (unmanagedResourceDirectories in (examples, Compile)).value,
+    (unmanagedResourceDirectories in (demos, Compile)).value,
   scalacOptions in Compile ++= {
     val jar = (Keys.`package` in (scalatexPlugin, Compile)).value
     val addPlugin = "-Xplugin:" + jar.getAbsolutePath
@@ -59,4 +59,4 @@ lazy val book = Project(
   }
 )
 
-lazy val examples = project.in(file("examples"))
+lazy val demos = project.in(file("examples/demos"))

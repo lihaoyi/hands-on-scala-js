@@ -164,7 +164,7 @@
     @p 
       After going through this chapter and following along with the exercises, you should have a good sense of how Scala.js works and how it feels building things in Scala.js. You would not be an expert, but you'll know where to get started if you decide to try out Scala.js for your next project.
 
-  @sect{Scala.js in Depth}
+  @sect{In Depth}
     @p
       This section of the book will cover lots of content that does not fit in the earlier Hands-On portion of the book. Things that aren't immediately necessary to get something up and running, things that only advanced users would care about, things that you probably don't need to know but you'd like to know out of intellectual curiosity.
 

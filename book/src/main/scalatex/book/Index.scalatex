@@ -1,8 +1,8 @@
 
-@sect("Hands-on Scala.js")
+@sect("Hands-on Scala.js", "Writing client-side web applications in Scala")
     @div(cls:="pure-g")
         @div(cls:="pure-u-1 pure-u-md-13-24")
-          @hl.ref("examples/src/main/scala/Splash.scala", "var x")
+          @hl.ref("examples/demos/src/main/scala/Splash.scala", "var x")
 
         @div(cls:="pure-u-1 pure-u-md-11-24")
           @canvas(id:="canvas1", display:="block")
@@ -17,31 +17,30 @@
     @sect("Intro to Scala.js")
         @Intro.template
 
-    @sect("Hands On")
-        @sect("Getting Started")
-            @handson.GettingStarted.template
+    @sect("Getting Started")
+        @handson.GettingStarted.template
 
-        @sect("Making a Canvas App")
-            @handson.CanvasApp.template
+    @sect("Making a Canvas App")
+        @handson.CanvasApp.template
 
-        @sect("Interactive Web Pages")
-            @handson.WebPage.template
+    @sect("Interactive Web Pages")
+        @handson.WebPage.template
 
-        @sect("Cross-platform Modules")
-            @handson.CrossModules.template
+    @sect("Cross-platform Modules")
+        @handson.CrossModules.template
 
-        @sect("Client-Server Integration")
-            @handson.ClientServer.template
+    @sect("Client-Server Integration")
+        @handson.ClientServer.template
 
-    @sect("Scala.js in Depth")
-        @sect("Javascript Interoperability")
-            @indepth.JavascriptInterop.template
+@sect("Scala.js in Depth", "Exploring Scala.js")
+    @sect("Javascript Interoperability")
+        @indepth.JavascriptInterop.template
 
-        @sect("Scala.js/Scala-JVM Differences")
-            @indepth.SemanticDifferences.template
+    @sect("Deviations from Scala-JVM")
+        @indepth.SemanticDifferences.template
 
-        @sect("The Scala.js Compilation Pipeline")
-            @indepth.CompilationPipeline.template
+    @sect("The Compilation Pipeline")
+        @indepth.CompilationPipeline.template
 
-        @sect("Scala.js' Design Space")
-            @indepth.DesignSpace.template
+    @sect("Scala.js' Design Space")
+        @indepth.DesignSpace.template

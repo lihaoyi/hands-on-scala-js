@@ -44,25 +44,25 @@ object Utils{
   var indent = 0
 
 
-  val headers = Seq[(String => scalatags.Text.Tag, Option[Frag => Frag])](
-    (h => div(cls:="header")(
+  val headers = Seq[((String, String) => scalatags.Text.Tag, Option[Frag => Frag])](
+    ((h, s) => div(cls:="header")(
       h1(h),
-      h2("Writing client-side web applications in Scala")
+      h2(s)
     ), Some(f => div(cls:="content", f))),
-    (h => div(cls:="header")(
+    ((h, s) => div(cls:="header")(
       h1(id:=Utils.munge(h), h),
       br
     ), None),
-    (h1(_), None),
-    (h2(_), None),
-    (h3(_), None),
-    (h4(_), None),
-    (h5(_), None),
-    (h6(_), None)
+    (h1(_, _), None),
+    (h2(_, _), None),
+    (h3(_, _), None),
+    (h4(_, _), None),
+    (h5(_, _), None),
+    (h6(_, _), None)
   )
 
   var structure: Node = null
-  case class sect(name: String){
+  case class sect(name: String, subname: String = ""){
     indent += 1
     val newNode = Node(name, mutable.Buffer.empty)
     val (headerWrap, contentWrap) = headers(indent-1)
@@ -72,7 +72,7 @@ object Utils{
     def apply(args: Frag*) = {
       val wrappedContents = contentWrap.getOrElse((x: Frag) => x)(args)
       val res = Seq[Frag](
-        headerWrap(name)(cls:="content-subhead", id:=munge(name)),
+        headerWrap(name, subname)(cls:="content-subhead", id:=munge(name)),
         wrappedContents
       )
       indent -= 1

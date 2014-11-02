@@ -13,7 +13,7 @@
 
   @div(cls:="pure-g")
     @div(cls:="pure-u-1 pure-u-md-13-24")
-      @hl.ref("examples/src/main/scala/webpage/HelloWorld0.scala")
+      @hl.ref("examples/demos/src/main/scala/webpage/HelloWorld0.scala")
 
     @div(cls:="pure-u-1 pure-u-md-11-24")
       @div(id:="div1")
@@ -36,14 +36,14 @@
   @p
     @a("Scalatags", href:="https://github.com/lihaoyi/scalatags") is a cross-platform Scala.js/Scala-JVM library that is designed to generate HTML. To use Scalatags, you need to add it as a dependency to your Scala.js SBT project, in the @code{build.sbt} file:
 
-  @hl.ref("examples/build.sbt", "com.scalatags")
+  @hl.ref("examples/demos/build.sbt", "com.scalatags")
 
   @p
     With that, the above snippet of code re-written using Scalatags looks as follows:
 
   @div(cls:="pure-g") 
     @div(cls:="pure-u-1 pure-u-md-13-24")
-      @hl.ref("examples/src/main/scala/webpage/HelloWorld1.scala")
+      @hl.ref("examples/demos/src/main/scala/webpage/HelloWorld1.scala")
 
     @div(cls:="pure-u-1 pure-u-md-11-24")
       @div(id:="div2")
@@ -58,7 +58,7 @@
   @sect{User Input}
     @div(cls:="pure-g") 
       @div(cls:="pure-u-1 pure-u-md-13-24")
-        @hl.ref("examples/src/main/scala/webpage/Inputs.scala", "val box")
+        @hl.ref("examples/demos/src/main/scala/webpage/Inputs.scala", "val box")
 
       @div(cls:="pure-u-1 pure-u-md-11-24")
         @div(id:="div3")
@@ -77,12 +77,12 @@
     @p
       To begin with, let's define our list of items: Fruits!
     
-    @hl.ref("examples/src/main/scala/webpage/Search0.scala", "val listings", "def")
+    @hl.ref("examples/demos/src/main/scala/webpage/Search0.scala", "val listings", "def")
 
     @p
       Next, let's think about how we want to render these fruits. One natural way would be as a list, which in HTML is represented by a @hl.html{<ul>} with @hl.html{<li>}s inside of it if we wanted the list to be unordered. We'll make it a @hl.scala{def}, because we know up-front we're going to need to re-render this listing as the search query changes. Lastly, we know we want 1 list item for each fruit, but only if the fruit starts with the search query.
 
-    @hl.ref("examples/src/main/scala/webpage/Search0.scala", "def renderListings", "lazy val")
+    @hl.ref("examples/demos/src/main/scala/webpage/Search0.scala", "def renderListings", "lazy val")
 
     @p
       Using a @hl.scala{for}-loop with a filter inside the Scalatags fragment is just normal Scala, since you can nest arbitrary Scala expressions inside a Scalatags snippet. In this case, we're converting both the fruit and the search query to lower case so we can compare them case-insensitively.
@@ -92,7 +92,7 @@
 
     @div(cls:="pure-g") 
       @div(cls:="pure-u-1 pure-u-md-13-24")
-        @hl.ref("examples/src/main/scala/webpage/Search0.scala", "val output")
+        @hl.ref("examples/demos/src/main/scala/webpage/Search0.scala", "val output")
 
       @div(cls:="pure-u-1 pure-u-md-11-24")
         @div(id:="div4")
@@ -103,7 +103,7 @@
 
     @div(cls:="pure-g") 
       @div(cls:="pure-u-1 pure-u-md-13-24")
-        @hl.ref("examples/src/main/scala/webpage/Search1.scala", "def renderListings", "lazy val")
+        @hl.ref("examples/demos/src/main/scala/webpage/Search1.scala", "def renderListings", "lazy val")
 
       @div(cls:="pure-u-1 pure-u-md-11-24")
         @div(id:="div5")
@@ -136,7 +136,7 @@
   @sect{Raw Javascript}
     @div(cls:="pure-g") 
       @div(cls:="pure-u-1 pure-u-md-13-24")
-        @hl.ref("examples/src/main/scala/webpage/Weather0.scala", "val xhr")
+        @hl.ref("examples/demos/src/main/scala/webpage/Weather0.scala", "val xhr")
 
       @div(cls:="pure-u-1 pure-u-md-11-24")
         @div(id:="div6")
@@ -149,7 +149,7 @@
 
     @div(cls:="pure-g") 
       @div(cls:="pure-u-1 pure-u-md-13-24")
-        @hl.ref("examples/src/main/resources/webpage/weather.js", "var xhr")
+        @hl.ref("examples/demos/src/main/resources/webpage/weather.js", "var xhr")
 
       @div(cls:="pure-u-1 pure-u-md-11-24")
         @div(id:="div7")
@@ -177,7 +177,7 @@
     @p
       With Scala.js, we provide a simpler API that is more clearly functional. First, you need to import some things into scope:
 
-    @hl.ref("examples/src/main/scala/webpage/Weather1.scala", "import dom", "val url =")
+    @hl.ref("examples/demos/src/main/scala/webpage/Weather1.scala", "import dom", "val url =")
     
     @p
       The first import brings in Scala adapters to several DOM APIs, which allow you to use them more idiomatically from Scala. The second brings in an implicit @hl.scala{ExecutionContext} that we'll need to run our asynchronous operations.
@@ -187,7 +187,7 @@
 
     @div(cls:="pure-g") 
       @div(cls:="pure-u-1 pure-u-md-13-24")
-        @hl.ref("examples/src/main/scala/webpage/Weather1.scala", "val url")
+        @hl.ref("examples/demos/src/main/scala/webpage/Weather1.scala", "val url")
 
       @div(cls:="pure-u-1 pure-u-md-11-24")
         @div(id:="div8")
@@ -205,7 +205,7 @@
 
     @div(cls:="pure-g") 
       @div(cls:="pure-u-1 pure-u-md-13-24")
-        @hl.ref("examples/src/main/scala/webpage/Weather2.scala", "Ajax.get")
+        @hl.ref("examples/demos/src/main/scala/webpage/Weather2.scala", "Ajax.get")
 
       @div(cls:="pure-u-1 pure-u-md-11-24")
         @div(id:="div9")
@@ -219,7 +219,7 @@
 
     @div(cls:="pure-g") 
       @div(cls:="pure-u-1 pure-u-md-13-24")
-        @hl.ref("examples/src/main/scala/webpage/Weather3.scala", "Ajax.get")
+        @hl.ref("examples/demos/src/main/scala/webpage/Weather3.scala", "Ajax.get")
 
       @div(cls:="pure-u-1 pure-u-md-11-24")
         @div(id:="div10")
@@ -235,12 +235,12 @@
   @p
     At this point we've made a small app that allows us to search from a pre-populated list of words, as well as a small app that lets us query a remote web-service to find the weather in Singapore. The natural thing to do is to put these things together to make a app that will let us search from a list of countries and query the weather in any country we desire. Let's start!
 
-  @hl.ref("examples/src/main/scala/webpage/WeatherSearch.scala", "lazy val box", "def fetchWeather")
+  @hl.ref("examples/demos/src/main/scala/webpage/WeatherSearch.scala", "lazy val box", "def fetchWeather")
 
   @p
     This sets up the basics: an input box, an output div, and sets an @hl.scala{onkeyup} that fetches the weather data each time you hit a key. It then renders all these components and sticks them into the @hl.scala{target} div. This is basically the same stuff we saw in the early examples, with minor tweaks e.g. adding a @hl.scala{maxHeight} and @hl.scala{overflowY:="scroll"} to the @hl.scala{output} box in case the output is too large. Whenever we enter something in the box, we call the function @hl.scala{fetchWeather}, which is defined as:
 
-  @hl.ref("examples/src/main/scala/webpage/WeatherSearch.scala", "def fetchWeather", "def showResults")
+  @hl.ref("examples/demos/src/main/scala/webpage/WeatherSearch.scala", "def fetchWeather", "def showResults")
 
   @p
     This is where the actual data fetching happens. It's relatively straightforward: we make an @hl.scala{Ajax.get} request, @hl.scala{JSON.parse} the response, and feed it into the callback function. We're using a slightly different API from earlier: we now have the @hl.scala{"type=like"} flag, which is documented in the @a("OpenWeatherMap API docs", href:="http://openweathermap.org/current#other") to return multiple results for each city whose name matches your query.
@@ -248,7 +248,7 @@
   @p
     Notably, before we re-render the results, we check whether the @hl.scala{query} that was passed in is the same value that's in the @hl.scala{box}. This is to prevent a particularly slow ajax call from finishing out-of-order, potentially stomping over the results of more recent searches. We also check whether the @hl.scala{.list: js.Dynamic} property we want is an instance of @hl.scala{js.Array}: if it isn't, it means we don't have any results to show, and we can skip the whole render-output step.
 
-  @hl.ref("examples/src/main/scala/webpage/WeatherSearch.scala", "def showResults")
+  @hl.ref("examples/demos/src/main/scala/webpage/WeatherSearch.scala", "def showResults")
 
   @p
     Here is the meat and potatoes of this program: every time it gets called with an array of weather-data, we iterate over the cities in that array. It then does a similar sort of data-extraction that we did earlier, putting the results into the @hl.scala{output} div we defined above, including highlighting.
