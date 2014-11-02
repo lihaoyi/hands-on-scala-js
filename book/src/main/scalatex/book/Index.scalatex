@@ -16,15 +16,32 @@
 
     @sect("Intro to Scala.js")
         @Intro.template
-        
-    @sect("Getting Started")
-        @GettingStarted.template
-        
-    @sect("Making a Canvas App")
-        @CanvasApp.template
-        
-    @sect("Interactive Web Pages")
-        @WebPage.template
 
+    @sect("Hands On")
+        @sect("Getting Started")
+            @handson.GettingStarted.template
 
+        @sect("Making a Canvas App")
+            @handson.CanvasApp.template
 
+        @sect("Interactive Web Pages")
+            @handson.WebPage.template
+
+        @sect("Cross-platform Modules")
+            @handson.CrossModules.template
+
+        @sect("Client-Server Integration")
+            @handson.ClientServer.template
+
+    @sect("Scala.js in Depth")
+        @sect("Javascript Interoperability")
+            @indepth.JavascriptInterop.template
+
+        @sect("Scala.js/Scala-JVM Differences")
+            @indepth.SemanticDifferences.template
+
+        @sect("The Scala.js Compilation Pipeline")
+            @indepth.CompilationPipeline.template
+
+        @sect("Scala.js' Design Space")
+            @indepth.DesignSpace.template

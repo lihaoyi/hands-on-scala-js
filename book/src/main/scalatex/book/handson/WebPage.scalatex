@@ -1,0 +1,277 @@
+
+
+@p
+  Most web applications aren't neat little games which live on a single canvas: they are large, structured HTML pages, which involve displaying data (whether from the user or from the web) in multiple ways, while allowing the user to make changes to the data that can be saved back to whatever remote web-service/database it came from.
+
+@p
+  At this point, you are already competent at using Scala.js to make basic, self-contained canvas applications. In this chapter, we will cover how to use Scala.js to build the sort of interactive-web-pages that make up the bulk of the modern-day internet. We'll cover how to use powerful libraries that turn front-end development form the typical fragile-mess into a structured, robust piece of software.
+
+@sect{Hello World: HTML}
+
+  @p
+    The most basic way of building interactive web pages using Scala.js is to use the Javascript APIs to blat HTML strings directly into some container div, often @code{document.body}. This approach works, as the following code snippet demonstrates:
+
+  @div(cls:="pure-g")
+    @div(cls:="pure-u-1 pure-u-md-13-24")
+      @hl.ref("examples/src/main/scala/webpage/HelloWorld0.scala")
+
+    @div(cls:="pure-u-1 pure-u-md-11-24")
+      @div(id:="div1")
+      @script("HelloWorld0().main(document.getElementById('div1'))")
+
+
+  @p
+    This approach works, as the above example shows, but has a couple of disadvantages:
+
+  @ul
+    @li
+      It is untyped: it is easy to accidentally mistype something, and result in malformed HTML. A typo such as @hl.html{<dvi>} would go un-noticed at build-time. Depending on where the typo happens, it could go un-noticed until the application is deployed, causing subtle bugs that only get resolved much later.
+    @li
+      It is insecure: @a("Cross-site Scripting", href:="http://en.wikipedia.org/wiki/Cross-site_scripting") is a real thing, and it is easy to forget to escape the values you are putting into your HTML strings. Above they're constants like @hl.scala{"dog"}, but if they're user-defined, you may not notice there is a problem until something like @hl.scala{"<script>...</script>"} sneaks through and your users' accounts & data is compromised.
+
+  @p
+    There are more, but we won't go deep into the intricacies of these problems. Suffice to say it makes mistakes easy to make and hard to catch, and we have something better...
+
+@sect{Scalatags}
+  @p
+    @a("Scalatags", href:="https://github.com/lihaoyi/scalatags") is a cross-platform Scala.js/Scala-JVM library that is designed to generate HTML. To use Scalatags, you need to add it as a dependency to your Scala.js SBT project, in the @code{build.sbt} file:
+
+  @hl.ref("examples/build.sbt", "com.scalatags")
+
+  @p
+    With that, the above snippet of code re-written using Scalatags looks as follows:
+
+  @div(cls:="pure-g") 
+    @div(cls:="pure-u-1 pure-u-md-13-24")
+      @hl.ref("examples/src/main/scala/webpage/HelloWorld1.scala")
+
+    @div(cls:="pure-u-1 pure-u-md-11-24")
+      @div(id:="div2")
+      @script("HelloWorld1().main(document.getElementById('div2'))")
+
+  @p
+    Scalatags has some nice advantages over plain HTML: it's type-safe, so typos like @hl.scala{dvi} get caught at compile-time. It's also secure, such that you don't need to worry about script-tags in strings or similar. The @a("Scalatags Readme", href:="https://github.com/lihaoyi/scalatags#scalatags") elaborates on these points and other advantages. As you can see, it takes just 1 import at the top of the file to bring it in scope, and then you can use all of Scalatags' functionality.
+
+  @p
+    The Scalatags github page has @a("comprehensive documentation", href:="https://github.com/lihaoyi/scalatags#hello-world") on how to express all manner of HTML fragments using Scalatags, so anyone who's familiar with how HTML works can quickly get up to speed. Instead of a detailed listing, we'll walk through some interactive examples to show Scalatags in action!
+
+  @sect{User Input}
+    @div(cls:="pure-g") 
+      @div(cls:="pure-u-1 pure-u-md-13-24")
+        @hl.ref("examples/src/main/scala/webpage/Inputs.scala", "val box")
+
+      @div(cls:="pure-u-1 pure-u-md-11-24")
+        @div(id:="div3")
+        @script("Inputs().main(document.getElementById('div3'))")
+
+    @p
+      In Scalatags, you build up fragments of type @hl.scala{Frag} using functions like @hl.scala{div}, @hl.scala{h1}, etc., and call @hl.scala{.render} on it to turn it into a real @hl.scala{dom.Element}. Different fragments render to different things: e.g. @hl.scala{input.render} gives you a @hl.scala{dom.HTMLInputElement}, @hl.scala{span.render} gives you a @hl.scala{dom.HTMLSpanElement}. You can then access the properties of these elements: adding callbacks, checking their value, anything you want.
+
+    @p
+      In this example, we render and @hl.scala{input} element and a @hl.scala{span}, wire up the input to set the value of the span whenever you press a key in the input, and then stuff both of them into a larger HTML fragment that forms the contents of our @hl.scala{target} element.
+
+  @sect{Re-rendering}
+    @p
+      Let's look at a slightly longer example. While above we spliced small snippets of text into the DOM, here we are going to re-render entire sections of HTML! The goal of this little exercise is to make a filtering search-box: starting from a default list of items, narrow it down as the user enters text into the box.
+
+    @p
+      To begin with, let's define our list of items: Fruits!
+    
+    @hl.ref("examples/src/main/scala/webpage/Search0.scala", "val listings", "def")
+
+    @p
+      Next, let's think about how we want to render these fruits. One natural way would be as a list, which in HTML is represented by a @hl.html{<ul>} with @hl.html{<li>}s inside of it if we wanted the list to be unordered. We'll make it a @hl.scala{def}, because we know up-front we're going to need to re-render this listing as the search query changes. Lastly, we know we want 1 list item for each fruit, but only if the fruit starts with the search query.
+
+    @hl.ref("examples/src/main/scala/webpage/Search0.scala", "def renderListings", "lazy val")
+
+    @p
+      Using a @hl.scala{for}-loop with a filter inside the Scalatags fragment is just normal Scala, since you can nest arbitrary Scala expressions inside a Scalatags snippet. In this case, we're converting both the fruit and the search query to lower case so we can compare them case-insensitively.
+
+    @p
+      Lastly, we just need to define the input box and output-container (as we did earlier), set the @hl.scala{onkeyup} event handler, and place it in a larger fragment, and then into our target:
+
+    @div(cls:="pure-g") 
+      @div(cls:="pure-u-1 pure-u-md-13-24")
+        @hl.ref("examples/src/main/scala/webpage/Search0.scala", "val output")
+
+      @div(cls:="pure-u-1 pure-u-md-11-24")
+        @div(id:="div4")
+        @script("Search0().main(document.getElementById('div4'))")
+
+    @p
+      And there you have it! A working search box. This is a relatively self-contained example: all the items its searching are available locally, no Ajax calls, and there's no fancy handling of the searched items. If we want to, for example, highlght the matched section of each fruit's name, we can modify the @hl.scala{def renderListings} call to do so:
+
+    @div(cls:="pure-g") 
+      @div(cls:="pure-u-1 pure-u-md-13-24")
+        @hl.ref("examples/src/main/scala/webpage/Search1.scala", "def renderListings", "lazy val")
+
+      @div(cls:="pure-u-1 pure-u-md-11-24")
+        @div(id:="div5")
+        @script("Search1().main(document.getElementById('div5'))")
+
+    @p
+      Here, instead of sticking the name of the matched fruits directly into the @hl.scala{li}, we instead first split off the part which matches the query, and then highlght the first section yellow. Easy!
+
+  @hr
+
+  @p
+    Hopefully this has given you a good overview of how to do things using Scala.js and Scalatags. I won't go too deep into the various ways you can use Scalatags: the @a("documentation", href:="https://github.com/lihaoyi/scalatags") should cover most of it. Now that you've gone through this experience, it's worth re-iterating a few things you've probably already noticed about Scalatags
+
+  @ul
+    @li
+      It's safe! If you make a trivial syntactic mistake, the compiler will catch it, because Scalatags is plain Scala
+    @li
+      It's composable! You can easily define fragments and assign them to variables, to be used later. You can break apart large Scalatags fragments the same way you break apart normal code, avoiding the huge monolithic HTML templates that are common in other templating systems.
+    @li
+      It's Scala! You have the full power of the Scala language to write your fragments. No need to learn special syntax/cases for conditionals or repetitions: you can use plain-old-scala if-elses, for-loops, etc.
+
+  @p
+    Now that you've gotten a quick overview of the kinds of things you can do with Scalatags, let's move on to the next section of our hands-on tutorial...
+
+@sect{Using Web Services}
+
+  @p
+    One half of the web application faces forwards towards the user, managing and rendering HTML or Canvas for the user to view and interact with. Another half faces backwards, talking to various web-services or databases which turn the application from a standalone-widget into part of a greater whole. We've already seen how to make the front half, let's now talk about working with the back half.
+
+  @sect{Raw Javascript}
+    @div(cls:="pure-g") 
+      @div(cls:="pure-u-1 pure-u-md-13-24")
+        @hl.ref("examples/src/main/scala/webpage/Weather0.scala", "val xhr")
+
+      @div(cls:="pure-u-1 pure-u-md-11-24")
+        @div(id:="div6")
+        @script("Weather0().main(document.getElementById('div6'))")
+    @p
+      The above snippet of code uses the raw Javascript Ajax API in order to make a request to @a("openweathermap.org", href:="http://openweathermap.org/"), to get the weather data for the city of Singapore as a JSON blob. The part of the API that we'll be using is documented @a("here", href:="http://openweathermap.org/current"). For now, we're unceremoniously dumping it in a @hl.scala{pre} so you can see the raw response data. 
+
+    @p
+      As you can see, using the raw Javascript API to make the Ajax call looks almost identical to actually doing this in Javascript, shown below:
+
+    @div(cls:="pure-g") 
+      @div(cls:="pure-u-1 pure-u-md-13-24")
+        @hl.ref("examples/src/main/resources/webpage/weather.js", "var xhr")
+
+      @div(cls:="pure-u-1 pure-u-md-11-24")
+        @div(id:="div7")
+        @script("WeatherJs(document.getElementById('div7'))")
+        @script("WeatherJs(document.getElementById('div7'))")
+
+    @p
+      The primary syntactic differences are:
+
+    @ul
+      @li 
+        @hl.scala{val}s for immutable data v.s. mutable @hl.javascript{var}s.
+      @li
+        @hl.scala("=>") v.s. @hl.javascript{function} to define the callback.
+      @li
+        Scalatags' @hl.scala{pre} v.s. @hl.javascript{document.createElement}  
+
+    @p
+      Overall, they're pretty close, which is a common theme in Scala.js: using Javascript APIs in Scala.js is often as seamless and easy as using them in Javascript itself, and it often looks almost identical.
+
+  @sect{dom.extensions}
+    @p
+      Although the Javascript XMLHttpRequest API is workable, it's kind of awkward and clunky compared to what you're used to in Scala. We create a half-baked object, set some magic properties, and call a magic function, which all has to be done in the correct order or it won't work. 
+
+    @p
+      With Scala.js, we provide a simpler API that is more clearly functional. First, you need to import some things into scope:
+
+    @hl.ref("examples/src/main/scala/webpage/Weather1.scala", "import dom", "val url =")
+    
+    @p
+      The first import brings in Scala adapters to several DOM APIs, which allow you to use them more idiomatically from Scala. The second brings in an implicit @hl.scala{ExecutionContext} that we'll need to run our asynchronous operations.
+
+    @p
+      Then we need the code itself:
+
+    @div(cls:="pure-g") 
+      @div(cls:="pure-u-1 pure-u-md-13-24")
+        @hl.ref("examples/src/main/scala/webpage/Weather1.scala", "val url")
+
+      @div(cls:="pure-u-1 pure-u-md-11-24")
+        @div(id:="div8")
+        @script("Weather1().main(document.getElementById('div8'))")
+
+    @p
+      A single call to @hl.scala{Ajax.get(...)}, with the URL, and we receive a @hl.scala{scala.concurrent.Future} that we can use to get access to the result when ready. Here we're just using it's @hl.scala{onSuccess}, but we could use it in a for-comprehension, with @a("Scala Async", href:="https://github.com/scala/async"), or however else we can use normal @hl.scala{Future}s
+
+  @sect{Parsing the Data}
+    @p
+      We've taken the data-dump from OpenWeatherMap in three different ways, but there's still something missing: we need to actually parse the JSON data to make use of it! Most people don't use their JSON data as strings but as structured documents, querying and extracting only the bits we need.
+
+    @p
+      First, let's make the call prettyprint the document, so at least we can see what it contains:
+
+    @div(cls:="pure-g") 
+      @div(cls:="pure-u-1 pure-u-md-13-24")
+        @hl.ref("examples/src/main/scala/webpage/Weather2.scala", "Ajax.get")
+
+      @div(cls:="pure-u-1 pure-u-md-11-24")
+        @div(id:="div9")
+        @script("Weather2().main(document.getElementById('div9'))")
+
+    @p
+      We do this by taking @hl.scala{xhr.responseText} and putting it through both @hl.scala{JSON.parse} and @hl.scala{JSON.stringify}, passing in a @hl.scala{space} argument to tell @hl.scala{JSON.stringify} to spread it out nicely.
+
+    @p
+      Now that we've pretty-printed it, we can immediately see what data it contains and which part of the data we want. Let's change the previous example's @hl.scala{onSuccess} call to extract the @hl.scala{weather}, @hl.scala{temp} and @hl.scala{humidity} and put them in a nice, human-friendly format for us to enjoy:
+
+    @div(cls:="pure-g") 
+      @div(cls:="pure-u-1 pure-u-md-13-24")
+        @hl.ref("examples/src/main/scala/webpage/Weather3.scala", "Ajax.get")
+
+      @div(cls:="pure-u-1 pure-u-md-11-24")
+        @div(id:="div10")
+        @script("Weather3().main(document.getElementById('div10'))")
+
+    @p
+      First we parse the incoming response, extract a bunch of values from it, and then stick it in a Scalatags fragment for us to see. Note how we can use the names of the attributes e.g. @hl.scala{json.name} even though @hl.scala{name} is a dynamic property which you can't be sure exists: this is because @hl.scala{json} is of type @hl.scala{js.Dynamic}, which allows us to refer to arbitrary parameters and methods on the underlying object without type-checking. 
+
+    @p
+      Calls on @hl.scala{js.Dynamic} resolve directly to javascript property/method references, and will fail at run-time with an exception if used wrongly. This is also why we need to call @hl.scala{.toString} or @hl.scala{.asInstanceOf}on the values before use: without these casts, the compiler can't be sure what kind of value is underneath the @hl.scala{js.Dynamic} type, and so we have to provide it the guarantee that it is what it needs.
+
+@sect{Tying it together: Weather Search}
+  @p
+    At this point we've made a small app that allows us to search from a pre-populated list of words, as well as a small app that lets us query a remote web-service to find the weather in Singapore. The natural thing to do is to put these things together to make a app that will let us search from a list of countries and query the weather in any country we desire. Let's start!
+
+  @hl.ref("examples/src/main/scala/webpage/WeatherSearch.scala", "lazy val box", "def fetchWeather")
+
+  @p
+    This sets up the basics: an input box, an output div, and sets an @hl.scala{onkeyup} that fetches the weather data each time you hit a key. It then renders all these components and sticks them into the @hl.scala{target} div. This is basically the same stuff we saw in the early examples, with minor tweaks e.g. adding a @hl.scala{maxHeight} and @hl.scala{overflowY:="scroll"} to the @hl.scala{output} box in case the output is too large. Whenever we enter something in the box, we call the function @hl.scala{fetchWeather}, which is defined as:
+
+  @hl.ref("examples/src/main/scala/webpage/WeatherSearch.scala", "def fetchWeather", "def showResults")
+
+  @p
+    This is where the actual data fetching happens. It's relatively straightforward: we make an @hl.scala{Ajax.get} request, @hl.scala{JSON.parse} the response, and feed it into the callback function. We're using a slightly different API from earlier: we now have the @hl.scala{"type=like"} flag, which is documented in the @a("OpenWeatherMap API docs", href:="http://openweathermap.org/current#other") to return multiple results for each city whose name matches your query.
+
+  @p
+    Notably, before we re-render the results, we check whether the @hl.scala{query} that was passed in is the same value that's in the @hl.scala{box}. This is to prevent a particularly slow ajax call from finishing out-of-order, potentially stomping over the results of more recent searches. We also check whether the @hl.scala{.list: js.Dynamic} property we want is an instance of @hl.scala{js.Array}: if it isn't, it means we don't have any results to show, and we can skip the whole render-output step.
+
+  @hl.ref("examples/src/main/scala/webpage/WeatherSearch.scala", "def showResults")
+
+  @p
+    Here is the meat and potatoes of this program: every time it gets called with an array of weather-data, we iterate over the cities in that array. It then does a similar sort of data-extraction that we did earlier, putting the results into the @hl.scala{output} div we defined above, including highlighting.
+
+  @div(id:="div11")
+  @script("WeatherSearch().main(document.getElementById('div11'))")    
+
+  @p
+    And that's the working example! Try searching for cities like "Singapore" or "New York" or "San Francisco" and watch as the search narrows as you enter more characters into the text box. Note that the OpenWeatherMap API limits ambiguous searches to about a dozen results, so if a city doesn't turn up in a partial-search, try entering more characters to narrow it down.
+
+@sect{Interactive Web Pages Recap} 
+  @p
+    In this chapter, we've explored the basics of how you can use Scala.js to build interactive web pages. The two main contributions are using Scalatags to render HTML in a concise, safe way, and making Ajax calls to external web services. We combined these two capabilities in a small weather-search app that let a user interactively search for the weather in different cities around the world.
+  @p
+    Some things you may have noticed in the process:
+
+  @ul
+    @li
+      Using Scalatags to render HTML fragments, and managing them at runtime with callbacks and getting/setting properties, is really quite nice
+    @li
+      Using @hl.scala{new dom.XMLHttpRequest} to make web requests feels just like the Javascript code to do so
+    @li
+      Using @hl.scala{Ajax.get(...)} and working with the resultant : @hl.scala{Future} feels a lot cleaner than directly using the Javascript API
+    
+  @p
+    You're at this point reasonably pro

@@ -143,7 +143,7 @@
       This is the function that handles what happens when you're dead. Essentially, we reset all the mutable variables to their initial state, and just count down the @hl.scala{dead} counter until it reaches zero and we're considered alive again.
 
   @sect{A Working Product}
-    @hl.ref("examples/src/main/scala/canvasapp/FlappyLine.scala", "def run")    
+    @hl.ref("examples/src/main/scala/canvasapp/FlappyLine.scala", "def run()")    
 
     @p
       And finally, this is the code that kicks everything off: we define the @hl.scala{run} function to swap between @hl.scala{runLive} and @hl.scala{runDead}, register an @hl.scala{canvas.onclick} handler to make the player jump by tweaking his velocity, and we call @code{setInterval} to run the @hl.scala{run} function every 20 milliseconds.

@@ -40,6 +40,8 @@ lazy val book = Project(
     (fastOptJS in (examples, Compile)).value
     (artifactPath in (examples, Compile, fastOptJS)).value
   },
+  (unmanagedResourceDirectories in Compile) ++=
+    (unmanagedResourceDirectories in (examples, Compile)).value,
   scalacOptions in Compile ++= {
     val jar = (Keys.`package` in (scalatexPlugin, Compile)).value
     val addPlugin = "-Xplugin:" + jar.getAbsolutePath

@@ -1,5 +1,7 @@
 package scalatex
 
+import java.nio.file.Paths
+
 import scala.reflect.internal.util.BatchSourceFile
 import scala.reflect.io.VirtualFile
 import scala.tools.nsc.{ Global, Phase }
@@ -19,10 +21,15 @@ class ScalaTexPlugin(val global: Global) extends Plugin {
     override val runsBefore = List("namer")
 
     val phaseName = "Demo"
-
+    val scalatexRoot = "book/src/main/scalatex"
     override def newPhase(prev: Phase) = new GlobalPhase(prev) {
       override def run() = {
-        for (file <- new java.io.File("book/src/main/scalatex/book").listFiles()) {
+        def recursiveListFiles(f: java.io.File): Array[java.io.File] = {
+          val these = f.listFiles
+          val (dirs, files) = f.listFiles().partition(_.isDirectory)
+          files ++ dirs.flatMap(recursiveListFiles)
+        }
+        for (file <- recursiveListFiles(new java.io.File(scalatexRoot))) {
           val txt = io.Source.fromFile(file).mkString
           val fakeJfile = new java.io.File(file.getName)
           val virtualFile = new VirtualFile(file.getName) {
@@ -32,8 +39,16 @@ class ScalaTexPlugin(val global: Global) extends Plugin {
           val unit = new CompilationUnit(sourceFile)
           val name = file.getName
           val objectName = name.slice(name.lastIndexOf('/'), name.lastIndexOf('.'))
+          val pkgName =
+            Paths.get(scalatexRoot)
+                .relativize(file.getParentFile.toPath)
+                .toString
+                .split("/")
+                .map(s => s"package $s")
+                .mkString("\n")
+
           val shim = s"""
-            package book
+            $pkgName
             import Book._
             import Utils.sect
             import scalatags.Text.all._

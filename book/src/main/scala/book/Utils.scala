@@ -18,7 +18,8 @@ object Utils{
     "css/grids-responsive-min.css",
     "css/layouts/side-menu.css",
     "js/ui.js",
-    "example-fastopt.js"
+    "example-fastopt.js",
+    "webpage/weather.js"
   )
   
   val manualResources = Seq(

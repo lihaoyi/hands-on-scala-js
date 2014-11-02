@@ -171,15 +171,8 @@
     @p 
       In general, this section of the book will go much deeper into Scala.js, much more than is necessary to get your first applications built. We will talk about the small number of semantic differences between Scala.js and Scala, details of the foreign-function-interface with Javascript, the various optimization levels and what they do. Nothing pressing or urgently needed, but all very interesting, and worth reading if you want to really understand Scala.js in depth.
 
-  @sect{Why}
     @p
-      Why should you care about Scala.js in the first place? Why not just write Javascript? As a new, barely-a-year-old project, what does it provide that other more mature compile-to-javascript langauges don't?
-
-    @p
-      In this section of the book, we will examine the reasons which got me first interested in Scala.js. We'll talk at length about the deficiencies of Javascript, the ubiquity of the browser as an application platform, and the technical characteristics that make this the case.
-
-    @p
-      Lastly, we will explore the solution space. Scala.js isn't the only game in town, and there are hundreds of over attempts at covering the same ground the Scala.js now attempts to cover. We'll compare and contrast the different approaches to see what Scala.js can bring to the table that other approaches cannot.
+      Lastly, we will explore the solution space. Scala.js isn't the only game in town, and there are hundreds of over attempts at covering the same ground the Scala.js now attempts to cover. We'll compare and contrast the different approaches to see what Scala.js can bring to the table that other approaches cannot. Many decisions have been made that shape what Scala.js is today; why did we make them?
 
   @hr
   
