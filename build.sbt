@@ -8,7 +8,8 @@ lazy val scalatexApi = project.in(file("scalatexApi"))
     "com.lihaoyi" %% "utest" % "0.2.4",
     "com.scalatags" %% "scalatags" % "0.4.2",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-    "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided"
+    "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
+    "org.parboiled" %% "parboiled" % "2.0.1"
   ),
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
   testFrameworks += new TestFramework("utest.runner.JvmFramework")
