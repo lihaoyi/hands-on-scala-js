@@ -4,7 +4,7 @@ package scalatex
 import org.parboiled2._
 import torimatomeru.ScalaSyntax
 
-object Main extends utest.TestSuite{
+object ParserTests extends utest.TestSuite{
   import Ast._
   import utest._
   def check[T](input: String, parse: ScalatexParser => scala.util.Try[T], expected: T) = {
@@ -50,6 +50,17 @@ object Main extends utest.TestSuite{
           Block(Seq(Block.Text("a "), Chain(Code("b"), Nil)))
         ))
       )
+    }
+    'Body{
+
+      val str =
+        """
+          |@omg
+          |  @wtf
+          |    @bbq
+          |      @lol
+        """.stripMargin
+      new ScalatexParser(str).Body.run()
     }
   }
 
