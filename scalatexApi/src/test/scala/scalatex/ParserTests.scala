@@ -53,14 +53,26 @@ object ParserTests extends utest.TestSuite{
     }
     'Body{
 
-      val str =
+      * - check(
         """
           |@omg
           |  @wtf
           |    @bbq
           |      @lol
-        """.stripMargin
-      new ScalatexParser(str).Body.run()
+        """.stripMargin,
+        _.Body.run(),
+        Block(Seq(
+          Chain(Code("omg"),Seq(Block(Seq(
+            Chain(Code("wtf"),Seq(Block(Seq(
+              Chain(Code("bbq"),Seq(Block(Seq(
+                Chain(Code("lol"),Seq(Block(Seq(
+                )))),
+                Ast.Block.Text("\n        ")
+              ))))
+            ))))
+          ))))
+        ))
+      )
     }
   }
 
