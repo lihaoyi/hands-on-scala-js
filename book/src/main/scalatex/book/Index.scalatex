@@ -29,7 +29,7 @@
     @sect("Cross-platform Modules")
         @handson.CrossModules.template
 
-    @sect("Client-Server Integration")
+    @sect("Integrating Client and Server")
         @handson.ClientServer.template
 
 @sect("Scala.js in Depth", "Exploring Scala.js")

@@ -10,3 +10,14 @@
 
 @sect("Why does error behavior differ?")
     TODO
+
+@sect("Why Jars instead of RequireJS/CommonJS") 
+  @p
+    In JVM-land, the standard method for distributing these libraries is as @a("Maven Artifacts", href:="http://stackoverflow.com/questions/2487485/what-is-maven-artifact"). These are typically published in a public location such as @a("Maven Central", href:="http://search.maven.org/"), where others can find and download them for use. Typically downloads are done automatically by the build-tool: in Scala-JVM typically this is SBT.
+  @p
+    In Javascript-land, there are multiple ways of acquiring dependencies: @a("CommonJS", href:="http://en.wikipedia.org/wiki/CommonJS") and @a("RequireJS/AMD", href:="http://requirejs.org/") are two competing standards with a host of implementations. Historically, a third approach has been most common: the developer would simply download the modules himself, check it into source-control and manually add a @hl.html{<script>} tag to the HTML page that will make the functionality available through some global variable.
+  @p
+    In Scala.js, we side with the JVM standard of distributing libraries as maven jars. This lets us take advantage of all the existing tooling around Scala to handle these jars (SBT, Ivy, Maven Central, etc.) which is far more mature and cohesive than the story in Javascript-land. For example, the Scalatags library we used in the earlier is @a("published on maven central", href:="http://search.maven.org/#search%7Cga%7C1%7Cscalatags"), and adding one line to SBT is enough to pull it down and include it in our project.
+
+  @p
+    One interesting wrinkle in Scala.js's case is that since Scala can compile to both Scala.js and Scala-JVM, it is entirely possible to publish a library that can run on both client and server! This chapter will explore the process of building, testing, and publishing such a library.

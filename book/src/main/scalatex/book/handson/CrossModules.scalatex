@@ -1,16 +1,112 @@
 @p
   We've spent several chapters exploring the experience of making web apps using Scala.js, but any large app (web or not!) likely relies on a host of libraries in order to implement large chunks of its functionality. Ideally these libraries would be re-usable, and can be shared among different projects, teams or even companies.
-@p
-  In JVM-land, the standard method for distributing these libraries is as @a("Maven Artifacts", href:="http://stackoverflow.com/questions/2487485/what-is-maven-artifact"). These are typically published in a public location such as @a("Maven Central", href:="http://search.maven.org/"), where others can find and download them for use. Typically downloads are done automatically by the build-tool: in Scala-JVM typically this is SBT.
-@p
-  In Javascript-land, there are multiple ways of acquiring dependencies: @a("CommonJS", href:="http://en.wikipedia.org/wiki/CommonJS") and @a("RequireJS/AMD", href:="http://requirejs.org/") are two competing standards with a host of implementations. Historically, a third approach has been most common: the developer would simply download the modules himself, check it into source-control and manually add a @hl.html{<script>} tag to the HTML page that will make the functionality available through some global variable.
-@p
-  In Scala.js, we side with the JVM standard of distributing libraries as maven jars. This lets us take advantage of all the existing tooling around Scala to handle these jars (SBT, Ivy, Maven Central, etc.) which is far more mature and cohesive than the story in Javascript-land. For example, the Scalatags library we used in the earlier is @a("published on maven central", href:="http://search.maven.org/#search%7Cga%7C1%7Cscalatags"), and adding one line to SBT is enough to pull it down and include it in our project.
 
 @p
-  One interesting wrinkle in Scala.js's case is that since Scala can compile to both Scala.js and Scala-JVM, it is entirely possible to publish a library that can run on both client and server! This chapter will explore the process of building, testing, and publishing such a library.
+  Not all code is developed in the browser. Maybe you want to run simple snippets of Scala.js which don't interact with the browser at all, and having to keep a browser open is an overkill. Maybe you want to write unit tests for your browser-destined code, so you can verify that it works without firing up Chrome. Maybe it's not a simple script but a re-distributable library, and you want to run the same command-line unit tests on both Scala.js and Scala-JVM to verify that the behavior is identical. This chapter will go through all these cases.
 
-@sect{A Sample Project}
+@sect{The Scala.js Command Line}
+  TODO
+
+@sect{A Scala.js Module}
+  TODO
+
+@sect{A Cross-Built Module}
 
   @p
-    As always, we will start with an example: in this case a tiny library whose sole purpose in life is to take a series of timestamps (milliseconds UTC) and format them into a list of strings.
+    As always, we will start with an example: in this case a toy library whose sole purpose in life is to take a series of timestamps (milliseconds UTC) and format them into a single, newline-delimited string. This is what the project layout looks like:
+
+  @hl.bash
+    $ tree
+    .
+    ├── build.sbt
+    ├── js
+    │   ├── shared
+    │   │   └── main
+    │   │       └── scala
+    │   │           └── simple
+    │   │               └── Simple.scala
+    │   └── src
+    │       └── main
+    │           └── scala
+    │               └── simple
+    │                   └── Platform.scala
+    ├── jvm
+    │   ├── shared -> ../js/shared
+    │   └── src
+    │       └── main
+    │           └── scala
+    │               └── simple
+    │                   └── Platform.scala
+    └── project
+        └── build.sbt
+  @p
+    In this case the two @code{shared/} folders are symlinked together to keep them in sync. This can be done by first creating @code{js/shared}, and then running
+
+  @hl.bash
+    $ ln -s ../js/shared jvm/shared
+
+  @p
+    From the bash shell in the project root. Let's take a look at the various files that make up this project. First, the @code{build.sbt} files:
+
+  @hl.ref("examples/crossBuilds/simple/project/build.sbt")
+
+  @p
+    The @code{project/build.sbt} file is uneventful: it simply includes the Scala.js SBT plugin. However, the @code{build.sbt} file is a bit more interesting:
+
+  @hl.ref("examples/crossBuilds/simple/build.sbt")
+
+  @p
+    Unlike the equivalent @code{build.sbt} files you saw in earlier chapters, this does not simply add @hl.scala{scalaJSSettings} to the root project. Rather, it sets up two projects: one in the @code{js/} folder and one in the @code{jvm/} folder, with the @code{js/} version getting the settings from the Scala.js plugin. To both of these, we add @code{shared/main/scala} to the list of source directories. This means that both projects will pick up the sources we symlinked between @code{js/shared/} and @code{jvm/shared/}.
+
+  @p
+    Now, let's look at the contents of the @code{.scala} files that make up the meat of this project:
+
+  @hl.ref("examples/crossBuilds/simple/js/shared/main/scala/simple/Simple.scala")
+
+  @p
+    In @code{Simple.scala} we have the shared, cross-platform API of our library: a single @hl.scala{object} with a single method @hl.scala{def} which does what we want, which can then be used in either Scala.js or Scala-JVM. In general, you can put as much shared logic here as you want: classes, objects, methods, anything that can run on both Javascript and on the JVM.
+  
+  @p
+    However, when it comes to actually formatting the date, we have a problem: Javascript and Java provide different utilities for formatting dates! They both let you format them, but they provide different APIs. Thus, to do the formatting of each individual date, we call out to the @hl.scala{Platform.format} function, which is implemented twice: once in @code{js/} and once in @code{jvm/}:
+
+  @div(cls:="pure-g")
+    @div(cls:="pure-u-1 pure-u-md-1-2")
+      @hl.ref("examples/crossBuilds/simple/js/src/main/scala/simple/Platform.scala")
+
+    @div(cls:="pure-u-1 pure-u-md-1-2")
+      @hl.ref("examples/crossBuilds/simple/jvm/src/main/scala/simple/Platform.scala")
+
+  @p
+    In the @code{js/} version, we are using the Javascript @hl.javascript{Date} object to take the millis and do what we want. In the @code{jvm/} version, we instead use @hl.scala{java.text.SimpleDateFormat} with a custom formatter (The syntax is defined @a("here", href:="http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html")).
+ 
+  @p
+    Again, you can put as much platform-specific logic in these files as you want, to account for differences in the available APIs. Maybe you want to use @hl.scala{js.JSON.parse} for parsing JSON blobs in @code{js/}, but @hl.scala{Jackson} or @hl.scala{GSON} for parsing them in @code{jvm/}.
+  @p
+    Lastly, you'll also have noticed the two identical @hl.scala{main} methods in the platform-specific code. This is an implementation detail around the fact that Scala.js picks up the main method differently from Scala-JVM, using @hl.scala{js.JSApp} instead of looking for a @hl.scala{main(args: Array[String]): Unit} method. These two main methods allow us to test our implementations
+
+  @hl.bash 
+    > ; js/run; jvm/run
+    [info] Running simple.Platform
+    Running on JS! 1
+    November 2, 2014 2:58:48 PM PST
+    November 2, 2014 2:58:49 PM PST
+    [success] Total time: 4 s, completed Nov 2, 2014 2:58:48 PM
+    [info] Running simple.Platform
+    Running on JVM! 1.0
+    November 2, 2014 2:58:49 PM PST
+    November 2, 2014 2:58:50 PM PST
+    [success] Total time: 0 s, completed Nov 2, 2014 2:58:49 PM
+
+  @p
+    As you can see, both runs printed the same results, modulo three things:
+
+  @ul
+    @li 
+      The "Running on XXX!" statement which shows us we're actually running on two platforms. 
+    @li
+      The other hint is the time taken: the second run is instant while the first takes three seconds! This is because by default we run on @a("Rhino", href:="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino"), which is a simple interpreter hundreds of times slower than running code natively on the JVM.
+    @li
+      In Scala-JVM the double 1.0 is printed as @code{1.0}, while in Scala.js it's printed as @code{1}. This is one of a small number of differences between Scala.js and Scala-JVM, and verifies that we are indeed running on both platforms!
+
+  @p
+    You've by this point set up a basic cross-building Scala.js/Scala-JVM project!
