@@ -78,13 +78,9 @@ package object scalatex {
     def compile(s: String): c.Tree = {
       val realPos = new OffsetPosition(source, point).asInstanceOf[c.universe.Position]
 
-      Compiler(c)(realPos, new Parser(s).Body.run().get)
+      Compiler(c)(realPos, Parser(stages.Trim(s)))
     }
-    def normalize(str: String) = {
-      val lines = str.split("\n")
-      val offset = lines.iterator.map(_.takeWhile(_ == ' ').length).min
-      lines.iterator.map(_.drop(offset)).mkString("\n")
-    }
+
     
     import c.Position
     try {

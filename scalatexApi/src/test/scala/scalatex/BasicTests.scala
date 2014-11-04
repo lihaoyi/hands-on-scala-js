@@ -11,42 +11,42 @@ object BasicTests extends TestSuite{
   import TestUtil._
 
   val tests = TestSuite{
-//
-//    'helloWorld{
-//      object omg {
-//        def wtf(s: Frag*): Frag = Seq[Frag]("|", s, "|")
-//      }
-//      def str = "hear me moo"
-//      check(
-//        tw("""
-//          @omg.wtf
-//            i @b{am} cow @str
-//        """),
-//        "|i<b>am</b>cowhearmemoo|"
-//      )
-//    }
+
+    'helloWorld{
+      object omg {
+        def wtf(s: Frag*): Frag = Seq[Frag]("|", s, "|")
+      }
+      def str = "hear me moo"
+      check(
+        tw("""
+          @omg.wtf
+            i @b{am} cow @str
+        """),
+        "|i<b>am</b>cowhearmemoo|"
+      )
+    }
     'interpolation{
-//      'chained-check(
-//        tw("omg @scala.math.pow(0.5, 3) wtf"),
-//        "omg 0.125 wtf"
-//      )
-//      'parens-check(
-//        tw("omg @(1 + 2 + 3 + 4) wtf"),
-//        "omg 10 wtf"
-//      )
-//      'block-check(
-//        tw("""
-//          @{"lol" * 3}
-//          @{
-//            val omg = "omg"
-//            omg * 2
-//          }
-//           """),
-//        """
-//          lollollol
-//          omgomg
-//        """
-//      )
+      'chained-check(
+        tw("omg @scala.math.pow(0.5, 3) wtf"),
+        "omg 0.125 wtf"
+      )
+      'parens-check(
+        tw("omg @(1 + 2 + 3 + 4) wtf"),
+        "omg 10 wtf"
+      )
+      'block-check(
+        tw("""
+          @{"lol" * 3}
+          @{
+            val omg = "omg"
+            omg * 2
+          }
+           """),
+        """
+          lollollol
+          omgomg
+        """
+      )
     }
 //    'imports{
 //      object Whee{
@@ -70,20 +70,20 @@ object BasicTests extends TestSuite{
 //        """
 //      )
 //    }
-//    'parenArgumentLists{
-//      'attributes{
-//        check(
-//          tw("""
-//          @div(id:="my-id"){ omg }
-//          @div(id:="my-id")
-//            omg
-//              """),
-//          """
-//          <divid="my-id">omg</div>
-//          <divid="my-id">omg</div>
-//          """
-//        )
-//      }
+    'parenArgumentLists{
+      'attributes{
+        check(
+          tw("""
+          @div(id:="my-id"){ omg }
+          @div(id:="my-id")
+            omg
+              """),
+          """
+          <divid="my-id">omg</div>
+          <divid="my-id">omg</div>
+          """
+        )
+      }
 //      'multiline{
 //
 //        check(
@@ -101,51 +101,51 @@ object BasicTests extends TestSuite{
 //          """
 //        )
 //      }
-//    }
-//    'grouping{
-//      'negative{
-//        // The indentation for "normal" text is ignored; we only
-//        // create blocks from the indentation following a scala
-//        // @xxx expression
-//        check(
-//          tw("""
-//          I am cow hear me moo
-//              I weigh twice as much as you
-//                And I look good on the barbecue
-//          Yoghurt curds cream cheese and butter
-//            Comes from liquids from my udder
-//              I am cow I am cow hear me moooooo
-//          """),
-//          """
-//          I am cow hear me moo
-//            I weigh twice as much as you
-//              And I look good on the barbecue
-//                Yoghurt curds cream cheese and butter
-//                  Comes from liquids from my udder
-//                    I am cow I am cow hear me moooooo
-//          """
-//        )
-//      }
-//      'indentation{
-//        'simple{
-//          val world = "World2"
-//
-//          check(
-//            tw("""
-//              @h1
-//                Hello World
-//              @h2
-//                hello @world
-//              @h3
-//                Cow
-//            """),
-//            """
-//              <h1>HelloWorld</h1>
-//              <h2>helloWorld2</h2>
-//              <h3>Cow</h3>
-//            """
-//          )
-//        }
+    }
+    'grouping{
+      'negative{
+        // The indentation for "normal" text is ignored; we only
+        // create blocks from the indentation following a scala
+        // @xxx expression
+        check(
+          tw("""
+          I am cow hear me moo
+              I weigh twice as much as you
+                And I look good on the barbecue
+          Yoghurt curds cream cheese and butter
+            Comes from liquids from my udder
+              I am cow I am cow hear me moooooo
+          """),
+          """
+          I am cow hear me moo
+            I weigh twice as much as you
+              And I look good on the barbecue
+                Yoghurt curds cream cheese and butter
+                  Comes from liquids from my udder
+                    I am cow I am cow hear me moooooo
+          """
+        )
+      }
+      'indentation{
+        'simple{
+          val world = "World2"
+
+          check(
+            tw("""
+              @h1
+                Hello World
+              @h2
+                hello @world
+              @h3
+                Cow
+            """),
+            """
+              <h1>HelloWorld</h1>
+              <h2>helloWorld2</h2>
+              <h3>Cow</h3>
+            """
+          )
+        }
 //        'linearNested{
 //          check(
 //            tw("""
@@ -162,39 +162,39 @@ object BasicTests extends TestSuite{
 //            """
 //          )
 //        }
-//        'crasher{
-//          tw("""
-//@html
-//    @head
-//        @meta
-//    @div
-//        @a
-//            @span
-//          """)
-//        }
-//      }
-//      'curlies{
-//        'simple{
-//          val world = "World2"
-//
-//          check(
-//            tw("""@div{Hello World}"""),
-//            """<div>HelloWorld</div>"""
-//          )
-//        }
-//        'multiline{
-//          check(
-//            tw("""
-//              @div{
-//                Hello
-//              }
-//            """),
-//            """
-//              <div>Hello</div>
-//            """
-//          )
-//        }
-//      }
+        'crasher{
+          tw("""
+@html
+    @head
+        @meta
+    @div
+        @a
+            @span
+          """)
+        }
+      }
+      'curlies{
+        'simple{
+          val world = "World2"
+
+          check(
+            tw("""@div{Hello World}"""),
+            """<div>HelloWorld</div>"""
+          )
+        }
+        'multiline{
+          check(
+            tw("""
+              @div{
+                Hello
+              }
+            """),
+            """
+              <div>Hello</div>
+            """
+          )
+        }
+      }
 //      'mixed{
 //        check(
 //          tw("""
@@ -420,6 +420,6 @@ object BasicTests extends TestSuite{
 //          "<p>lols2</p>"
 //        )
 //      }
-//    }
+    }
   }
 }

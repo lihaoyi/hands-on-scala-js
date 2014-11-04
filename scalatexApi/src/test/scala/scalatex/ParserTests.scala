@@ -16,7 +16,63 @@ object ParserTests extends utest.TestSuite{
     assert(parsed.get == expected)
   }
   def tests = TestSuite{
-    'Test {
+    'Trim{
+      def wrap(s: String) = "|" + s + "|"
+      * - {
+        val trimmed = wrap(stages.Trim("""
+            i am cow
+              hear me moo
+                i weigh twice as much as you
+        """))
+        val expected = wrap("""
+                         |i am cow
+                         |  hear me moo
+                         |    i weigh twice as much as you
+                         |""".stripMargin)
+         assert(trimmed == expected)
+
+      }
+      * - {
+        val trimmed = wrap(stages.Trim(
+          """
+          @{"lol" * 3}
+          @{
+            val omg = "omg"
+            omg * 2
+          }
+          """
+        ))
+        val expected = wrap(
+          """
+            |@{"lol" * 3}
+            |@{
+            |  val omg = "omg"
+            |  omg * 2
+            |}
+            |""".stripMargin
+        )
+        assert(trimmed == expected)
+      }
+      'dropTrailingWhitespace - {
+
+        val trimmed = wrap(stages.Trim(
+          Seq(
+            "  i am a cow   ",
+            "    hear me moo    ",
+            "   i weigh twice as much as you"
+          ).mkString("\n")
+        ))
+        val expected = wrap(
+          Seq(
+            "i am a cow",
+            "  hear me moo",
+            " i weigh twice as much as you"
+          ).mkString("\n")
+        )
+        assert(trimmed == expected)
+      }
+    }
+    'Text {
       * - check("i am a cow", _.Text.run(), Block.Text("i am a cow"))
       * - check("i am a @cow", _.Text.run(), Block.Text("i am a "))
       * - check("i am a @@cow", _.Text.run(), Block.Text("i am a @cow"))
@@ -63,7 +119,7 @@ object ParserTests extends utest.TestSuite{
       )
     }
     'Body{
-      * - check(
+      'indents - check(
         """
           |@omg
           |  @wtf
@@ -84,7 +140,7 @@ object ParserTests extends utest.TestSuite{
           ))))
         ))
       )
-      * - check(
+      'dedents - check(
         """
           |@omg
           |  @wtf
@@ -101,7 +157,7 @@ object ParserTests extends utest.TestSuite{
           Chain("bbq", Seq())
         ))
       )
-      * - check(
+      'dedentText - check(
         """
           |@omg("lol", 1, 2)
           |  @wtf
@@ -139,7 +195,7 @@ object ParserTests extends utest.TestSuite{
 //          Text("bbq")
 //        ))
 //      )
-      * - check(
+      'codeBlocks - check(
         """
           |@{"lol" * 3}
           |@{

@@ -4,26 +4,15 @@ package stages
 import org.parboiled2._
 import torimatomeru.ScalaSyntax
 import Util._
-trait Ast{
-  def offset: Int
-}
-object Ast{
-  case class Block(parts: Seq[Block.Sub], offset: Int = 0) extends Chain.Sub
-  object Block{
-    trait Sub extends Ast
-    case class Text(txt: String, offset: Int = 0) extends Block.Sub
-  }
 
-  case class Chain(lhs: String, parts: Seq[Chain.Sub], offset: Int = 0) extends Block.Sub
-  object Chain{
-    trait Sub extends Ast
-    case class Prop(str: String, offset: Int = 0) extends Sub
-    case class TypeArgs(str: String, offset: Int = 0) extends Sub
-    case class Args(str: String, offset: Int = 0) extends Sub
-  }
-}
-object Parser{
-  def parse(input: String): Ast.Block = {
+/**
+ * Parses the input text into a roughly-structured AST. This AST
+ * is much simpler than the real Scala AST, but serves us well
+ * enough until we stuff the code-strings into the real Scala
+ * parser later
+ */
+object Parser extends (String => Ast.Block){
+  def apply(input: String): Ast.Block = {
     new Parser(input).Body.run().get
   }
 }
@@ -93,5 +82,24 @@ class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
     ) ~> {x =>
       Ast.Block(x.flatten)
     }
+  }
+}
+
+trait Ast{
+  def offset: Int
+}
+object Ast{
+  case class Block(parts: Seq[Block.Sub], offset: Int = 0) extends Chain.Sub
+  object Block{
+    trait Sub extends Ast
+    case class Text(txt: String, offset: Int = 0) extends Block.Sub
+  }
+
+  case class Chain(lhs: String, parts: Seq[Chain.Sub], offset: Int = 0) extends Block.Sub
+  object Chain{
+    trait Sub extends Ast
+    case class Prop(str: String, offset: Int = 0) extends Sub
+    case class TypeArgs(str: String, offset: Int = 0) extends Sub
+    case class Args(str: String, offset: Int = 0) extends Sub
   }
 }

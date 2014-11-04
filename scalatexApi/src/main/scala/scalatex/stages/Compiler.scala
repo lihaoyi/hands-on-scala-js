@@ -6,9 +6,7 @@ import scala.reflect.macros.whitebox.Context
 import scala.reflect.internal.util.{Position, OffsetPosition}
 
 /**
- * Walks the parsed AST, converting it into an un-structured Scala source-blob
- * which when compiled results in a function that can be used to generate the
- * given Frag at runtime.
+ * Walks the parsed AST, converting it into a structured Scala c.Tree
  */
 object Compiler{
 
@@ -17,7 +15,7 @@ object Compiler{
     import c.universe._
     def fragType = tq"scalatags.Text.all.Frag"
 
-
+    println(template)
     def compileChain(code: String, parts: Seq[Ast.Chain.Sub], offset: Int): c.Tree = {
       parts.foldLeft(c.parse(code)){
         case (curr, Ast.Chain.Prop(str, offset2)) => q"$curr.${TermName(str)}"
