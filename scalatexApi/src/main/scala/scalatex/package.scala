@@ -25,14 +25,14 @@ package object scalatex {
 
     def applyMacroFile(c: Context)(filename: c.Expr[String]): c.Expr[Frag] = {
       import c.universe._
-      val s = filename.tree
+      val fileName = filename.tree
         .asInstanceOf[Literal]
         .value
         .value
         .asInstanceOf[String]
-      val txt = io.Source.fromFile(s).mkString |> stages.IndentHandler
+      val txt = io.Source.fromFile(fileName).mkString
       val sourceFile = new BatchSourceFile(
-        new PlainFile(s),
+        new PlainFile(fileName),
         txt.toCharArray
       )
 
@@ -47,7 +47,7 @@ package object scalatex {
                        debug: Boolean)
                       : c.Expr[Frag] = {
       import c.universe._
-      val s = expr.tree
+      val scalatexFragment = expr.tree
                   .asInstanceOf[Literal]
                   .value
                   .value
@@ -58,10 +58,8 @@ package object scalatex {
           .lineContent
           .drop(expr.tree.pos.column)
           .take(2)
-      val indented = s |> stages.IndentHandler
-      if (debug) println(indented)
       compileThing(c)(
-        indented,
+        scalatexFragment,
         expr.tree.pos.source,
         expr.tree.pos.point + (if (stringStart == "\"\"") 1 else -1),
         runtimeErrors,
@@ -80,7 +78,7 @@ package object scalatex {
     def compile(s: String): c.Tree = {
       val realPos = new OffsetPosition(source, point).asInstanceOf[c.universe.Position]
 
-      Compiler(c)(realPos, s |> stages.Parser)
+      Compiler(c)(realPos, new ScalatexParser(s).Body.run().get)
     }
 
     import c.Position
@@ -96,7 +94,5 @@ package object scalatex {
           c.Expr( q"""throw scalatex.Internals.DebugFailure($msg, $posMsg)""")
         }
     }
-
   }
-
 }

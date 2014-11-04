@@ -9,14 +9,15 @@ trait Ast{
 object Ast{
   case class Block(parts: Seq[Block.Sub], offset: Int = 0) extends Chain.Sub
   object Block{
-    trait Sub
+    trait Sub extends Ast
     case class Text(txt: String, offset: Int = 0) extends Block.Sub
   }
-  case class Code(code: String, offset: Int = 0)
-  case class Chain(lhs: Code, parts: Seq[Chain.Sub], offset: Int = 0) extends Block.Sub
+
+  case class Chain(lhs: String, parts: Seq[Chain.Sub], offset: Int = 0) extends Block.Sub
   object Chain{
-    trait Sub
+    trait Sub extends Ast
     case class Prop(str: String, offset: Int = 0) extends Sub
+    case class TypeArgs(str: String, offset: Int = 0) extends Sub
     case class Args(str: String, offset: Int = 0) extends Sub
   }
 }
@@ -42,7 +43,7 @@ class ScalatexParser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(in
   }
   def Text = TextNot("@")
   def Code = rule {
-    "@" ~ capture(Id | BlockExpr | ('(' ~ optional(Exprs) ~ ')')) ~> (Ast.Code(_))
+    "@" ~ capture(Id | BlockExpr2 | ('(' ~ optional(Exprs) ~ ')'))
   }
   def BlankLine = rule{ '\n' ~ zeroOrMore(' ') ~ &('\n') }
   def Indent = rule{ '\n' ~ indent.times(' ') ~ zeroOrMore(' ') }
@@ -62,7 +63,8 @@ class ScalatexParser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(in
     Code ~ zeroOrMore(Extension) ~> {Ast.Chain(_, _)}
   }
   def Extension: Rule1[Ast.Chain.Sub] = rule {
-    (capture(('.' ~ Id) ~ optional(TypeArgs2)) ~> (Ast.Chain.Prop(_))) |
+    (capture('.' ~ Id) ~> (Ast.Chain.Prop(_))) |
+    (capture(TypeArgs2) ~> (Ast.Chain.TypeArgs(_))) |
     (capture(ArgumentExprs2) ~> (Ast.Chain.Args(_))) |
     TBlock
   }
@@ -72,6 +74,7 @@ class ScalatexParser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(in
   def ArgumentExprs2 = rule {
     '(' ~ Ws ~ (optional(Exprs ~ ',' ~ Ws) ~ PostfixExpr ~ ':' ~ Ws ~ '_' ~ Ws ~ '*' ~ Ws | optional(Exprs)) ~ ')'
   }
+  def BlockExpr2: Rule0 = rule { '{' ~ Ws ~ (CaseClauses | Block) ~ '}' }
   def TBlock = rule{ '{' ~ Body ~ '}' }
 
   def Body = rule{
