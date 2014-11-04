@@ -81,17 +81,37 @@ object ParserTests extends utest.TestSuite{
 
     }
     'Code{
-      * - check("@(1 + 1)lolsss\n", _.Code.run(),  "(1 + 1)")
-      * - check("@{{1} + (1)}  ", _.Code.run(), "{{1} + (1)}")
-      * - check("@{val x = 1; 1} ", _.Code.run(), "{val x = 1; 1}")
-      * - check("@{`{}}{()@`}\n", _.Code.run(), "{`{}}{()@`}")
-      * - check("@gggg  ", _.Code.run(), "gggg")
+      'identifier - check("@gggg  ", _.Code.run(), "gggg")
+      'parens - check("@(1 + 1)lolsss\n", _.Code.run(),  "(1 + 1)")
+      'curlies - check("@{{1} + (1)}  ", _.Code.run(), "{{1} + (1)}")
+      'blocks - check("@{val x = 1; 1} ", _.Code.run(), "{val x = 1; 1}")
+      'weirdBackticks - check("@{`{}}{()@`}\n", _.Code.run(), "{`{}}{()@`}")
      }
+    'MiscCode{
+      'imports{
+        * - check("@import math.abs", _.Header.run(), "import math.abs")
+        * - check("@import math.{abs, sin}", _.Header.run(), "import math.{abs, sin}")
+      }
+      'headerblocks{
+        check(
+          """@import math.abs
+            |@import math.sin
+            |
+            |hello world
+            |""".stripMargin,
+          _.HeaderBlock.run(),
+          Ast.Block(
+            Some("import math.abs\nimport math.sin"),
+            Seq(Text("\n"), Text("hello world"), Text("\n"))
+          )
+        )
+      }
 
+    }
     'Block{
-      * - check("{i am a cow}", _.TBlock.run(), Block(Seq(Block.Text("i am a cow"))))
+      * - check("{i am a cow}", _.TBlock.run(), Block(None, Seq(Block.Text("i am a cow"))))
       * - check("{i @am a @cow}", _.TBlock.run(),
-        Block(Seq(
+        Block(None, Seq(
           Block.Text("i "),
           Chain("am",Seq()),
           Block.Text(" a "),
@@ -111,10 +131,10 @@ object ParserTests extends utest.TestSuite{
       )
       * - check("@omg{bbq}.cow(moo){a @b}\n", _.ScalaChain.run(),
         Chain("omg",Seq(
-          Block(Seq(Block.Text("bbq"))),
+          Block(None, Seq(Block.Text("bbq"))),
           Chain.Prop("cow"),
           Chain.Args("(moo)"),
-          Block(Seq(Block.Text("a "), Chain("b", Nil)))
+          Block(None, Seq(Block.Text("a "), Chain("b", Nil)))
         ))
       )
     }
@@ -126,13 +146,13 @@ object ParserTests extends utest.TestSuite{
           |    @bbq
           |      @lol""".stripMargin,
         _.Body.run(),
-        Block(Seq(
+        Block(None, Seq(
           Text("\n"),
-          Chain("omg",Seq(Block(Seq(
+          Chain("omg",Seq(Block(None, Seq(
             Text("\n  "),
-            Chain("wtf",Seq(Block(Seq(
+            Chain("wtf",Seq(Block(None, Seq(
               Text("\n    "),
-              Chain("bbq",Seq(Block(Seq(
+              Chain("bbq",Seq(Block(None, Seq(
                 Text("\n      "),
                 Chain("lol",Seq())
               ))))
@@ -146,9 +166,10 @@ object ParserTests extends utest.TestSuite{
           |  @wtf
           |@bbq""".stripMargin,
         _.Body.run(),
-        Block(Seq(
+        Block(None, Seq(
           Text("\n"),
           Chain("omg",Seq(Block(
+            None,
             Seq(
               Text("\n  "),
               Chain("wtf",Seq()))
@@ -163,11 +184,11 @@ object ParserTests extends utest.TestSuite{
           |  @wtf
           |bbq""".stripMargin,
         _.Body.run(),
-        Block(Seq(
+        Block(None, Seq(
           Text("\n"),
           Chain("omg",Seq(
             Args("""("lol", 1, 2)"""),
-            Block(Seq(
+            Block(None, Seq(
               Text("\n  "),
               Chain("wtf",Seq())))
           )),
@@ -203,7 +224,7 @@ object ParserTests extends utest.TestSuite{
           |  omg * 2
           |}""".stripMargin,
         _.Body.run(),
-        Block(Seq(
+        Block(None, Seq(
           Text("\n"),
           Chain("{\"lol\" * 3}", Seq()),
           Text("\n"),
@@ -217,7 +238,6 @@ object ParserTests extends utest.TestSuite{
       )
     }
   }
-
 }
 
 

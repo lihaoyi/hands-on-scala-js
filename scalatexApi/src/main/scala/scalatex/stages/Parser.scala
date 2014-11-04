@@ -40,6 +40,16 @@ class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
   def Code = rule {
     "@" ~ capture(Id | BlockExpr2 | ('(' ~ optional(Exprs) ~ ')'))
   }
+  def Header = rule {
+    "@" ~ capture(Def | Import)
+  }
+
+  def HeaderBlock: Rule1[Ast.Block] = rule{
+    oneOrMore(Header ~ NewlineS) ~ runSubParser{new Parser(_, indent).Body0} ~> {
+      (head: Seq[String], body: Ast.Block) => body.copy(front = Some(head.mkString("\n")))
+    }
+  }
+
   def BlankLine = rule{ '\n' ~ zeroOrMore(' ') ~ &('\n') }
   def Indent = rule{ '\n' ~ indent.times(' ') ~ zeroOrMore(' ') }
   def LoneScalaChain: Rule2[Ast.Block.Text, Ast.Chain] = rule {
@@ -72,15 +82,22 @@ class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
   def BlockExpr2: Rule0 = rule { '{' ~ Ws ~ (CaseClauses | Block) ~ '}' }
   def TBlock = rule{ '{' ~ Body ~ '}' }
 
-  def Body = rule{
-    oneOrMore(
-      LoneScalaChain ~> (Seq(_, _)) |
+  def BodyItem = rule{
+    LoneScalaChain ~> (Seq(_, _)) |
+      HeaderBlock ~> (Seq(_)) |
       TextNot("@}") ~> (Seq(_)) |
       (capture(Indent) ~> (x => Seq(Ast.Block.Text(x)))) |
       (capture(BlankLine) ~> (x => Seq(Ast.Block.Text(x)))) |
       ScalaChain ~> (Seq(_))
-    ) ~> {x =>
-      Ast.Block(x.flatten)
+  }
+  def Body = rule{
+    oneOrMore(BodyItem) ~> {x =>
+      Ast.Block(None, x.flatten)
+    }
+  }
+  def Body0 = rule{
+    zeroOrMore(BodyItem) ~> {x =>
+      Ast.Block(None, x.flatten)
     }
   }
 }
@@ -89,12 +106,28 @@ trait Ast{
   def offset: Int
 }
 object Ast{
-  case class Block(parts: Seq[Block.Sub], offset: Int = 0) extends Chain.Sub
+
+  /**
+   * @param front Any parameter lists (if it's a lambda), imports, val/def/lazy-val,
+   *              class/object/trait declarations that occur before the parts of this
+   *              block, and must be in scope within those parts
+   * @param parts The various bits of text and other things which make up this block
+   * @param offset
+   */
+  case class Block(front: Option[String],
+                   parts: Seq[Block.Sub],
+                   offset: Int = 0)
+                   extends Chain.Sub with Block.Sub
   object Block{
     trait Sub extends Ast
     case class Text(txt: String, offset: Int = 0) extends Block.Sub
   }
 
+  /**
+   * @param lhs The first expression in this method-chain
+   * @param parts A list of follow-on items chained to the first
+   * @param offset
+   */
   case class Chain(lhs: String, parts: Seq[Chain.Sub], offset: Int = 0) extends Block.Sub
   object Chain{
     trait Sub extends Ast
