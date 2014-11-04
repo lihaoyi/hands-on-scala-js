@@ -1,16 +1,16 @@
-//package scalatex
-//import utest._
-//import scalatex.stages._
-//import scalatags.Text.all._
-//
-//
-///**
-//* Created by haoyi on 7/14/14.
-//*/
-//object BasicTests extends TestSuite{
-//  import TestUtil._
-//
-//  val tests = TestSuite{
+package scalatex
+import utest._
+import scalatex.stages._
+import scalatags.Text.all._
+
+
+/**
+* Created by haoyi on 7/14/14.
+*/
+object BasicTests extends TestSuite{
+  import TestUtil._
+
+  val tests = TestSuite{
 //
 //    'helloWorld{
 //      object omg {
@@ -25,7 +25,7 @@
 //        "|i<b>am</b>cowhearmemoo|"
 //      )
 //    }
-//    'interpolation{
+    'interpolation{
 //      'chained-check(
 //        tw("omg @scala.math.pow(0.5, 3) wtf"),
 //        "omg 0.125 wtf"
@@ -47,7 +47,7 @@
 //          omgomg
 //        """
 //      )
-//    }
+    }
 //    'imports{
 //      object Whee{
 //        def func(x: Int) = x * 2
@@ -421,5 +421,5 @@
 //        )
 //      }
 //    }
-//  }
-//}
+  }
+}

@@ -1,8 +1,9 @@
 package scalatex
+package stages
 
 import org.parboiled2._
 import torimatomeru.ScalaSyntax
-
+import Util._
 trait Ast{
   def offset: Int
 }
@@ -21,7 +22,12 @@ object Ast{
     case class Args(str: String, offset: Int = 0) extends Sub
   }
 }
-class ScalatexParser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
+object Parser{
+  def parse(input: String): Ast.Block = {
+    new Parser(input).Body.run().get
+  }
+}
+class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
   val txt = input.sliceString(0, input.length)
   val indentTable = txt.split('\n').map{ s =>
     if (s.trim == "") -1
@@ -35,7 +41,7 @@ class ScalatexParser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(in
   def cursorNextIndent() = {
     nextIndentTable(txt.take(cursor).count(_ == '\n'))
   }
-  println("INDENT " + indent)
+
   def TextNot(chars: String) = rule {
     capture(oneOrMore(noneOf(chars + "\n") | "@@")) ~> {
       x => Ast.Block.Text(x.replace("@@", "@"))
@@ -47,13 +53,13 @@ class ScalatexParser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(in
   }
   def BlankLine = rule{ '\n' ~ zeroOrMore(' ') ~ &('\n') }
   def Indent = rule{ '\n' ~ indent.times(' ') ~ zeroOrMore(' ') }
-  def LoneScalaChain: Rule1[Ast.Chain] = rule {
-    Indent ~
+  def LoneScalaChain: Rule2[Ast.Block.Text, Ast.Chain] = rule {
+    (capture(Indent) ~> (Ast.Block.Text(_))) ~
     ScalaChain ~
     zeroOrMore(BlankLine) ~
     test(cursorNextIndent() > indent) ~
     runSubParser {
-      new ScalatexParser(_, cursorNextIndent()).Body
+      new Parser(_, cursorNextIndent()).Body
     } ~> { (chain: Ast.Chain, body: Ast.Block) =>
       chain.copy(parts = chain.parts :+ body)
     }
@@ -63,7 +69,7 @@ class ScalatexParser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(in
     Code ~ zeroOrMore(Extension) ~> {Ast.Chain(_, _)}
   }
   def Extension: Rule1[Ast.Chain.Sub] = rule {
-    (capture('.' ~ Id) ~> (Ast.Chain.Prop(_))) |
+    ('.' ~ capture(Id) ~> (Ast.Chain.Prop(_))) |
     (capture(TypeArgs2) ~> (Ast.Chain.TypeArgs(_))) |
     (capture(ArgumentExprs2) ~> (Ast.Chain.Args(_))) |
     TBlock
@@ -78,14 +84,14 @@ class ScalatexParser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(in
   def TBlock = rule{ '{' ~ Body ~ '}' }
 
   def Body = rule{
-    zeroOrMore(
-      LoneScalaChain |
-      TextNot("@}") |
-      (capture(Indent) ~> (Ast.Block.Text(_))) |
-      (capture(BlankLine) ~> (Ast.Block.Text(_))) |
-      ScalaChain
+    oneOrMore(
+      LoneScalaChain ~> (Seq(_, _)) |
+      TextNot("@}") ~> (Seq(_)) |
+      (capture(Indent) ~> (x => Seq(Ast.Block.Text(x)))) |
+      (capture(BlankLine) ~> (x => Seq(Ast.Block.Text(x)))) |
+      ScalaChain ~> (Seq(_))
     ) ~> {x =>
-      Ast.Block(x)
+      Ast.Block(x.flatten)
     }
   }
 }

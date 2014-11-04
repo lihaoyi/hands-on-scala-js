@@ -4,16 +4,15 @@ package scalatex
 import org.parboiled2._
 import torimatomeru.ScalaSyntax
 
-import scalatex.Ast.Block.Text
-import scalatex.Ast.Chain.Args
+import scalatex.stages.{Parser, Ast}
+import Ast.Block.Text
+import Ast.Chain.Args
 
 object ParserTests extends utest.TestSuite{
   import Ast._
   import utest._
-  def check[T](input: String, parse: ScalatexParser => scala.util.Try[T], expected: T) = {
-    val parsed = parse(new ScalatexParser(input))
-    println(parsed.get)
-    println(expected)
+  def check[T](input: String, parse: Parser => scala.util.Try[T], expected: T) = {
+    val parsed = parse(new Parser(input))
     assert(parsed.get == expected)
   }
   def tests = TestSuite{
@@ -47,9 +46,9 @@ object ParserTests extends utest.TestSuite{
     'Chain{
       * - check("@omg.bbq[omg].fff[fff](123)  ", _.ScalaChain.run(),
         Chain("omg",Seq(
-          Chain.Prop(".bbq"),
+          Chain.Prop("bbq"),
           Chain.TypeArgs("[omg]"),
-          Chain.Prop(".fff"),
+          Chain.Prop("fff"),
           Chain.TypeArgs("[fff]"),
           Chain.Args("(123)")
         ))
@@ -57,7 +56,7 @@ object ParserTests extends utest.TestSuite{
       * - check("@omg{bbq}.cow(moo){a @b}\n", _.ScalaChain.run(),
         Chain("omg",Seq(
           Block(Seq(Block.Text("bbq"))),
-          Chain.Prop(".cow"),
+          Chain.Prop("cow"),
           Chain.Args("(moo)"),
           Block(Seq(Block.Text("a "), Chain("b", Nil)))
         ))
@@ -72,11 +71,14 @@ object ParserTests extends utest.TestSuite{
           |      @lol""".stripMargin,
         _.Body.run(),
         Block(Seq(
+          Text("\n"),
           Chain("omg",Seq(Block(Seq(
+            Text("\n  "),
             Chain("wtf",Seq(Block(Seq(
+              Text("\n    "),
               Chain("bbq",Seq(Block(Seq(
-                Chain("lol",Seq(Block(Seq(
-                ))))
+                Text("\n      "),
+                Chain("lol",Seq())
               ))))
             ))))
           ))))
@@ -89,14 +91,14 @@ object ParserTests extends utest.TestSuite{
           |@bbq""".stripMargin,
         _.Body.run(),
         Block(Seq(
+          Text("\n"),
           Chain("omg",Seq(Block(
             Seq(
               Text("\n  "),
               Chain("wtf",Seq()))
           ))),
-          Chain("bbq",
-            Seq(Block(Seq()))
-          )
+          Text("\n"),
+          Chain("bbq", Seq())
         ))
       )
       * - check(
@@ -106,6 +108,7 @@ object ParserTests extends utest.TestSuite{
           |bbq""".stripMargin,
         _.Body.run(),
         Block(Seq(
+          Text("\n"),
           Chain("omg",Seq(
             Args("""("lol", 1, 2)"""),
             Block(Seq(
@@ -116,27 +119,46 @@ object ParserTests extends utest.TestSuite{
           Text("bbq")
         ))
       )
+//      * - check(
+//        """
+//          |@omg("lol",
+//          |1,
+//          |       2
+//          |    )
+//          |  wtf
+//          |bbq""".stripMargin,
+//        _.Body.run(),
+//        Block(Seq(
+//          Chain("omg",Seq(
+//            Args("(\"lol\",\n1,\n       2\n    )"),
+//            Block(Seq(
+//              Text("\n  "), Text("wtf")
+//            ))
+//          )),
+//          Text("\n"),
+//          Text("bbq")
+//        ))
+//      )
       * - check(
         """
-          |@omg("lol",
-          |1,
-          |       2
-          |    )
-          |  wtf
-          |bbq""".stripMargin,
+          |@{"lol" * 3}
+          |@{
+          |  val omg = "omg"
+          |  omg * 2
+          |}""".stripMargin,
         _.Body.run(),
         Block(Seq(
-          Chain("omg",Seq(
-            Args("(\"lol\",\n1,\n       2\n    )"),
-            Block(Seq(
-              Text("\n  "), Text("wtf")
-            ))
-          )),
           Text("\n"),
-          Text("bbq")
+          Chain("{\"lol\" * 3}", Seq()),
+          Text("\n"),
+          Chain("""{
+            |  val omg = "omg"
+            |  omg * 2
+            |}""".stripMargin,
+            Seq()
+          )
         ))
       )
-
     }
   }
 

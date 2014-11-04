@@ -2,7 +2,7 @@ import scala.reflect.internal.util.{BatchSourceFile, SourceFile, OffsetPosition}
 import scala.reflect.io.{PlainFile, AbstractFile}
 import scala.reflect.macros.{TypecheckException, Context}
 import scalatags.Text.all._
-import scalatex.stages.Compiler
+import scalatex.stages.{Parser, Compiler}
 import scala.language.experimental.macros
 import acyclic.file
 
@@ -69,7 +69,7 @@ package object scalatex {
   }
 
   def compileThing(c: Context)
-                  (s: String,
+                  (scalatexSource: String,
                    source: SourceFile,
                    point: Int,
                    runtimeErrors: Boolean,
@@ -78,12 +78,17 @@ package object scalatex {
     def compile(s: String): c.Tree = {
       val realPos = new OffsetPosition(source, point).asInstanceOf[c.universe.Position]
 
-      Compiler(c)(realPos, new ScalatexParser(s).Body.run().get)
+      Compiler(c)(realPos, new Parser(s).Body.run().get)
     }
-
+    def normalize(str: String) = {
+      val lines = str.split("\n")
+      val offset = lines.iterator.map(_.takeWhile(_ == ' ').length).min
+      lines.iterator.map(_.drop(offset)).mkString("\n")
+    }
+    
     import c.Position
     try {
-      val compiled = compile(s)
+      val compiled = compile(scalatexSource)
       if (debug) println(compiled)
       c.Expr[Frag](c.typeCheck(compiled))
     } catch {
