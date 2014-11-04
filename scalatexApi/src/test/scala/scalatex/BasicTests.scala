@@ -48,28 +48,74 @@ object BasicTests extends TestSuite{
         """
       )
     }
-//    'imports{
-//      object Whee{
-//        def func(x: Int) = x * 2
-//      }
-//      check(
-//        tw("""
-//          @import math._
-//          @import Whee.func
-//          @abs(-10)
-//          @p
-//            @max(1, 2)
-//            @func(2)
-//        """),
-//        """
-//          10
-//          <p>
-//            2
-//            4
-//          </p>
-//        """
-//      )
-//    }
+    'definitions{
+      'imports{
+        object Whee{
+          def func(x: Int) = x * 2
+        }
+        check(
+          tw("""
+            @import math._
+            @import Whee.func
+            @abs(-10)
+            @p
+              @max(1, 2)
+              @func(2)
+          """),
+          """
+            10
+            <p>
+              2
+              4
+            </p>
+          """
+        )
+      }
+      'valDefVar{
+        check(
+          tw("""
+            Hello
+            @val x = 1
+            World @x
+            @def y = "omg"
+            mooo
+            @y
+          """),
+          """
+            Hello
+            World 1
+            mooo
+            omg
+          """
+        )
+      }
+      'classObjectTrait{
+        check(
+          tw("""
+            @trait Trait{
+              def tt = 2
+            }
+            Hello
+            @case object moo extends Trait{
+              val omg = "wtf"
+            }
+
+            @moo.toString
+            @moo.omg
+            @case class Foo(i: Int, s: String, b: Boolean)
+            TT is @moo.tt
+            @Foo(10, "10", true).toString
+          """),
+          """
+            Hello
+            moo
+            wtf
+            TT is 2
+            Foo(10, 10, true)
+          """
+        )
+      }
+    }
     'parenArgumentLists{
       'attributes{
         check(

@@ -44,9 +44,9 @@ class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
     "@" ~ capture(Def | Import)
   }
 
-  def HeaderBlock: Rule1[Ast.Block] = rule{
-    oneOrMore(Header ~ NewlineS) ~ runSubParser{new Parser(_, indent).Body0} ~> {
-      (head: Seq[String], body: Ast.Block) => body.copy(front = Some(head.mkString("\n")))
+  def HeaderBlock: Rule1[Ast.Header] = rule{
+    Header ~ zeroOrMore(capture(NewlineS) ~ Header ~> (_ + _)) ~ runSubParser{new Parser(_, indent).Body0} ~> {
+      (start: String, heads: Seq[String], body: Ast.Block) => Ast.Header(start + heads.mkString, body)
     }
   }
 
@@ -92,12 +92,12 @@ class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
   }
   def Body = rule{
     oneOrMore(BodyItem) ~> {x =>
-      Ast.Block(None, x.flatten)
+      Ast.Block(x.flatten)
     }
   }
   def Body0 = rule{
     zeroOrMore(BodyItem) ~> {x =>
-      Ast.Block(None, x.flatten)
+      Ast.Block(x.flatten)
     }
   }
 }
@@ -108,21 +108,18 @@ trait Ast{
 object Ast{
 
   /**
-   * @param front Any parameter lists (if it's a lambda), imports, val/def/lazy-val,
-   *              class/object/trait declarations that occur before the parts of this
-   *              block, and must be in scope within those parts
    * @param parts The various bits of text and other things which make up this block
    * @param offset
    */
-  case class Block(front: Option[String],
-                   parts: Seq[Block.Sub],
+  case class Block(parts: Seq[Block.Sub],
                    offset: Int = 0)
                    extends Chain.Sub with Block.Sub
   object Block{
     trait Sub extends Ast
     case class Text(txt: String, offset: Int = 0) extends Block.Sub
-  }
 
+  }
+  case class Header(front: String, block: Block, offset: Int = 0) extends Block.Sub with Chain.Sub
   /**
    * @param lhs The first expression in this method-chain
    * @param parts A list of follow-on items chained to the first

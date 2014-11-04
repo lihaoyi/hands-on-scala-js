@@ -166,7 +166,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Params: Rule0 = rule { zeroOrMore(Param).separatedBy(',') }
   def Param: Rule0 = rule { zeroOrMore(Annotation) ~ IdS ~ optional(':' ~ ParamType) ~ optional('=' ~ Expr) }
   def ClassParamClauses: Rule0 = rule { zeroOrMore(ClassParamClause) ~ optional(optional(NewlineS) ~ '(' ~ "implicit" ~ ClassParam ~ ')') }
-  def ClassParamClause: Rule0 = rule { optional(NewlineS) ~ '(' ~ optional(ClassParam) ~ ')' }
+  def ClassParamClause: Rule0 = rule { optional(NewlineS) ~ '(' ~ optional(ClassParams) ~ ')' }
   def ClassParams: Rule0 = rule { oneOrMore(ClassParam).separatedBy(',') }
   def ClassParam: Rule0 = rule { zeroOrMore(Annotation) ~ optional(zeroOrMore(Modifier) ~ ("val" | "var")) ~ IdS ~ ":" ~ ParamType ~ optional("=" ~ Expr) }
 

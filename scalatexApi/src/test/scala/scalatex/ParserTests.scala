@@ -12,8 +12,8 @@ object ParserTests extends utest.TestSuite{
   import Ast._
   import utest._
   def check[T](input: String, parse: Parser => scala.util.Try[T], expected: T) = {
-    val parsed = parse(new Parser(input))
-    assert(parsed.get == expected)
+    val parsed = parse(new Parser(input)).get
+    assert(parsed == expected)
   }
   def tests = TestSuite{
     'Trim{
@@ -100,18 +100,28 @@ object ParserTests extends utest.TestSuite{
             |hello world
             |""".stripMargin,
           _.HeaderBlock.run(),
-          Ast.Block(
-            Some("import math.abs\nimport math.sin"),
-            Seq(Text("\n"), Text("hello world"), Text("\n"))
+          Ast.Header(
+            "import math.abs\nimport math.sin",
+            Ast.Block(
+              Seq(Text("\n"), Text("\n"), Text("hello world"), Text("\n"))
+            )
           )
+        )
+      }
+      'caseclass{
+        check(
+          """@case class Foo(i: Int, s: String)
+          """.stripMargin,
+          _.Header.run(),
+          "case class Foo(i: Int, s: String)"
         )
       }
 
     }
     'Block{
-      * - check("{i am a cow}", _.TBlock.run(), Block(None, Seq(Block.Text("i am a cow"))))
+      * - check("{i am a cow}", _.TBlock.run(), Block(Seq(Block.Text("i am a cow"))))
       * - check("{i @am a @cow}", _.TBlock.run(),
-        Block(None, Seq(
+        Block(Seq(
           Block.Text("i "),
           Chain("am",Seq()),
           Block.Text(" a "),
@@ -131,10 +141,10 @@ object ParserTests extends utest.TestSuite{
       )
       * - check("@omg{bbq}.cow(moo){a @b}\n", _.ScalaChain.run(),
         Chain("omg",Seq(
-          Block(None, Seq(Block.Text("bbq"))),
+          Block(Seq(Block.Text("bbq"))),
           Chain.Prop("cow"),
           Chain.Args("(moo)"),
-          Block(None, Seq(Block.Text("a "), Chain("b", Nil)))
+          Block(Seq(Block.Text("a "), Chain("b", Nil)))
         ))
       )
     }
@@ -146,13 +156,13 @@ object ParserTests extends utest.TestSuite{
           |    @bbq
           |      @lol""".stripMargin,
         _.Body.run(),
-        Block(None, Seq(
+        Block(Seq(
           Text("\n"),
-          Chain("omg",Seq(Block(None, Seq(
+          Chain("omg",Seq(Block(Seq(
             Text("\n  "),
-            Chain("wtf",Seq(Block(None, Seq(
+            Chain("wtf",Seq(Block(Seq(
               Text("\n    "),
-              Chain("bbq",Seq(Block(None, Seq(
+              Chain("bbq",Seq(Block(Seq(
                 Text("\n      "),
                 Chain("lol",Seq())
               ))))
@@ -166,10 +176,9 @@ object ParserTests extends utest.TestSuite{
           |  @wtf
           |@bbq""".stripMargin,
         _.Body.run(),
-        Block(None, Seq(
+        Block(Seq(
           Text("\n"),
           Chain("omg",Seq(Block(
-            None,
             Seq(
               Text("\n  "),
               Chain("wtf",Seq()))
@@ -184,11 +193,11 @@ object ParserTests extends utest.TestSuite{
           |  @wtf
           |bbq""".stripMargin,
         _.Body.run(),
-        Block(None, Seq(
+        Block(Seq(
           Text("\n"),
           Chain("omg",Seq(
             Args("""("lol", 1, 2)"""),
-            Block(None, Seq(
+            Block(Seq(
               Text("\n  "),
               Chain("wtf",Seq())))
           )),
@@ -224,7 +233,7 @@ object ParserTests extends utest.TestSuite{
           |  omg * 2
           |}""".stripMargin,
         _.Body.run(),
-        Block(None, Seq(
+        Block(Seq(
           Text("\n"),
           Chain("{\"lol\" * 3}", Seq()),
           Text("\n"),
