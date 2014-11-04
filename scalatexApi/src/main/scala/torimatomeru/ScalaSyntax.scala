@@ -6,7 +6,7 @@ import org.parboiled2._
 
 class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identifiers with Literals {
 
-  def Whitespace = rule { zeroOrMore(WhitespaceChar | Comment) }
+  def Whitespace = rule { zeroOrMore(WhitespaceChar | Comment | Newline) }
 
   /**
    * Every token handles space at the end.

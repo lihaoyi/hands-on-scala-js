@@ -4,11 +4,16 @@ package scalatex
 import org.parboiled2._
 import torimatomeru.ScalaSyntax
 
+import scalatex.Ast.Block.Text
+import scalatex.Ast.Chain.Args
+
 object ParserTests extends utest.TestSuite{
   import Ast._
   import utest._
   def check[T](input: String, parse: ScalatexParser => scala.util.Try[T], expected: T) = {
     val parsed = parse(new ScalatexParser(input))
+    println(parsed.get)
+    println(expected)
     assert(parsed.get == expected)
   }
   def tests = TestSuite{
@@ -58,24 +63,78 @@ object ParserTests extends utest.TestSuite{
           |@omg
           |  @wtf
           |    @bbq
-          |      @lol
-        """.stripMargin,
+          |      @lol""".stripMargin,
         _.Body.run(),
         Block(Seq(
           Chain(Code("omg"),Seq(Block(Seq(
             Chain(Code("wtf"),Seq(Block(Seq(
               Chain(Code("bbq"),Seq(Block(Seq(
                 Chain(Code("lol"),Seq(Block(Seq(
-                )))),
-                Ast.Block.Text("\n        ")
+                ))))
               ))))
             ))))
           ))))
         ))
       )
+      * - check(
+        """
+          |@omg
+          |  @wtf
+          |@bbq""".stripMargin,
+        _.Body.run(),
+        Block(Seq(
+          Chain(Code("omg"),Seq(Block(
+            Seq(
+              Text("\n  "),
+              Chain(Code("wtf"),Seq()))
+          ))),
+          Chain(Code("bbq"),
+            Seq(Block(Seq()))
+          )
+        ))
+      )
+      * - check(
+        """
+          |@omg("lol", 1, 2)
+          |  @wtf
+          |bbq""".stripMargin,
+        _.Body.run(),
+        Block(Seq(
+          Chain(Code("omg"),Seq(
+            Args("""("lol", 1, 2)"""),
+            Block(Seq(
+              Text("\n  "),
+              Chain(Code("wtf"),Seq())))
+          )),
+          Text("\n"),
+          Text("bbq")
+        ))
+      )
+      * - check(
+        """
+          |@omg("lol",
+          |1,
+          |       2
+          |    )
+          |  wtf
+          |bbq""".stripMargin,
+        _.Body.run(),
+        Block(Seq(
+          Chain(Code("omg"),Seq(
+            Args("(\"lol\",\n1,\n       2\n    )"),
+            Block(Seq(
+              Text("\n  "), Text("wtf")
+            ))
+          )),
+          Text("\n"),
+          Text("bbq")
+        ))
+      )
+
     }
   }
 
 }
+
 
 

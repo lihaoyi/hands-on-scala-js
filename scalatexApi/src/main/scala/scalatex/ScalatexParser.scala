@@ -62,11 +62,18 @@ class ScalatexParser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(in
     Code ~ zeroOrMore(Extension) ~> {Ast.Chain(_, _)}
   }
   def Extension: Rule1[Ast.Chain.Sub] = rule {
-    (capture(('.' ~ Id) ~ optional(TypeArgs)) ~> (Ast.Chain.Prop(_))) |
-    (capture(!BlockExpr ~ ArgumentExprs) ~> (Ast.Chain.Args(_))) |
+    (capture(('.' ~ Id) ~ optional(TypeArgs2)) ~> (Ast.Chain.Prop(_))) |
+    (capture(ArgumentExprs2) ~> (Ast.Chain.Args(_))) |
     TBlock
   }
+  def Ws = Whitespace
+  // clones of the version in ScalaSyntax, but without tailing whitespace or newlines
+  def TypeArgs2 = rule { '[' ~ Ws ~ Types ~ ']' }
+  def ArgumentExprs2 = rule {
+    '(' ~ Ws ~ (optional(Exprs ~ ',' ~ Ws) ~ PostfixExpr ~ ':' ~ Ws ~ '_' ~ Ws ~ '*' ~ Ws | optional(Exprs)) ~ ')'
+  }
   def TBlock = rule{ '{' ~ Body ~ '}' }
+
   def Body = rule{
     zeroOrMore(
       LoneScalaChain |
