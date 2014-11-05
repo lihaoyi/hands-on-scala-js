@@ -55,13 +55,28 @@ class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
   def LoneScalaChain: Rule2[Ast.Block.Text, Ast.Chain] = rule {
     (capture(Indent) ~> (Ast.Block.Text(_))) ~
     ScalaChain ~
-    zeroOrMore(BlankLine) ~
     test(cursorNextIndent() > indent) ~
-    runSubParser {
-      new Parser(_, cursorNextIndent()).Body
-    } ~> { (chain: Ast.Chain, body: Ast.Block) =>
-      chain.copy(parts = chain.parts :+ body)
+    runSubParser(new Parser(_, cursorNextIndent()).Body) ~> {
+      (chain: Ast.Chain, body: Ast.Block) => chain.copy(parts = chain.parts :+ body)
     }
+  }
+
+  def IfElse = rule{
+    "@" ~ capture("if" ~ "(" ~ Expr ~ ")") ~ TBlock ~ optional("else" ~ TBlock) ~>{
+      Ast.Block.IfElse(_, _, _)
+    }
+  }
+  def ForLoop = rule{
+    "@" ~
+    capture("for" ~ ('(' ~ Enumerators ~ ')' | '{' ~ Enumerators ~ '}')) ~
+    TBlock ~> (Ast.Block.For(_, _))
+  }
+  def LoneForLoop = rule{
+    "@" ~
+    capture("for" ~ ('(' ~ Enumerators ~ ')' | '{' ~ Enumerators ~ '}')) ~
+    test(cursorNextIndent() > indent) ~
+    runSubParser(new Parser(_, cursorNextIndent()).Body) ~>
+    (Ast.Block.For(_, _))
   }
 
   def ScalaChain = rule {
@@ -80,15 +95,17 @@ class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
     '(' ~ Ws ~ (optional(Exprs ~ ',' ~ Ws) ~ PostfixExpr ~ ':' ~ Ws ~ '_' ~ Ws ~ '*' ~ Ws | optional(Exprs)) ~ ')'
   }
   def BlockExpr2: Rule0 = rule { '{' ~ Ws ~ (CaseClauses | Block) ~ '}' }
-  def TBlock = rule{ '{' ~ Body ~ '}' }
+  def TBlock: Rule1[Ast.Block] = rule{ '{' ~ Body ~ '}' }
 
-  def BodyItem = rule{
+  def BodyItem: Rule1[Seq[Ast.Block.Sub]] = rule{
     LoneScalaChain ~> (Seq(_, _)) |
-      HeaderBlock ~> (Seq(_)) |
-      TextNot("@}") ~> (Seq(_)) |
-      (capture(Indent) ~> (x => Seq(Ast.Block.Text(x)))) |
-      (capture(BlankLine) ~> (x => Seq(Ast.Block.Text(x)))) |
-      ScalaChain ~> (Seq(_))
+    HeaderBlock ~> (Seq(_)) |
+    ForLoop ~> (Seq(_)) |
+    LoneForLoop ~> (Seq(_)) |
+    TextNot("@}") ~> (Seq(_)) |
+    (capture(Indent) ~> (x => Seq(Ast.Block.Text(x)))) |
+    (capture(BlankLine) ~> (x => Seq(Ast.Block.Text(x)))) |
+    ScalaChain ~> (Seq(_: Ast.Block.Sub))
   }
   def Body = rule{
     oneOrMore(BodyItem) ~> {x =>
@@ -117,9 +134,11 @@ object Ast{
   object Block{
     trait Sub extends Ast
     case class Text(txt: String, offset: Int = 0) extends Block.Sub
-
+    case class For(generators: String, block: Block, offset: Int = 0) extends Block.Sub
+    case class IfElse(condition: String, block: Block, elseBlock: Option[Block], offset: Int = 0) extends Block.Sub
   }
   case class Header(front: String, block: Block, offset: Int = 0) extends Block.Sub with Chain.Sub
+
   /**
    * @param lhs The first expression in this method-chain
    * @param parts A list of follow-on items chained to the first

@@ -5,7 +5,7 @@ import org.parboiled2._
 import torimatomeru.ScalaSyntax
 
 import scalatex.stages.{Parser, Ast}
-import Ast.Block.Text
+import scalatex.stages.Ast.Block.{IfElse, For, Text}
 import Ast.Chain.Args
 
 object ParserTests extends utest.TestSuite{
@@ -148,6 +148,29 @@ object ParserTests extends utest.TestSuite{
         ))
       )
     }
+    'ControlFlow{
+      'for - check(
+        "@for(x <- 0 until 3){lol}",
+        _.ForLoop.run(),
+        For("for(x <- 0 until 3)", Block(Seq(Text("lol"))))
+      )
+      'forBlock - check(
+        """@for(x <- 0 until 3)
+          |  lol""".stripMargin,
+        _.LoneForLoop.run(),
+        For("for(x <- 0 until 3)", Block(Seq(Text("\n  "), Text("lol"))))
+      )
+      'if - check(
+        "@if(true){lol}",
+        _.IfElse.run(),
+        IfElse("if(true)", Block(Seq(Text("lol"))), None)
+      )
+      'ifElse - check(
+        "@if(true){lol}else{ omg }",
+        _.IfElse.run(),
+        IfElse("if(true)", Block(Seq(Text("lol"))), Some(Block(Seq(Text(" omg ")))))
+      )
+    }
     'Body{
       'indents - check(
         """
@@ -181,7 +204,28 @@ object ParserTests extends utest.TestSuite{
           Chain("omg",Seq(Block(
             Seq(
               Text("\n  "),
-              Chain("wtf",Seq()))
+              Chain("wtf",Seq())
+            )
+          ))),
+          Text("\n"),
+          Chain("bbq", Seq())
+        ))
+      )
+      'braces - check(
+        """
+          |@omg{
+          |  @wtf
+          |}
+          |@bbq""".stripMargin,
+        _.Body.run(),
+        Block(Seq(
+          Text("\n"),
+          Chain("omg",Seq(Block(
+            Seq(
+              Text("\n  "),
+              Chain("wtf",Seq()),
+              Text("\n")
+            )
           ))),
           Text("\n"),
           Chain("bbq", Seq())

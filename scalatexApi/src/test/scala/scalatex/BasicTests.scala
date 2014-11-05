@@ -1,5 +1,6 @@
 package scalatex
 import utest._
+import scala.collection.mutable.ArrayBuffer
 import scalatex.stages._
 import scalatags.Text.all._
 
@@ -241,30 +242,31 @@ object BasicTests extends TestSuite{
           )
         }
       }
-//      'mixed{
-//        check(
-//          tw("""
-//            @div{
-//              Hello
-//              @div
-//                @h1 WORLD @b{!!!}
-//                  lol
-//                @p{
-//                  @h2{Header 2}
-//                }
-//            }
-//          """),
-//          """
-//            <div>
-//              Hello
-//              <div>
-//                <h1></h1>WORLD<b>!!!</b>lol
-//                <p><h2>Header2</h2></p>
-//              </div>
-//            </div>
-//          """
-//        )
-//      }
+      'mixed{
+        check(
+          tw("""
+            @div{
+              Hello
+              @div
+                @h1
+                  WORLD @b{!!!}
+                  lol
+                @p{
+                  @h2{Header 2}
+                }
+            }
+          """),
+          """
+            <div>
+              Hello
+              <div>
+                <h1>WORLD<b>!!!</b>lol</h1>
+                <p><h2>Header2</h2></p>
+              </div>
+            </div>
+          """
+        )
+      }
 //
 //      'args{
 //        val things = Seq(1, 2, 3)
@@ -468,4 +470,5 @@ object BasicTests extends TestSuite{
 //      }
     }
   }
+
 }
