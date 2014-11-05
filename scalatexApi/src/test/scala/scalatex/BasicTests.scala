@@ -193,22 +193,22 @@ object BasicTests extends TestSuite{
             """
           )
         }
-//        'linearNested{
-//          check(
-//            tw("""
-//              @h1 @span @a Hello World
-//              @h2 @span @a hello
-//                  @b world
-//              @h3 @i
-//                  @div Cow
-//            """),
-//            """
-//              <h1></h1><span></span><a></a>HelloWorld
-//              <h2></h2><span></span><a></a>hello<b></b>world
-//              <h3></h3><i></i><div></div>Cow
-//            """
-//          )
-//        }
+        'linearNested{
+          check(
+            tw("""
+              @h1 @span @a Hello World
+              @h2 @span @a hello
+                  @b world
+              @h3 @i
+                  @div Cow
+            """),
+            """
+              <h1></h1><span></span><a></a>HelloWorld
+              <h2></h2><span></span><a></a>hello<b></b>world
+              <h3></h3><i></i><div></div>Cow
+            """
+          )
+        }
         'crasher{
           tw("""
 @html
@@ -294,9 +294,9 @@ object BasicTests extends TestSuite{
 //          """
 //        )
 //      }
-//    }
+    }
 //
-//    'loops {
+    'loops {
 //
       * - check(
         tw("""
@@ -310,124 +310,124 @@ object BasicTests extends TestSuite{
         """),
         "lollollol"
       )
-//
-//
-//      * - check(
-//          tw("""
-//            @p
-//              @for(x <- 0 until 2)
-//                @for(y <- 0 until 2)
-//                  lol@x@y
-//          """),
-//          tw( """
-//            @p
-//              @for(x <- 0 until 2) {
-//                @for(y <- 0 until 2)
-//                  lol@x@y
-//              }
-//          """),
-//          tw("""
-//            @p
-//              @for(x <- 0 until 2)
-//                @for(y <- 0 until 2){
-//                  lol@x@y
-//                }
-//          """),
-//          "<p>lol00lol01lol10lol11</p>"
-//        )
-//        check(
-//          tw("""
-//            @p
-//              @for(x <- 0 until 2)
-//                @for(y <- 0 until 2)
-//                  lol@x@y
-//          """),
-//          "<p>lol00lol01lol10lol11</p>"
-//        )
-//
-//      * - check(
-//          tw(
-//            """
-//            @for(x <- 0 until 2; y <- 0 until 2)
-//              @div{@x@y}
-//
-//          """),
-//        """<div>00</div><div>01</div><div>10</div><div>11</div>"""
-//        )
-//    }
-//
-//    'ifElse{
-//      'basicExamples{
-//        * - check(
-//          tw("""
-//            @if(false)
-//              Hello
-//            @else
-//              lols
-//            @p
-//          """),
-//          "lols<p></p>"
-//        )
-//
-//        * - check(
-//          tw("""
-//            @div
-//              @if(true)
-//                Hello
-//              @else
-//                lols
-//          """),
-//          "<div>Hello</div>"
-//        )
-//
-//        * - check(
-//          tw("""
-//            @div
-//              @if(true)
-//                Hello
-//              @else
-//                lols
-//          """),
-//          "<div>Hello</div>"
-//        )
-//        * - check(
-//          tw("""
-//            @if(false)
-//              Hello
-//            @else
-//              lols
-//          """),
-//          "lols"
-//        )
-//        * - check(
-//          tw("""
-//            @if(false)
-//              Hello
-//            @else
-//              lols
-//            @img
-//          """),
-//          "lols<img/>"
-//        )
-//        * - check(
-//          tw("""
-//            @p
-//              @if(true)
-//                Hello
-//              @else
-//                lols
-//          """),
-//          tw("""
-//            @p
-//              @if(true) {
-//                Hello
-//              } else {
-//                lols
-//              }
-//          """),
-//          "<p>Hello</p>"
-//        )
-//      }
+
+
+      * - check(
+          tw("""
+            @p
+              @for(x <- 0 until 2)
+                @for(y <- 0 until 2)
+                  lol@x@y
+          """),
+          tw( """
+            @p
+              @for(x <- 0 until 2){
+                @for(y <- 0 until 2)
+                  lol@x@y
+              }
+          """),
+          tw("""
+            @p
+              @for(x <- 0 until 2)
+                @for(y <- 0 until 2){
+                  lol@x@y
+                }
+          """),
+          "<p>lol00lol01lol10lol11</p>"
+        )
+        check(
+          tw("""
+            @p
+              @for(x <- 0 until 2)
+                @for(y <- 0 until 2)
+                  lol@x@y
+          """),
+          "<p>lol00lol01lol10lol11</p>"
+        )
+
+      * - check(
+          tw(
+            """
+            @for(x <- 0 until 2; y <- 0 until 2)
+              @div{@x@y}
+
+          """),
+        """<div>00</div><div>01</div><div>10</div><div>11</div>"""
+        )
+    }
+
+    'ifElse{
+      'basicExamples{
+        * - check(
+          tw("""
+            @if(false)
+              Hello
+            @else
+              lols
+            @p
+          """),
+          "lols<p></p>"
+        )
+
+        * - check(
+          tw("""
+            @div
+              @if(true)
+                Hello
+              @else
+                lols
+          """),
+          "<div>Hello</div>"
+        )
+
+        * - check(
+          tw("""
+            @div
+              @if(true)
+                Hello
+              @else
+                lols
+          """),
+          "<div>Hello</div>"
+        )
+        * - check(
+          tw("""
+            @if(false)
+              Hello
+            @else
+              lols
+          """),
+          "lols"
+        )
+        * - check(
+          tw("""
+            @if(false)
+              Hello
+            @else
+              lols
+            @img
+          """),
+          "lols<img/>"
+        )
+        * - check(
+          tw("""
+            @p
+              @if(true)
+                Hello
+              @else
+                lols
+          """),
+          tw("""
+            @p
+              @if(true){
+                Hello
+              }else{
+                lols
+              }
+          """),
+          "<p>Hello</p>"
+        )
+      }
 //      'funkyExpressions{
 //        * - check(
 //          tw("""

@@ -173,7 +173,7 @@ object ParserTests extends utest.TestSuite{
           _.Body.run(),
           Block(Seq(
             Text("\n"),
-            For("for(x <- 0 until 3)", Block(Seq(Text("\n  "), Text("lol"))))
+            For("for(x <- 0 until 3)", Block(Seq(Text("\n  "), Text("lol"), Text("\n"))))
           ))
         )
       }
@@ -189,13 +189,15 @@ object ParserTests extends utest.TestSuite{
           IfElse("if(true)", Block(Seq(Text("lol"))), Some(Block(Seq(Text(" omg ")))))
         )
         'ifBlock - check(
-          """@if(true)
+          """
+            |@if(true)
             |  omg""".stripMargin,
           _.IfElse.run(),
           IfElse("if(true)", Block(Seq(Text("\n  "), Text("omg"))), None)
         )
         'ifBlockElseBlock - check(
-          """@if(true)
+          """
+            |@if(true)
             |  omg
             |@else
             |  wtf""".stripMargin,
@@ -206,6 +208,43 @@ object ParserTests extends utest.TestSuite{
             Some(Block(Seq(Text("\n  "), Text("wtf"))))
           )
         )
+        'ifBlockElseBraceBlock - check(
+          """@if(true){
+            |  omg
+            |}else{
+            |  wtf
+            |}""".stripMargin,
+          _.IfElse.run(),
+          IfElse(
+            "if(true)",
+            Block(Seq(Text("\n  "), Text("omg"), Text("\n"))),
+            Some(Block(Seq(Text("\n  "), Text("wtf"), Text("\n"))))
+          )
+        )
+        'ifBlockElseBraceBlockNested - {
+          val res = Parser(Trim(
+            """
+        @p
+          @if(true){
+            Hello
+          }else{
+            lols
+          }
+            """))
+          val expected =
+            Block(Vector(
+              Text("\n"),
+              Chain("p",Vector(Block(Vector(
+                Text("\n  "),
+                IfElse("if(true)", Block(Vector(
+                  Text("\n    "), Text("Hello"), Text("\n  "))),
+                  Some(Block(Vector(
+                    Text("\n    "), Text("lols"), Text("\n  "))))
+                ))))),
+              Text("\n")
+            ))
+          assert(res == expected)
+        }
         'ifElseBlock - check(
           """@if(true){
             |  omg
@@ -219,6 +258,7 @@ object ParserTests extends utest.TestSuite{
           )
         )
       }
+
     }
     'Body{
       'indents - check(

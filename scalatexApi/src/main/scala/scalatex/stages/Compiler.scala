@@ -38,6 +38,17 @@ object Compiler{
         case Ast.Block.Text(str, _) => q"$str"
         case Ast.Chain(code, parts, offset) => compileChain(code, parts, offset)
         case Ast.Header(header, block, offset) => compileHeader(header, block, offset)
+        case b @ Ast.Block.IfElse(condString, Ast.Block(parts2, offset2), elseBlock, offset) =>
+          println("AST " + b)
+          val If(cond, _, _) = c.parse(condString + "{}")
+          val elseCompiled = elseBlock match{
+            case Some(Ast.Block(parts3, offset3)) => wrapBlock(compileBlock(parts3, offset3))
+            case None => EmptyTree
+          }
+
+          val res = If(cond, wrapBlock(compileBlock(parts2, offset2)), elseCompiled)
+          println("Tree " + res)
+          res
         case Ast.Block.For(generators, Ast.Block(parts2, offset2), offset) =>
           val fresh = c.fresh()
 
@@ -48,7 +59,7 @@ object Compiler{
               val a2 = Apply(fun, List(f2))
               a2
             case Ident(x: TermName) if x.decoded == fresh =>
-              q"Seq[$fragType](..${compileBlock(parts2, offset2)})"
+              wrapBlock(compileBlock(parts2, offset2))
           }
 
           val out = rec(tree)

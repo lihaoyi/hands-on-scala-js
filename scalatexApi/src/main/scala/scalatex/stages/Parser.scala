@@ -51,7 +51,8 @@ class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
   }
 
   def BlankLine = rule{ '\n' ~ zeroOrMore(' ') ~ &('\n') }
-  def Indent = rule{ '\n' ~ indent.times(' ') ~ zeroOrMore(' ') }
+  def IndentSpaces = rule{ indent.times(' ') ~ zeroOrMore(' ') }
+  def Indent = rule{ '\n' ~ IndentSpaces }
   def LoneScalaChain: Rule2[Ast.Block.Text, Ast.Chain] = rule {
     (capture(Indent) ~> (Ast.Block.Text(_))) ~
     ScalaChain ~
@@ -60,26 +61,27 @@ class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
     }
   }
   def IndentBlock = rule{
+    &("\n") ~
     test(cursorNextIndent() > indent) ~
     runSubParser(new Parser(_, cursorNextIndent()).Body)
   }
   def IfHead = rule{ "@" ~ capture("if" ~ "(" ~ Expr ~ ")") }
   def IfElse1 = rule{
-   IfHead ~ BraceBlock ~ optional("else" ~ (BraceBlock | IndentBlock))
+    IfHead ~ BraceBlock ~ optional("else" ~ (BraceBlock | IndentBlock))
   }
   def IfElse2 = rule{
-    IfHead ~ IndentBlock ~ optional(Indent ~ "@else" ~ (BraceBlock | IndentBlock))
+    Indent ~ IfHead ~ IndentBlock ~ optional(Indent ~ "@else" ~ (BraceBlock | IndentBlock))
   }
   def IfElse = rule{
     (IfElse1 | IfElse2) ~> (Ast.Block.IfElse(_, _, _))
   }
 
   def ForHead = rule{
-    "@" ~ capture("for" ~ '(' ~ Enumerators ~ ')'~ run(println("f")))
+    "@" ~ capture("for" ~ '(' ~ Enumerators ~ ')')
   }
   def ForLoop = rule{
-    run(println("A")) ~ ForHead ~ run(println("B")) ~
-    BraceBlock ~ run(println("C")) ~> (Ast.Block.For(_, _))
+    ForHead ~
+    BraceBlock ~> (Ast.Block.For(_, _))
   }
   def LoneForLoop = rule{
     (capture(Indent) ~> (Ast.Block.Text(_))) ~
