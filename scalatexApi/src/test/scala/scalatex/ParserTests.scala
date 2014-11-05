@@ -4,7 +4,7 @@ package scalatex
 import org.parboiled2._
 import torimatomeru.ScalaSyntax
 
-import scalatex.stages.{Parser, Ast}
+import scalatex.stages.{Trim, Parser, Ast}
 import scalatex.stages.Ast.Block.{IfElse, For, Text}
 import Ast.Chain.Args
 
@@ -149,57 +149,76 @@ object ParserTests extends utest.TestSuite{
       )
     }
     'ControlFlow{
-      'for - check(
-        "@for(x <- 0 until 3){lol}",
-        _.ForLoop.run(),
-        For("for(x <- 0 until 3)", Block(Seq(Text("lol"))))
-      )
-      'forBlock - check(
-        """@for(x <- 0 until 3)
-          |  lol""".stripMargin,
-        _.LoneForLoop.run(),
-        For("for(x <- 0 until 3)", Block(Seq(Text("\n  "), Text("lol"))))
-      )
-      'if - check(
-        "@if(true){lol}",
-        _.IfElse.run(),
-        IfElse("if(true)", Block(Seq(Text("lol"))), None)
-      )
-      'ifElse - check(
-        "@if(true){lol}else{ omg }",
-        _.IfElse.run(),
-        IfElse("if(true)", Block(Seq(Text("lol"))), Some(Block(Seq(Text(" omg ")))))
-      )
-      'ifBlock- check(
-        """@if(true)
-          |  omg""".stripMargin,
-        _.IfElse.run(),
-        IfElse("if(true)", Block(Seq(Text("\n  "), Text("omg"))), None)
-      )
-      'ifBlockElseBlock - check(
-        """@if(true)
-          |  omg
-          |@else
-          |  wtf""".stripMargin,
-        _.IfElse.run(),
-        IfElse(
-          "if(true)",
-          Block(Seq(Text("\n  "), Text("omg"))),
-          Some(Block(Seq(Text("\n  "), Text("wtf"))))
+      'for {
+        'for - check(
+          "@for(x <- 0 until 3){lol}",
+          _.ForLoop.run(),
+          For("for(x <- 0 until 3)", Block(Seq(Text("lol"))))
         )
-      )
-      'ifElseBlock - check(
-        """@if(true){
-          |  omg
-          |}else
-          |  wtf""".stripMargin,
-        _.IfElse.run(),
-        IfElse(
-          "if(true)",
-          Block(Seq(Text("\n  "), Text("omg"), Text("\n"))),
-          Some(Block(Seq(Text("\n  "), Text("wtf"))))
+        'forBlock - check(
+          """
+            |@for(x <- 0 until 3)
+            |  lol""".stripMargin,
+          _.Body.run(),
+          Block(Seq(
+            Text("\n"),
+            For("for(x <- 0 until 3)", Block(Seq(Text("\n  "), Text("lol"))))
+          ))
         )
-      )
+        'forBlockBraces - check(
+          """
+            |@for(x <- 0 until 3){
+            |  lol
+            |}""".stripMargin,
+          _.Body.run(),
+          Block(Seq(
+            Text("\n"),
+            For("for(x <- 0 until 3)", Block(Seq(Text("\n  "), Text("lol"))))
+          ))
+        )
+      }
+      'ifElse {
+        'if - check(
+          "@if(true){lol}",
+          _.IfElse.run(),
+          IfElse("if(true)", Block(Seq(Text("lol"))), None)
+        )
+        'ifElse - check(
+          "@if(true){lol}else{ omg }",
+          _.IfElse.run(),
+          IfElse("if(true)", Block(Seq(Text("lol"))), Some(Block(Seq(Text(" omg ")))))
+        )
+        'ifBlock - check(
+          """@if(true)
+            |  omg""".stripMargin,
+          _.IfElse.run(),
+          IfElse("if(true)", Block(Seq(Text("\n  "), Text("omg"))), None)
+        )
+        'ifBlockElseBlock - check(
+          """@if(true)
+            |  omg
+            |@else
+            |  wtf""".stripMargin,
+          _.IfElse.run(),
+          IfElse(
+            "if(true)",
+            Block(Seq(Text("\n  "), Text("omg"))),
+            Some(Block(Seq(Text("\n  "), Text("wtf"))))
+          )
+        )
+        'ifElseBlock - check(
+          """@if(true){
+            |  omg
+            |}else
+            |  wtf""".stripMargin,
+          _.IfElse.run(),
+          IfElse(
+            "if(true)",
+            Block(Seq(Text("\n  "), Text("omg"), Text("\n"))),
+            Some(Block(Seq(Text("\n  "), Text("wtf"))))
+          )
+        )
+      }
     }
     'Body{
       'indents - check(

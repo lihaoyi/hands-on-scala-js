@@ -298,24 +298,18 @@ object BasicTests extends TestSuite{
 //
 //    'loops {
 //
-//      * - check(
-//        tw("""
-//          @for(x <- 0 until 3)
-//            lol
-//        """),
-//        tw("""
-//          @for(x <- 0 until 3){
-//            lol
-//          }
-//        """),
-//        tw(
-//          """
-//          @for(x <- 0 until 3)  {
-//            lol
-//          }
-//        """),
-//        "lollollol"
-//        )
+      * - check(
+        tw("""
+          @for(x <- 0 until 3)
+            lol
+        """),
+        tw("""
+          @for(x <- 0 until 3){
+            lol
+          }
+        """),
+        "lollollol"
+      )
 //
 //
 //      * - check(

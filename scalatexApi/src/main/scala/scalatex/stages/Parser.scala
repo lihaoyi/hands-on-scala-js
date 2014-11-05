@@ -73,17 +73,21 @@ class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
   def IfElse = rule{
     (IfElse1 | IfElse2) ~> (Ast.Block.IfElse(_, _, _))
   }
+
+  def ForHead = rule{
+    "@" ~ capture("for" ~ '(' ~ Enumerators ~ ')'~ run(println("f")))
+  }
   def ForLoop = rule{
-    "@" ~
-    capture("for" ~ ('(' ~ Enumerators ~ ')' | '{' ~ Enumerators ~ '}')) ~
-    BraceBlock ~> (Ast.Block.For(_, _))
+    run(println("A")) ~ ForHead ~ run(println("B")) ~
+    BraceBlock ~ run(println("C")) ~> (Ast.Block.For(_, _))
   }
   def LoneForLoop = rule{
-    "@" ~
-    capture("for" ~ ('(' ~ Enumerators ~ ')' | '{' ~ Enumerators ~ '}')) ~
+    (capture(Indent) ~> (Ast.Block.Text(_))) ~
+    ForHead ~
     IndentBlock ~>
     (Ast.Block.For(_, _))
   }
+
   def ScalaChain = rule {
     Code ~ zeroOrMore(Extension) ~> {Ast.Chain(_, _)}
   }
@@ -103,10 +107,11 @@ class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
   def BraceBlock: Rule1[Ast.Block] = rule{ '{' ~ Body ~ '}' }
 
   def BodyItem: Rule1[Seq[Ast.Block.Sub]] = rule{
+    ForLoop ~> (Seq(_)) |
+    LoneForLoop ~> (Seq(_, _)) |
+    IfElse ~> (Seq(_)) |
     LoneScalaChain ~> (Seq(_, _)) |
     HeaderBlock ~> (Seq(_)) |
-    ForLoop ~> (Seq(_)) |
-    LoneForLoop ~> (Seq(_)) |
     TextNot("@}") ~> (Seq(_)) |
     (capture(Indent) ~> (x => Seq(Ast.Block.Text(x)))) |
     (capture(BlankLine) ~> (x => Seq(Ast.Block.Text(x)))) |
