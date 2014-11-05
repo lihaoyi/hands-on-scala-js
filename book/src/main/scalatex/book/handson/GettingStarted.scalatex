@@ -273,9 +273,11 @@
         A large portion of this 144k is the Scala standard library, and so the size of the compiled blob does not grow that fast as your program grows. For example, while this ~50 line application is 144k, a much larger ~2000 line application is only 288k.
       @li
         This size is pre-@a("gzip", href:="http://en.wikipedia.org/wiki/Gzip"), and most webservers serve their contents compressed via gzip to reduce the download size. Gzip cuts the actual download size down to 43k, which is more acceptable.
+      @li
+        You will likely have other portions of the page that are of similar size: e.g. @a("JQuery", href:="http://jquery.com/") is extremely popular, and weights in at a comparable 32kb minified and gzipped, while @a("React.js", href:="http://facebook.github.io/react/downloads.html") weighs in at a cool 150kb gzipped. Scala.js arguably provides more than either of these libraries.
 
     @p
-      And there is ongoing work to shrink the size of these executables. If you want to read more about this, check out the section on the Scala.js File Encoding and the Optimization Pipeline.
+      Regardless, there is ongoing work to shrink the size of these executables. If you want to read more about this, check out the section on the Scala.js File Encoding and the Optimization Pipeline.
 
   @hr
 

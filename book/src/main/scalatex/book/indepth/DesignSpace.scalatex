@@ -3,7 +3,124 @@
 
 
 @sect("Why No Reflection?")
-    TODO
+  @p  
+    Scala.js prohibits reflection as it makes dead-code elimination difficult, and the compiler relies heavily on dead-code elimination to generate reasonably-sized executables. The chapter on the Compilation Pipeline goes into more detail of why, but a rough estimate of the effect of various optimizations on a small application is:
+
+  @ul
+    @li
+      @b{Full Output} - ~20mb
+    @li
+      @b{Naive Dead-Code-Elimnation} - ~800kb
+    @li 
+      @b{Inlining Dead-Code-Elimnation} - ~600kb
+    @li
+      @b{Minified by Google Closure Compiler} - ~200kb
+
+  @p
+    The default output size of 20mb makes the executables difficult to work with. Even though browsers can deal with 20mb Javascript blobs, it takes the browser several seconds to even load it, and up to a minute after that for the JIT to optimize the whole thing. 
+
+  @sect{Dead Code Elimination}
+    @p
+      To illustrate why reflection makes things difficult, consider a tiny application:
+
+    @hl.scala
+      @@JSExport
+      object App extends js.JSApp{
+        @@JSExport
+        def main() = {
+          println(foo())
+        }
+        def foo() = 10
+        def bar = "i am a cow"
+      }
+      object Dead{
+        def complexFunction() = ...
+      }
+
+    @p
+      When the Scala.js optimizer looks at this application, it is able to deduce certain things immediately:
+
+    @ul
+      @li
+        @hl.scala{App} and @hl.scala{App.main} are exported via @hl.scala{@@JSExport}, and thus can't be considered dead code.
+      @li
+        @hl.scala{App.foo} is called from @hl.scala{App.main}, and so has to be kept around
+      @li
+        @hl.scala{App.bar} is never called from @hl.scala{App.main} or @hl.scala{App.foo}, and so can be eliminated
+      @li
+        @hl.scala{Dead}, including @hl.scala{Dead.complexFunction}, are not called from any live code, and can be eliminated.
+
+    @p
+      The actual process is a bit more involved than this, but this is a first-approximation of how the dead-code-elimination works: you start with a small set of live code (e.g. @hl.scala{@@JSExport}ed things), search out to find the things which are recursively reachable from that set, and eliminate all the rest. This means that the Scala.js compiler can eliminate, e.g., parts of the Scala standard library that you are not using. The standard library is not small, and makes up the bulk of the 20mb of the uncompressed blob.
+
+  @sect{Whither Reflection?}
+    @p
+      To imagine why reflection makes this difficult, imagine a slightly modified program which includes some reflective calls in @hl.scala{App.main}
+    
+    @hl.scala
+      @@JSExport
+      object App extends js.JSApp{
+        @@JSExport
+        def main() = {
+          Class.forName(userInput()).getMethod(userInput()).invoke()
+        }
+        def foo() = 10
+        def bar = "i am a cow"
+      }
+      object Dead{
+        def complexFunction() = ...
+      }
+
+    @p
+      Here, we're assuming @hl.scala{userInput()} is some method which returns a @hl.scala{String} that was input by the user or otherwise somehow decided at runtime.
+    @p
+      We can start the same process: @hl.scala{App.main} is live since we @hl.scala{@@JSExport}ed it, but what objects or methods are reachable from @hl.scala{App.main}? The answer is: it depends on the values of @hl.scala{userInput()}, which we don't know. And hence we don't know which classes or methods are reachable! Depending on what @hl.scala{userInput()} returns, any or all methods and classes could be used by @hl.scala{App.main()}. 
+    @p
+      This leaves us a few options:
+
+    @ul
+      @li
+        Keep every method or class around at runtime. This severely hampers the compiler's ability to optimize, and results in massive 20mb executables.
+      @li
+        Ignore reflection, and go ahead and eliminate/optimize things assuming reflection did not exist.
+      @li
+        Allow the user to annotate methods/classes that should be kept, and eliminate the rest.
+
+    @p
+      All three are possible options: Scala.js started off with #1. #3 is the approach used by @a("Proguard", href:="http://proguard.sourceforge.net/manual/examples.html#annotated"), which lets you annotate things e.g. @hl.scala{@@KeepApplication} to preserve things for reflection and preventing Proguard from eliminating them as dead code.
+
+    @p
+      In the end, Scala.js chose #2. This is helped by the fact that overall, Scala code tends not to use reflection as heavily as Java, or dynamic languages which use it heavily. Scala uses techniques such as @a("lambdas", href:="http://docs.scala-lang.org/tutorials/tour/anonymous-function-syntax.html") or @a("implicits", href:="http://docs.scala-lang.org/tutorials/tour/implicit-parameters.html") to satisfy many use cases which Java has traditionally used reflection for, while friendly to the optimizer. 
+
+    @p
+      There are a range of use-cases for reflection where you want to inspect an object's structure or methods, where lambdas or implicits don't help. People use reflection to @a("serialize objects", href:="http://jackson.codehaus.org/DataBindingDeepDive"), or for @a("routing messages to methods", href:="https://access.redhat.com/documentation/en-US/Fuse_ESB_Enterprise/7.1/html/Implementing_Enterprise_Integration_Patterns/files/BasicPrinciples-BeanIntegration.html"). However, both these cases can be satisfied by...
+
+  @sect{Macros}
+
+    @p
+      The Scala programming language, since the 2.10.x series, has support for @a("Macros", href:="http://docs.scala-lang.org/overviews/macros/overview.html") in the language. Although experimental, these are heavily used in many projects such as Play and Slick and Akka, and allow a developer to perform compile-time computations and generate code where-ever the macros are used.
+
+    @p
+      People typically think of macros as AST-transformers: you pass in an AST and get a modified AST out. However, in Scala, these ASTs are strongly-typed, and the macro is able to inspect the types involved in generating the output AST. This leads to a lot of @a("interesting techniques", href:="http://docs.scala-lang.org/overviews/macros/implicits.html") around macros where you synthesize ASTs based on the type (explicit or inferred) of the macro callsite, something that is impossible in dynamic languages.
+
+    @p
+      Practically, this means that you can use macros to do things such as inspecting the methods, fields and other type-level properties of a typed value. This allows us to do things like @a("serialize objects with no boilerplate", href:="https://github.com/lihaoyi/upickle"):
+
+    @hl.scala
+      import upickle._
+
+      case class Thing(a: Int, b: String)
+      write(Thing(1, "gg"))           
+      // res23: String = {"a": 1, "b": "gg"}
+
+    @p
+      Or to @a("route messages to the appropiate methods", href:="https://github.com/lihaoyi/autowire") without boilerplate, and @i{without} using reflection! 
+
+    @p
+      The fact that you can satisfy these use cases with macros is non-obvious: in dynamic languages, macros only get an AST, which is basically opaque when you're only passing a single value to it. With Scala, you get the value @i{together with it's type}, which lets you inspect the type and generate the proper serialization/routing code that is impossible to do in a dynamic language with macros. 
+
+    @p
+      Using macros here also plays well with the Scala.js optimizer: the macros are fully expanded before the optimizer is run, so by the time the optimizer sees the code, there is no more magic left: it is then free to do dead-code-elimination/inlining/other-optimizations without worrying about reflection causing the code to do weird things at runtime. Thus, we've managed to substitute most of the main use-cases of reflection, and so can do without it.
 
 @sect("Why No inline-Javascript?")
     TODO
