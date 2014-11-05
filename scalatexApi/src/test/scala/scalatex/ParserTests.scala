@@ -119,8 +119,8 @@ object ParserTests extends utest.TestSuite{
 
     }
     'Block{
-      * - check("{i am a cow}", _.TBlock.run(), Block(Seq(Block.Text("i am a cow"))))
-      * - check("{i @am a @cow}", _.TBlock.run(),
+      * - check("{i am a cow}", _.BraceBlock.run(), Block(Seq(Block.Text("i am a cow"))))
+      * - check("{i @am a @cow}", _.BraceBlock.run(),
         Block(Seq(
           Block.Text("i "),
           Chain("am",Seq()),
@@ -169,6 +169,36 @@ object ParserTests extends utest.TestSuite{
         "@if(true){lol}else{ omg }",
         _.IfElse.run(),
         IfElse("if(true)", Block(Seq(Text("lol"))), Some(Block(Seq(Text(" omg ")))))
+      )
+      'ifBlock- check(
+        """@if(true)
+          |  omg""".stripMargin,
+        _.IfElse.run(),
+        IfElse("if(true)", Block(Seq(Text("\n  "), Text("omg"))), None)
+      )
+      'ifBlockElseBlock - check(
+        """@if(true)
+          |  omg
+          |@else
+          |  wtf""".stripMargin,
+        _.IfElse.run(),
+        IfElse(
+          "if(true)",
+          Block(Seq(Text("\n  "), Text("omg"))),
+          Some(Block(Seq(Text("\n  "), Text("wtf"))))
+        )
+      )
+      'ifElseBlock - check(
+        """@if(true){
+          |  omg
+          |}else
+          |  wtf""".stripMargin,
+        _.IfElse.run(),
+        IfElse(
+          "if(true)",
+          Block(Seq(Text("\n  "), Text("omg"), Text("\n"))),
+          Some(Block(Seq(Text("\n  "), Text("wtf"))))
+        )
       )
     }
     'Body{

@@ -55,30 +55,35 @@ class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
   def LoneScalaChain: Rule2[Ast.Block.Text, Ast.Chain] = rule {
     (capture(Indent) ~> (Ast.Block.Text(_))) ~
     ScalaChain ~
-    test(cursorNextIndent() > indent) ~
-    runSubParser(new Parser(_, cursorNextIndent()).Body) ~> {
+    IndentBlock ~> {
       (chain: Ast.Chain, body: Ast.Block) => chain.copy(parts = chain.parts :+ body)
     }
   }
-
+  def IndentBlock = rule{
+    test(cursorNextIndent() > indent) ~
+    runSubParser(new Parser(_, cursorNextIndent()).Body)
+  }
+  def IfHead = rule{ "@" ~ capture("if" ~ "(" ~ Expr ~ ")") }
+  def IfElse1 = rule{
+   IfHead ~ BraceBlock ~ optional("else" ~ (BraceBlock | IndentBlock))
+  }
+  def IfElse2 = rule{
+    IfHead ~ IndentBlock ~ optional(Indent ~ "@else" ~ (BraceBlock | IndentBlock))
+  }
   def IfElse = rule{
-    "@" ~ capture("if" ~ "(" ~ Expr ~ ")") ~ TBlock ~ optional("else" ~ TBlock) ~>{
-      Ast.Block.IfElse(_, _, _)
-    }
+    (IfElse1 | IfElse2) ~> (Ast.Block.IfElse(_, _, _))
   }
   def ForLoop = rule{
     "@" ~
     capture("for" ~ ('(' ~ Enumerators ~ ')' | '{' ~ Enumerators ~ '}')) ~
-    TBlock ~> (Ast.Block.For(_, _))
+    BraceBlock ~> (Ast.Block.For(_, _))
   }
   def LoneForLoop = rule{
     "@" ~
     capture("for" ~ ('(' ~ Enumerators ~ ')' | '{' ~ Enumerators ~ '}')) ~
-    test(cursorNextIndent() > indent) ~
-    runSubParser(new Parser(_, cursorNextIndent()).Body) ~>
+    IndentBlock ~>
     (Ast.Block.For(_, _))
   }
-
   def ScalaChain = rule {
     Code ~ zeroOrMore(Extension) ~> {Ast.Chain(_, _)}
   }
@@ -86,7 +91,7 @@ class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
     ('.' ~ capture(Id) ~> (Ast.Chain.Prop(_))) |
     (capture(TypeArgs2) ~> (Ast.Chain.TypeArgs(_))) |
     (capture(ArgumentExprs2) ~> (Ast.Chain.Args(_))) |
-    TBlock
+    BraceBlock
   }
   def Ws = Whitespace
   // clones of the version in ScalaSyntax, but without tailing whitespace or newlines
@@ -95,7 +100,7 @@ class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
     '(' ~ Ws ~ (optional(Exprs ~ ',' ~ Ws) ~ PostfixExpr ~ ':' ~ Ws ~ '_' ~ Ws ~ '*' ~ Ws | optional(Exprs)) ~ ')'
   }
   def BlockExpr2: Rule0 = rule { '{' ~ Ws ~ (CaseClauses | Block) ~ '}' }
-  def TBlock: Rule1[Ast.Block] = rule{ '{' ~ Body ~ '}' }
+  def BraceBlock: Rule1[Ast.Block] = rule{ '{' ~ Body ~ '}' }
 
   def BodyItem: Rule1[Seq[Ast.Block.Sub]] = rule{
     LoneScalaChain ~> (Seq(_, _)) |
