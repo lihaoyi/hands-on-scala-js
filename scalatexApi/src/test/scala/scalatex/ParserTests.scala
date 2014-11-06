@@ -398,13 +398,13 @@ object ParserTests extends utest.TestSuite{
         ))
       )
     }
-    'Test{
+//    'Test{
 //      check(
-//        "@scala.math.abs((1, 2).swap._1.toString())",
-//        _.Body.run(),
+//        "@{() => ()}",
+//        _.Code.run(),
 //        ""
 //      )
-    }
+//    }
   }
 }
 

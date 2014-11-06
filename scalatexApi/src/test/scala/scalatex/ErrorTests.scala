@@ -342,16 +342,16 @@ object ErrorTests extends TestSuite{
             ^
         """
       )
-      'wrongType - check(
-        twRuntimeErrors("""
-        omg @{() => ()} lol
-        """),
-        """type mismatch""",
-        """
-        omg @{() => ()} lol
-                 ^
-        """
-      )
+//      'wrongType - check(
+//        twRuntimeErrors("""
+//        omg @{() => ()} lol
+//        """),
+//        """type mismatch""",
+//        """
+//        omg @{() => ()} lol
+//                 ^
+//        """
+//      )
 
       'bigExpression - check(
         twRuntimeErrors("""

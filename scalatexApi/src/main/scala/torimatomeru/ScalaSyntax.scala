@@ -111,18 +111,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def PostfixExpr: Rule0 = rule { InfixExpr ~ optional(IdS ~ optional(NewlineS)) }
   def InfixExpr: Rule0 = rule { PrefixExpr ~ zeroOrMore(IdS ~ optional(NewlineS) ~ PrefixExpr) }
   def PrefixExpr = rule { optional(anyOf("-+~!")) ~ SimpleExpr }
-"""
-  SimpleExpr ::= ‘new’ (ClassTemplate | TemplateBody)
-                | BlockExpr
-                | SimpleExpr1 [‘_’]
-  SimpleExpr1 ::= Literal
-                | Path
-                | ‘_’
-                | ‘(’ [Exprs] ‘)’
-                | SimpleExpr ‘.’ id s
-                | SimpleExpr TypeArgs
-                | SimpleExpr1 ArgmentExprs
-"""
+
   def SimpleExpr: Rule0 = rule {
     SimpleExpr1 ~ zeroOrMore('.' ~ IdS | TypeArgs | ArgumentExprs) ~ optional('_')
   }
