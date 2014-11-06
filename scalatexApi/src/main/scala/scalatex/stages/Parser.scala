@@ -13,7 +13,7 @@ import Util._
  */
 object Parser extends ((String, Int) => Ast.Block){
   def apply(input: String, offset: Int = 0): Ast.Block = {
-    new Parser(input).Body.run().get
+    new Parser(input, offset).Body.run().get
   }
 }
 class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends ScalaSyntax(input) {

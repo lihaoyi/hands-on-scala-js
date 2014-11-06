@@ -30,124 +30,124 @@ object ErrorTests extends TestSuite{
   val tests = TestSuite{
 
 
-//    'simple - check(
-//      twRuntimeErrors("omg @notInScope lol"),
-//      """not found: value notInScope""",
-//      """
-//      twRuntimeErrors("omg @notInScope lol"),
-//                           ^
-//      """
-//    )
-//
+    'simple - check(
+      twRuntimeErrors("omg @notInScope lol"),
+      """not found: value notInScope""",
+      """
+      twRuntimeErrors("omg @notInScope lol"),
+                           ^
+      """
+    )
+
 //    'chained{
       'properties {
-//        * - check(
-//          twRuntimeErrors("omg @math.lol lol"),
-//          """object lol is not a member of package math""",
-//          """
-//          twRuntimeErrors("omg @math.lol lol"),
-//                                    ^
-//          """
-//        )
-//
-//        * - check(
-//          twRuntimeErrors("omg @math.E.lol lol"),
-//          """value lol is not a member of Double""",
-//          """
-//          twRuntimeErrors("omg @math.E.lol lol"),
-//                                      ^
-//          """
-//        )
-//        * - check(
-//          twRuntimeErrors("omg @_root_.scala.math.lol lol"),
-//          """object lol is not a member of package math""",
-//          """
-//          twRuntimeErrors("omg @_root_.scala.math.lol lol"),
-//                                                 ^
-//          """
-//        )
-//        * - check(
-//          twRuntimeErrors("omg @_root_.scala.gg.lol lol"),
-//          """object gg is not a member of package scala""",
-//          """
-//          twRuntimeErrors("omg @_root_.scala.gg.lol lol"),
-//                                            ^
-//          """
-//        )
-//        * - check(
-//          twRuntimeErrors("omg @_root_.ggnore.math.lol lol"),
-//          """object ggnore is not a member of package <root>""",
-//          """
-//          twRuntimeErrors("omg @_root_.ggnore.math.lol lol"),
-//                                      ^
-//          """
-//        )
-//      }
-//      'calls{
-//        * - check(
-//          twRuntimeErrors("@scala.QQ.abs(-10).tdo(10).sum.z"),
-//          """object QQ is not a member of package scala""",
-//          """
-//          twRuntimeErrors("@scala.QQ.abs(-10).tdo(10).sum.z"),
-//                                 ^
-//          """
-//        )
-//        * - check(
-//          twRuntimeErrors("@scala.math.abs(-10).tdo(10).sum.z"),
-//          "value tdo is not a member of Int",
-//          """
-//          twRuntimeErrors("@scala.math.abs(-10).tdo(10).sum.z"),
-//                                               ^
-//          """
-//        )
-//        * - check(
-//          twRuntimeErrors("@scala.math.abs(-10).to(10).sum.z"),
-//          "value z is not a member of Int",
-//          """
-//          twRuntimeErrors("@scala.math.abs(-10).to(10).sum.z"),
-//                                                          ^
-//          """
-//        )
-//        * - check(
-//          twRuntimeErrors("@scala.math.abs(-10).to(10).sum.z()"),
-//          "value z is not a member of Int",
-//          """
-//          twRuntimeErrors("@scala.math.abs(-10).to(10).sum.z()"),
-//                                                          ^
-//          """
-//        )
-//        * - check(
-//          twRuntimeErrors("@scala.math.abs(-10).cow.sum.z"),
-//          "value cow is not a member of Int",
-//          """
-//          twRuntimeErrors("@scala.math.abs(-10).cow.sum.z"),
-//                                               ^
-//          """
-//        )
-//        * - check(
-//          twRuntimeErrors("@scala.smath.abs.cow.sum.z"),
-//          "object smath is not a member of package scala",
-//          """
-//          twRuntimeErrors("@scala.smath.abs.cow.sum.z"),
-//                                 ^
-//          """
-//        )
-//        * - check(
-//          twRuntimeErrors("@scala.math.cos('omg)"),
-//          "type mismatch",
-//          """
-//          twRuntimeErrors("@scala.math.cos('omg)"),
-//                                           ^
-//          """
-//        )
-//        * - check(
-//          twRuntimeErrors("@scala.math.cos[omg]('omg)"),
-//          "not found: type omg",
-//          """
-//          twRuntimeErrors("@scala.math.cos[omg]('omg)"),
-//                                           ^
-//          """
-//        )
+        * - check(
+          twRuntimeErrors("omg @math.lol lol"),
+          """object lol is not a member of package math""",
+          """
+          twRuntimeErrors("omg @math.lol lol"),
+                                    ^
+          """
+        )
+
+        * - check(
+          twRuntimeErrors("omg @math.E.lol lol"),
+          """value lol is not a member of Double""",
+          """
+          twRuntimeErrors("omg @math.E.lol lol"),
+                                      ^
+          """
+        )
+        * - check(
+          twRuntimeErrors("omg @_root_.scala.math.lol lol"),
+          """object lol is not a member of package math""",
+          """
+          twRuntimeErrors("omg @_root_.scala.math.lol lol"),
+                                                 ^
+          """
+        )
+        * - check(
+          twRuntimeErrors("omg @_root_.scala.gg.lol lol"),
+          """object gg is not a member of package scala""",
+          """
+          twRuntimeErrors("omg @_root_.scala.gg.lol lol"),
+                                            ^
+          """
+        )
+        * - check(
+          twRuntimeErrors("omg @_root_.ggnore.math.lol lol"),
+          """object ggnore is not a member of package <root>""",
+          """
+          twRuntimeErrors("omg @_root_.ggnore.math.lol lol"),
+                                      ^
+          """
+        )
+      }
+      'calls{
+        * - check(
+          twRuntimeErrors("@scala.QQ.abs(-10).tdo(10).sum.z"),
+          """object QQ is not a member of package scala""",
+          """
+          twRuntimeErrors("@scala.QQ.abs(-10).tdo(10).sum.z"),
+                                 ^
+          """
+        )
+        * - check(
+          twRuntimeErrors("@scala.math.abs(-10).tdo(10).sum.z"),
+          "value tdo is not a member of Int",
+          """
+          twRuntimeErrors("@scala.math.abs(-10).tdo(10).sum.z"),
+                                               ^
+          """
+        )
+        * - check(
+          twRuntimeErrors("@scala.math.abs(-10).to(10).sum.z"),
+          "value z is not a member of Int",
+          """
+          twRuntimeErrors("@scala.math.abs(-10).to(10).sum.z"),
+                                                          ^
+          """
+        )
+        * - check(
+          twRuntimeErrors("@scala.math.abs(-10).to(10).sum.z()"),
+          "value z is not a member of Int",
+          """
+          twRuntimeErrors("@scala.math.abs(-10).to(10).sum.z()"),
+                                                          ^
+          """
+        )
+        * - check(
+          twRuntimeErrors("@scala.math.abs(-10).cow.sum.z"),
+          "value cow is not a member of Int",
+          """
+          twRuntimeErrors("@scala.math.abs(-10).cow.sum.z"),
+                                               ^
+          """
+        )
+        * - check(
+          twRuntimeErrors("@scala.smath.abs.cow.sum.z"),
+          "object smath is not a member of package scala",
+          """
+          twRuntimeErrors("@scala.smath.abs.cow.sum.z"),
+                                 ^
+          """
+        )
+        * - check(
+          twRuntimeErrors("@scala.math.cos('omg)"),
+          "type mismatch",
+          """
+          twRuntimeErrors("@scala.math.cos('omg)"),
+                                           ^
+          """
+        )
+        * - check(
+          twRuntimeErrors("@scala.math.cos[omg]('omg)"),
+          "not found: type omg",
+          """
+          twRuntimeErrors("@scala.math.cos[omg]('omg)"),
+                                           ^
+          """
+        )
         * - check(
           twRuntimeErrors("""
             I am cow hear me moo
@@ -162,23 +162,23 @@ object ErrorTests extends TestSuite{
         )
       }
 //      'curlies{
-//        * - check(
-//          twRuntimeErrors("@p{@Seq(1, 2, 3).foldLeft(0)}"),
-//          "missing arguments for method foldLeft",
-//          """
-//          twRuntimeErrors("@p{@Seq(1, 2, 3).foldLeft(0)}"),
-//                                                   ^
-//          """
-//        )
+        * - check(
+          twRuntimeErrors("@p{@Seq(1, 2, 3).foldLeft(0)}"),
+          "missing arguments for method foldLeft",
+          """
+          twRuntimeErrors("@p{@Seq(1, 2, 3).foldLeft(0)}"),
+                                                   ^
+          """
+        )
 //
-//        * - check(
-//          twRuntimeErrors("@Nil.foldLeft{XY}"),
-//          "missing arguments for method foldLeft",
-//          """
-//          twRuntimeErrors("@Nil.foldLeft{XY}"),
-//                                         ^
-//          """
-//        )
+        * - check(
+          twRuntimeErrors("@Nil.foldLeft{XY}"),
+          "missing arguments for method foldLeft",
+          """
+          twRuntimeErrors("@Nil.foldLeft{XY}"),
+                                         ^
+          """
+        )
 //
 //        * - check(
 //          twRuntimeErrors("@Nil.map{(x: Int, y: String) => omg}"),
