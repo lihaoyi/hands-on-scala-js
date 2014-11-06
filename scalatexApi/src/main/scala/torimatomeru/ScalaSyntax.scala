@@ -98,7 +98,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     ForCFlow |
     "throw" ~ Expr |
     "return" ~ optional(Expr) |
-    SimpleExpr1 ~ ArgumentExprs ~ '=' ~ Expr |
+    SimpleExpr ~ ArgumentExprs ~ '=' ~ Expr |
     optional(SimpleExpr ~ '.') ~ IdS ~ '=' ~ Expr |
     PostfixExpr ~ optional("match" ~ '{' ~ CaseClauses ~ '}' | Ascription)
   }
@@ -111,19 +111,32 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def PostfixExpr: Rule0 = rule { InfixExpr ~ optional(IdS ~ optional(NewlineS)) }
   def InfixExpr: Rule0 = rule { PrefixExpr ~ zeroOrMore(IdS ~ optional(NewlineS) ~ PrefixExpr) }
   def PrefixExpr = rule { optional(anyOf("-+~!")) ~ SimpleExpr }
-  def SimpleExpr: Rule0 = rule { SimpleExpr1 ~ optional(ArgumentExprs) ~ optional('_') | SimpleExprNoLiteral}
-  def SimpleExprNoLiteral: Rule0 = rule {
-    "new" ~ (ClassTemplate | TemplateBody) | BlockExpr | '(' ~ optional(Exprs) ~ ')'
+"""
+  SimpleExpr ::= ‘new’ (ClassTemplate | TemplateBody)
+                | BlockExpr
+                | SimpleExpr1 [‘_’]
+  SimpleExpr1 ::= Literal
+                | Path
+                | ‘_’
+                | ‘(’ [Exprs] ‘)’
+                | SimpleExpr ‘.’ id s
+                | SimpleExpr TypeArgs
+                | SimpleExpr1 ArgmentExprs
+"""
+  def SimpleExpr: Rule0 = rule {
+    SimpleExpr1 ~ zeroOrMore('.' ~ IdS | TypeArgs | ArgumentExprs) ~ optional('_')
   }
-  def SimpleExpr1: Rule0 = rule {
-    //    run(println("SimpleExpr1 matching on " + pos)) ~
-    LiteralS ~ drop[String] | //literal currently captures, so it can be used outside. but since all our rules lack AST, we drop its value in order to be able to compose them
+
+  def SimpleExpr1 = rule{
+    "new" ~ (ClassTemplate | TemplateBody) |
+    BlockExpr |
+    LiteralS ~ drop[String] |
     Path |
     '_' |
-    SimpleExprNoLiteral ~ '.' ~ IdS |
-    SimpleExprNoLiteral ~ TypeArgs /*|
-    XmlExpr*/
+    '(' ~ optional(Exprs) ~ ')'
   }
+
+
   def Exprs: Rule0 = rule { oneOrMore(Expr).separatedBy(',') }
   def ArgumentExprs: Rule0 = rule {
     '(' ~ (optional(Exprs ~ ',') ~ PostfixExpr ~ ':' ~ '_' ~ '*' | optional(Exprs)) ~ ')' |
