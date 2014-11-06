@@ -92,15 +92,15 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Expr: Rule0 = rule { (Bindings | optional("implicit") ~ IdS | "_") ~ "=>" ~ Expr | Expr1 }
   def Expr1: Rule0 = rule {
     IfCFlow |
-      WhileCFlow |
-      TryCFlow |
-      DoWhileCFlow |
-      ForCFlow |
-      "throw" ~ Expr |
-      "return" ~ optional(Expr) |
-      SimpleExpr1 ~ ArgumentExprs ~ '=' ~ Expr |
-      optional(SimpleExpr ~ '.') ~ IdS ~ '=' ~ Expr |
-      PostfixExpr ~ optional("match" ~ '{' ~ CaseClauses ~ '}' | Ascription)
+    WhileCFlow |
+    TryCFlow |
+    DoWhileCFlow |
+    ForCFlow |
+    "throw" ~ Expr |
+    "return" ~ optional(Expr) |
+    SimpleExpr1 ~ ArgumentExprs ~ '=' ~ Expr |
+    optional(SimpleExpr ~ '.') ~ IdS ~ '=' ~ Expr |
+    PostfixExpr ~ optional("match" ~ '{' ~ CaseClauses ~ '}' | Ascription)
   }
 
   def IfCFlow = rule { "if" ~ '(' ~ Expr ~ ')' ~ zeroOrMore(NewlineS) ~ Expr ~ optional(optional(SemiS) ~ "else" ~ Expr) }
@@ -111,19 +111,20 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def PostfixExpr: Rule0 = rule { InfixExpr ~ optional(IdS ~ optional(NewlineS)) }
   def InfixExpr: Rule0 = rule { PrefixExpr ~ zeroOrMore(IdS ~ optional(NewlineS) ~ PrefixExpr) }
   def PrefixExpr = rule { optional(anyOf("-+~!")) ~ SimpleExpr }
-  def SimpleExpr: Rule0 = rule { SimpleExprNoLiteral | SimpleExpr1 ~ optional(ArgumentExprs) ~ optional('_') }
-  def SimpleExprNoLiteral: Rule0 = rule { "new" ~ (ClassTemplate | TemplateBody) | BlockExpr }
+  def SimpleExpr: Rule0 = rule { SimpleExpr1 ~ optional(ArgumentExprs) ~ optional('_') | SimpleExprNoLiteral}
+  def SimpleExprNoLiteral: Rule0 = rule {
+    "new" ~ (ClassTemplate | TemplateBody) | BlockExpr | '(' ~ optional(Exprs) ~ ')'
+  }
   def SimpleExpr1: Rule0 = rule {
     //    run(println("SimpleExpr1 matching on " + pos)) ~
     LiteralS ~ drop[String] | //literal currently captures, so it can be used outside. but since all our rules lack AST, we drop its value in order to be able to compose them
-      Path |
-      '_' |
-      '(' ~ optional(Exprs) ~ ')' |
-      SimpleExprNoLiteral ~ '.' ~ IdS |
-      SimpleExprNoLiteral ~ TypeArgs /*|
+    Path |
+    '_' |
+    SimpleExprNoLiteral ~ '.' ~ IdS |
+    SimpleExprNoLiteral ~ TypeArgs /*|
     XmlExpr*/
   }
-  def Exprs: Rule0 = rule { oneOrMore(Expr) separatedBy ',' }
+  def Exprs: Rule0 = rule { oneOrMore(Expr).separatedBy(',') }
   def ArgumentExprs: Rule0 = rule {
     '(' ~ (optional(Exprs ~ ',') ~ PostfixExpr ~ ':' ~ '_' ~ '*' | optional(Exprs)) ~ ')' |
       optional(NewlineS) ~ BlockExpr
@@ -132,9 +133,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Block: Rule0 = rule { zeroOrMore(BlockStat ~ SemiS) ~ optional(ResultExpr) }
   def BlockStat: Rule0 = rule {
     &(SemiS) ~ MATCH | //shortcircuit when Semi is found
-      Import |
-      zeroOrMore(Annotation) ~ (optional("implicit" | "lazy") ~ Def | zeroOrMore(LocalModifier) ~ TmplDef) |
-      Expr1
+    Import |
+    zeroOrMore(Annotation) ~ (optional("implicit" | "lazy") ~ Def | zeroOrMore(LocalModifier) ~ TmplDef) |
+    Expr1
   }
   def ResultExpr: Rule0 = rule { (Bindings | optional("implicit") ~ IdS | "_") ~ "=>" ~ Block | Expr1 }
   def Enumerators: Rule0 = rule { Generator ~ zeroOrMore(SemiS ~ Enumerator) }

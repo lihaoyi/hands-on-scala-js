@@ -104,7 +104,9 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
   // clones of the version in ScalaSyntax, but without tailing whitespace or newlines
   def TypeArgs2 = rule { '[' ~ Ws ~ Types ~ ']' }
   def ArgumentExprs2 = rule {
-    '(' ~ Ws ~ (optional(Exprs ~ ',' ~ Ws) ~ PostfixExpr ~ ':' ~ Ws ~ '_' ~ Ws ~ '*' ~ Ws | optional(Exprs)) ~ ')'
+    '(' ~ Ws ~
+    (optional(Exprs ~ ',' ~ Ws) ~ PostfixExpr ~ ':' ~ Ws ~ '_' ~ Ws ~ '*' ~ Ws |  run(println("ArgumentExprs2 B")) ~ optional(Exprs) ~ run(println("ArgumentExprs2 C"))) ~
+    ')'
   }
   def BlockExpr2: Rule0 = rule { '{' ~ Ws ~ (CaseClauses | Block) ~ '}' }
   def BraceBlock: Rule1[Ast.Block] = rule{ '{' ~ Body ~ '}' }

@@ -387,6 +387,13 @@ object ParserTests extends utest.TestSuite{
         ))
       )
     }
+    'Test{
+//      check(
+//        "@scala.math.abs((1, 2).wtf)",
+//        _.Body.run(),
+//        ""
+//      )
+    }
   }
 }
 
