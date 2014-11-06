@@ -33,8 +33,8 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
   }
 
   def TextNot(chars: String) = rule {
-    capture(oneOrMore(noneOf(chars + "\n") | "@@")) ~> {
-      x => Ast.Block.Text(x.replace("@@", "@"))
+    push(offsetCursor) ~ capture(oneOrMore(noneOf(chars + "\n") | "@@")) ~> {
+      (i, x) => Ast.Block.Text(x.replace("@@", "@"), i)
     }
   }
   def Text = TextNot("@")
@@ -55,7 +55,7 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
   def IndentSpaces = rule{ indent.times(' ') ~ zeroOrMore(' ') }
   def Indent = rule{ '\n' ~ IndentSpaces }
   def LoneScalaChain: Rule2[Ast.Block.Text, Ast.Chain] = rule {
-    (capture(Indent) ~> (Ast.Block.Text(_))) ~
+    (push(offsetCursor) ~ capture(Indent) ~> ((i, x) => Ast.Block.Text(x, i))) ~
     ScalaChain ~
     IndentBlock ~> {
       (chain: Ast.Chain, body: Ast.Block) => chain.copy(parts = chain.parts :+ body)
@@ -85,7 +85,7 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
     BraceBlock ~> (Ast.Block.For(_, _))
   }
   def LoneForLoop = rule{
-    (capture(Indent) ~> (Ast.Block.Text(_))) ~
+    (push(offsetCursor) ~ capture(Indent) ~> ((i, t) => Ast.Block.Text(t, i))) ~
     ForHead ~
     IndentBlock ~>
     (Ast.Block.For(_, _))
@@ -116,8 +116,8 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
     LoneScalaChain ~> (Seq(_, _)) |
     HeaderBlock ~> (Seq(_)) |
     TextNot("@}") ~> (Seq(_)) |
-    (capture(Indent) ~> (x => Seq(Ast.Block.Text(x)))) |
-    (capture(BlankLine) ~> (x => Seq(Ast.Block.Text(x)))) |
+    (push(offsetCursor) ~ capture(Indent) ~> ((i, x) => Seq(Ast.Block.Text(x, i)))) |
+    (push(offsetCursor) ~ capture(BlankLine) ~> ((i, x) => Seq(Ast.Block.Text(x, i)))) |
     ScalaChain ~> (Seq(_: Ast.Block.Sub))
   }
   def Body = rule{

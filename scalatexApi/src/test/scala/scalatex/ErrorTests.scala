@@ -161,7 +161,7 @@ object ErrorTests extends TestSuite{
           """
         )
       }
-//      'curlies{
+      'curlies{
         * - check(
           twRuntimeErrors("@p{@Seq(1, 2, 3).foldLeft(0)}"),
           "missing arguments for method foldLeft",
@@ -170,21 +170,21 @@ object ErrorTests extends TestSuite{
                                                    ^
           """
         )
-//
+
         * - check(
           twRuntimeErrors("@Nil.foldLeft{XY}"),
           "missing arguments for method foldLeft",
           """
           twRuntimeErrors("@Nil.foldLeft{XY}"),
-                                         ^
+                                        ^
           """
         )
-//
+
 //        * - check(
-//          twRuntimeErrors("@Nil.map{(x: Int, y: String) => omg}"),
+//          twRuntimeErrors("@Seq(1).map{(y: String) => omg}"),
 //            "type mismatch",
 //            """
-//          twRuntimeErrors("@Nil.map{(x: Int, y: String) => omg}"),
+//          twRuntimeErrors("@Seq(1).map{(y: String) => omg}"),
 //                                                ^
 //          """
 //        )
@@ -368,6 +368,6 @@ object ErrorTests extends TestSuite{
 //                      ^
 //        """
 //      )
-//    }
+    }
   }
 }

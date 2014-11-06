@@ -44,10 +44,10 @@ object Compiler{
         case (curr, Ast.Chain.TypeArgs(str, offset2)) =>
           val TypeApply(fun, args) = c.parse(s"omg$str")
           incPos(TypeApply(curr, args.map(incPosRec(_, offset2 - 2))), offset2)
-        case (curr, Ast.Block(parts, offset)) =>
-          q"$curr(${compileBlock(parts, offset)})"
-        case (curr, Ast.Header(header, block, offset)) =>
-          q"$curr(${compileHeader(header, block, offset)})"
+        case (curr, Ast.Block(parts, offset1)) =>
+          incPos(q"$curr(${compileBlock(parts, offset1)})", offset1)
+        case (curr, Ast.Header(header, block, offset1)) =>
+          incPos(q"$curr(${compileHeader(header, block, offset1)})", offset1)
 
       }
       out.foreach(o => println(o.pos + "\t" + o))
@@ -55,19 +55,23 @@ object Compiler{
     }
     def compileBlock(parts: Seq[Ast.Block.Sub], offset: Int): c.Tree = {
       val res = parts.map{
-        case Ast.Block.Text(str, _) => q"$str"
-        case Ast.Chain(code, parts, offset) => compileChain(code, parts, offset)
-        case Ast.Header(header, block, offset) => compileHeader(header, block, offset)
-        case b @ Ast.Block.IfElse(condString, Ast.Block(parts2, offset2), elseBlock, offset) =>
-          println("AST " + b)
+        case Ast.Block.Text(str, offset1) =>
+          incPos(q"$str", offset1)
+        case Ast.Chain(code, parts, offset1) =>
+          compileChain(code, parts, offset1)
+        case Ast.Header(header, block, offset1) =>
+          compileHeader(header, block, offset1)
+        case Ast.Block.IfElse(condString, Ast.Block(parts2, offset2), elseBlock, offset1) =>
           val If(cond, _, _) = c.parse(condString + "{}")
           val elseCompiled = elseBlock match{
             case Some(Ast.Block(parts3, offset3)) => compileBlock(parts3, offset3)
             case None => EmptyTree
           }
 
-          val res = If(cond, compileBlock(parts2, offset2), elseCompiled)
+          val res = If(incPosRec(cond, offset1), compileBlock(parts2, offset2), elseCompiled)
+
           println("Tree " + res)
+          incPos(res, offset1)
           res
         case Ast.Block.For(generators, Ast.Block(parts2, offset2), offset) =>
           val fresh = c.fresh()
