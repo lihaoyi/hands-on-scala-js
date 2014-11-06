@@ -121,13 +121,13 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
     ScalaChain ~> (Seq(_: Ast.Block.Sub))
   }
   def Body = rule{
-    oneOrMore(BodyItem) ~> {x =>
-      Ast.Block(x.flatten)
+    push(offsetCursor) ~ oneOrMore(BodyItem) ~> {(i, x) =>
+      Ast.Block(x.flatten, i)
     }
   }
   def Body0 = rule{
-    zeroOrMore(BodyItem) ~> {x =>
-      Ast.Block(x.flatten)
+    push(offsetCursor) ~ zeroOrMore(BodyItem) ~> {(i, x) =>
+      Ast.Block(x.flatten, i)
     }
   }
 }

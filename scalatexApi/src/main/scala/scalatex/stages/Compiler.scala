@@ -45,7 +45,7 @@ object Compiler{
           val TypeApply(fun, args) = c.parse(s"omg$str")
           incPos(TypeApply(curr, args.map(incPosRec(_, offset2 - 2))), offset2)
         case (curr, Ast.Block(parts, offset)) =>
-          q"$curr(..${compileBlock(parts, offset)})"
+          q"$curr(${compileBlock(parts, offset)})"
         case (curr, Ast.Header(header, block, offset)) =>
           q"$curr(${compileHeader(header, block, offset)})"
 
@@ -53,8 +53,8 @@ object Compiler{
       out.foreach(o => println(o.pos + "\t" + o))
       out
     }
-    def compileBlock(parts: Seq[Ast.Block.Sub], offset: Int): Seq[c.Tree] = {
-      parts.map{
+    def compileBlock(parts: Seq[Ast.Block.Sub], offset: Int): c.Tree = {
+      val res = parts.map{
         case Ast.Block.Text(str, _) => q"$str"
         case Ast.Chain(code, parts, offset) => compileChain(code, parts, offset)
         case Ast.Header(header, block, offset) => compileHeader(header, block, offset)
@@ -62,11 +62,11 @@ object Compiler{
           println("AST " + b)
           val If(cond, _, _) = c.parse(condString + "{}")
           val elseCompiled = elseBlock match{
-            case Some(Ast.Block(parts3, offset3)) => wrapBlock(compileBlock(parts3, offset3))
+            case Some(Ast.Block(parts3, offset3)) => compileBlock(parts3, offset3)
             case None => EmptyTree
           }
 
-          val res = If(cond, wrapBlock(compileBlock(parts2, offset2)), elseCompiled)
+          val res = If(cond, compileBlock(parts2, offset2), elseCompiled)
           println("Tree " + res)
           res
         case Ast.Block.For(generators, Ast.Block(parts2, offset2), offset) =>
@@ -79,23 +79,21 @@ object Compiler{
               val a2 = Apply(fun, List(f2))
               a2
             case Ident(x: TermName) if x.decoded == fresh =>
-              wrapBlock(compileBlock(parts2, offset2))
+              compileBlock(parts2, offset2)
           }
 
           val out = rec(tree)
           println(out)
           out
       }
+      incPos(q"Seq[$fragType](..$res)", offset)
     }
     def compileHeader(header: String, block: Ast.Block, offset: Int): c.Tree = {
       val Block(stmts, expr) = c.parse(s"{$header\n ()}")
-      Block(stmts, wrapBlock(compileBlock(block.parts, block.offset)))
+      Block(stmts, compileBlock(block.parts, block.offset))
     }
 
-    def wrapBlock(items: Seq[c.Tree]) = {
-      q"Seq[$fragType](..$items)"
-    }
-    val res = wrapBlock(compileBlock(template.parts, template.offset))
+    val res = compileBlock(template.parts, template.offset)
     println("::::::::::::::::::::::::::::::::::::::::::::::::")
     println(res)
     println("::::::::::::::::::::::::::::::::::::::::::::::::")

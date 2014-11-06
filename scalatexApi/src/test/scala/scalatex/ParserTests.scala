@@ -103,7 +103,8 @@ object ParserTests extends utest.TestSuite{
           Ast.Header(
             "import math.abs\nimport math.sin",
             Ast.Block(
-              Seq(Text("\n"), Text("\n"), Text("hello world"), Text("\n"))
+              Seq(Text("\n"), Text("\n"), Text("hello world"), Text("\n")),
+              33
             )
           )
         )
@@ -119,14 +120,14 @@ object ParserTests extends utest.TestSuite{
 
     }
     'Block{
-      * - check("{i am a cow}", _.BraceBlock.run(), Block(Seq(Block.Text("i am a cow"))))
+      * - check("{i am a cow}", _.BraceBlock.run(), Block(Seq(Block.Text("i am a cow")), 1))
       * - check("{i @am a @cow}", _.BraceBlock.run(),
         Block(Seq(
           Block.Text("i "),
           Chain("am",Seq(), 3),
           Block.Text(" a "),
           Chain("cow",Seq(), 9)
-        ))
+        ), 1)
       )
     }
     'Chain{
@@ -141,10 +142,10 @@ object ParserTests extends utest.TestSuite{
       )
       * - check("@omg{bbq}.cow(moo){a @b}\n", _.ScalaChain.run(),
         Chain("omg",Seq(
-          Block(Seq(Block.Text("bbq"))),
+          Block(Seq(Block.Text("bbq")), 5),
           Chain.Prop("cow", 9),
           Chain.Args("(moo)", 13),
-          Block(Seq(Block.Text("a "), Chain("b", Nil, 21)))
+          Block(Seq(Block.Text("a "), Chain("b", Nil, 21)), 19)
         ))
       )
     }
@@ -153,7 +154,7 @@ object ParserTests extends utest.TestSuite{
         'for - check(
           "@for(x <- 0 until 3){lol}",
           _.ForLoop.run(),
-          For("for(x <- 0 until 3)", Block(Seq(Text("lol"))))
+          For("for(x <- 0 until 3)", Block(Seq(Text("lol")), 21))
         )
         'forBlock - check(
           """
@@ -162,7 +163,7 @@ object ParserTests extends utest.TestSuite{
           _.Body.run(),
           Block(Seq(
             Text("\n"),
-            For("for(x <- 0 until 3)", Block(Seq(Text("\n  "), Text("lol"))))
+            For("for(x <- 0 until 3)", Block(Seq(Text("\n  "), Text("lol")), 21))
           ))
         )
         'forBlockBraces - check(
@@ -173,7 +174,7 @@ object ParserTests extends utest.TestSuite{
           _.Body.run(),
           Block(Seq(
             Text("\n"),
-            For("for(x <- 0 until 3)", Block(Seq(Text("\n  "), Text("lol"), Text("\n"))))
+            For("for(x <- 0 until 3)", Block(Seq(Text("\n  "), Text("lol"), Text("\n")), 22))
           ))
         )
       }
@@ -181,19 +182,19 @@ object ParserTests extends utest.TestSuite{
         'if - check(
           "@if(true){lol}",
           _.IfElse.run(),
-          IfElse("if(true)", Block(Seq(Text("lol"))), None)
+          IfElse("if(true)", Block(Seq(Text("lol")), 10), None)
         )
         'ifElse - check(
           "@if(true){lol}else{ omg }",
           _.IfElse.run(),
-          IfElse("if(true)", Block(Seq(Text("lol"))), Some(Block(Seq(Text(" omg ")))))
+          IfElse("if(true)", Block(Seq(Text("lol")), 10), Some(Block(Seq(Text(" omg ")), 19)))
         )
         'ifBlock - check(
           """
             |@if(true)
             |  omg""".stripMargin,
           _.IfElse.run(),
-          IfElse("if(true)", Block(Seq(Text("\n  "), Text("omg"))), None)
+          IfElse("if(true)", Block(Seq(Text("\n  "), Text("omg")), 10), None)
         )
         'ifBlockElseBlock - check(
           """
@@ -204,8 +205,8 @@ object ParserTests extends utest.TestSuite{
           _.IfElse.run(),
           IfElse(
             "if(true)",
-            Block(Seq(Text("\n  "), Text("omg"))),
-            Some(Block(Seq(Text("\n  "), Text("wtf"))))
+            Block(Seq(Text("\n  "), Text("omg")), 10),
+            Some(Block(Seq(Text("\n  "), Text("wtf")), 22))
           )
         )
         'ifBlockElseBraceBlock - check(
@@ -217,8 +218,8 @@ object ParserTests extends utest.TestSuite{
           _.IfElse.run(),
           IfElse(
             "if(true)",
-            Block(Seq(Text("\n  "), Text("omg"), Text("\n"))),
-            Some(Block(Seq(Text("\n  "), Text("wtf"), Text("\n"))))
+            Block(Seq(Text("\n  "), Text("omg"), Text("\n")), 10),
+            Some(Block(Seq(Text("\n  "), Text("wtf"), Text("\n")), 23))
           )
         )
         'ifBlockElseBraceBlockNested - {
@@ -236,11 +237,14 @@ object ParserTests extends utest.TestSuite{
               Text("\n"),
               Chain("p",Vector(Block(Vector(
                 Text("\n  "),
-                IfElse("if(true)", Block(Vector(
-                  Text("\n    "), Text("Hello"), Text("\n  "))),
+                IfElse("if(true)",
+                  Block(Vector(
+                    Text("\n    "), Text("Hello"), Text("\n  ")
+                  ), 16),
                   Some(Block(Vector(
-                    Text("\n    "), Text("lols"), Text("\n  "))))
-                )))), 1),
+                    Text("\n    "), Text("lols"), Text("\n  ")
+                  ), 35))
+                )), 3)), 1),
               Text("\n")
             ))
           assert(res == expected)
@@ -253,8 +257,8 @@ object ParserTests extends utest.TestSuite{
           _.IfElse.run(),
           IfElse(
             "if(true)",
-            Block(Seq(Text("\n  "), Text("omg"), Text("\n"))),
-            Some(Block(Seq(Text("\n  "), Text("wtf"))))
+            Block(Seq(Text("\n  "), Text("omg"), Text("\n")), 10),
+            Some(Block(Seq(Text("\n  "), Text("wtf")), 22))
           )
         )
       }
@@ -277,9 +281,9 @@ object ParserTests extends utest.TestSuite{
               Chain("bbq",Seq(Block(Seq(
                 Text("\n      "),
                 Chain("lol",Seq(), 16)
-              ))), 12)
-            ))), 8)
-          ))), 1)
+              ), 9)), 12)
+            ), 7)), 8)
+          ), 5)), 1)
         ))
       )
       'dedents - check(
@@ -294,7 +298,8 @@ object ParserTests extends utest.TestSuite{
             Seq(
               Text("\n  "),
               Chain("wtf",Seq(), 8)
-            )
+            ),
+            5
           )), 1),
           Text("\n"),
           Chain("bbq", Seq(), 13)
@@ -314,7 +319,8 @@ object ParserTests extends utest.TestSuite{
               Text("\n  "),
               Chain("wtf",Seq(), 9),
               Text("\n")
-            )
+            ),
+            6
           )), 1),
           Text("\n"),
           Chain("bbq", Seq(), 16)
@@ -333,7 +339,7 @@ object ParserTests extends utest.TestSuite{
             Block(Seq(
               Text("\n  "),
               Chain("wtf",Seq(), 21)
-            ))
+            ), 18)
           ), 1),
           Text("\n"),
           Text("bbq")
