@@ -1,35 +1,35 @@
-//package scalatex
-//
-//import utest._
-//import scalatex.stages._
-//import scalatags.Text.all._
-//import scalatex.Internals.{DebugFailure, twRuntimeErrors}
-//
-///**
-//* Created by haoyi on 7/14/14.
-//*/
-//object ErrorTests extends TestSuite{
-//  def check(x: => Unit, expectedMsg: String, expectedError: String) = {
-//    val DebugFailure(msg, pos) = intercept[DebugFailure](x)
-//    def format(str: String) = {
-//      val whitespace = " \t\n".toSet
-//      "\n" + str.dropWhile(_ == '\n')
-//                .reverse
-//                .dropWhile(whitespace.contains)
-//                .reverse
-//    }
-//    // Format these guys nicely to normalize them and make them
-//    // display nicely in the assert error message if it blows up
-//    val formattedPos = format(pos)
-//    val formattedExpectedPos = format(expectedError)
-//
-//    assert(msg.contains(expectedMsg))
-//    assert(formattedPos == formattedExpectedPos)
-//
-//  }
-//  val tests = TestSuite{
-//
-//
+package scalatex
+
+import utest._
+import scalatex.stages._
+import scalatags.Text.all._
+import scalatex.Internals.{DebugFailure, twRuntimeErrors}
+
+/**
+* Created by haoyi on 7/14/14.
+*/
+object ErrorTests extends TestSuite{
+  def check(x: => Unit, expectedMsg: String, expectedError: String) = {
+    val DebugFailure(msg, pos) = intercept[DebugFailure](x)
+    def format(str: String) = {
+      val whitespace = " \t\n".toSet
+      "\n" + str.dropWhile(_ == '\n')
+                .reverse
+                .dropWhile(whitespace.contains)
+                .reverse
+    }
+    // Format these guys nicely to normalize them and make them
+    // display nicely in the assert error message if it blows up
+    val formattedPos = format(pos)
+    val formattedExpectedPos = format(expectedError)
+
+    assert(msg.contains(expectedMsg))
+    assert(formattedPos == formattedExpectedPos)
+
+  }
+  val tests = TestSuite{
+
+
 //    'simple - check(
 //      twRuntimeErrors("omg @notInScope lol"),
 //      """not found: value notInScope""",
@@ -40,7 +40,7 @@
 //    )
 //
 //    'chained{
-//      'properties {
+      'properties {
 //        * - check(
 //          twRuntimeErrors("omg @math.lol lol"),
 //          """object lol is not a member of package math""",
@@ -133,18 +133,34 @@
 //          """
 //        )
 //        * - check(
-//          twRuntimeErrors("""
-//            I am cow hear me moo
-//            @scala.math.abs(-10).tdo(10).sum.z
-//            I weigh twice as much as you
-//          """),
-//          "value tdo is not a member of Int",
+//          twRuntimeErrors("@scala.math.cos('omg)"),
+//          "type mismatch",
 //          """
-//            @scala.math.abs(-10).tdo(10).sum.z
-//                                ^
+//          twRuntimeErrors("@scala.math.cos('omg)"),
+//                                           ^
 //          """
 //        )
-//      }
+//        * - check(
+//          twRuntimeErrors("@scala.math.cos[omg]('omg)"),
+//          "not found: type omg",
+//          """
+//          twRuntimeErrors("@scala.math.cos[omg]('omg)"),
+//                                           ^
+//          """
+//        )
+        * - check(
+          twRuntimeErrors("""
+            I am cow hear me moo
+            @scala.math.abs(-10).tdo(10).sum.z
+            I weigh twice as much as you
+          """),
+          "value tdo is not a member of Int",
+          """
+            @scala.math.abs(-10).tdo(10).sum.z
+                                ^
+          """
+        )
+      }
 //      'curlies{
 //        * - check(
 //          twRuntimeErrors("@p{@Seq(1, 2, 3).foldLeft(0)}"),
@@ -353,5 +369,5 @@
 //        """
 //      )
 //    }
-//  }
-//}
+  }
+}

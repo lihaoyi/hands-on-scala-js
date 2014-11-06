@@ -15,23 +15,43 @@ object Compiler{
     import c.universe._
     def fragType = tq"scalatags.Text.all.Frag"
 
+    def incPosRec(trees: c.Tree, offset: Int): trees.type = {
+      println(s"incPosRec\t$offset\t$trees")
+      trees.foreach(incPos(_, offset))
+      trees
+    }
+    def incPos(tree: c.Tree, offset: Int): tree.type = {
+      println(s"incPos\t$offset\t$tree")
+      val current = if (tree.pos == NoPosition) 0 else tree.pos.point
+      c.internal.setPos(tree,
+        new OffsetPosition(
+          fragPos.source,
+          offset + current + fragPos.point
+        ).asInstanceOf[c.universe.Position]
+      )
+      tree
+    }
+
     println(template)
     def compileChain(code: String, parts: Seq[Ast.Chain.Sub], offset: Int): c.Tree = {
       println("CODE " + code)
-      parts.foldLeft(c.parse(code)){
-        case (curr, Ast.Chain.Prop(str, offset2)) => q"$curr.${TermName(str)}"
+      val out = parts.foldLeft(incPosRec(c.parse(code), offset + 1)){
+        case (curr, Ast.Chain.Prop(str, offset2)) =>
+          incPos(q"$curr.${TermName(str)}", offset2 + 1)
         case (curr, Ast.Chain.Args(str, offset2)) =>
           val Apply(fun, args) = c.parse(s"omg$str")
-          Apply(curr, args)
+          incPos(Apply(curr, args.map(incPosRec(_, offset2 - 2))), offset2)
         case (curr, Ast.Chain.TypeArgs(str, offset2)) =>
           val TypeApply(fun, args) = c.parse(s"omg$str")
-          TypeApply(curr, args)
+          incPos(TypeApply(curr, args.map(incPosRec(_, offset2 - 2))), offset2)
         case (curr, Ast.Block(parts, offset)) =>
           q"$curr(..${compileBlock(parts, offset)})"
         case (curr, Ast.Header(header, block, offset)) =>
           q"$curr(${compileHeader(header, block, offset)})"
 
       }
+      out.foreach(o => println(o.pos + "\t" + o))
+      out
     }
     def compileBlock(parts: Seq[Ast.Block.Sub], offset: Int): Seq[c.Tree] = {
       parts.map{

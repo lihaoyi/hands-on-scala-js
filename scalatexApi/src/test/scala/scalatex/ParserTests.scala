@@ -123,28 +123,28 @@ object ParserTests extends utest.TestSuite{
       * - check("{i @am a @cow}", _.BraceBlock.run(),
         Block(Seq(
           Block.Text("i "),
-          Chain("am",Seq()),
+          Chain("am",Seq(), 3),
           Block.Text(" a "),
-          Chain("cow",Seq())
+          Chain("cow",Seq(), 9)
         ))
       )
     }
     'Chain{
       * - check("@omg.bbq[omg].fff[fff](123)  ", _.ScalaChain.run(),
         Chain("omg",Seq(
-          Chain.Prop("bbq"),
-          Chain.TypeArgs("[omg]"),
-          Chain.Prop("fff"),
-          Chain.TypeArgs("[fff]"),
-          Chain.Args("(123)")
+          Chain.Prop("bbq", 4),
+          Chain.TypeArgs("[omg]", 8),
+          Chain.Prop("fff", 13),
+          Chain.TypeArgs("[fff]", 17),
+          Chain.Args("(123)", 22)
         ))
       )
       * - check("@omg{bbq}.cow(moo){a @b}\n", _.ScalaChain.run(),
         Chain("omg",Seq(
           Block(Seq(Block.Text("bbq"))),
-          Chain.Prop("cow"),
-          Chain.Args("(moo)"),
-          Block(Seq(Block.Text("a "), Chain("b", Nil)))
+          Chain.Prop("cow", 9),
+          Chain.Args("(moo)", 13),
+          Block(Seq(Block.Text("a "), Chain("b", Nil, 21)))
         ))
       )
     }
@@ -240,7 +240,7 @@ object ParserTests extends utest.TestSuite{
                   Text("\n    "), Text("Hello"), Text("\n  "))),
                   Some(Block(Vector(
                     Text("\n    "), Text("lols"), Text("\n  "))))
-                ))))),
+                )))), 1),
               Text("\n")
             ))
           assert(res == expected)
@@ -276,10 +276,10 @@ object ParserTests extends utest.TestSuite{
               Text("\n    "),
               Chain("bbq",Seq(Block(Seq(
                 Text("\n      "),
-                Chain("lol",Seq())
-              ))))
-            ))))
-          ))))
+                Chain("lol",Seq(), 16)
+              ))), 12)
+            ))), 8)
+          ))), 1)
         ))
       )
       'dedents - check(
@@ -293,11 +293,11 @@ object ParserTests extends utest.TestSuite{
           Chain("omg",Seq(Block(
             Seq(
               Text("\n  "),
-              Chain("wtf",Seq())
+              Chain("wtf",Seq(), 8)
             )
-          ))),
+          )), 1),
           Text("\n"),
-          Chain("bbq", Seq())
+          Chain("bbq", Seq(), 13)
         ))
       )
       'braces - check(
@@ -312,12 +312,12 @@ object ParserTests extends utest.TestSuite{
           Chain("omg",Seq(Block(
             Seq(
               Text("\n  "),
-              Chain("wtf",Seq()),
+              Chain("wtf",Seq(), 9),
               Text("\n")
             )
-          ))),
+          )), 1),
           Text("\n"),
-          Chain("bbq", Seq())
+          Chain("bbq", Seq(), 16)
         ))
       )
       'dedentText - check(
@@ -329,11 +329,12 @@ object ParserTests extends utest.TestSuite{
         Block(Seq(
           Text("\n"),
           Chain("omg",Seq(
-            Args("""("lol", 1, 2)"""),
+            Args("""("lol", 1, 2)""", 5),
             Block(Seq(
               Text("\n  "),
-              Chain("wtf",Seq())))
-          )),
+              Chain("wtf",Seq(), 21)
+            ))
+          ), 1),
           Text("\n"),
           Text("bbq")
         ))
@@ -368,13 +369,14 @@ object ParserTests extends utest.TestSuite{
         _.Body.run(),
         Block(Seq(
           Text("\n"),
-          Chain("{\"lol\" * 3}", Seq()),
+          Chain("{\"lol\" * 3}", Seq(), 1),
           Text("\n"),
           Chain("""{
             |  val omg = "omg"
             |  omg * 2
             |}""".stripMargin,
-            Seq()
+            Seq(),
+            14
           )
         ))
       )

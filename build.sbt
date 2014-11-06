@@ -60,4 +60,5 @@ lazy val book = Project(
   }
 )
 
+
 lazy val demos = project.in(file("examples/demos"))

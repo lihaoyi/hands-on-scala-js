@@ -11,12 +11,13 @@ import Util._
  * enough until we stuff the code-strings into the real Scala
  * parser later
  */
-object Parser extends (String => Ast.Block){
-  def apply(input: String): Ast.Block = {
+object Parser extends ((String, Int) => Ast.Block){
+  def apply(input: String, offset: Int = 0): Ast.Block = {
     new Parser(input).Body.run().get
   }
 }
-class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
+class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends ScalaSyntax(input) {
+  def offsetCursor = offset + cursor
   val txt = input.sliceString(0, input.length)
   val indentTable = txt.split('\n').map{ s =>
     if (s.trim == "") -1
@@ -45,7 +46,7 @@ class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
   }
 
   def HeaderBlock: Rule1[Ast.Header] = rule{
-    Header ~ zeroOrMore(capture(NewlineS) ~ Header ~> (_ + _)) ~ runSubParser{new Parser(_, indent).Body0} ~> {
+    Header ~ zeroOrMore(capture(NewlineS) ~ Header ~> (_ + _)) ~ runSubParser{new Parser(_, indent, cursor).Body0} ~> {
       (start: String, heads: Seq[String], body: Ast.Block) => Ast.Header(start + heads.mkString, body)
     }
   }
@@ -63,7 +64,7 @@ class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
   def IndentBlock = rule{
     &("\n") ~
     test(cursorNextIndent() > indent) ~
-    runSubParser(new Parser(_, cursorNextIndent()).Body)
+    runSubParser(new Parser(_, cursorNextIndent(), cursor).Body)
   }
   def IfHead = rule{ "@" ~ capture("if" ~ "(" ~ Expr ~ ")") }
   def IfElse1 = rule{
@@ -91,12 +92,12 @@ class Parser(input: ParserInput, indent: Int = 0) extends ScalaSyntax(input) {
   }
 
   def ScalaChain = rule {
-    Code ~ zeroOrMore(Extension) ~> {Ast.Chain(_, _)}
+    push(offsetCursor) ~ Code ~ zeroOrMore(Extension) ~> { (a, b, c) => Ast.Chain(b, c, a)}
   }
   def Extension: Rule1[Ast.Chain.Sub] = rule {
-    ('.' ~ capture(Id) ~> (Ast.Chain.Prop(_))) |
-    (capture(TypeArgs2) ~> (Ast.Chain.TypeArgs(_))) |
-    (capture(ArgumentExprs2) ~> (Ast.Chain.Args(_))) |
+    (push(offsetCursor) ~ '.' ~ capture(Id) ~> ((x, y) => Ast.Chain.Prop(y, x))) |
+    (push(offsetCursor) ~ capture(TypeArgs2) ~> ((x, y) => Ast.Chain.TypeArgs(y, x))) |
+    (push(offsetCursor) ~ capture(ArgumentExprs2) ~> ((x, y) => Ast.Chain.Args(y, x))) |
     BraceBlock
   }
   def Ws = Whitespace
