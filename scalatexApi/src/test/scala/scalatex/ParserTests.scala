@@ -163,7 +163,11 @@ object ParserTests extends utest.TestSuite{
           _.Body.run(),
           Block(Seq(
             Text("\n"),
-            For("for(x <- 0 until 3)", Block(Seq(Text("\n  ", 21), Text("lol", 24)), 21))
+            For(
+              "for(x <- 0 until 3)",
+              Block(Seq(Text("\n  ", 21), Text("lol", 24)), 21),
+              1
+            )
           ))
         )
         'forBlockBraces - check(
@@ -174,7 +178,11 @@ object ParserTests extends utest.TestSuite{
           _.Body.run(),
           Block(Seq(
             Text("\n"),
-            For("for(x <- 0 until 3)", Block(Seq(Text("\n  ", 22), Text("lol", 25), Text("\n", 28)), 22))
+            For(
+              "for(x <- 0 until 3)",
+              Block(Seq(Text("\n  ", 22), Text("lol", 25), Text("\n", 28)), 22),
+              1
+            )
           ))
         )
       }
@@ -194,7 +202,7 @@ object ParserTests extends utest.TestSuite{
             |@if(true)
             |  omg""".stripMargin,
           _.IfElse.run(),
-          IfElse("if(true)", Block(Seq(Text("\n  ", 10), Text("omg", 13)), 10), None)
+          IfElse("if(true)", Block(Seq(Text("\n  ", 10), Text("omg", 13)), 10), None, 1)
         )
         'ifBlockElseBlock - check(
           """
@@ -206,7 +214,8 @@ object ParserTests extends utest.TestSuite{
           IfElse(
             "if(true)",
             Block(Seq(Text("\n  ", 10), Text("omg", 13)), 10),
-            Some(Block(Seq(Text("\n  ", 22), Text("wtf", 25)), 22))
+            Some(Block(Seq(Text("\n  ", 22), Text("wtf", 25)), 22)),
+          1
           )
         )
         'ifBlockElseBraceBlock - check(
@@ -219,7 +228,8 @@ object ParserTests extends utest.TestSuite{
           IfElse(
             "if(true)",
             Block(Seq(Text("\n  ", 10), Text("omg", 13), Text("\n", 16)), 10),
-            Some(Block(Seq(Text("\n  ", 23), Text("wtf", 26), Text("\n", 29)), 23))
+            Some(Block(Seq(Text("\n  ", 23), Text("wtf", 26), Text("\n", 29)), 23)),
+            0
           )
         )
         'ifBlockElseBraceBlockNested - {
@@ -243,7 +253,8 @@ object ParserTests extends utest.TestSuite{
                   ), 16),
                   Some(Block(Vector(
                     Text("\n    ", 35), Text("lols", 40), Text("\n  ", 44)
-                  ), 35))
+                  ), 35)),
+                  6
                 )), 3)), 1),
               Text("\n", 48)
             ))

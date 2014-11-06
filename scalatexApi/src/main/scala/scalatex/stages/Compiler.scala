@@ -68,7 +68,7 @@ object Compiler{
             case None => EmptyTree
           }
 
-          val res = If(incPosRec(cond, offset1), compileBlock(parts2, offset2), elseCompiled)
+          val res = If(incPosRec(cond, offset1 + 2), compileBlock(parts2, offset2), elseCompiled)
 
           println("Tree " + res)
           incPos(res, offset1)

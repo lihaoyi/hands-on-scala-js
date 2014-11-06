@@ -68,27 +68,27 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
   }
   def IfHead = rule{ "@" ~ capture("if" ~ "(" ~ Expr ~ ")") }
   def IfElse1 = rule{
-    IfHead ~ BraceBlock ~ optional("else" ~ (BraceBlock | IndentBlock))
+    push(offsetCursor) ~ IfHead ~ BraceBlock ~ optional("else" ~ (BraceBlock | IndentBlock))
   }
   def IfElse2 = rule{
-    Indent ~ IfHead ~ IndentBlock ~ optional(Indent ~ "@else" ~ (BraceBlock | IndentBlock))
+    Indent ~ push(offsetCursor) ~ IfHead ~ IndentBlock ~ optional(Indent ~ "@else" ~ (BraceBlock | IndentBlock))
   }
   def IfElse = rule{
-    (IfElse1 | IfElse2) ~> (Ast.Block.IfElse(_, _, _))
+    (IfElse1 | IfElse2) ~> ((a, b, c, d) => Ast.Block.IfElse(b, c, d, a))
   }
 
   def ForHead = rule{
-    "@" ~ capture("for" ~ '(' ~ Enumerators ~ ')')
+    push(offsetCursor) ~ "@" ~ capture("for" ~ '(' ~ Enumerators ~ ')')
   }
   def ForLoop = rule{
     ForHead ~
-    BraceBlock ~> (Ast.Block.For(_, _))
+    BraceBlock ~> ((a, b, c) => Ast.Block.For(b, c, a))
   }
   def LoneForLoop = rule{
     (push(offsetCursor) ~ capture(Indent) ~> ((i, t) => Ast.Block.Text(t, i))) ~
     ForHead ~
     IndentBlock ~>
-    (Ast.Block.For(_, _))
+    ((a, b, c) => Ast.Block.For(b, c, a))
   }
 
   def ScalaChain = rule {

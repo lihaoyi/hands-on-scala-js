@@ -39,7 +39,7 @@ object ErrorTests extends TestSuite{
       """
     )
 
-//    'chained{
+    'chained{
       'properties {
         * - check(
           twRuntimeErrors("omg @math.lol lol"),
@@ -216,95 +216,95 @@ object ErrorTests extends TestSuite{
           """
         )
       }
-//    }
-//    'ifElse{
-//      'oneLine {
-//        * - check(
-//          twRuntimeErrors("@if(math > 10){ 1 }else{ 2 }"),
-//          "object > is not a member of package math",
-//          """
-//          twRuntimeErrors("@if(math > 10){ 1 }else{ 2 }"),
-//                                    ^
-//          """
-//        )
-//        * - check(
-//          twRuntimeErrors("@if(true){ (@math.pow(10)) * 10  }else{ 2 }"),
-//          "Unspecified value parameter y",
-//          """
-//          twRuntimeErrors("@if(true){ (@math.pow(10)) * 10  }else{ 2 }"),
-//                                               ^
-//          """
-//        )
-//        * - check(
-//          twRuntimeErrors("@if(true){ * 10  }else{ @math.sin(3, 4, 5) }"),
-//          "too many arguments for method sin: (x: Double)Double",
-//          """
-//          twRuntimeErrors("@if(true){ * 10  }else{ @math.sin(3, 4, 5) }"),
-//                                                           ^
-//          """
-//        )
-//      }
-//      'multiLine{
-//        * - check(
-//          twRuntimeErrors("""
-//            Ho Ho Ho
-//
-//            @if(math != 10)
-//              I am a cow
-//            @else
-//              You are a cow
-//            GG
-//          """),
-//          "object != is not a member of package math",
-//          """
-//            @if(math != 10)
-//                     ^
-//          """
-//        )
-//        * - check(
-//          twRuntimeErrors("""
-//            Ho Ho Ho
-//
-//            @if(4 != 10)
-//              I am a cow @math.lols
-//            @else
-//              You are a cow
-//            GG
-//          """),
-//          "object lols is not a member of package math",
-//          """
-//              I am a cow @math.lols
-//                               ^
-//          """
-//        )
-//        * - check(
-//          twRuntimeErrors("""
-//            Ho Ho Ho
-//
-//            @if(12 != 10)
-//              I am a cow
-//            @else
-//              @math.E.toString.gog(1)
-//            GG
-//          """),
-//          "value gog is not a member of String",
-//          """
-//              @math.E.toString.gog(1)
-//                                 ^
-//          """
-//        )
-//      }
-//    }
+    }
+    'ifElse{
+      'oneLine {
+        * - check(
+          twRuntimeErrors("@if(math > 10){ 1 }else{ 2 }"),
+          "object > is not a member of package math",
+          """
+          twRuntimeErrors("@if(math > 10){ 1 }else{ 2 }"),
+                                    ^
+          """
+        )
+        * - check(
+          twRuntimeErrors("@if(true){ (@math.pow(10)) * 10  }else{ 2 }"),
+          "Unspecified value parameter y",
+          """
+          twRuntimeErrors("@if(true){ (@math.pow(10)) * 10  }else{ 2 }"),
+                                               ^
+          """
+        )
+        * - check(
+          twRuntimeErrors("@if(true){ * 10  }else{ @math.sin(3, 4, 5) }"),
+          "too many arguments for method sin: (x: Double)Double",
+          """
+          twRuntimeErrors("@if(true){ * 10  }else{ @math.sin(3, 4, 5) }"),
+                                                           ^
+          """
+        )
+      }
+      'multiLine{
+        * - check(
+          twRuntimeErrors("""
+            Ho Ho Ho
+
+            @if(math != 10)
+              I am a cow
+            @else
+              You are a cow
+            GG
+          """),
+          "object != is not a member of package math",
+          """
+            @if(math != 10)
+                     ^
+          """
+        )
+        * - check(
+          twRuntimeErrors("""
+            Ho Ho Ho
+
+            @if(4 != 10)
+              I am a cow @math.lols
+            @else
+              You are a cow
+            GG
+          """),
+          "object lols is not a member of package math",
+          """
+              I am a cow @math.lols
+                              ^
+          """
+        )
+        * - check(
+          twRuntimeErrors("""
+            Ho Ho Ho
+
+            @if(12 != 10)
+              I am a cow
+            @else
+              @math.E.toString.gog(1)
+            GG
+          """),
+          "value gog is not a member of String",
+          """
+              @math.E.toString.gog(1)
+                              ^
+          """
+        )
+      }
+    }
 //    'forLoop{
 //      'oneLine{
-//        'header - check(
-//          twRuntimeErrors("omg @for(x <- (0 + 1 + 2) omglolol (10 + 11 + 2)){ hello }"),
-//          """value omglolol is not a member of Int""",
-//          """
-//          twRuntimeErrors("omg @for(x <- (0 + 1 + 2) omglolol (10 + 11 + 2)){ hello }"),
-//                                                      ^
-//          """
-//        )
+        'header - check(
+          twRuntimeErrors("omg @for(x <- (0 + 1 + 2) omglolol (10 + 11 + 2)){ hello }"),
+          """value omglolol is not a member of Int""",
+          """
+          twRuntimeErrors("omg @for(x <- (0 + 1 + 2) omglolol (10 + 11 + 2)){ hello }"),
+                                                      ^
+          """
+        )
 //
 //        'body - check(
 //          twRuntimeErrors("omg @for(x <- 0 until 10){ @((x, 2) + (1, 2)) }"),
