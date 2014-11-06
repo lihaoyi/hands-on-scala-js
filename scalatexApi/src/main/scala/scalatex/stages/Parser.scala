@@ -105,7 +105,7 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
   def TypeArgs2 = rule { '[' ~ Ws ~ Types ~ ']' }
   def ArgumentExprs2 = rule {
     '(' ~ Ws ~
-    (optional(Exprs ~ ',' ~ Ws) ~ PostfixExpr ~ ':' ~ Ws ~ '_' ~ Ws ~ '*' ~ Ws |  run(println("ArgumentExprs2 B")) ~ optional(Exprs) ~ run(println("ArgumentExprs2 C"))) ~
+    (optional(Exprs ~ ',' ~ Ws) ~ PostfixExpr ~ ':' ~ Ws ~ '_' ~ Ws ~ '*' ~ Ws | optional(Exprs) ) ~
     ')'
   }
   def BlockExpr2: Rule0 = rule { '{' ~ Ws ~ (CaseClauses | Block) ~ '}' }

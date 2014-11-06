@@ -16,12 +16,12 @@ object Compiler{
     def fragType = tq"scalatags.Text.all.Frag"
 
     def incPosRec(trees: c.Tree, offset: Int): trees.type = {
-      println(s"incPosRec\t$offset\t$trees")
+
       trees.foreach(incPos(_, offset))
       trees
     }
     def incPos(tree: c.Tree, offset: Int): tree.type = {
-      println(s"incPos\t$offset\t$tree")
+
       val current = if (tree.pos == NoPosition) 0 else tree.pos.point
       c.internal.setPos(tree,
         new OffsetPosition(
@@ -32,9 +32,8 @@ object Compiler{
       tree
     }
 
-    println(template)
     def compileChain(code: String, parts: Seq[Ast.Chain.Sub], offset: Int): c.Tree = {
-      println("CODE " + code)
+
       val out = parts.foldLeft(incPosRec(c.parse(code), offset + 1)){
         case (curr, Ast.Chain.Prop(str, offset2)) =>
           incPos(q"$curr.${TermName(str)}", offset2 + 1)
@@ -45,15 +44,15 @@ object Compiler{
           val TypeApply(fun, args) = c.parse(s"omg$str")
           incPos(TypeApply(curr, args.map(incPosRec(_, offset2 - 2))), offset2)
         case (curr, Ast.Block(parts, offset1)) =>
-          incPos(q"$curr(${compileBlock(parts, offset1)})", offset1)
+          incPos(q"$curr(..${compileBlock(parts, offset1)})", offset1)
         case (curr, Ast.Header(header, block, offset1)) =>
           incPos(q"$curr(${compileHeader(header, block, offset1)})", offset1)
 
       }
-      out.foreach(o => println(o.pos + "\t" + o))
-      out
+
+      q"$out: $fragType"
     }
-    def compileBlock(parts: Seq[Ast.Block.Sub], offset: Int): c.Tree = {
+    def compileBlock(parts: Seq[Ast.Block.Sub], offset: Int): Seq[c.Tree] = {
       val res = parts.map{
         case Ast.Block.Text(str, offset1) =>
           incPos(q"$str", offset1)
@@ -64,11 +63,11 @@ object Compiler{
         case Ast.Block.IfElse(condString, Ast.Block(parts2, offset2), elseBlock, offset1) =>
           val If(cond, _, _) = c.parse(condString + "{}")
           val elseCompiled = elseBlock match{
-            case Some(Ast.Block(parts3, offset3)) => compileBlock(parts3, offset3)
+            case Some(Ast.Block(parts3, offset3)) => compileBlockWrapped(parts3, offset3)
             case None => EmptyTree
           }
 
-          val res = If(incPosRec(cond, offset1 + 2), compileBlock(parts2, offset2), elseCompiled)
+          val res = If(incPosRec(cond, offset1 + 2), compileBlockWrapped(parts2, offset2), elseCompiled)
 
           println("Tree " + res)
           incPos(res, offset1)
@@ -84,24 +83,26 @@ object Compiler{
               val a2 = Apply(fun, List(f2))
               a2
             case Ident(x: TermName) if x.decoded == fresh =>
-              compileBlock(parts2, offset2)
+              compileBlockWrapped(parts2, offset2)
           }
 
           val out = rec(tree)
           println(out)
-          out
+
+          q"$out: $fragType"
+
       }
-      incPos(q"Seq[$fragType](..$res)", offset)
+      res
+    }
+    def compileBlockWrapped(parts: Seq[Ast.Block.Sub], offset: Int): c.Tree = {
+      incPos(q"Seq[$fragType](..${compileBlock(parts, offset)})", offset)
     }
     def compileHeader(header: String, block: Ast.Block, offset: Int): c.Tree = {
       val Block(stmts, expr) = c.parse(s"{$header\n ()}")
-      Block(stmts, compileBlock(block.parts, block.offset))
+      Block(stmts, compileBlockWrapped(block.parts, block.offset))
     }
 
-    val res = compileBlock(template.parts, template.offset)
-    println("::::::::::::::::::::::::::::::::::::::::::::::::")
-    println(res)
-    println("::::::::::::::::::::::::::::::::::::::::::::::::")
+    val res = compileBlockWrapped(template.parts, template.offset)
     res
   }
 }
