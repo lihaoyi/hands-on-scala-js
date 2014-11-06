@@ -196,7 +196,7 @@ object ErrorTests extends TestSuite{
 //                                    ^
 //          """
 //        )
-//      }
+      }
       'callContents{
         * - check(
           twRuntimeErrors("@scala.math.abs((1, 2).wtf)"),
@@ -295,79 +295,79 @@ object ErrorTests extends TestSuite{
         )
       }
     }
-//    'forLoop{
-//      'oneLine{
+    'forLoop{
+      'oneLine{
         'header - check(
           twRuntimeErrors("omg @for(x <- (0 + 1 + 2) omglolol (10 + 11 + 2)){ hello }"),
           """value omglolol is not a member of Int""",
           """
           twRuntimeErrors("omg @for(x <- (0 + 1 + 2) omglolol (10 + 11 + 2)){ hello }"),
-                                                      ^
+                                                     ^
           """
         )
-//
-//        'body - check(
-//          twRuntimeErrors("omg @for(x <- 0 until 10){ @((x, 2) + (1, 2)) }"),
-//          """too many arguments for method +""",
-//          """
-//          twRuntimeErrors("omg @for(x <- 0 until 10){ @((x, 2) + (1, 2)) }"),
-//                                                               ^
-//          """
-//        )
-//      }
-//      'multiLine{
-//        'body - check(
-//          twRuntimeErrors("""
-//            omg
-//            @for(x <- 0 until 10)
-//              I am cow hear me moo
-//              I weigh twice as much as @x.kkk
-//          """),
-//          """value kkk is not a member of Int""",
-//          """
-//              I weigh twice as much as @x.kkk
-//                                          ^
-//          """
-//        )
-//      }
-//    }
-//    'multiLine{
-//      'missingVar - check(
-//        twRuntimeErrors("""
-//        omg @notInScope lol
-//        """),
-//        """not found: value notInScope""",
-//        """
-//        omg @notInScope lol
-//            ^
-//        """
-//      )
-//      'wrongType - check(
-//        twRuntimeErrors("""
-//        omg @{() => ()} lol
-//        """),
-//        """type mismatch""",
-//        """
-//        omg @{() => ()} lol
-//                 ^
-//        """
-//      )
-//
-//      'bigExpression - check(
-//        twRuntimeErrors("""
-//          @{
-//            val x = 1 + 2
-//            val y = new Object()
-//            val z = y * x
-//            x
-//          }
-//        """),
-//        "value * is not a member of Object",
-//        """
-//            val z = y * x
-//                      ^
-//        """
-//      )
+
+        'body - check(
+          twRuntimeErrors("omg @for(x <- 0 until 10){ @((x, 2) + (1, 2)) }"),
+          """too many arguments for method +""",
+          """
+          twRuntimeErrors("omg @for(x <- 0 until 10){ @((x, 2) + (1, 2)) }"),
+                                                              ^
+          """
+        )
+      }
+      'multiLine{
+        'body - check(
+          twRuntimeErrors("""
+            omg
+            @for(x <- 0 until 10)
+              I am cow hear me moo
+              I weigh twice as much as @x.kkk
+          """),
+          """value kkk is not a member of Int""",
+          """
+              I weigh twice as much as @x.kkk
+                                         ^
+          """
+        )
+      }
+    }
+    'multiLine{
+      'missingVar - check(
+        twRuntimeErrors("""
+        omg @notInScope lol
+        """),
+        """not found: value notInScope""",
+        """
+        omg @notInScope lol
+            ^
+        """
+      )
+      'wrongType - check(
+        twRuntimeErrors("""
+        omg @{() => ()} lol
+        """),
+        """type mismatch""",
+        """
+        omg @{() => ()} lol
+                 ^
+        """
+      )
+
+      'bigExpression - check(
+        twRuntimeErrors("""
+          @{
+            val x = 1 + 2
+            val y = new Object()
+            val z = y * x
+            x
+          }
+        """),
+        "value * is not a member of Object",
+        """
+            val z = y * x
+                     ^
+        """
+      )
     }
   }
 }

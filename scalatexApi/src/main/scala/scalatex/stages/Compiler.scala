@@ -73,10 +73,11 @@ object Compiler{
           println("Tree " + res)
           incPos(res, offset1)
           res
-        case Ast.Block.For(generators, Ast.Block(parts2, offset2), offset) =>
+        case Ast.Block.For(generators, Ast.Block(parts2, offset2), offset1) =>
           val fresh = c.fresh()
 
-          val tree = c.parse(s"$generators yield $fresh" )
+          val tree = incPosRec(c.parse(s"$generators yield $fresh"), offset1 + 2)
+
           def rec(t: Tree): Tree = t match {
             case a @ Apply(fun, List(f @ Function(vparams, body))) =>
               val f2 = Function(vparams, rec(body))
