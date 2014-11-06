@@ -19,7 +19,7 @@ object ParserTests extends utest.TestSuite{
     'Trim{
       def wrap(s: String) = "|" + s + "|"
       * - {
-        val trimmed = wrap(stages.Trim("""
+        val trimmed = wrap(stages.Trim.old("""
             i am cow
               hear me moo
                 i weigh twice as much as you
@@ -33,7 +33,7 @@ object ParserTests extends utest.TestSuite{
 
       }
       * - {
-        val trimmed = wrap(stages.Trim(
+        val trimmed = wrap(stages.Trim.old(
           """
           @{"lol" * 3}
           @{
@@ -55,7 +55,7 @@ object ParserTests extends utest.TestSuite{
       }
       'dropTrailingWhitespace - {
 
-        val trimmed = wrap(stages.Trim(
+        val trimmed = wrap(stages.Trim.old(
           Seq(
             "  i am a cow   ",
             "    hear me moo    ",
@@ -222,7 +222,7 @@ object ParserTests extends utest.TestSuite{
           )
         )
         'ifBlockElseBraceBlockNested - {
-          val res = Parser(Trim(
+          val res = Parser(Trim.old(
             """
         @p
           @if(true){

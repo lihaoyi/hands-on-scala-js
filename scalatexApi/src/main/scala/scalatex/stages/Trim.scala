@@ -8,16 +8,21 @@ package scalatex.stages
  *
  * Remove all trailing whitespace from each line.
  */
-object Trim extends (String => String){
+object Trim extends (String => (String, Int)){
   def apply(str: String) = {
-    val lines = str.split("\n")
+    val lines = str.split("\n", -1)
     val offset = lines.iterator
                       .filter(_.length > 0)
                       .next()
                       .takeWhile(_ == ' ')
                       .length
-    lines.iterator
-         .map(_.drop(offset).replaceFirst("\\s+$", ""))
-         .mkString("\n")
+    val res = lines.iterator
+                   .map(_.replaceFirst("\\s+$", ""))
+                   .mkString("\n")
+    (res, offset)
+  }
+  def old(str: String) = {
+    val (res, offset) = this.apply(str)
+    res.split("\n", -1).map(_.drop(offset)).mkString("\n")
   }
 }

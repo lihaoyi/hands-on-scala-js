@@ -78,7 +78,7 @@ package object scalatex {
     def compile(s: String): c.Tree = {
       val realPos = new OffsetPosition(source, point).asInstanceOf[c.universe.Position]
 
-      Compiler(c)(realPos, Parser(stages.Trim(s)))
+      Compiler(c)(realPos, Parser(stages.Trim.old(s)))
     }
 
     
