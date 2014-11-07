@@ -4,9 +4,6 @@
 @p
   Not all code is developed in the browser. Maybe you want to run simple snippets of Scala.js which don't interact with the browser at all, and having to keep a browser open is an overkill. Maybe you want to write unit tests for your browser-destined code, so you can verify that it works without firing up Chrome. Maybe it's not a simple script but a re-distributable library, and you want to run the same command-line unit tests on both Scala.js and Scala-JVM to verify that the behavior is identical. This chapter will go through all these cases.
 
-@sect{The Scala.js Command Line}
-  TODO
-
 @sect{A Scala.js Module}
   TODO
 

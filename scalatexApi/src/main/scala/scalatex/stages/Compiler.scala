@@ -50,7 +50,7 @@ object Compiler{
 
       }
 
-      q"$out: $fragType"
+      out
     }
     def compileBlock(parts: Seq[Ast.Block.Sub], offset: Int): Seq[c.Tree] = {
       val res = parts.map{
@@ -69,7 +69,6 @@ object Compiler{
 
           val res = If(incPosRec(cond, offset1 + 2), compileBlockWrapped(parts2, offset2), elseCompiled)
 
-          println("Tree " + res)
           incPos(res, offset1)
           res
         case Ast.Block.For(generators, Ast.Block(parts2, offset2), offset1) =>
@@ -86,11 +85,7 @@ object Compiler{
               compileBlockWrapped(parts2, offset2)
           }
 
-          val out = rec(tree)
-          println(out)
-
-          q"$out: $fragType"
-
+          rec(tree)
       }
       res
     }

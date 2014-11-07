@@ -1,1 +1,175 @@
-TODO
+
+@sect{Background}
+  @p
+    Scala.js is implemented as a compiler plugin in the Scala compiler. Despite this, the overall process looks very different from that of a normal Scala application. This is because Scala.js optimizes for the size of the compiled executable, which is something that Scala-JVM does not usually do.
+
+  @sect{Small Executables}
+    Why do we care so much about how big our executables are in Scala.js? Why don't we care about how big they are on Scala-JVM? This is mostly due to three reasons:
+
+    @ul
+      @li
+        When cross-compiling Scala to Javascript, the end-result tends to be much more verbose than when cross-compiled to Java Bytecode.
+      @li
+        Scala.js typically is run in web browsers, which typically do not work well with large executables compared to e.g. the JVM
+      @li
+        Scala.js often is delivered to many users over the network, and long download times force users to wait, degrading the user experience
+
+    @p
+      These factors combined means that Scala.js has to put in extra effort to optimize the code to reduce it's size at compile-time. 
+
+    @sect{Raw Verbosity}
+      @p
+        Scala.js compiles to Javascript source code, while Scala-JVM compiles to Java bytecode. Java bytecode is a binary format and thus somewhat optimized for size, while Javascript is textual and is designed to be easy to read and write by hand.
+      @p
+        What does these mean, concretely? This means that a symbol marking something, e.g. the start of a function, is often a single byte in Java bytecode. Even more, it may not have any delimiter at all, instead the meaning of the binary data being inferred from its position in the file! On the other hand, in Javascript, declaring a function takes a long-and-verbose @hl.javascript{function} keyword, which together with peripheral punctuation (@code{.}, @code{ = }, etc.) often adds up to tens of bytes to express a single idea.
+      @p
+        What does this mean concretely? This means that expressing the same meaning in Javascript usually takes more "raw code" than expressing the same meaning in Java bytecode. Even though Java bytecode is relatively verbose for a binary format, it still is significantly more concise the Javascript, and it shows: the Scala standard library weighs in at a cool 6mb on Scala-JVM, while it weighs 20mb on Scala.js.
+      @p
+        All things being equal, this would mean that Scala.js would have to work harder to keep down code-size than Scala-JVM would have to. Alas, not all other things are equal.
+
+    @sect{Browsers Performance}
+      @p
+        Without any optimization, a naive compilation to Scala.js results in an executable (Including the standard library) weighing around 20mb. On the surface, this isn't a problem: runtimes like the JVM have no issue with loading 20mb of Java bytecode to execute; many large desktop applications weigh in the 100s of megabytes while still loading and executing fine.
+      @p
+        However, the web browser isn't a native execution environment; loading 20mb of Javascript is sufficient to heavily tax even the most modern web browsers such as Chrome and Firefox. Even though most of the code comprises class and method definitions that never have their contents executed, loading such a heavy load into e.g. Chrome makes it freeze for 5-10 seconds initially. Even after that, even after the code has all been parsed and isn't been actively executed, having all this Javascript makes the browser sluggish for up to a minute before the JIT compiler can speed things up.
+      @p
+        Overall, this means that you probably do not want to work with un-optimized Scala.js executables. Even for development, the slow load times and initial sluggishness make testing the results of your hard-work in the browser a frustrating experience. But that's not all...
+
+    @sect{Deployment Size}
+      @p
+        Scala.js applications often run in the browser. Not just any browser, but the browsers of your users, who had come to your website or web-app to try and accomplish some task. This is in stark contrast the Scala-JVM applications, which most often run on servers: servers that you own and control, and can deploy code to at your leisure.
+
+      @p
+        When running code on your own servers in some data center, you often do not care how big the compiled code is: the Scala standard library is several (6-7) megabytes, which added to your own code and any third-party libraries you're using, may add up to tens of megabytes, maybe a hundred or two if it's a relatively large application. Even that pales in comparison to the size of the JVM, which weighs in the 100s of megabytes. 
+      @p
+        Even so, you are deploying your code on an machine (virtual or real) which has several gigabytes of memory and 100s of gigabytes of disk space. Even if the size of the code makes deployment slower, you only deploy fresh code a handful of times a day at most, and the size of your executable typically does not worry you.
+      @p
+        Scala.js is different: it runs in the browsers of your users. Before it can run in their browser, it first has to be downloaded, probably over a connection that is much slower than the one used to deploy your code to your servers or data-center. It probably is downloaded thousands of times per day, and every user which downloads it must pay the cost of waiting for it to finish downloading before they can take any actions on your website. 
+
+      @p
+        A typical website loads ~100kb-1mb of Javascript, and 1mb is on the heavy side. Most Javascript libraries weigh in on the order of 50-100kb. For Scala.js to be useful in the browser, it has to be able to compare favorably with these numbers.
+    
+    @hr
+    
+    @p
+      Thus, while on Scala-JVM you typically have executables that (including dependencies) end up weighing 10s to 100s of megabytes, Scala.js has a much tighter budget. A hello world Scala.js application weighs in at around 100kb, and as you write more code and use more libraries (and parts of the standard library) this number rises to the 100s of kb. This isn't tiny, especially compared to the many small Javascript libraries out there, but it definitely is much smaller than what you'd be used to on the JVM.
+
+  @sect{Whole Program Optimizaton}
+    @p
+      At a first approximation, Scala.js achieves its tiny executables by using whole-program optimization. Scala-JVM, like Java, allows for separate compilation: this means that after compilation, you can combine your compiled code with code compiled separately, which can interact with the code you already compiled in an ad-hoc basis: code from both sides can call each others methods, instantiate each others classes, etc. without any limits. 
+
+    @p
+      Even things like package-private do not help you: Java packages are separate-compile-able too, and multiple compilation runs can dump things in the same package! You may think that private members and methods may be some salvation, but the Java ecosystem typically relies heavily on reflection, which depends on the fact that these private things remain exactly as-they-are. 
+
+    @p
+      Overall, this makes it difficult to do any meaningful optimization: you never know whether or not you can eliminate a class, method or field. Even if it's not used anywhere you can see, it could easily be used by some other code compiled separately, or accessed through reflection.
+
+    @p
+      With Scala.js, we have decided to forgo reflection, and forgo separate compilation, in exchange for smaller executables. This is made easier by the fact that the pure-Scala ecosystem makes little use of reflection overall. Thus, at the right before shipping your Scala.js app to your users, the Scala.js optimizer gathers up all your Scala.js code, determines which things are used and which are not, and eliminates all the un-used classes/methods/variables. This allows us to achieve a much smaller code size than is possible with reflection/separate-compilation support. Furthermore, because we forgo these two things, we can perform much more aggressive inlining and other compile-time optimizations than is possible with Scala-JVM, further reducing code size and improving performance.
+
+    @p
+      It's worth noting that such optimizations exist as an option on the JVM aswell: @a("Proguard", href:="http://proguard.sourceforge.net/") is a well known library for doing similar DCE/optimization for Java/Scala applications, and is extensively used in developing mobile applications which face similar "minimize-code-size" constraints that web-apps do. However, the bulk of Scala code which runs on the server does not use these tools.
+
+@sect{How Compilation Works}
+  @p
+    The Scala.js compilation pipeline is roughly split into multiple stages:
+
+  @ul
+    @li
+      @b{Initial Compilation}: @code{.scala} files to @code{.class} and @code{.sjsir} files 
+    @li 
+      @b{Optimization}: @code{.sjsir} files to smallish/fast @code{.js} files
+    @li
+      @b{Closure-Compiler}: @code{.js} files to smaller/faster @code{.js} files
+
+  @p
+    @code{.scala} files are the source code you're familiar with. @code{.class} files are the JVM-targetted artifacts which aren't used, but we keep around: tools such as IntelliJ or Eclipse use these files to provide IDE support for Scala.js code, even if they take no part in compilation. @code{.js} files are the output Javascript, which we can execute in a web browser.
+  @p
+    @code{.sjsir} files are worth calling out: the name stands for "ScalaJS Intermediate Representation", and these files contain compiled code half-way between Scala and Javascript: most Scala features have by this point been replaced their Java/Javascript equivalents, but it still contains Types (which have all been inferred) that can aid in analysis. Many Scala.js specific optimizations take place on this IR.
+
+  @p
+    Each stage has a purpose, and together the stages do bring benefits to offset their cost in complexity. The original compilation pipeline was much more simple:
+
+  @ul
+    @li
+      @b{Compilation}: @code{.scala} files to @code{.js} files
+
+  @p
+    But produced far larger (20mb) and slower executables. This section will explore each stage and we'll learn what these stages do.
+
+  @sect{Initial Compilation}
+    @p
+      As described earlier, the Scala.js compiler is implemented as a Scala compiler plugin, and lives in the main repository in @a("compiler/", href:="https://github.com/scala-js/scala-js/tree/master/compiler"). The bulk of the plugin runs after the @code{mixin} phase in the @a("Scala compilation pipeline", href:="http://stackoverflow.com/a/4528092/871202"). By this point:
+    
+    @ul
+      @li
+        Types and implicits have all been inferred
+      @li
+        Pattern-matches have been compiled to imperative code
+      @li
+        @hl.scala("@tailrec") functions have been translated to while-loops, @hl.scala{lazy val}s have been replaced by @hl.scala{var}s.
+      @li
+        @hl.scala{trait}s have been @a("replaced by interfaces and classes", href:="http://stackoverflow.com/a/2558317/871202")
+
+    @p
+      Overall, by the time the Scala.js compiler plugin takes action, most of the high-level features of the Scala language have already been removed. Compared to a hypothetical, alternative "from scratch" implementation, this approach has several advantages: 
+
+    @ul
+      @li
+        It helps ensure that the semantics of these features always, 100% match that of Scala-JVM
+      @li
+        It reduces the amount of implementation work required by re-using the existing compilation phases
+    
+    @p
+      This first phase is mostly a translation from the Scala compiler's internal AST to the Scala.js Intermediate Representation, and does not contain very many interesting optimizations. At the end of the initial compilation, the Scala compiler with Scala.js plugin results in two sets of files:
+
+    @ul
+      @li
+        The original @code{.class} files, as if it were compiled on the JVM. For code that does not use any Javascript interop, these are perfectly valid Java @code{.class} files full of bytecode and can even be executed on the JVM.
+      @li
+        The @code{.sjsir} files, destined for further compilation in the Scala.js pipeline.
+
+    @p
+      The ASTs defined in the @code{.sjsir} files is at about the same level of abstraction as the @hl.scala{Tree}s that the Scala compiler is working with at this stage. However, the @hl.scala{Tree}s within the Scala compiler contain a lot of cruft related to the compiler internals, and are also not easily serializable. This phase cleans them up into a "purer" format, (defined in the @a("ir/", href:="https://github.com/scala-js/scala-js/blob/master/ir/src/main/scala/scala/scalajs/ir/Trees.scala") folder) which is also serializable.
+
+    @p
+      This is the only phase in the Scala.js compilation pipeline that separate compilation is possible: you can compile many different sets of Scala.js @code{.scala} files separately, only to combine them later. This is used e.g. for distributing Scala.js libraries as Maven Jars, which are compiled separately by library authors to be combined into a final executable later.
+
+  @sect{Optimization}
+    @p
+      This phase is a whole-program optimization of the @code{.sjsir} files, and lives in the @a("tools/", href:="https://github.com/scala-js/scala-js/tree/master/tools") folder of the Scala.js repository. The rough operations that get performed are:
+
+    @ul
+      @li
+        @b{Dead-code elimination}: entry-points to the program such as @hl.scala("@JSExport")ed methods/classes are kept, as are any methods/classes that these reference. All others are removed. This reduces the potentially 20mb of Javascript generated by a naive compilation to a more manageable 700kb-1mb for a typical application
+      @li
+        @b{Inlining}: in cases where a method is only called in a few places, the optimizer inlines the implementation of the method at those callsites. This typically reduces the code size by a small amount, but offers a several-times speedup of the generated code by inlining away much of the overhead from the abstractions (implicit-conversions, higher-order-functions, etc.) in Scala's standard library.
+    @p
+      As a whole-program optimization, it tightly ties together the code it is compiling and does not let you e.g. inject additional classes later. This does not mean you cannot interact with external code at all: you can, but it has to go through explicitly @hl.scala{@@JSExport}ed methods and classes via Javascript Interop, and not on ad-hoc classes/methods within the module. Thus it's entirely possible to have multiple "whole-programs" running in the same browser; they just will likely have duplicate copies of e.g. standard library classes inside of them, since they cannot share the code as it's not exported.
+
+    @p
+      While the input for this phase is the aggregate @code{.sjsir} files from your project and all your dependencies, the output is executable Javascript. This phase usually runs in less than a second, outputs a Javascript blob in the 700kb-1mb range, and is suitable for repeated use during development. This corresponds to the @code{fastOptJS} command in SBT.
+
+  @sect{Closure-Compiler}
+    @p
+      The @a("Google Closure Compiler", href:="https://developers.google.com/closure/compiler/") (GCC) is a set of tools that work with Javascript. It has multiple @a("levels of optimization", href:="https://developers.google.com/closure/compiler/docs/compilation_levels"), doing everything from basic whitespace-removal to heavy optimization. It is a old, relatively mature project that is relied on both inside and outside google to optimize the delivery of Javascript to the browser.
+    @p
+      Scala.js uses GCC in its most aggressive mode: @a("Advanced Optimization", href:="https://developers.google.com/closure/compiler/docs/api-tutorial3"). As described in the linked documentation, this performs optimizations such as:
+
+    @ul
+      @li
+        Whitespace removal
+      @li
+        Variable and property renaming
+      @li
+        Dead code elimination
+      @li
+        Inlining
+
+    @p
+      Notably, GCC @i{does not preserve the semantics of arbitrary Javascript}! In particular, it only works for a subset of Javascript that it understands and can properly analyze. This is an issue when hand-writing Javascript for GCC since it's very easy to step outside that subset and have GCC break your code, but is not a worry when using Scala.js: the Scala.js optimizer (the previous phase in the pipeline) automatically outputs Javascript which GCC understands and can work with.
+    @p
+      GCC duplicates a lot of functionality that the Scala.js optimizer already does, such as DCE and inlining. It is entirely possible to skip the optimization phase, output the naive 20mb Javascript blob, and run GCC on it to bring the size down. However, GCC is much slower than the Scala.js optimizer, taking 60 seconds where the optimizer takes less than 1. 
+
+    @p
+      Empirically, running GCC on the output of the optimizer produces the smallest output blobs: ~150-400kb, significantly smaller than the output of running either of them alone, and so that is what we do. This takes 5-10 seconds to run, which makes it somewhat slow for iterative development, so it's typically only run right before final testing and deployment. This corresponds to the @code{fullOptJS} command in SBT.

@@ -108,7 +108,7 @@
       In general, code like this will usually end up being necessary in a Scala.js program: the Javascript APIs that the browser provides to do things often ends up being somewhat roundabout and verbose. It's somewhat annoying to have to do for a small program such as this one, but in a larger application, the cost is both spread out over thousands of lines of code and also typically hidden away in some helpers, so you don't have to mess with this stuff unless you really want to.
 
   @sect{Defining our State}
-    @hl.ref("examples/demos/src/main/scala/canvasapp/FlappyLine.scala", "/*variables*/", end="def runDead")
+    @hl.ref("examples/demos/src/main/scala/canvasapp/FlappyLine.scala", "/*variables*/", end="def runLive")
 
     @p
       This is where we start defining things that are relevant to Flappy Box. There are roughly two groups of values here: immutable constants in the top group, and mutable variables in the bottom. The rough meaning of each variable is documented in the comments, and we'll see exactly how we use them later. 
@@ -137,7 +137,7 @@
     @p    
       This function basically contains all the game logic, from motion, to collision-detection, to rendering, so it's pretty large. Not that large though! And entirely understandable, even if it takes a few moments to read through.
 
-    @hl.ref("examples/demos/src/main/scala/canvasapp/FlappyLine.scala", "def runDead", end="def run")
+    @hl.ref("examples/demos/src/main/scala/canvasapp/FlappyLine.scala", "def runDead", "def run()")
 
     @p
       This is the function that handles what happens when you're dead. Essentially, we reset all the mutable variables to their initial state, and just count down the @hl.scala{dead} counter until it reaches zero and we're considered alive again.

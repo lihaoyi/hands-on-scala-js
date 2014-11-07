@@ -12,6 +12,17 @@ import scalatags.Text.all._
 object Book {
   import Utils.sect
 
+  val myTable = Seq(
+    ("Most of java.lang.*", "j.l.Thread, j.l.Runtime, ..."),
+    ("Almost all of scala.*", "s.c.parallel, s.tools.nsc"),
+    ("Some of java.util.*", "org.omg.CORBA, sun.misc.*"),
+    ("Scala Macros: upickle, scala-async, scalaxy, etc", "Reflection: scala-pickling, scala-reflect"),
+    ("Pure-Scala ecosystem: shapeless, scalaz, scalatags, utest", "Java-dependent: Scalatest, Scalate"),
+    ("JS stuff: XmlHttpRequest, Websockets. Localstorage", " JVM stuff: Netty, akka, spray, file IO, JNI"),
+    ("HTML DOM, Canvas, WebGL", "AWT, Swing, SWT, OpenGL"),
+    ("JavaScript libraries: chipmunk.js, hand.js, react.js, jquery", "Java ecosystem: guice, junit, apache-commons, log4j"),
+    ("IntelliJ, Eclipse, SBT, Chrome console, firebug", "Scala REPL, Yourkit, VisualVM, JProfiler")
+  )
   val txt = Index.template
   val contentBar = {
     def rec(current: Node, depth: Int): Seq[Frag] = {

@@ -60,11 +60,15 @@ object FlappyLine extends{
       // Render obstacles, and check for collision
       renderer.fillStyle = "darkblue"
       for((holeY, i) <- obstacles.zipWithIndex){
+        // Where each obstacle appears depends on what frame it is.
+        // This is what keeps the obstacles moving to the left as time passes.
         val holeX = i * obstacleGap - frame + canvas.width
         renderer.fillRect(holeX, 0, 5, holeY - holeSize)
         renderer.fillRect(
           holeX, holeY + holeSize, 5, canvas.height - holeY - holeSize
         )
+
+        // Kill the player if he hits some obstacle
         if (math.abs(holeX - canvas.width/2) < 5 &&
           math.abs(holeY - playerY) > holeSize){
           dead = 50
@@ -80,7 +84,6 @@ object FlappyLine extends{
         dead = 50
       }
     }
-
 
     def runDead() = {
       playerY = canvas.height / 2

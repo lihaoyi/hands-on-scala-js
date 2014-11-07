@@ -129,7 +129,7 @@
     TODO
 
 @sect("Why Jars instead of RequireJS/CommonJS") 
-  @p
+  @p 
     In JVM-land, the standard method for distributing these libraries is as @a("Maven Artifacts", href:="http://stackoverflow.com/questions/2487485/what-is-maven-artifact"). These are typically published in a public location such as @a("Maven Central", href:="http://search.maven.org/"), where others can find and download them for use. Typically downloads are done automatically by the build-tool: in Scala-JVM typically this is SBT.
   @p
     In Javascript-land, there are multiple ways of acquiring dependencies: @a("CommonJS", href:="http://en.wikipedia.org/wiki/CommonJS") and @a("RequireJS/AMD", href:="http://requirejs.org/") are two competing standards with a host of implementations. Historically, a third approach has been most common: the developer would simply download the modules himself, check it into source-control and manually add a @hl.html{<script>} tag to the HTML page that will make the functionality available through some global variable.

@@ -109,26 +109,28 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
     ')'
   }
   def BlockExpr2: Rule0 = rule { '{' ~ Ws ~ (CaseClauses | Block) ~ '}' }
-  def BraceBlock: Rule1[Ast.Block] = rule{ '{' ~ Body ~ '}' }
+  def BraceBlock: Rule1[Ast.Block] = rule{ '{' ~ BodyNoBrace ~ '}' }
 
-  def BodyItem: Rule1[Seq[Ast.Block.Sub]] = rule{
+  def BodyItem(exclusions: String): Rule1[Seq[Ast.Block.Sub]] = rule{
     ForLoop ~> (Seq(_)) |
     LoneForLoop ~> (Seq(_, _)) |
     IfElse ~> (Seq(_)) |
     LoneScalaChain ~> (Seq(_, _)) |
     HeaderBlock ~> (Seq(_)) |
-    TextNot("@}") ~> (Seq(_)) |
+    TextNot("@" + exclusions) ~> (Seq(_)) |
     (push(offsetCursor) ~ capture(Indent) ~> ((i, x) => Seq(Ast.Block.Text(x, i)))) |
     (push(offsetCursor) ~ capture(BlankLine) ~> ((i, x) => Seq(Ast.Block.Text(x, i)))) |
     ScalaChain ~> (Seq(_: Ast.Block.Sub))
   }
-  def Body = rule{
-    push(offsetCursor) ~ oneOrMore(BodyItem) ~> {(i, x) =>
+  def Body = rule{ BodyEx() }
+  def BodyNoBrace = rule{ BodyEx("}") }
+  def BodyEx(exclusions: String = "") = rule{
+    push(offsetCursor) ~ oneOrMore(BodyItem(exclusions)) ~> {(i, x) =>
       Ast.Block(x.flatten, i)
     }
   }
   def Body0 = rule{
-    push(offsetCursor) ~ zeroOrMore(BodyItem) ~> {(i, x) =>
+    push(offsetCursor) ~ zeroOrMore(BodyItem("")) ~> {(i, x) =>
       Ast.Block(x.flatten, i)
     }
   }
