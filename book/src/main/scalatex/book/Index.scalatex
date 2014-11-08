@@ -26,10 +26,11 @@
   @sect("Interactive Web Pages")
     @handson.WebPage.template
 
-  @sect("The Scala.js Command Line")
+  @sect("The Command Line")
     @handson.CommandLine.template
-  @sect("Cross-platform Modules")
-    @handson.CrossModules.template
+
+  @sect("Publishing Modules")
+    @handson.PublishingModules.template
 
   @sect("Integrating Client and Server")
     @handson.ClientServer.template
