@@ -250,6 +250,6 @@ Hides the menu at `48em`, but modify this based on your app's needs.
 }
 
 /*Workaround for bug in highlight.js IDEA theme*/
-.hljs-tag{
+.hljs-tag, .hljs-symbol{
     background: none;
 }

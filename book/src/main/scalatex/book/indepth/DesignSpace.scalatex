@@ -122,12 +122,72 @@
     @p
       Using macros here also plays well with the Scala.js optimizer: the macros are fully expanded before the optimizer is run, so by the time the optimizer sees the code, there is no more magic left: it is then free to do dead-code-elimination/inlining/other-optimizations without worrying about reflection causing the code to do weird things at runtime. Thus, we've managed to substitute most of the main use-cases of reflection, and so can do without it.
 
-@sect("Why No inline-Javascript?")
-    TODO
+@sect{Why does error behavior differ?}
+  @p
+    Scala.js deviates from the semantics of Scala-JVM in several ways. Many of these ways revolve around the edge-conditions of a program: what happens when something goes wrong? An array index is out of bounds? An integer is divided-by-zero? These differences cause some amount of annoyance when debugging, since when you mess up an array index, you expect an exception, not silently-invalid-data!
 
-@sect("Why does error behavior differ?")
-    TODO
+  @p
+    In most of these cases, it was a trade-off between performance and correctness. These are situations where the default semantics of Scala deviate from that of Javascript, and Scala.js would have to perform extra work to emulate the desired behavior. For example, compare the division behavior of the JVM and Javascript.
+  @sect{Divide-by-zero: a case study}
+    @hl.scala
+      /*JVM*/
+      15 / 4              // 3
+    @hl.javascript
+      /*JS*/
+      15 / 4              // 3.25
+    @p
+      On the JVM, integer division is a primitive, and dividing @hl.scala{15 / 4} gives @hl.scala{3}. However, in Javascript, it gives @hl.javascript{3.25}, since all numbers of double-precision floating points.
 
+    @p
+      Scala.js works around this in the general case by adding a @hl.javascript{| 0} to the translation, e.g.
+    
+    @hl.scala
+      /*JVM*/
+      15 / 4              // 3
+    @hl.javascript
+      /*JS*/  
+      (15 / 4) | 0        // 3
+
+    @p
+      This gives the correct result for most numbers, and is reasonably efficient. However, what about dividing-by-zero?
+
+    @hl.scala
+      /*JVM*/
+      15 / 0              // ArithmeticException
+    @hl.javascript
+      /*JS*/
+      15 / 0              // Infinity
+      (15 / 0) | 0        // 0
+
+    @p
+      On the JVM, the JVM is kind enough to throw an exception for you. However, in Javascript, the integer simply wraps around to @hl.javascript{Infinity}, which then gets truncated down to zero.
+    @p
+      So that's the current behavior of integers in Scala.js. One may ask: can we fix it? And the answer is, we can:
+    @hl.scala
+      /*JVM*/
+      1 / 0               // ArithmeticException
+    @hl.javascript
+      /*JS*/
+      function intDivide(x, y){
+        var z = x / y
+        if (z == Infinity) throw new ArithmeticException("Divide by Zero")
+        else return z
+      }
+      intDivide(1, 0)     // ArithmeticException
+    @p
+      This translation fixes the problem, and enforces that the @hl.scala{ArithmeticException} is thrown at the correct time. However, this approach causes some overhead: what was previously two primitive operations is now a function call, a local variable assignment, and a conditional. That is a lot more expensive than two primitive operations!
+
+  @sect{The Performance/Correctness Tradeoff}
+    @p
+      In the end, a lot of the semantic differences listed here come down to the same tradeoff: we could make the code behave more-like-Scala, but at a cost of adding overhead via function calls and other checks. Furthermore, the cost is paid regardless of whether the "exceptional case" is triggered or not: in the example above, every division in the program pays the cost!
+    @p
+      The decision to not support these exceptional cases comes down to a value judgement: how often do people actually depend on an exception being thrown as part of their program semantics, e.g. by catching it and performing actions? And how often are they just a way of indicating bugs? It turns out that very few @hl.scala{ArithmeticException}s, @hl.scala{ArrayIndexOutOfBoundsException}s, or similar are actually a necessary part of the program! They exist during debugging, but after that, these code paths are never relied upon "in production".
+    @p
+      Thus Scala.js goes for a compromise: in the Fast Optimization mode, we run the code with all these checks in place, so as to catch cases where these errors occur close-to-the-source and make it easy for you to debug them. In Full Optimization mode, on the other hand, we remove these checks, assuming you've already ran through these cases and found any bugs during development. 
+    @p
+      This is a common pattern in situations where there's a tradeoff between debuggability and speed. In Scala.js' case, it allows us to get good debuggability in development, as well as good performance in production. There's some loss in debuggability in development, sacrificed in exchange for greater performance.
+
+  
 @sect("Why Jars instead of RequireJS/CommonJS") 
   @p 
     In JVM-land, the standard method for distributing these libraries is as @a("Maven Artifacts", href:="http://stackoverflow.com/questions/2487485/what-is-maven-artifact"). These are typically published in a public location such as @a("Maven Central", href:="http://search.maven.org/"), where others can find and download them for use. Typically downloads are done automatically by the build-tool: in Scala-JVM typically this is SBT.

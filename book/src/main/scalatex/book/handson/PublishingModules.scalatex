@@ -4,10 +4,8 @@
 @p
   Not all code is developed in the browser. Maybe you want to run simple snippets of Scala.js which don't interact with the browser at all, and having to keep a browser open is an overkill. Maybe you want to write unit tests for your browser-destined code, so you can verify that it works without firing up Chrome. Maybe it's not a simple script but a re-distributable library, and you want to run the same command-line unit tests on both Scala.js and Scala-JVM to verify that the behavior is identical. This chapter will go through all these cases.
 
-@sect{A Scala.js Module}
-  TODO
 
-@sect{A Cross-Built Module}
+@sect{A Simple Cross-Built Module}
 
   @p
     As always, we will start with an example: in this case a toy library whose sole purpose in life is to take a series of timestamps (milliseconds UTC) and format them into a single, newline-delimited string. This is what the project layout looks like:
@@ -42,68 +40,170 @@
   @hl.bash
     $ ln -s ../js/shared jvm/shared
 
+  @sect{Build Configuration}
+    @p
+      From the bash shell in the project root. Let's take a look at the various files that make up this project. First, the @code{build.sbt} files:
+
+    @hl.ref("examples/crossBuilds/simple/project/build.sbt")
+
+    @p
+      The @code{project/build.sbt} file is uneventful: it simply includes the Scala.js SBT plugin. However, the @code{build.sbt} file is a bit more interesting:
+
+    @hl.ref("examples/crossBuilds/simple/build.sbt")
+
+    @p
+      Unlike the equivalent @code{build.sbt} files you saw in earlier chapters, this does not simply add @hl.scala{scalaJSSettings} to the root project. Rather, it sets up two projects: one in the @code{js/} folder and one in the @code{jvm/} folder, with the @code{js/} version getting the settings from the Scala.js plugin. To both of these, we add @code{shared/main/scala} to the list of source directories. This means that both projects will pick up the sources we symlinked between @code{js/shared/} and @code{jvm/shared/}.
+
+  @sect{Source Files}
+
+    @p
+      Now, let's look at the contents of the @code{.scala} files that make up the meat of this project:
+
+    @hl.ref("examples/crossBuilds/simple/js/shared/main/scala/simple/Simple.scala")
+
+    @p
+      In @code{Simple.scala} we have the shared, cross-platform API of our library: a single @hl.scala{object} with a single method @hl.scala{def} which does what we want, which can then be used in either Scala.js or Scala-JVM. In general, you can put as much shared logic here as you want: classes, objects, methods, anything that can run on both Javascript and on the JVM.
+    
+    @p
+      However, when it comes to actually formatting the date, we have a problem: Javascript and Java provide different utilities for formatting dates! They both let you format them, but they provide different APIs. Thus, to do the formatting of each individual date, we call out to the @hl.scala{Platform.format} function, which is implemented twice: once in @code{js/} and once in @code{jvm/}:
+
+    @div(cls:="pure-g")
+      @div(cls:="pure-u-1 pure-u-md-1-2")
+        @hl.ref("examples/crossBuilds/simple/js/src/main/scala/simple/Platform.scala")
+
+      @div(cls:="pure-u-1 pure-u-md-1-2")
+        @hl.ref("examples/crossBuilds/simple/jvm/src/main/scala/simple/Platform.scala")
+
+    @p
+      In the @code{js/} version, we are using the Javascript @hl.javascript{Date} object to take the millis and do what we want. In the @code{jvm/} version, we instead use @hl.scala{java.text.SimpleDateFormat} with a custom formatter (The syntax is defined @a("here", href:="http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html")).
+   
+    @p
+      Again, you can put as much platform-specific logic in these files as you want, to account for differences in the available APIs. Maybe you want to use @hl.scala{js.JSON.parse} for parsing JSON blobs in @code{js/}, but @hl.scala{Jackson} or @hl.scala{GSON} for parsing them in @code{jvm/}.
+    @p
+      Lastly, you'll also have noticed the two identical @hl.scala{main} methods in the platform-specific code. This is an implementation detail around the fact that Scala.js picks up the main method differently from Scala-JVM, using @hl.scala{js.JSApp} instead of looking for a @hl.scala{main(args: Array[String]): Unit} method. These two main methods allow us to test our implementations
+  @sect{Running the Module}
+    @hl.bash 
+      > ; js/run; jvm/run
+      [info] Running simple.Platform
+      Running on JS! 1
+      November 2, 2014 2:58:48 PM PST
+      November 2, 2014 2:58:49 PM PST
+      [success] Total time: 4 s, completed Nov 2, 2014 2:58:48 PM
+      [info] Running simple.Platform
+      Running on JVM! 1.0
+      November 2, 2014 2:58:49 PM PST
+      November 2, 2014 2:58:50 PM PST
+      [success] Total time: 0 s, completed Nov 2, 2014 2:58:49 PM
+
+    @p
+      As you can see, both runs printed the same results, modulo three things:
+
+    @ul
+      @li 
+        The "Running on XXX!" statement which shows us we're actually running on two platforms. 
+      @li
+        The other hint is the time taken: the second run is instant while the first takes three seconds! This is because by default we run on @a("Rhino", href:="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino"), which is a simple interpreter hundreds of times slower than running code natively on the JVM.
+      @li
+        In Scala-JVM the double 1.0 is printed as @code{1.0}, while in Scala.js it's printed as @code{1}. This is one of a small number of differences between Scala.js and Scala-JVM, and verifies that we are indeed running on both platforms!
+
+    @p
+      You've by this point set up a basic cross-building Scala.js/Scala-JVM project! 
+
+  @hr
+
   @p
-    From the bash shell in the project root. Let's take a look at the various files that make up this project. First, the @code{build.sbt} files:
-
-  @hl.ref("examples/crossBuilds/simple/project/build.sbt")
-
-  @p
-    The @code{project/build.sbt} file is uneventful: it simply includes the Scala.js SBT plugin. However, the @code{build.sbt} file is a bit more interesting:
-
-  @hl.ref("examples/crossBuilds/simple/build.sbt")
-
-  @p
-    Unlike the equivalent @code{build.sbt} files you saw in earlier chapters, this does not simply add @hl.scala{scalaJSSettings} to the root project. Rather, it sets up two projects: one in the @code{js/} folder and one in the @code{jvm/} folder, with the @code{js/} version getting the settings from the Scala.js plugin. To both of these, we add @code{shared/main/scala} to the list of source directories. This means that both projects will pick up the sources we symlinked between @code{js/shared/} and @code{jvm/shared/}.
-
-  @p
-    Now, let's look at the contents of the @code{.scala} files that make up the meat of this project:
-
-  @hl.ref("examples/crossBuilds/simple/js/shared/main/scala/simple/Simple.scala")
-
-  @p
-    In @code{Simple.scala} we have the shared, cross-platform API of our library: a single @hl.scala{object} with a single method @hl.scala{def} which does what we want, which can then be used in either Scala.js or Scala-JVM. In general, you can put as much shared logic here as you want: classes, objects, methods, anything that can run on both Javascript and on the JVM.
-  
-  @p
-    However, when it comes to actually formatting the date, we have a problem: Javascript and Java provide different utilities for formatting dates! They both let you format them, but they provide different APIs. Thus, to do the formatting of each individual date, we call out to the @hl.scala{Platform.format} function, which is implemented twice: once in @code{js/} and once in @code{jvm/}:
-
-  @div(cls:="pure-g")
-    @div(cls:="pure-u-1 pure-u-md-1-2")
-      @hl.ref("examples/crossBuilds/simple/js/src/main/scala/simple/Platform.scala")
-
-    @div(cls:="pure-u-1 pure-u-md-1-2")
-      @hl.ref("examples/crossBuilds/simple/jvm/src/main/scala/simple/Platform.scala")
-
-  @p
-    In the @code{js/} version, we are using the Javascript @hl.javascript{Date} object to take the millis and do what we want. In the @code{jvm/} version, we instead use @hl.scala{java.text.SimpleDateFormat} with a custom formatter (The syntax is defined @a("here", href:="http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html")).
- 
-  @p
-    Again, you can put as much platform-specific logic in these files as you want, to account for differences in the available APIs. Maybe you want to use @hl.scala{js.JSON.parse} for parsing JSON blobs in @code{js/}, but @hl.scala{Jackson} or @hl.scala{GSON} for parsing them in @code{jvm/}.
-  @p
-    Lastly, you'll also have noticed the two identical @hl.scala{main} methods in the platform-specific code. This is an implementation detail around the fact that Scala.js picks up the main method differently from Scala-JVM, using @hl.scala{js.JSApp} instead of looking for a @hl.scala{main(args: Array[String]): Unit} method. These two main methods allow us to test our implementations
-
-  @hl.bash 
-    > ; js/run; jvm/run
-    [info] Running simple.Platform
-    Running on JS! 1
-    November 2, 2014 2:58:48 PM PST
-    November 2, 2014 2:58:49 PM PST
-    [success] Total time: 4 s, completed Nov 2, 2014 2:58:48 PM
-    [info] Running simple.Platform
-    Running on JVM! 1.0
-    November 2, 2014 2:58:49 PM PST
-    November 2, 2014 2:58:50 PM PST
-    [success] Total time: 0 s, completed Nov 2, 2014 2:58:49 PM
-
-  @p
-    As you can see, both runs printed the same results, modulo three things:
+    If you wish, you can do more things with this project you've set up:
 
   @ul
-    @li 
-      The "Running on XXX!" statement which shows us we're actually running on two platforms. 
     @li
-      The other hint is the time taken: the second run is instant while the first takes three seconds! This is because by default we run on @a("Rhino", href:="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino"), which is a simple interpreter hundreds of times slower than running code natively on the JVM.
+      Flesh it out! Currently this module only does a single, trivial thing. If you've done any web development before, I'm sure you can find some code snippet, function or algorithm that you'd like to share between client and server. Try implementing it in the @code{shared/} folder to be usable in both Scala.js and Scala-JVM
     @li
-      In Scala-JVM the double 1.0 is printed as @code{1.0}, while in Scala.js it's printed as @code{1}. This is one of a small number of differences between Scala.js and Scala-JVM, and verifies that we are indeed running on both platforms!
+      Publish it! Both @code{sbt publishLocal} and @code{sbt publishSigned} work on this module, for publishing either locally, Maven Central via Sonatype, or Bintray. Running the command bare should be sufficient to publish both the @code{js} or @code{jvm} projects, or you can also specify which one e.g. @code{jvm/publishLocal} to publish only one subproject.
+  
+  @p
+    This @code{jvm} project works identically to any other Scala-JVM project, and the @code{js} project works identically to the Command Line API described earlier. Thus you can do things like @code{fastOptStage::run} to run the code on Node.js, setting @hl.scala{requiresDOM := true}, run @code{fullOptStage::run} to run the code with full, aggressive optimizations. And of course, things that work in both Scala.js and Scala-JVM can be run on both, basic commands such as code{run} or @code{test}.
 
   @p
-    You've by this point set up a basic cross-building Scala.js/Scala-JVM project!
+    You can also run tests using this code, if you have a testing library set up. The next section will go into detail as to how to set that up.
+
+@sect{Cross-Testing with uTest}
+  @p
+    @a("uTest", href:="https://github.com/lihaoyi.utest") is a small unit-testing library for Scala programs, that works on both Scala-JVM and Scala.js. At the time it was written, it was the first one out there, though now there are others such as @a("little-spec", href:="https://github.com/eecolor/little-spec") or @a("otest", href:="https://github.com/cgta/otest"). Notably, Scala's traditional testing libraries such as @a("Scalatest", href:="http://www.scalatest.org/") or @a("Specs2", href:="http://etorreborre.github.io/specs2/") do not work with Scala.js, as they make use of Reflection or other things not supported on Scala.js
+
+  @sect{uTest Configuration}
+    @p
+      To make your code use uTest, there are a few changes you need to make. First, you need to add the uTest SBT plugin:
+
+    @hl.ref("examples/crossBuilds/simple2/project/build.sbt")
+
+    @p
+      Here, in @code{project/build.sbt}, we see it used next to the Scala.js SBT plugin. Next, we need to modify our @code{build.sbt} file
+
+    @hl.ref("examples/crossBuilds/simple2/build.sbt")
+
+    @p
+      The main thing we've done is make use of uTest's @hl.scala{JsCrossBuild}: this does the work we've previously done to setup the shared-source-directory in SBT, as well as doing the neccessary configuration for uTest itself, providing you with ready-made @hl.scala{js} and @hl.scala{jvm} projects you can work with.
+
+  @sect{Your First Tests!}
+    @p
+      Lastly, we need to start writing tests! @a("uTest", href:="https://github.com/lihaoyi.utest") is well documented, but to get started here's a simple test suite for our @hl.scala{formatDates} function:
+
+    @hl.ref("examples/crossBuilds/simple2/js/shared/test/scala/simple/SimpleTest.scala")
+
+    @p
+      Since this is in @code{shared/}, it is automatically symlinked and is picked up by both @code{js} and @code{jvm} subprojects. With that done, you just need to run the @code{test} commands:
+
+    @hl.bash
+      > ; js/test; jvm/test
+      [info] 1/4     simple.SimpleTest.format.nil   Success
+      [info] 2/4     simple.SimpleTest.format.timeZero    Success
+      [info] 3/4     simple.SimpleTest.format   Success
+      [info] 4/4     simple.SimpleTest    Success
+      [info] -----------------------------------Results-----------------------------------
+      [info] simple.SimpleTest    Success
+      [info]     format   Success
+      [info]         nil    Success
+      [info]         timeZero   Success
+      [info] Failures:
+      [info]
+      [info] Tests: 4
+      [info] Passed: 4
+      [info] Failed: 0
+      [success] Total time: 4 s, completed Nov 8, 2014 7:42:39 PM
+      [info] 1/4     simple.SimpleTest.format.nil   Success
+      [info] 2/4     simple.SimpleTest.format.timeZero    Success
+      [info] 3/4     simple.SimpleTest.format   Success
+      [info] 4/4     simple.SimpleTest    Success
+      [info] -----------------------------------Results-----------------------------------
+      [info] simple.SimpleTest    Success
+      [info]     format   Success
+      [info]         nil    Success
+      [info]         timeZero   Success
+      [info] Failures:
+      [info]
+      [info] Tests: 4
+      [info] Passed: 4
+      [info] Failed: 0
+      [success] Total time: 0 s, completed Nov 8, 2014 7:42:39 PM
+
+    @p
+      And you'll see that we've run our unit tests twice: once on Scala.js in Rhino, and once on Scala-JVM! As expected, the first run in Rhino took much longer (4 seconds!) than the second, as Rhino is much slower than running code directly on the JVM. You can configure the Scala.js run to run in Node.js or PhantomJS, as well as running under different optimization levels. 
+
+  @hr
+
+  @p
+    Now that you've got a basic cross-platform Scala module building and testing, what next? One thing you may want to do is add things to the project. Depending on where you want your code to run, there's a place for everythign:
+
+  @ul
+    @li
+      @code{js/shared/main/scala}/@code{jvm/shared/main/scala} is where your shared library code goes. This code will be run on both Scala.js and Scala-JVM
+    @li
+      @code{jvm/src/main/scala} Scala-JVM only code
+    @li
+      @code{js/src/main/scala} Scala.js only code
+
+  @p
+    It is entirely possible for your modules to have slightly different implementations and APIs on Scala.js and Scala-JVM. @a("Scalatags", href:="https://github.com/lihaoyi/scalatags") exposes additional DOM-related functionality only for it's Scala.js version, while @a("uPickle", href:="https://github.com/lihaoyi/upickle") uses different JSON libraries (@a("Jawn", href:="https://github.com/non/jawn") v.s. @a("DOM", href:="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse")) on the backend while the exposed interface remains the same. You have the flexibility to pick and choose which bits of your library you wish to share and which bits will be different.
+
+  @p
+    Everything above also applies to your unit tests, which fall in @code{test/} folders mirroring the @code{main/} folders listed above. You can also choose to share or not-share your unit test code as you see fit.

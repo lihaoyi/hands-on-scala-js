@@ -72,7 +72,8 @@ object Utils{
     def apply(args: Frag*) = {
       val wrappedContents = contentWrap.getOrElse((x: Frag) => x)(args)
       val res = Seq[Frag](
-        headerWrap(name, subname)(cls:="content-subhead", id:=munge(name)),
+        if (name == "") ""
+        else headerWrap(name, subname)(cls:="content-subhead", id:=munge(name)),
         wrappedContents
       )
       indent -= 1

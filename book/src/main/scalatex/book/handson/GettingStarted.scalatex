@@ -98,17 +98,17 @@
   @p
     We've downloaded, compiled, ran, and made changes to our first Scala.js application. Let's now take a closer look at the code that we just ran:
 
-  @hl.ref("output/temp/src/main/scala/example/ScalaJSExample.scala")      
+  @hl.ref("output/workbench-example-app/src/main/scala/example/ScalaJSExample.scala")      
 
   @p
     It's a good chunk of code, though not a huge amount. To someone who didn't know about Scala.js, they would just think it's normal Scala, albeit with this unusual @hl.scala{dom} library and a few weird annotations. Let's pick it apart starting from the top:
 
-  @hl.ref("output/temp/src/main/scala/example/ScalaJSExample.scala", "case class Point", "@JSExport")
+  @hl.ref("output/workbench-example-app/src/main/scala/example/ScalaJSExample.scala", "case class Point", "@JSExport")
 
   @p
     Here we are defining a @hl.scala{Point} case class which represents a X/Y position, with some basic operators defined on it. This is done mostly for convenience later on, when we want to manipulate these two-dimensional points. Scala.js is Scala, and supports the entirety of the Scala language. @hl.scala{Point} here behaves identically as it would if you had run Scala on the JVM.
 
-  @hl.ref("output/temp/src/main/scala/example/ScalaJSExample.scala", "@JSExport", "val ctx")
+  @hl.ref("output/workbench-example-app/src/main/scala/example/ScalaJSExample.scala", "@JSExport", "val ctx")
 
   @p
     This @hl.scala("@JSExport") annotation is used to tell Scala.js that you want this method to be visible and callable from Javascript. By default, Scala.js does dead code elimination and removes any methods or classes which are not used. This is done to keep the compiled executables a reasonable size, since most projects use only a small fraction of e.g. the standard library. @hl.scala("@JSExport") is used to tell Scala.js that the @hl.scala{ScalaJSExample} object and its @hl.scala{def main} method are entry points to the program. Even if they aren't called anywhere internally, they are called externally by Javascript that the Scala.js compiler is not aware of, and should not be removed.
@@ -116,7 +116,7 @@
   @p
     Apart from this annotation, @hl.scala{ScalaJSExample} is just a normal Scala @hl.scala{object}, and behaves like one in every way. Note that the main-method in this case takes a @hl.scala{dom.HTMLCanvasElement}: your exported methods can have any signature, with arbitrary arity or types for parameters or the return value. This is in contrast to the main method on the JVM which always takes an @hl.scala{Array[String]} and returns @hl.scala{Unit}. In fact, there's nothing special about this method at all! It's like any other exported method, we just happen to attribute it the "main" entry point.
 
-  @hl.ref("output/temp/src/main/scala/example/ScalaJSExample.scala", "val ctx", "var count")
+  @hl.ref("output/workbench-example-app/src/main/scala/example/ScalaJSExample.scala", "val ctx", "var count")
 
   @p
     Here we are retrieving a handle to the canvas we will draw on using @hl.scala{document.getElementById}, and from it we can get a @hl.scala{dom.CanvasRenderingContext2D} which we actually use to draw on it.
@@ -127,7 +127,7 @@
   @p 
     We need to perform the @hl.scala{asInstanceOf} call because depending on what you pass to @hl.scala{getElementById} and @hl.scala{getContext}, you could be returned elements and contexts of different types. Hence we need to tell the compiler explicitly that we're expecting a @hl.scala{dom.HTMLCanvasElement} and @hl.scala{dom.CanvasRenderingContext2D} back from these methods for the strings we passed in.
 
-  @hl.ref("output/temp/src/main/scala/example/ScalaJSExample.scala", "def run", "dom.setInterval")
+  @hl.ref("output/workbench-example-app/src/main/scala/example/ScalaJSExample.scala", "def run", "dom.setInterval")
 
   @p
     This is the part of the Scala.js program which does the real work. It runs 10 iterations of a @a("small algorithm", href:="http://en.wikipedia.org/wiki/Sierpinski_triangle#Chaos_game") that generates a Sierpinski Triangle point-by-point. The steps, as described by the linked article, are roughly:
@@ -145,7 +145,7 @@
   @p
     In this example, the triangle is hard-coded to be 255 pixels high by 255 pixels wide, and some math is done to pick a color for each dot which will give the triangle a pretty gradient.
 
-  @hl.ref("output/temp/src/main/scala/example/ScalaJSExample.scala", "dom.setInterval")
+  @hl.ref("output/workbench-example-app/src/main/scala/example/ScalaJSExample.scala", "dom.setInterval")
 
   @p
     Now this is the call that actually does the useful work. All this method does is call @hl.scala{dom.setInterval}, which tells the browser to run the @hl.scala{run} method every 50 milliseconds. As mentioned earlier, the @hl.scala{dom.*} methods are simply facades to their native Javascript equivalents, and @hl.scala{dom.setInterval} is @a("no different", href:="https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers.setInterval"). Note how you can pass a Scala lambda to @hl.scala{setInterval} to have it called by the browser, where in Javascript you'd need to pass a Javascript @hl.javascript{function(){...}}
@@ -156,7 +156,7 @@
     We've already taken a look at the application code for a simple, self-contained Scala.js application, but this application is not @i{entirely} self contained. It's wrapped in a small SBT project that sets up the necessary dependencies and infrastructure for this application to work.
 
   @sect{project/build.sbt}
-    @hl.ref("output/temp/project/build.sbt")
+    @hl.ref("output/workbench-example-app/project/build.sbt")
 
     @p
       This is the list of SBT plugins used by this small example application. There are two of them: the Scala.js plugin (which contains the Scala.js compiler and other things, e.g. tasks such as @code{fastOptJS}) and the @a("Workbench", href:="https://github.com/lihaoyi/workbench") plugin, which is used to provide the auto-reload-on-change behavior and the forwarding of SBT logspam to the browser console.
@@ -166,7 +166,7 @@
 
       
   @sect{build.sbt}
-    @hl.ref("output/temp/build.sbt")
+    @hl.ref("output/workbench-example-app/build.sbt")
 
     @p
       The @code{build.sbt} project file for this application is similarly unremarkable: It includes the settings for the two SBT plugins we saw earlier, as well as boilerplate @hl.scala{name}/@hl.scala{version}/@hl.scala{scalaVersion} values common to all projects.
@@ -178,7 +178,7 @@
       Lastly, we have two Workbench related settings: @hl.scala{bootSnippet} basically tells Workbench how to restart your application when a new compilation run finishes, and @hl.scala{updateBrowsers} actually tells it to perform this application-restarting.
 
   @sect{src/main/resources/index-dev.html}
-    @hl.ref("output/temp/src/main/resources/index-dev.html")
+    @hl.ref("output/workbench-example-app/src/main/resources/index-dev.html")
 
     @p
       This is the HTML page which our toy app lives in, and the same page that we have so far been using to view the app in the browser. To anyone who has used HTML, most of it is probably familiar. Things of note are the Script tags: @hl.scala{"../example-fastopt.js"} Is the executable blob spat out by the compiler, which we need to include in the HTML page for anything to happen. This is where the results of your compiled Scala code appear. @hl.scala{"workbench.js"} is the client for the Workbench plugin that connects to SBT, reloads the browser and forwards logspam to the browser console.

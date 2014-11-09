@@ -14,8 +14,15 @@
   @p
     This book contains something for all levels of experience with Scala.js: absolute beginners can get started with the Introduction and Hands-on tutorial, people who have used it before can skip ahead to the later parts of the tutorial, building a canvas app or dynamic HTML page. Intermediate users will find the chapters on cross-publishing a Scala.js library interesting, and even experienced users will find the In-depth Documention useful.
 
+  @p
+    This book does not spend time on pontifying a philosophy or ideology behind Scala.js or Scala. It instead spends its words on hands-on tutorials and in-depth dives into parts of the Scala.js platform, to try and get you acquainted with Scala.js as soon as possible, so you can make your own decisions about its merits or qualities.
+
   @sect("Intro to Scala.js")
     @Intro.template
+
+@sect("Hands On", "Writing your first Scala.js programs")
+  @p
+    This half of the book walks you through various facets of the Scala.js development experience. From making your first app, to testing and publishing modules, to writing an integrated client-server application.
 
   @sect("Getting Started")
     @handson.GettingStarted.template
@@ -37,7 +44,7 @@
 
 @sect("Scala.js in Depth", "Exploring Scala.js")
   @p
-    This half of the book dives into a few aspects of Scala.js much more deeply that the hands-on introduction does. It's aimed at someone who has already used Scala.js, and wants to explore the edge-cases or how things work under-the-cover. It's not a formal specification; rather, it's aim is to be a useful reference to read instead of (or in preparation for) digging into the implementation code.
+    This half of the book dives into a few aspects of Scala.js much more deeply that the hands-on introduction does. It's aimed at someone who has already used Scala.js, and wants to explore the edge-cases, how things work under-the-cover, or why it has been designed in such a way. It's not a formal specification; rather, it's aim is to be a useful reference to read instead of (or in preparation for) digging into the implementation code.
 
   @sect("Javascript Interoperability")
     @indepth.JavascriptInterop.template
@@ -50,3 +57,6 @@
 
   @sect("Scala.js' Design Space")
     @indepth.DesignSpace.template
+
+  @sect("Java APIs")
+    @indepth.JavaAPIs.template
