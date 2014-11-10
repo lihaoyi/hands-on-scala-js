@@ -62,7 +62,7 @@
     @hl.ref("examples/crossBuilds/simple/js/shared/main/scala/simple/Simple.scala")
 
     @p
-      In @code{Simple.scala} we have the shared, cross-platform API of our library: a single @hl.scala{object} with a single method @hl.scala{def} which does what we want, which can then be used in either Scala.js or Scala-JVM. In general, you can put as much shared logic here as you want: classes, objects, methods, anything that can run on both Javascript and on the JVM.
+      In @code{Simple.scala} we have the shared, cross-platform API of our library: a single @hl.scala{object} with a single method @hl.scala{def} which does what we want, which can then be used in either Scala.js or Scala-JVM. In general, you can put as much shared logic here as you want: classes, objects, methods, anything that can run on both Javascript and on the JVM. We're chopping off the last 5 characters (the milliseconds) to keep the formatted dates slightly less verbose.
     
     @p
       However, when it comes to actually formatting the date, we have a problem: Javascript and Java provide different utilities for formatting dates! They both let you format them, but they provide different APIs. Thus, to do the formatting of each individual date, we call out to the @hl.scala{Platform.format} function, which is implemented twice: once in @code{js/} and once in @code{jvm/}:
@@ -75,7 +75,7 @@
         @hl.ref("examples/crossBuilds/simple/jvm/src/main/scala/simple/Platform.scala")
 
     @p
-      In the @code{js/} version, we are using the Javascript @hl.javascript{Date} object to take the millis and do what we want. In the @code{jvm/} version, we instead use @hl.scala{java.text.SimpleDateFormat} with a custom formatter (The syntax is defined @a("here", href:="http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html")).
+      In the @code{js/} version, we are using the Javascript @hl.javascript{Date} object to take the millis and do what we want. In the @code{jvm/} version, we instead use @hl.scala{java.text.SimpleDateFormat} with a custom formatter (The syntax is defined @a("here", href:="http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html")). 
    
     @p
       Again, you can put as much platform-specific logic in these files as you want, to account for differences in the available APIs. Maybe you want to use @hl.scala{js.JSON.parse} for parsing JSON blobs in @code{js/}, but @hl.scala{Jackson} or @hl.scala{GSON} for parsing them in @code{jvm/}.

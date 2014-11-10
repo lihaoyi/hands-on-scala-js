@@ -13,129 +13,85 @@
 @p
   Scala.js lets you share code between client and server relatively straightforwardly. As we saw in the previous chapter, where we made a shared module. Let's work to turn that shared module into a working client-server application!
 
-@sect{Client-Server Configuration}
+@sect{A Client-Server Setup}
   @p
     Getting started with client-server integration, let's go with the simplest configuration possible: a Spray server and a Scala.js client. Most of the other web-frameworks (Play, Scalatra, etc.) will have more complex configurations, but the basic mechanism of wiring up Scala.js to your web framework will be the same.
   
   @p
-    First, let's do the wiring in @code{build.sbt} to add Spray as a dependency,
+    First, let's do the wiring in @code{build.sbt}:
 
   @hl.ref("examples/crossBuilds/clientserver/build.sbt")
-  
-  @p
-    This does the standard boilerplate for including dependencies via SBT, and does on additional thing: we add the output of @code{fastOptJS} from the client to the @code{resources} on the server. 
 
+  @p
+    We have two projects: @code{client} and @code{server}, one of which is a Scala.js project (indicated by the presence of @hl.scala{scalaJSSettings}). Both projects share a number of settings: the presence of the @code{shared/} folder, which shared code can live in (similar to what we saw in Cross-platform Modules) and the settings to add Scalatags and uPickle to the build. Note that those two dependencies use the triple @code{%%%} instead of the double @code{%%} to declare: this means that for each dependency, we will pull in the Scala-JVM or Scala.js version depending on whether it's being used in a Scala.js project.
+  @p
+    The @code{client} subproject is uneventful, with a dependency on the by-now-familiar @code{scalajs-dom} library. The @code{server} project, on the other hand, is interesting: it contains the dependencies required for us to set up out Spray server, and one additioanl thing: we add the output of @code{fastOptJS} from the client to the @code{resources} on the server. This will allow the @code{server} to serve the compiled-javascript from our @code{client} project from its resources.
+  
   @p
     Next, let's kick off the Spray server in our Scala-JVM main method:
 
-  @hl.ref("examples/crossBuilds/clientserver/jvm/src/main/scala/simple/Platform.scala")
+  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala")
 
   @p
-    This is a not-very-interesting @a("spray-routing", href:="http://spray.io/documentation/1.2.2/spray-routing/") application: we set up a server on @code{localhost:8080}, have the root URL serve a HTML string, and have other URLs serve resources. This includes the @code{js-fastopt.js} file that is now in our resources because of our @code{build.sbt} config earlier! We also add a POST route to allow the client ask the server to format dates any time it wants via Ajax.
+    This is a not-very-interesting @a("spray-routing", href:="http://spray.io/documentation/1.2.2/spray-routing/") application: we set up a server on @code{localhost:8080}, have the root URL serve the main page on GET, and have other GET URLs serve resources. This includes the @code{js-fastopt.js} file that is now in our resources because of our @code{build.sbt} config earlier! We also add a POST route to allow the client ask the server to list files various directories.
 
+  @p
+    The HTML template @hl.scala{Page.skeleton} is not shown above; I put it in a separate file for neatness:
+
+  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Page.scala")
+
+  @p
+    This is a typical Scalatags HTML snippet. Note that since we're serving it directly from the server in Scala code, we do not need to leave a @code{.html} file somewhere on the filesystem! We can declare all HTML, including the skeleton of the page, in Scalatags. Otherwise it's the same as what we saw in earlier chapters: A simple HTML page which includes a script tag to run our Scala.js application.
   @p
     Lastly, we'll set up the Scala.js main method, which we are calling in the @hl.html{<script>} tag above to kick off the client-side application.
 
-  @hl.ref("examples/crossBuilds/clientserver/js/src/main/scala/simple/Platform.scala")
+  @hl.ref("examples/crossBuilds/clientserver/client/src/main/scala/simple/Client.scala")
 
   @p
-    Apart from the main method, we also set up an Ajax call to the POST route we defined earlier on the server, which will ask the server to do it's date formatting a second time when the page loads.
+    Again this is a simple Scala.js application, not unlike what we saw in earlier chapters. However, there is one difference: earlier, we made our Ajax calls to @code{api.openweathermap.org/...}. Here, we're making it to @code{/ajax}: the same server the page is served from!
+
+  @p
+    You may have noticed in both client and server, we have made reference to a mysterious @hl.scala{FileData} type which holds the name and size of each file. @hl.scala{FileData} is defined in the @code{shared/} folder, so it can be accessed from both Scala-JVM and Scala.js:
+
+  @hl.ref("examples/crossBuilds/clientserver/client/shared/main/scala/simple/FileData.scala")
 
   @p
     Now, if we go to the browser at @code{localhost:8080}, we should see our web-page!
 
-  @div
-    @h1
-      Hello from Scala-JVM!
-    @p  
-      December 31, 1969 4:00:00 PM PST January 13, 1970 2:15:41 AM PST
-                
-    @h1
-      Hello from Scala.js!
+@sect{Client-Server Reflections}
+  @p
+    By now you've already set up your first client-server application. However, it might not be immediately clear what we've done and why it's interesting! Here are some points to consider.
+
+  @sect{Shared Templating}
+
     @p
-      12/31/1969, 4:00:00 PM 1/13/1970, 2:15:41 AM
-
-    @h1
-      Hello from Ajax!
-    @p  
-      December 31, 1969 4:00:00 PM PST January 13, 1970 2:15:41 AM PST
-                
-  @p
-    As you can see, this client-server app exercises it's shared code to render dates on both client and server!
-
-  @p
-    The app isn't a very pretty app: HTML strings everywhere, splicing strings to create the DOM, etc.. Neither is it very useful, to be able to format dates on the same way on both client and server! Nonetheless, it should give you a sense of the configuration necessary to wire up Scala.js into any existing SBT project: you simply dump the output executable from @code{fastOptJS}/@code{fullOptJS} in the web-server's resources, to let it get served to the world. Pretty neat! 
-
-  @p
-    Although it's a minimal example, you can probably imagine what it would take to extend it in a traditional way: use proper client-side and server-side templating languages like @a("Twirl", href:="https://github.com/playframework/twirl") and @a("Mustache", href:="http://mustache.github.io/"). Add additional routes to our Spray server and using @hl.javascript{XMLHttpRequest} to make requests to them. Maybe add some @a("jQuery", href:="http://jquery.com/") on the client (which has a @a("Scala.js wrapper", href:="https://github.com/scala-js/scala-js-jquery") to add some interactivity. The list goes on. 
-
-  @p
-    On the other hand, Scala.js doesn't just allow you to make websites the traditional way. There are many techniques which are effectively unique to the Scala.js way of doing things, and have the potential to make your program much more uniform, type-safe, and robust. We'll explore these next.
-
-@sect{Idiomatic Scala.js}
-  @p
-    The previous section showed you how to make an interactive client-server web application using Scala/Spray on the server and Scala.js on the client, but it was a pretty close-to-Javascript implementation that didn't take much advantage of the tools available in Scala.js. Let's set about remedying that!
-
-  @p
-    The main changes we will introduce in this section are:
-
-  @ul
-    @li 
-      Replacing the direct use of @hl.scala{dom.XMLHttpRequest} with @hl.scala{dom.extensions.Ajax}
-    @li
-      Swapping out HTML-strings with Scalatags, to make the HTML-generation code typo-safe
-    @li
-      Using uPickle to serialize the data being transfered between client & server, to replace the ad-hoc string concatenation and splitting
-
-  @p
-    The first step we'll need to do is add Scalatags and uPickle to our @code{build.sbt} file. We want it added to both our @code{js} and @code{jvm} projects, so they'll go inside the @hl.scala{JsCrossBuild} where we put shared settings.
-
-  @hl.ref("examples/crossBuilds/clientserver2/build.sbt")
-
-  @p
-    Next, let's re-write the server to use our new tools!
-
-  @hl.ref("examples/crossBuilds/clientserver2/jvm/src/main/scala/simple/Platform.scala")
-
-  @p
-    The main changes here are:
-
-  @ul
-    @li
-      Moving the HTML template out into a separate object and using Scalatags to render it
-    @li
-      using @hl.scala{upickle.read} to deserialize the incoming Ajax call automatically, rather than having to pry it apart with @hl.scala{String.split}
-
-  @p
-    Lastly, we need to modify our client:
-
-  @hl.ref("examples/crossBuilds/clientserver2/js/src/main/scala/simple/Platform.scala")
-
-  @p
-    This involves swapping out direct use of @hl.scala{dom.XMLHttpRequest} with @hl.scala{dom.extensions.Ajax}, using Scalatags to render the fragments here, and @hl.scala{upickle.write} to deal with the serialization of the Ajax arguments.
-
-  @p
-    If we look at the output of the website, it would look exactly the same!
-
-  @div
-    @h1
-      Hello from Scala-JVM!
-    @p  
-      December 31, 1969 4:00:00 PM PST January 13, 1970 2:15:41 AM PST
-                
-    @h1
-      Hello from Scala.js!
+      In both the client code and the server code, we made use of the same Scalatags HTML generation library. This is pretty neat: transferring rendering logic between client and server no longer means an annoying/messy rewrite! You can simply C&P the Scalatags snippet over. That means it's easy if you want to e.g. shift the logic from one side to the other in order to optimize for performance or time-to-load or other things.
     @p
-      12/31/1969, 4:00:00 PM 1/13/1970, 2:15:41 AM
+      One thing to take note of is that we're actually using subtly @i{different} implementations of Scalatags on both sides: on the server, we're importing from @hl.scala{scalatags.Text}, while on the client we're using @hl.scala{scalatags.JsDom}. The @hl.scala{Text} backend renders directly to Strings, and is available on both Scala-JVM and Scala.js. The @hl.scala{JsDom} backend, on the other hand, renders to @hl.scala{dom.HTMLElement}s which only exist on Scala.js. Thus while on the client you can do things like attach event listeners to the rendered @hl.scala{dom.HTMLElement} objects, or checking their runtime @code{.value}, on the server you can't. And that's exactly what you want!
 
-    @h1
-      Hello from Ajax!
-    @p  
-      December 31, 1969 4:00:00 PM PST January 13, 1970 2:15:41 AM PST
-  
-  @p
-    But we've simplified the code considerably: most notably, all the manual string-munging we did in the previous version (to build HTML, to serialize the Ajax arguments) are all gone. They've been replaced with type-safe, functional equivalents.
+  @sect{Shared Code}
+    @p
+      One thing that we skimmed over is the fact that we could easily define our @hl.scala{case class FileData(name: String, size: Long)} in the @code{shared/} folder, and have it instantly and consistently available on both client and server. This perhaps does not seem so amazing: we've already done many similar things earlier when we were building Cross-platform Modules. Nevertheless, in the context of web development, it is a relatively novel idea to be able to ad-hoc share bits of code between client and server.
+    @p
+      Sharing code is not limited to class definitions: @i{anything} can be shared. Objects, classes, interfaces/traits, functions and algorithms, constants: all of these are things that you will likely want to share at some point or another. Traditionally, people have simply re-implemented the same code twice in two languages, or have resorted to awkward Ajax calls to push the logic to the server. With Scala.js, you no longer need to do so: you can easily, create ad-hoc bits of code which are available on both platforms.
 
+  @sect{Boilerplate-free Serialization}
+    @p
+      The Ajax/RPC layer is one of the more fragile parts of web applications. Often, you have your various Ajax endpoints written once on the server, have a set of routes written to connect those Ajax endpoints to URLs, and client code (traditionally Javascript) made calls to those URLs with "raw" data: basically whatever you wanted, packed in an ad-hoc mix of CSV and JSON and raw-strings. 
 
-@sect{Ajax calls via Autowire}
-  TODO
+    @p
+      This has always been annoying boilerplate, and Scala.js removes it. With uPickle, you can simply call @hl.scala{upickle.write(...)} and @hl.scala{upickle.read[T](...)} to convert your collections, primitives or case-classes to and from JSON. This means you do not need to constantly re-invent different ways of making Ajax calls: you can just fling the data right across the network from client to server and back again.
+
+@hr
+
+@p
+  Hopefully this chapter has given you a glimpse of how a basic client-server application works using Scala.js. Although it is specific to a Spray server, there isn't any reason why you couldn't set up an equivalent thing for your Play, Scalatra or whichever other web framework that you're using.
+
+@p
+  It's probably worth taking a moment to play around with the existing client-server system you have set up. Ideas for improvement include:
+
+@ul
+  @li
+    Try adding additional functionality to the client-server interface: what about making it show the contents of a file if you've entered its full path? This can be added as a separate Ajax call or as part of the existing one.
+  @li
+    How about setting up the build.sbt so it serves the fully-optimized Scala.js blob, @code{client-opt.js}? This is probably what you want before deployment into production, and the same technique as we used to serve the fast-optimized version applies here too.
