@@ -39,7 +39,7 @@
   @sect("Publishing Modules")
     @handson.PublishingModules.template
 
-  @sect("Integrating Client and Server")
+  @sect("Integrating Client-Server")
     @handson.ClientServer.template
 
 @sect("Scala.js in Depth", "Exploring Scala.js")
