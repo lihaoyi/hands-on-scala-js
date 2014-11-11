@@ -15,25 +15,12 @@
     .
     ├── build.sbt
     ├── js
-    │   ├── shared
-    │   │   └── main
-    │   │       └── scala
-    │   │           └── simple
-    │   │               └── Simple.scala
-    │   └── src
-    │       └── main
-    │           └── scala
-    │               └── simple
-    │                   └── Platform.scala
+    │   ├── shared/main/scala/simple/Simple.scala
+    │   └── src/main/scala/simple/Platform.scala
     ├── jvm
     │   ├── shared -> ../js/shared
-    │   └── src
-    │       └── main
-    │           └── scala
-    │               └── simple
-    │                   └── Platform.scala
-    └── project
-        └── build.sbt
+    │   └── src/main/scala/simple/Platform.scala
+    └── project/ build.sbt
   @p
     In this case the two @code{shared/} folders are symlinked together to keep them in sync. This can be done by first creating @code{js/shared}, and then running
 

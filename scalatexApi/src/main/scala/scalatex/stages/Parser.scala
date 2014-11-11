@@ -1,9 +1,8 @@
 package scalatex
 package stages
-
+import acyclic.file
 import org.parboiled2._
 import torimatomeru.ScalaSyntax
-import Util._
 
 /**
  * Parses the input text into a roughly-structured AST. This AST

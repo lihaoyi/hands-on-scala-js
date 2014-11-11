@@ -1,5 +1,5 @@
 package book
-
+import acyclic.file
 import scalatex._
 
 import scalatags.Text.tags2
@@ -11,7 +11,6 @@ import scalatags.Text.all._
  */
 object Book {
   import Utils.sect
-
   val myTable = Seq(
     ("Most of java.lang.*", "j.l.Thread, j.l.Runtime, ..."),
     ("Almost all of scala.*", "s.c.parallel, s.tools.nsc"),
@@ -23,58 +22,7 @@ object Book {
     ("JavaScript libraries: chipmunk.js, hand.js, react.js, jquery", "Java ecosystem: guice, junit, apache-commons, log4j"),
     ("IntelliJ, Eclipse, SBT, Chrome console, firebug", "Scala REPL, Yourkit, VisualVM, JProfiler")
   )
-  val txt = Index.template
-  val contentBar = {
-    def rec(current: Node, depth: Int): Seq[Frag] = {
-      println("\t"*depth + current.name)
-      Seq(
-        li(
-          a(
-            current.name,
-            href:="#"+Utils.munge(current.name),
-            paddingLeft := s"${depth * 10 + 10}px",
-            cls := "menu-item" + (if (depth == 1) " menu-item-divided " else "")
-          )
-        )
-      ) ++ current.children.flatMap(rec(_, depth + 1))
-    }
 
-    println("TABLE OF CONTENTS")
-    rec(Utils.structure, 0)
-  }
-  val site = Seq(
-    raw("<!doctype html>"),
-    html(
-      head(
-        meta(charset:="utf-8"),
-        meta(name:="viewport", content:="width=device-width, initial-scale=1.0"),
-        tags2.title("Hands-on Scala.js"),
-        Utils.includes
-      ),
-
-      div(id:="layout")(
-        a(href:="#menu", id:="menuLink", cls:="menu-link")(
-          span
-        ),
-
-        div(id:="menu")(
-          div(cls:="pure-menu pure-menu-open")(
-            a(cls:="pure-menu-heading", href:="#")(
-              "Contents"
-            ),
-            ul(cls:="menu-item-list")(
-              contentBar
-            )
-          )
-        )
-      ),
-      div(id:="main",
-        div(id:="main-box")(
-          txt
-        )
-      )
-    )
-  ).render
 
   object hl{
     def highlight(snippet: Seq[String], lang: String) = {

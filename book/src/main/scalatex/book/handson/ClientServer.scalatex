@@ -15,7 +15,22 @@
 
 @sect{A Client-Server Setup}
   @p
-    Getting started with client-server integration, let's go with the simplest configuration possible: a Spray server and a Scala.js client. Most of the other web-frameworks (Play, Scalatra, etc.) will have more complex configurations, but the basic mechanism of wiring up Scala.js to your web framework will be the same.
+    Getting started with client-server integration, let's go with the simplest configuration possible: a Spray server and a Scala.js client. Most of the other web-frameworks (Play, Scalatra, etc.) will have more complex configurations, but the basic mechanism of wiring up Scala.js to your web framework will be the same. Our project will look like this:
+
+  @hl.bash
+    $ tree
+    .
+    ├── build.sbt
+    ├── client
+    │   ├── shared/main/scala/simple/FileData.scala
+    │   └── src/main/scala/simple/Client.scala
+    ├── project
+    │   └── build.sbt
+    └── server
+        ├── shared -> ../client/shared
+        └── src/main/scala/simple
+                           ├── Page.scala
+                           └── Server.scala
   
   @p
     First, let's do the wiring in @code{build.sbt}:
@@ -95,3 +110,5 @@
     Try adding additional functionality to the client-server interface: what about making it show the contents of a file if you've entered its full path? This can be added as a separate Ajax call or as part of the existing one.
   @li
     How about setting up the build.sbt so it serves the fully-optimized Scala.js blob, @code{client-opt.js}? This is probably what you want before deployment into production, and the same technique as we used to serve the fast-optimized version applies here too.
+  @li
+    What if you wanted to use another server rather than Spray? How about trying to set up a Play or Scalatra server to serve our Scala.js application code?

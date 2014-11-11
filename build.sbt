@@ -1,9 +1,11 @@
+
 import scala.scalajs.sbtplugin.ScalaJSPlugin._
 import ScalaJSKeys._
 
+
 lazy val scalatexApi = project.in(file("scalatexApi"))
                        .settings(
-  scalaVersion := "2.11.2",
+  scalaVersion := "2.11.4",
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "utest" % "0.2.4",
     "com.scalatags" %% "scalatags" % "0.4.2",
@@ -20,7 +22,7 @@ lazy val scalatexPlugin = Project(
   base = file("scalatexPlugin"),
   dependencies = Seq(scalatexApi)
 ) settings (
-  scalaVersion := "2.11.2",
+  scalaVersion := "2.11.4",
   libraryDependencies += "org.scala-lang" % "scala-compiler" % scalaVersion.value,
   publishArtifact in Compile := false
 )
@@ -30,7 +32,7 @@ lazy val book = Project(
   base = file("book"),
   dependencies = Seq(scalatexApi)
 ).settings(
-  scalaVersion := "2.11.2",
+  scalaVersion := "2.11.4",
   libraryDependencies ++= Seq(
     "org.webjars" % "highlightjs" % "8.2-1",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
@@ -57,8 +59,20 @@ lazy val book = Project(
   },
   (watchSources in Test) ++= {
     ((sourceDirectory in Test).value / "scalatex" ** "*.scalatex").get
-  }
+  },
+  libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
+  autoCompilerPlugins := true,
+  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2")
 )
 
 
 lazy val demos = project.in(file("examples/demos"))
+
+lazy val simple = project.in(file("examples/crossBuilds/simple"))
+
+lazy val simple2 = project.in(file("examples/crossBuilds/simple2"))
+
+lazy val client = ProjectRef(file("examples/crossBuilds/clientserver"), "client")
+
+lazy val server = ProjectRef(file("examples/crossBuilds/clientserver"), "server")
+

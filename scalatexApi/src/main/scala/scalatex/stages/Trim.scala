@@ -1,4 +1,5 @@
 package scalatex.stages
+import acyclic.file
 
 /**
  * Preprocesses the input string to normalize things related to whitespace

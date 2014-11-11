@@ -1,5 +1,6 @@
 package scalatex
 package stages
+
 import acyclic.file
 
 import scala.reflect.macros.whitebox.Context

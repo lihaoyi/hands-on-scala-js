@@ -96,7 +96,7 @@
     @p
       At this point, all of Google, Facebook, and Microsoft have all announced work on a typed variant of Javascript. These are not academic exercises: Dart/AtScript/Flow/Typescript are all problems that solve a real need, that these large companies have all faced once they've grown beyond a certain size. Clearly, Javascript isn't cutting it anymore, and the convenience and "native-ness" of the language is more than made up for in the constant barrage of self-inflicted problems. Scala.js takes this idea and runs with it!
 
-  @sect{Shared Code}
+  @sect{Sharing Code}
     @p
       Scala.js does not just stop at writing code on the client, though! Scala itself is a very successful, capable language for writing all sorts of systems, from web servers to backend infrastructure. With Scala.js, you can utilize the same libraries you use writing your Scala servers when writing your Scala web clients! On one end, you are sharing your templating language with @a("Scalatags", href:="https://github.com/lihaoyi/scalatags") or sharing your serialization logic with @a("uPickle", href:="https://github.com/lihaoyi/upickle"). At the other, you are sharing large, abstract libraries like @a("Scalaz", href:="https://github.com/japgolly/scalaz") or @a("Shapeless", href:="https://groups.google.com/forum/#!searchin/scala-js/shapeless/scala-js/5Sf2up0z3PU/9F9SYB0qHEcJ").
 
@@ -147,7 +147,7 @@
   @p
     This book will be roughly divided into three sections. These sections can be read in any order. Although the later chapters will make references to earlier chapters, there'll be hyperlinks so you can quickly go back and catch up on what you missed skipping over ,
 
-  @sect{Hands On}
+  @sect{Part 1: Hands On}
     @p
       A whirlwind tour of the various things that Scala.js can be used for. We will cover:
 
@@ -164,15 +164,12 @@
     @p 
       After going through this chapter and following along with the exercises, you should have a good sense of how Scala.js works and how it feels building things in Scala.js. You would not be an expert, but you'll know where to get started if you decide to try out Scala.js for your next project.
 
-  @sect{In Depth}
+  @sect{Part 2: In Depth}
     @p
       This section of the book will cover lots of content that does not fit in the earlier Hands-On portion of the book. Things that aren't immediately necessary to get something up and running, things that only advanced users would care about, things that you probably don't need to know but you'd like to know out of intellectual curiosity.
 
     @p 
       In general, this section of the book will go much deeper into Scala.js, much more than is necessary to get your first applications built. We will talk about the small number of semantic differences between Scala.js and Scala, details of the foreign-function-interface with Javascript, the various optimization levels and what they do. Nothing pressing or urgently needed, but all very interesting, and worth reading if you want to really understand Scala.js in depth.
-
-    @p
-      Lastly, we will explore the solution space. Scala.js isn't the only game in town, and there are hundreds of over attempts at covering the same ground the Scala.js now attempts to cover. We'll compare and contrast the different approaches to see what Scala.js can bring to the table that other approaches cannot. Many decisions have been made that shape what Scala.js is today; why did we make them?
 
   @hr
   
