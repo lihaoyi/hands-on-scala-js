@@ -21,7 +21,9 @@ object Book {
     "css/layouts/side-menu.css",
     "js/ui.js",
     "example-fastopt.js",
-    "webpage/weather.js"
+    "webpage/weather.js",
+    "favicon.svg",
+    "favicon.png"
   )
 
   val manualResources = Seq(
@@ -68,6 +70,7 @@ object Book {
       head(
         meta(charset:="utf-8"),
         meta(name:="viewport", content:="width=device-width, initial-scale=1.0"),
+        link(rel:="shortcut icon", `type`:="image/png", href:="favicon.png"),
         tags2.title("Hands-on Scala.js"),
         includes
       ),

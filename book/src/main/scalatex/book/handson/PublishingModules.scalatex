@@ -62,7 +62,7 @@
         @hl.ref("examples/crossBuilds/simple/jvm/src/main/scala/simple/Platform.scala")
 
     @p
-      In the @code{js/} version, we are using the Javascript @hl.javascript{Date} object to take the millis and do what we want. In the @code{jvm/} version, we instead use @hl.scala{java.text.SimpleDateFormat} with a custom formatter (The syntax is defined @a("here", href:="http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html")).
+      In the @code{js/} version, we are using the Javascript @hl.javascript{Date} object to take the millis and do what we want. In the @code{jvm/} version, we instead use @hl.scala{java.text.SimpleDateFormat} with a custom formatter (The syntax is defined @lnk("here", "http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html")).
 
     @p
       Again, you can put as much platform-specific logic in these files as you want, to account for differences in the available APIs. Maybe you want to use @hl.scala{js.JSON.parse} for parsing JSON blobs in @code{js/}, but @hl.scala{Jackson} or @hl.scala{GSON} for parsing them in @code{jvm/}.
@@ -89,7 +89,7 @@
       @li
         The "Running on XXX!" statement which shows us we're actually running on two platforms.
       @li
-        The other hint is the time taken: the second run is instant while the first takes three seconds! This is because by default we run on @a("Rhino", href:="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino"), which is a simple interpreter hundreds of times slower than running code natively on the JVM.
+        The other hint is the time taken: the second run is instant while the first takes three seconds! This is because by default we run on @lnk("Rhino", "https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino"), which is a simple interpreter hundreds of times slower than running code natively on the JVM.
       @li
         In Scala-JVM the double 1.0 is printed as @code{1.0}, while in Scala.js it's printed as @code{1}. This is one of a small number of differences between Scala.js and Scala-JVM, and verifies that we are indeed running on both platforms!
 
@@ -115,7 +115,7 @@
 
 @sect{Cross-Testing with uTest}
   @p
-    @a("uTest", href:="https://github.com/lihaoyi.utest") is a small unit-testing library for Scala programs, that works on both Scala-JVM and Scala.js. At the time it was written, it was the first one out there, though now there are others such as @a("little-spec", href:="https://github.com/eecolor/little-spec") or @a("otest", href:="https://github.com/cgta/otest"). Notably, Scala's traditional testing libraries such as @a("Scalatest", href:="http://www.scalatest.org/") or @a("Specs2", href:="http://etorreborre.github.io/specs2/") do not work with Scala.js, as they make use of Reflection or other things not supported on Scala.js
+    @lnk("uTest", "https://github.com/lihaoyi.utest") is a small unit-testing library for Scala programs, that works on both Scala-JVM and Scala.js. At the time it was written, it was the first one out there, though now there are others such as @lnk("little-spec", "https://github.com/eecolor/little-spec") or @lnk("otest", "https://github.com/cgta/otest"). Notably, Scala's traditional testing libraries such as @lnk("Scalatest", "http://www.scalatest.org/") or @lnk("Specs2", "http://etorreborre.github.io/specs2/") do not work with Scala.js, as they make use of Reflection or other things not supported on Scala.js
 
   @sect{uTest Configuration}
     @p
@@ -133,7 +133,7 @@
 
   @sect{Your First Tests!}
     @p
-      Lastly, we need to start writing tests! @a("uTest", href:="https://github.com/lihaoyi.utest") is well documented, but to get started here's a simple test suite for our @hl.scala{formatDates} function:
+      Lastly, we need to start writing tests! @lnk("uTest", "https://github.com/lihaoyi.utest") is well documented, but to get started here's a simple test suite for our @hl.scala{formatDates} function:
 
     @hl.ref("examples/crossBuilds/simple2/js/shared/test/scala/simple/SimpleTest.scala")
 
@@ -190,7 +190,7 @@
       @code{js/src/main/scala} Scala.js only code
 
   @p
-    It is entirely possible for your modules to have slightly different implementations and APIs on Scala.js and Scala-JVM. @a("Scalatags", href:="https://github.com/lihaoyi/scalatags") exposes additional DOM-related functionality only for it's Scala.js version, while @a("uPickle", href:="https://github.com/lihaoyi/upickle") uses different JSON libraries (@a("Jawn", href:="https://github.com/non/jawn") v.s. @a("DOM", href:="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse")) on the backend while the exposed interface remains the same. You have the flexibility to pick and choose which bits of your library you wish to share and which bits will be different.
+    It is entirely possible for your modules to have slightly different implementations and APIs on Scala.js and Scala-JVM. @lnk("Scalatags", "https://github.com/lihaoyi/scalatags") exposes additional DOM-related functionality only for it's Scala.js version, while @lnk("uPickle", "https://github.com/lihaoyi/upickle") uses different JSON libraries (@lnk("Jawn", "https://github.com/non/jawn") v.s. @lnk("DOM", "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse")) on the backend while the exposed interface remains the same. You have the flexibility to pick and choose which bits of your library you wish to share and which bits will be different.
 
   @p
     Everything above also applies to your unit tests, which fall in @code{test/} folders mirroring the @code{main/} folders listed above. You can also choose to share or not-share your unit test code as you see fit.

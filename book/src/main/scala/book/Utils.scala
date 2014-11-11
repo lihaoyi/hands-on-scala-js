@@ -3,6 +3,14 @@ package book
 import acyclic.file
 import scala.collection.mutable
 import scalatags.Text.all._
+case class pureTable(header: Frag*){
+  def apply(content: Frag*) = {
+    table(cls:="pure-table pure-table-horizontal half-table")(
+      thead(header),
+      tbody(content)
+    )
+  }
+}
 object sect{
 
   var indent = 0
@@ -57,6 +65,13 @@ case class sect(name: String, subname: String = ""){
   }
 }
 case class Node(name: String, children: mutable.Buffer[Node])
+object lnk{
+  val usedLinks = mutable.Set.empty[String]
+  def apply(name: String, url: String) = {
+    usedLinks.add(url)
+    a(name, href:=url)
+  }
+}
 
 object hl{
   def highlight(snippet: Seq[String], lang: String) = {

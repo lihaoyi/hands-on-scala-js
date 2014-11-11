@@ -4,21 +4,21 @@
 
 @ul
   @li
-    @a("sbt", href:="http://www.scala-sbt.org/"): SBT is the most common build-tool in the Scala community, and is what we will use for building our Scala.js application. Their home page has a link to download and install it.
+    @lnk("sbt", "http://www.scala-sbt.org/"): SBT is the most common build-tool in the Scala community, and is what we will use for building our Scala.js application. Their home page has a link to download and install it.
   @li
-    An editor for Scala: @a("IntelliJ Scala", href:="http://blog.jetbrains.com/scala/") and @a("Eclipse ScalaIDE", href:="http://scala-ide.org/") are the most popular choices and work on all platforms, though there are others.
+    An editor for Scala: @lnk("IntelliJ Scala", "http://blog.jetbrains.com/scala/") and @lnk("Eclipse ScalaIDE", "http://scala-ide.org/") are the most popular choices and work on all platforms, though there are others.
   @li
-    @a("Git", href:="http://git-scm.com/"): This is a version-control system that we will use to download and manage our Scala.js projects.
+    @lnk("Git", "http://git-scm.com/"): This is a version-control system that we will use to download and manage our Scala.js projects.
   @li
-    A terminal: on OSX you have @a("Terminal.app", href:="http://guides.macrumors.com/Terminal") already installed, in Linux you have @a("Terminal", href:="https://help.ubuntu.com/community/UsingTheTerminal"), and on Windows you have @a("PowerShell", href:="http://en.wikipedia.org/wiki/Windows_PowerShell").
+    A terminal: on OSX you have @lnk("Terminal.app", "http://guides.macrumors.com/Terminal") already installed, in Linux you have @lnk("Terminal", "https://help.ubuntu.com/community/UsingTheTerminal"), and on Windows you have @lnk("PowerShell", "http://en.wikipedia.org/wiki/Windows_PowerShell").
   @li
-    Your favorite web browser: @a("Chrome", href:="https://www.google.com/chrome") and @a("Firefox", href:="https://www.mozilla.org/en-US/firefox") are the most popular.
+    Your favorite web browser: @lnk("Chrome", "https://www.google.com/chrome") and @lnk("Firefox", "https://www.mozilla.org/en-US/firefox") are the most popular.
 
 @p
   If you've worked with Scala before, you probably already have most of these installed. Otherwise, take a moment to download them before we get to work.
 
 @p
-  The quickest way to get started with Scala.js is to @code{git clone} @a("workbench-example-app", href:="https://github.com/lihaoyi/workbench-example-app"), go into the repository root, and run @code{~fastOptJS}
+  The quickest way to get started with Scala.js is to @code{git clone} @lnk("workbench-example-app", "https://github.com/lihaoyi/workbench-example-app"), go into the repository root, and run @code{~fastOptJS}
 
 @hl.bash
   git clone https://github.com/lihaoyi/workbench-example-app
@@ -122,7 +122,7 @@
     Here we are retrieving a handle to the canvas we will draw on using @hl.scala{document.getElementById}, and from it we can get a @hl.scala{dom.CanvasRenderingContext2D} which we actually use to draw on it.
 
   @p
-    @hl.scala{document.getElementById} is the exact same API that's used in normal Javascript, as documented @a("here", href:="https://developer.mozilla.org/en-US/docs/Web/API/document.getElementById"). In fact, the entire @hl.scala{org.scalajs.dom} namespace (imported at the top of the file) comprises statically typed facades for the javascript APIs provided by the browser.
+    @hl.scala{document.getElementById} is the exact same API that's used in normal Javascript, as documented @lnk("here", "https://developer.mozilla.org/en-US/docs/Web/API/document.getElementById"). In fact, the entire @hl.scala{org.scalajs.dom} namespace (imported at the top of the file) comprises statically typed facades for the javascript APIs provided by the browser.
 
   @p
     We need to perform the @hl.scala{asInstanceOf} call because depending on what you pass to @hl.scala{getElementById} and @hl.scala{getContext}, you could be returned elements and contexts of different types. Hence we need to tell the compiler explicitly that we're expecting a @hl.scala{dom.HTMLCanvasElement} and @hl.scala{dom.CanvasRenderingContext2D} back from these methods for the strings we passed in.
@@ -130,7 +130,7 @@
   @hl.ref("output/workbench-example-app/src/main/scala/example/ScalaJSExample.scala", "def run", "dom.setInterval")
 
   @p
-    This is the part of the Scala.js program which does the real work. It runs 10 iterations of a @a("small algorithm", href:="http://en.wikipedia.org/wiki/Sierpinski_triangle#Chaos_game") that generates a Sierpinski Triangle point-by-point. The steps, as described by the linked article, are roughly:
+    This is the part of the Scala.js program which does the real work. It runs 10 iterations of a @lnk("small algorithm", "http://en.wikipedia.org/wiki/Sierpinski_triangle#Chaos_game") that generates a Sierpinski Triangle point-by-point. The steps, as described by the linked article, are roughly:
 
   @ul
     @li
@@ -148,7 +148,7 @@
   @hl.ref("output/workbench-example-app/src/main/scala/example/ScalaJSExample.scala", "dom.setInterval")
 
   @p
-    Now this is the call that actually does the useful work. All this method does is call @hl.scala{dom.setInterval}, which tells the browser to run the @hl.scala{run} method every 50 milliseconds. As mentioned earlier, the @hl.scala{dom.*} methods are simply facades to their native Javascript equivalents, and @hl.scala{dom.setInterval} is @a("no different", href:="https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers.setInterval"). Note how you can pass a Scala lambda to @hl.scala{setInterval} to have it called by the browser, where in Javascript you'd need to pass a Javascript @hl.javascript{function(){...}}
+    Now this is the call that actually does the useful work. All this method does is call @hl.scala{dom.setInterval}, which tells the browser to run the @hl.scala{run} method every 50 milliseconds. As mentioned earlier, the @hl.scala{dom.*} methods are simply facades to their native Javascript equivalents, and @hl.scala{dom.setInterval} is @lnk("no different", "https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers.setInterval"). Note how you can pass a Scala lambda to @hl.scala{setInterval} to have it called by the browser, where in Javascript you'd need to pass a Javascript @hl.javascript{function(){...}}
 
 @sect{The Project Code}
 
@@ -159,7 +159,7 @@
     @hl.ref("output/workbench-example-app/project/build.sbt")
 
     @p
-      This is the list of SBT plugins used by this small example application. There are two of them: the Scala.js plugin (which contains the Scala.js compiler and other things, e.g. tasks such as @code{fastOptJS}) and the @a("Workbench", href:="https://github.com/lihaoyi/workbench") plugin, which is used to provide the auto-reload-on-change behavior and the forwarding of SBT logspam to the browser console.
+      This is the list of SBT plugins used by this small example application. There are two of them: the Scala.js plugin (which contains the Scala.js compiler and other things, e.g. tasks such as @code{fastOptJS}) and the @lnk("Workbench", "https://github.com/lihaoyi/workbench") plugin, which is used to provide the auto-reload-on-change behavior and the forwarding of SBT logspam to the browser console.
 
     @p
       Of the two, only the Scala.js plugin is really necessary. The Workbench plugin is a convenience that makes development easier. Without it you'd need to keep a terminal open to view the SBT logspam, and manually refresh the page when compilation finished. Not the end of the world.
@@ -216,7 +216,7 @@
     All the @code{.class} and @code{.sjsir} files are the direct output of the Scala.js compiler, and aren't necessary to actually run the application. The only two files necessary are @code{index-dev.html} and @code{example-fastopt.js}. You may recognize @code{index-dev.html} as the file that we were navigating to in the browser earlier.
 
   @p
-    These two files can be extracted and published as-is: you can put them on @a("Github-Pages", href:="https://pages.github.com/"), @a("Amazon Web Services", href:="http://docs.aws.amazon.com/gettingstarted/latest/swh/website-hosting-intro.html"), or a hundred other places. However, one thing of note is the fact that the generated Javascript file is quite large:
+    These two files can be extracted and published as-is: you can put them on @lnk("Github-Pages", "https://pages.github.com/"), @lnk("Amazon Web Services", "http://docs.aws.amazon.com/gettingstarted/latest/swh/website-hosting-intro.html"), or a hundred other places. However, one thing of note is the fact that the generated Javascript file is quite large:
 
   @hl.bash
     haoyi-mbp:temp haoyi$ du -h target/scala-2.11/example-fastopt.js
@@ -272,9 +272,9 @@
       @li
         A large portion of this 144k is the Scala standard library, and so the size of the compiled blob does not grow that fast as your program grows. For example, while this ~50 line application is 144k, a much larger ~2000 line application is only 288k.
       @li
-        This size is pre-@a("gzip", href:="http://en.wikipedia.org/wiki/Gzip"), and most webservers serve their contents compressed via gzip to reduce the download size. Gzip cuts the actual download size down to 43k, which is more acceptable.
+        This size is pre-@lnk("gzip", "http://en.wikipedia.org/wiki/Gzip"), and most webservers serve their contents compressed via gzip to reduce the download size. Gzip cuts the actual download size down to 43k, which is more acceptable.
       @li
-        You will likely have other portions of the page that are of similar size: e.g. @a("JQuery", href:="http://jquery.com/") is extremely popular, and weights in at a comparable 32kb minified and gzipped, while @a("React.js", href:="http://facebook.github.io/react/downloads.html") weighs in at a cool 150kb gzipped. Scala.js arguably provides more than either of these libraries.
+        You will likely have other portions of the page that are of similar size: e.g. @lnk("JQuery", "http://jquery.com/") is extremely popular, and weights in at a comparable 32kb minified and gzipped, while @lnk("React.js", "http://facebook.github.io/react/downloads.html") weighs in at a cool 150kb gzipped. Scala.js arguably provides more than either of these libraries.
 
     @p
       Regardless, there is ongoing work to shrink the size of these executables. If you want to read more about this, check out the section on the Scala.js File Encoding and the Optimization Pipeline.
@@ -314,11 +314,11 @@
 
   @ul
     @li
-      Javascript includes APIs for @a("getting the size of the window", href:="http://stackoverflow.com/questions/1248081/get-the-browser-viewport-dimensions-with-javascript") and @a("changing the size of a canvas", href:="http://stackoverflow.com/questions/9251480/set-canvas-size-using-javascript"). These Javascript APIs are available in Scala.js, and we've already used some of them in the course of this example. Try making the Canvas full-screen, and re-positioning the corners of the triangle to match.
+      Javascript includes APIs for @lnk("getting the size of the window", "http://stackoverflow.com/questions/1248081/get-the-browser-viewport-dimensions-with-javascript") and @lnk("changing the size of a canvas", "http://stackoverflow.com/questions/9251480/set-canvas-size-using-javascript"). These Javascript APIs are available in Scala.js, and we've already used some of them in the course of this example. Try making the Canvas full-screen, and re-positioning the corners of the triangle to match.
     @li
       The @hl.scala{dom.CanvasRenderingContext2D} has a bunch of methods on it that can be used to draw things. Here we only draw 1x1 rectangles to put points on the canvas; try modifying the code to make it draw something else.
     @li
-      We've look at the @code{master} branch of @code{workbench-example-app}, but this project also has several other branches showing off different facets of Scala.js: @a("dodge-the-dots", href:="https://github.com/lihaoyi/workbench-example-app/tree/dodge-the-dots") and @a("space-invaders", href:="https://github.com/lihaoyi/workbench-example-app/tree/space-invaders") are both interesting branches worth playing with as a beginner. Check them out!
+      We've look at the @code{master} branch of @code{workbench-example-app}, but this project also has several other branches showing off different facets of Scala.js: @lnk("dodge-the-dots", "https://github.com/lihaoyi/workbench-example-app/tree/dodge-the-dots") and @lnk("space-invaders", "https://github.com/lihaoyi/workbench-example-app/tree/space-invaders") are both interesting branches worth playing with as a beginner. Check them out!
     @li
       Try publishing the output code somewhere. You only need @code{example-opt.js} and @code{index-opt.html}; try putting them somewhere online where the world can see it.
 

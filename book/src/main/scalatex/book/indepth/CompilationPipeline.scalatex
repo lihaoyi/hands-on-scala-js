@@ -68,7 +68,7 @@
       With Scala.js, we have decided to forgo reflection, and forgo separate compilation, in exchange for smaller executables. This is made easier by the fact that the pure-Scala ecosystem makes little use of reflection overall. Thus, at the right before shipping your Scala.js app to your users, the Scala.js optimizer gathers up all your Scala.js code, determines which things are used and which are not, and eliminates all the un-used classes/methods/variables. This allows us to achieve a much smaller code size than is possible with reflection/separate-compilation support. Furthermore, because we forgo these two things, we can perform much more aggressive inlining and other compile-time optimizations than is possible with Scala-JVM, further reducing code size and improving performance.
 
     @p
-      It's worth noting that such optimizations exist as an option on the JVM aswell: @a("Proguard", href:="http://proguard.sourceforge.net/") is a well known library for doing similar DCE/optimization for Java/Scala applications, and is extensively used in developing mobile applications which face similar "minimize-code-size" constraints that web-apps do. However, the bulk of Scala code which runs on the server does not use these tools.
+      It's worth noting that such optimizations exist as an option on the JVM aswell: @lnk("Proguard", "http://proguard.sourceforge.net/") is a well known library for doing similar DCE/optimization for Java/Scala applications, and is extensively used in developing mobile applications which face similar "minimize-code-size" constraints that web-apps do. However, the bulk of Scala code which runs on the server does not use these tools.
 
 @sect{How Compilation Works}
   @p
@@ -99,7 +99,7 @@
 
   @sect{Initial Compilation}
     @p
-      As described earlier, the Scala.js compiler is implemented as a Scala compiler plugin, and lives in the main repository in @a("compiler/", href:="https://github.com/scala-js/scala-js/tree/master/compiler"). The bulk of the plugin runs after the @code{mixin} phase in the @a("Scala compilation pipeline", href:="http://stackoverflow.com/a/4528092/871202"). By this point:
+      As described earlier, the Scala.js compiler is implemented as a Scala compiler plugin, and lives in the main repository in @lnk("compiler/", "https://github.com/scala-js/scala-js/tree/master/compiler"). The bulk of the plugin runs after the @code{mixin} phase in the @lnk("Scala compilation pipeline", "http://stackoverflow.com/a/4528092/871202"). By this point:
 
     @ul
       @li
@@ -109,7 +109,7 @@
       @li
         @hl.scala("@tailrec") functions have been translated to while-loops, @hl.scala{lazy val}s have been replaced by @hl.scala{var}s.
       @li
-        @hl.scala{trait}s have been @a("replaced by interfaces and classes", href:="http://stackoverflow.com/a/2558317/871202")
+        @hl.scala{trait}s have been @lnk("replaced by interfaces and classes", "http://stackoverflow.com/a/2558317/871202")
 
     @p
       Overall, by the time the Scala.js compiler plugin takes action, most of the high-level features of the Scala language have already been removed. Compared to a hypothetical, alternative "from scratch" implementation, this approach has several advantages:
@@ -130,14 +130,14 @@
         The @code{.sjsir} files, destined for further compilation in the Scala.js pipeline.
 
     @p
-      The ASTs defined in the @code{.sjsir} files is at about the same level of abstraction as the @hl.scala{Tree}s that the Scala compiler is working with at this stage. However, the @hl.scala{Tree}s within the Scala compiler contain a lot of cruft related to the compiler internals, and are also not easily serializable. This phase cleans them up into a "purer" format, (defined in the @a("ir/", href:="https://github.com/scala-js/scala-js/blob/master/ir/src/main/scala/scala/scalajs/ir/Trees.scala") folder) which is also serializable.
+      The ASTs defined in the @code{.sjsir} files is at about the same level of abstraction as the @hl.scala{Tree}s that the Scala compiler is working with at this stage. However, the @hl.scala{Tree}s within the Scala compiler contain a lot of cruft related to the compiler internals, and are also not easily serializable. This phase cleans them up into a "purer" format, (defined in the @lnk("ir/", "https://github.com/scala-js/scala-js/blob/master/ir/src/main/scala/scala/scalajs/ir/Trees.scala") folder) which is also serializable.
 
     @p
       This is the only phase in the Scala.js compilation pipeline that separate compilation is possible: you can compile many different sets of Scala.js @code{.scala} files separately, only to combine them later. This is used e.g. for distributing Scala.js libraries as Maven Jars, which are compiled separately by library authors to be combined into a final executable later.
 
   @sect{Optimization}
     @p
-      This phase is a whole-program optimization of the @code{.sjsir} files, and lives in the @a("tools/", href:="https://github.com/scala-js/scala-js/tree/master/tools") folder of the Scala.js repository. The rough operations that get performed are:
+      This phase is a whole-program optimization of the @code{.sjsir} files, and lives in the @lnk("tools/", "https://github.com/scala-js/scala-js/tree/master/tools") folder of the Scala.js repository. The rough operations that get performed are:
 
     @ul
       @li
@@ -152,9 +152,9 @@
 
   @sect{Closure-Compiler}
     @p
-      The @a("Google Closure Compiler", href:="https://developers.google.com/closure/compiler/") (GCC) is a set of tools that work with Javascript. It has multiple @a("levels of optimization", href:="https://developers.google.com/closure/compiler/docs/compilation_levels"), doing everything from basic whitespace-removal to heavy optimization. It is a old, relatively mature project that is relied on both inside and outside google to optimize the delivery of Javascript to the browser.
+      The @lnk("Google Closure Compiler", "https://developers.google.com/closure/compiler/") (GCC) is a set of tools that work with Javascript. It has multiple @lnk("levels of optimization", "https://developers.google.com/closure/compiler/docs/compilation_levels"), doing everything from basic whitespace-removal to heavy optimization. It is a old, relatively mature project that is relied on both inside and outside google to optimize the delivery of Javascript to the browser.
     @p
-      Scala.js uses GCC in its most aggressive mode: @a("Advanced Optimization", href:="https://developers.google.com/closure/compiler/docs/api-tutorial3"). As described in the linked documentation, this performs optimizations such as:
+      Scala.js uses GCC in its most aggressive mode: @lnk("Advanced Optimization", "https://developers.google.com/closure/compiler/docs/api-tutorial3"). As described in the linked documentation, this performs optimizations such as:
 
     @ul
       @li

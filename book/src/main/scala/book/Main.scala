@@ -45,6 +45,9 @@ object Main {
     assert(dangling.size == 0, s"Dangling Refs: $dangling")
 
     println("Writing Done")
+
+    // can be used to verify that no links are broken
+    // lnk.usedLinks
   }
 
 

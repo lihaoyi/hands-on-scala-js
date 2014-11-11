@@ -98,7 +98,7 @@
 
   @sect{Sharing Code}
     @p
-      Scala.js does not just stop at writing code on the client, though! Scala itself is a very successful, capable language for writing all sorts of systems, from web servers to backend infrastructure. With Scala.js, you can utilize the same libraries you use writing your Scala servers when writing your Scala web clients! On one end, you are sharing your templating language with @a("Scalatags", href:="https://github.com/lihaoyi/scalatags") or sharing your serialization logic with @a("uPickle", href:="https://github.com/lihaoyi/upickle"). At the other, you are sharing large, abstract libraries like @a("Scalaz", href:="https://github.com/japgolly/scalaz") or @a("Shapeless", href:="https://groups.google.com/forum/#!searchin/scala-js/shapeless/scala-js/5Sf2up0z3PU/9F9SYB0qHEcJ").
+      Scala.js does not just stop at writing code on the client, though! Scala itself is a very successful, capable language for writing all sorts of systems, from web servers to backend infrastructure. With Scala.js, you can utilize the same libraries you use writing your Scala servers when writing your Scala web clients! On one end, you are sharing your templating language with @lnk("Scalatags", "https://github.com/lihaoyi/scalatags") or sharing your serialization logic with @lnk("uPickle", "https://github.com/lihaoyi/upickle"). At the other, you are sharing large, abstract libraries like @lnk("Scalaz", "https://github.com/japgolly/scalaz") or @lnk("Shapeless", "https://groups.google.com/forum/#!searchin/scala-js/shapeless/scala-js/5Sf2up0z3PU/9F9SYB0qHEcJ").
 
     @p
       Sharing code means several things:
@@ -128,7 +128,7 @@
 
   @sect{Client-Server Integration}
     @p
-      There is an endless supply of new platforms which have promised to change-the-way-we-do-web-development-forever. From old-timers like @a("Ur-Web", href:="http://www.impredicative.com/ur/"), to @a("GWT", href:="http://www.gwtproject.org/"), to Asana's @a("LunaScript", href:="https://asana.com/luna"), to more recently things like @a("Meteor.js", href:="https://www.meteor.com/").
+      There is an endless supply of new platforms which have promised to change-the-way-we-do-web-development-forever. From old-timers like @lnk("Ur-Web", "http://www.impredicative.com/ur/"), to @lnk("GWT", "http://www.gwtproject.org/"), to Asana's @lnk("LunaScript", "https://asana.com/luna"), to more recently things like @lnk("Meteor.js", "https://www.meteor.com/").
     @p
       One common theme in all these platforms is that their main selling point is their tight, seamless client-server integration, to the point where you can just make method calls across the client-server boundary and the platform/language/compiler figures out what to do.
     @p

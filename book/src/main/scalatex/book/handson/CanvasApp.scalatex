@@ -1,6 +1,6 @@
 
 @p
-  By this point, you've already cloned and got your hands dirty fiddling around with the toy @a("workbench-example-app", href:="https://github.com/lihaoyi/workbench-example-app"). You have your editor set up, SBT installed, and have published the example application in a way you can host online for other people to see. Maybe you've even made some changes to the application to see what happens. Hopefully you're curious, and want to learn more.
+  By this point, you've already cloned and got your hands dirty fiddling around with the toy @lnk("workbench-example-app", "https://github.com/lihaoyi/workbench-example-app"). You have your editor set up, SBT installed, and have published the example application in a way you can host online for other people to see. Maybe you've even made some changes to the application to see what happens. Hopefully you're curious, and want to learn more.
 
 @p
   In this section of the book, we will walk through making a small canvas application. This will expose you to important concepts like:
@@ -73,7 +73,7 @@
       @script("Clock().main(document.getElementById('canvas3'))")
 
   @p
-    As you can see, we're using more @a("Canvas APIs", href:="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D"), in this case dealing with rendering text on the canvas. Another thing we're using is the Javascript @a("Date", href:="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date") class, in Scala.js under the fully name @hl.scala{scala.scalajs.js.Date}, here imported as @hl.scala{js.Date}.
+    As you can see, we're using more @lnk("Canvas APIs", "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D"), in this case dealing with rendering text on the canvas. Another thing we're using is the Javascript @lnk("Date", "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date") class, in Scala.js under the fully name @hl.scala{scala.scalajs.js.Date}, here imported as @hl.scala{js.Date}.
 
 @sect{Tying it together: Flappy Box}
 
@@ -81,7 +81,7 @@
     You've just seen two examples of how to use Scala.js, together with the Javascript DOM APIs, to make simple applications. However, we've only used the "Scala" in Scala.js in the most rudimentary fashion: setting a few primitives here and there, defining some methods, mainly just gluing together a few Javascript APIs
 
   @p
-    In this example we will make a spiritual clone of the popular @a("Flappy Bird", href:="http://en.wikipedia.org/wiki/Flappy_Bird") video game. This game involves a few simple rules
+    In this example we will make a spiritual clone of the popular @lnk("Flappy Bird", "http://en.wikipedia.org/wiki/Flappy_Bird") video game. This game involves a few simple rules
 
   @ul
     @li
@@ -201,13 +201,13 @@
 
   @ul
     @li
-      Make more video games! I have a set of @a("retro-games ported to Scala.js", href:="http://lihaoyi.github.io/scala-js-games/"). Maybe re-make one of them without looking at the source, or maybe port some other game you're familiar with and enjoy playing. Even just drawing things on canvas, games can get @a("pretty elaborate", href:="http://lihaoyi.github.io/roll/").
+      Make more video games! I have a set of @lnk("retro-games ported to Scala.js", "http://lihaoyi.github.io/scala-js-games/"). Maybe re-make one of them without looking at the source, or maybe port some other game you're familiar with and enjoy playing. Even just drawing things on canvas, games can get @lnk("pretty elaborate", "http://lihaoyi.github.io/roll/").
 
     @li
-      Explore the APIs! We've touched on a small number of Javascript APIs here, mainly for dealign with the canvas, but modern browsers offer a whole @a("zoo of functionality", href:="https://developer.mozilla.org/en-US/docs/Web/API"). Try making an application that uses @a("localStorage", href:="https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Storage") to save state even when you close the tab, or an application that works with the HTML DOM.
+      Explore the APIs! We've touched on a small number of Javascript APIs here, mainly for dealign with the canvas, but modern browsers offer a whole @lnk("zoo of functionality", "https://developer.mozilla.org/en-US/docs/Web/API"). Try making an application that uses @lnk("localStorage", "https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Storage") to save state even when you close the tab, or an application that works with the HTML DOM.
 
     @li
-      Draw something pretty! We have a working canvas, a nice programming language, and a way to easily publish the results online. @a("Various", href:="http://www.scala-js-fiddle.com/gist/77a3840678d154257ca1/KochSnowflake.scala") @a("fractals", href:="http://www.scala-js-fiddle.com/gist/77a3840678d154257ca1/KochCurve.scala"), or @a("colorful visualizations", href:="http://www.scala-js-fiddle.com/gist/9443f8e0ecc68d1058ad/RayTracer.scala") are all possibilities.
+      Draw something pretty! We have a working canvas, a nice programming language, and a way to easily publish the results online. @lnk("Various", "http://www.scala-js-fiddle.com/gist/77a3840678d154257ca1/KochSnowflake.scala") @lnk("fractals", "http://www.scala-js-fiddle.com/gist/77a3840678d154257ca1/KochCurve.scala"), or @lnk("colorful visualizations", "http://www.scala-js-fiddle.com/gist/9443f8e0ecc68d1058ad/RayTracer.scala") are all possibilities.
 
   @p
     By this point you've some experience building stand-alone, single-canvas Scala.js applications, which has hopefully given you a feel for how Scala.js works. The problem is that few web applications satisfy the criteria of being stand-alone single-page canvas applications! Most web applications need to deal with the DOM of the HTML page, need to fetch data from web services, and generally need to do a lot of other messy things. We'll go into that in the next chapter

@@ -48,7 +48,7 @@
   @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala")
 
   @p
-    This is a not-very-interesting @a("spray-routing", href:="http://spray.io/documentation/1.2.2/spray-routing/") application: we set up a server on @code{localhost:8080}, have the root URL serve the main page on GET, and have other GET URLs serve resources. This includes the @code{js-fastopt.js} file that is now in our resources because of our @code{build.sbt} config earlier! We also add a POST route to allow the client ask the server to list files various directories.
+    This is a not-very-interesting @lnk("spray-routing", "http://spray.io/documentation/1.2.2/spray-routing/") application: we set up a server on @code{localhost:8080}, have the root URL serve the main page on GET, and have other GET URLs serve resources. This includes the @code{js-fastopt.js} file that is now in our resources because of our @code{build.sbt} config earlier! We also add a POST route to allow the client ask the server to list files various directories.
 
   @p
     The HTML template @hl.scala{Page.skeleton} is not shown above; I put it in a separate file for neatness:

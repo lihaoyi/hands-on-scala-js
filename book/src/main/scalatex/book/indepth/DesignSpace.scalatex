@@ -87,24 +87,24 @@
         Allow the user to annotate methods/classes that should be kept, and eliminate the rest.
 
     @p
-      All three are possible options: Scala.js started off with #1. #3 is the approach used by @a("Proguard", href:="http://proguard.sourceforge.net/manual/examples.html#annotated"), which lets you annotate things e.g. @hl.scala{@@KeepApplication} to preserve things for reflection and preventing Proguard from eliminating them as dead code.
+      All three are possible options: Scala.js started off with #1. #3 is the approach used by @lnk("Proguard", "http://proguard.sourceforge.net/manual/examples.html#annotated"), which lets you annotate things e.g. @hl.scala{@@KeepApplication} to preserve things for reflection and preventing Proguard from eliminating them as dead code.
 
     @p
-      In the end, Scala.js chose #2. This is helped by the fact that overall, Scala code tends not to use reflection as heavily as Java, or dynamic languages which use it heavily. Scala uses techniques such as @a("lambdas", href:="http://docs.scala-lang.org/tutorials/tour/anonymous-function-syntax.html") or @a("implicits", href:="http://docs.scala-lang.org/tutorials/tour/implicit-parameters.html") to satisfy many use cases which Java has traditionally used reflection for, while friendly to the optimizer.
+      In the end, Scala.js chose #2. This is helped by the fact that overall, Scala code tends not to use reflection as heavily as Java, or dynamic languages which use it heavily. Scala uses techniques such as @lnk("lambdas", "http://docs.scala-lang.org/tutorials/tour/anonymous-function-syntax.html") or @lnk("implicits", "http://docs.scala-lang.org/tutorials/tour/implicit-parameters.html") to satisfy many use cases which Java has traditionally used reflection for, while friendly to the optimizer.
 
     @p
-      There are a range of use-cases for reflection where you want to inspect an object's structure or methods, where lambdas or implicits don't help. People use reflection to @a("serialize objects", href:="http://jackson.codehaus.org/DataBindingDeepDive"), or for @a("routing messages to methods", href:="https://access.redhat.com/documentation/en-US/Fuse_ESB_Enterprise/7.1/html/Implementing_Enterprise_Integration_Patterns/files/BasicPrinciples-BeanIntegration.html"). However, both these cases can be satisfied by...
+      There are a range of use-cases for reflection where you want to inspect an object's structure or methods, where lambdas or implicits don't help. People use reflection to @lnk("serialize objects", "http://jackson.codehaus.org/DataBindingDeepDive"), or for @lnk("routing messages to methods", "https://access.redhat.com/documentation/en-US/Fuse_ESB_Enterprise/7.1/html/Implementing_Enterprise_Integration_Patterns/files/BasicPrinciples-BeanIntegration.html"). However, both these cases can be satisfied by...
 
   @sect{Macros}
 
     @p
-      The Scala programming language, since the 2.10.x series, has support for @a("Macros", href:="http://docs.scala-lang.org/overviews/macros/overview.html") in the language. Although experimental, these are heavily used in many projects such as Play and Slick and Akka, and allow a developer to perform compile-time computations and generate code where-ever the macros are used.
+      The Scala programming language, since the 2.10.x series, has support for @lnk("Macros", "http://docs.scala-lang.org/overviews/macros/overview.html") in the language. Although experimental, these are heavily used in many projects such as Play and Slick and Akka, and allow a developer to perform compile-time computations and generate code where-ever the macros are used.
 
     @p
-      People typically think of macros as AST-transformers: you pass in an AST and get a modified AST out. However, in Scala, these ASTs are strongly-typed, and the macro is able to inspect the types involved in generating the output AST. This leads to a lot of @a("interesting techniques", href:="http://docs.scala-lang.org/overviews/macros/implicits.html") around macros where you synthesize ASTs based on the type (explicit or inferred) of the macro callsite, something that is impossible in dynamic languages.
+      People typically think of macros as AST-transformers: you pass in an AST and get a modified AST out. However, in Scala, these ASTs are strongly-typed, and the macro is able to inspect the types involved in generating the output AST. This leads to a lot of @lnk("interesting techniques", "http://docs.scala-lang.org/overviews/macros/implicits.html") around macros where you synthesize ASTs based on the type (explicit or inferred) of the macro callsite, something that is impossible in dynamic languages.
 
     @p
-      Practically, this means that you can use macros to do things such as inspecting the methods, fields and other type-level properties of a typed value. This allows us to do things like @a("serialize objects with no boilerplate", href:="https://github.com/lihaoyi/upickle"):
+      Practically, this means that you can use macros to do things such as inspecting the methods, fields and other type-level properties of a typed value. This allows us to do things like @lnk("serialize objects with no boilerplate", "https://github.com/lihaoyi/upickle"):
 
     @hl.scala
       import upickle._
@@ -114,7 +114,7 @@
       // res23: String = {"a": 1, "b": "gg"}
 
     @p
-      Or to @a("route messages to the appropiate methods", href:="https://github.com/lihaoyi/autowire") without boilerplate, and @i{without} using reflection!
+      Or to @lnk("route messages to the appropiate methods", "https://github.com/lihaoyi/autowire") without boilerplate, and @i{without} using reflection!
 
     @p
       The fact that you can satisfy these use cases with macros is non-obvious: in dynamic languages, macros only get an AST, which is basically opaque when you're only passing a single value to it. With Scala, you get the value @i{together with it's type}, which lets you inspect the type and generate the proper serialization/routing code that is impossible to do in a dynamic language with macros.
@@ -190,11 +190,11 @@
 
 @sect("Why Jars instead of RequireJS/CommonJS")
   @p
-    In JVM-land, the standard method for distributing these libraries is as @a("Maven Artifacts", href:="http://stackoverflow.com/questions/2487485/what-is-maven-artifact"). These are typically published in a public location such as @a("Maven Central", href:="http://search.maven.org/"), where others can find and download them for use. Typically downloads are done automatically by the build-tool: in Scala-JVM typically this is SBT.
+    In JVM-land, the standard method for distributing these libraries is as @lnk("Maven Artifacts", "http://stackoverflow.com/questions/2487485/what-is-maven-artifact"). These are typically published in a public location such as @lnk("Maven Central", "http://search.maven.org/"), where others can find and download them for use. Typically downloads are done automatically by the build-tool: in Scala-JVM typically this is SBT.
   @p
-    In Javascript-land, there are multiple ways of acquiring dependencies: @a("CommonJS", href:="http://en.wikipedia.org/wiki/CommonJS") and @a("RequireJS/AMD", href:="http://requirejs.org/") are two competing standards with a host of implementations. Historically, a third approach has been most common: the developer would simply download the modules himself, check it into source-control and manually add a @hl.html{<script>} tag to the HTML page that will make the functionality available through some global variable.
+    In Javascript-land, there are multiple ways of acquiring dependencies: @lnk("CommonJS", "http://en.wikipedia.org/wiki/CommonJS") and @lnk("RequireJS/AMD", "http://requirejs.org/") are two competing standards with a host of implementations. Historically, a third approach has been most common: the developer would simply download the modules himself, check it into source-control and manually add a @hl.html{<script>} tag to the HTML page that will make the functionality available through some global variable.
   @p
-    In Scala.js, we side with the JVM standard of distributing libraries as maven jars. This lets us take advantage of all the existing tooling around Scala to handle these jars (SBT, Ivy, Maven Central, etc.) which is far more mature and cohesive than the story in Javascript-land. For example, the Scalatags library we used in the earlier is @a("published on maven central", href:="http://search.maven.org/#search%7Cga%7C1%7Cscalatags"), and adding one line to SBT is enough to pull it down and include it in our project.
+    In Scala.js, we side with the JVM standard of distributing libraries as maven jars. This lets us take advantage of all the existing tooling around Scala to handle these jars (SBT, Ivy, Maven Central, etc.) which is far more mature and cohesive than the story in Javascript-land. For example, the Scalatags library we used in the earlier is @lnk("published on maven central", "http://search.maven.org/#search%7Cga%7C1%7Cscalatags"), and adding one line to SBT is enough to pull it down and include it in our project.
 
   @p
     One interesting wrinkle in Scala.js's case is that since Scala can compile to both Scala.js and Scala-JVM, it is entirely possible to publish a library that can run on both client and server! This chapter will explore the process of building, testing, and publishing such a library.

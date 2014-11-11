@@ -133,39 +133,32 @@
   @p
     This table gives a quick overview of the sorts of libraries you can and can't use when working on Scala.js:
 
-  @table
-    @thead
-      @th{Can Use}@th{Can't Use}
-    @tbody
-      @for(tuple <- BookData.myTable)
-        @tr
-          @td{@tuple._1}@td{@tuple._2}
+  @val tableHead = pureTable(th("Can Use"), th("Can't Use"))
+
+  @tableHead
+    @for(tuple <- BookData.myTable)
+      @tr
+        @td{@tuple._1}@td{@tuple._2}
 
   @p
     We'll go into each section bit by bit
 
   @sect{Standard Library}
-    @table
-      @thead
-        @th{Can Use}@th{Can't Use}
-      @tbody
-        @for(tuple <- BookData.myTable.slice(0, 3))
-          @tr
-            @td{@tuple._1}@td{@tuple._2}
+    @tableHead
+      @for(tuple <- BookData.myTable.slice(0, 3))
+        @tr
+          @td{@tuple._1}@td{@tuple._2}
 
     @p
       You can use more-or-less the whole Scala standard library in Scala.js, sans some more esoteric components like the parallel collections or the tools. Furthermore, we've ported some subset of the Java standard library that many common Scala libraries depends on, including most of @hl.scala{java.lang.*} and some of @hl.scala{java.util.*}.
     @p
-      There isn't a full list of library APIs which are available from Scala.js, but a rough idea can be had from looking the the source code @a("on", href:="https://github.com/scala-js/scala-js/tree/master/javalanglib/src/main/scala/java/lang") @a("github", href:="https://github.com/scala-js/scala-js/tree/master/javalib/src/main/scala/java").
+      There isn't a full list of library APIs which are available from Scala.js, but a rough idea can be had from looking the the source code @lnk("on", "https://github.com/scala-js/scala-js/tree/master/javalanglib/src/main/scala/java/lang") @lnk("github", "https://github.com/scala-js/scala-js/tree/master/javalib/src/main/scala/java").
 
   @sect{Reflection v.s. Macros}
-    @table
-      @thead
-        @th{Can Use}@th{Can't Use}
-      @tbody
-        @for(tuple <- BookData.myTable.slice(3, 4))
-          @tr
-            @td{@tuple._1}@td{@tuple._2}
+    @tableHead
+      @for(tuple <- BookData.myTable.slice(3, 4))
+        @tr
+          @td{@tuple._1}@td{@tuple._2}
 
     @p
       As described @a("here"), in Reflection is not supported in Scala.js, due to the way it inhibits optimization. This doesn't just mean you can't use reflection yourself: many third-party libraries also use reflection, and you won't be able to use them either.
@@ -174,26 +167,20 @@
       On the other hand, Scala.js does support Macros, and macros can in many ways substitute many of the use cases that people have traditionally used reflection for. For example, instead of using a reflection-based serialization library like @code{scala-pickling}, you can use a macro-based library such as @code{upickle}.
 
   @sect{Pure-Scala v.s. Java Libraries}
-    @table
-      @thead
-        @th{Can Use}@th{Can't Use}
-      @tbody
-        @for(tuple <- BookData.myTable.slice(4, 5))
-          @tr
-            @td{@tuple._1}@td{@tuple._2}
+    @tableHead
+      @for(tuple <- BookData.myTable.slice(4, 5))
+        @tr
+          @td{@tuple._1}@td{@tuple._2}
     @p
       Scala.js has access to any pure-Scala libraries that you have cross-compiled to Scala.js, and cross-compiling a pure-Scala library with no dependencies is straightforward. Many of them, such as the ones listed above, have already been cross-compiled and can be used via their maven coordinates.
     @p
       You cannot use any libraries which have a Java dependency. This means libraries like Scalatest or Scalate, which depend on a number of external Java libraries or source files, cannot be used from Scala.js. You can only use libraries which have no dependency on Java libraries or sources.
 
   @sect{Javascript APIs v.s. JVM APIs}
-    @table
-      @thead
-        @th{Can Use}@th{Can't Use}
-      @tbody
-        @for(tuple <- BookData.myTable.slice(5, 7))
-          @tr
-            @td{@tuple._1}@td{@tuple._2}
+    @tableHead
+      @for(tuple <- BookData.myTable.slice(5, 7))
+        @tr
+          @td{@tuple._1}@td{@tuple._2}
 
     @p
       Apart from depending on Java sources, the other thing that you can't use in Scala.js are JVM-specific APIs. This means that anything which goes down to the underlying operating system, filesystem, GUI or network are unavailable in Scala.js. This makes sense when you consider that these capabilities are no provided by the browser which Scala.js runs in, and it's impossible to re-implement them ourselves.
@@ -204,13 +191,10 @@
 
 
   @sect{Java tooling v.s. Scala/Browser tooling}
-    @table
-      @thead
-        @th{Can Use}@th{Can't Use}
-      @tbody
-        @for(tuple <- BookData.myTable.slice(7, 8))
-          @tr
-            @td{@tuple._1}@td{@tuple._2}
+    @tableHead
+      @for(tuple <- BookData.myTable.slice(7, 8))
+        @tr
+          @td{@tuple._1}@td{@tuple._2}
 
 
     @p

@@ -1,7 +1,7 @@
 @p
   Below is a list of classes from the Java Standard Library that are available from Scala.js. In general, much of @hl.scala{java.lang}, and parts of @hl.scala{java.io}, @hl.scala{java.util} and @hl.scala{java.net} have been ported over. This means that all these classes are available for use in Scala.js applications despite being part of the Java standard library.
 @p
-  There are many reasons you may want to port a Java class to Scala.js: you want to use it directly, you may be trying to port a library which uses it. In general, we haven't been porting things "for fun", and obscure classes like @hl.scala{org.omg.corba} will likely never be ported: we've been porting things as the need arises in order to support libraries (e.g. @a("Scala.Rx", href:="https://github.com/lihaoyi/scala.rx") that need them.
+  There are many reasons you may want to port a Java class to Scala.js: you want to use it directly, you may be trying to port a library which uses it. In general, we haven't been porting things "for fun", and obscure classes like @hl.scala{org.omg.corba} will likely never be ported: we've been porting things as the need arises in order to support libraries (e.g. @lnk("Scala.Rx", "https://github.com/lihaoyi/scala.rx") that need them.
 
 @sect{Available Java APIs}
 
@@ -17,9 +17,9 @@
     @li
       Find a class that you want to use in Scala.js, but is not implemented.
     @li
-      Write a clean-room implementation in Scala, without looking at the source code of @a("OpenJDK", href:="http://openjdk.java.net/"). This is due to legal-software-license incompatibility between OpenJDK and Scala.js. Reading the docs or specification are fine, as is looking at the source of alternate implementations such as @a("Harmony", href:="http://harmony.apache.org/")
+      Write a clean-room implementation in Scala, without looking at the source code of @lnk("OpenJDK", "http://openjdk.java.net/"). This is due to legal-software-license incompatibility between OpenJDK and Scala.js. Reading the docs or specification are fine, as is looking at the source of alternate implementations such as @lnk("Harmony", "http://harmony.apache.org/")
     @li
-      Submit a pull-request to the @a("Scala.js repository", href:="https://github.com/scala-js/scala-js"), including your implementation, together with tests. See the @a("existing tests", href:="https://github.com/scala-js/scala-js/tree/master/test-suite/src/test/scala/scala/scalajs/testsuite/javalib") in the repository if you need examples of how to write your own.
+      Submit a pull-request to the @lnk("Scala.js repository", "https://github.com/scala-js/scala-js"), including your implementation, together with tests. See the @lnk("existing tests", "https://github.com/scala-js/scala-js/tree/master/test-suite/src/test/scala/scala/scalajs/testsuite/javalib") in the repository if you need examples of how to write your own.
 
   @p
     In general, this is a simple process, for "pure-Java" classes which do not use any special JVM/Java-specific APIs. However, this will not be possible for classes which do! This means that classes that make use of Java-specific things like:
@@ -35,4 +35,4 @@
       @hl.scala{sun.misc.Unsafe}
 
   @p
-    And other similar APIs will either need to be rewritten to not-use them (e.g. @a("AtomicIntegers", href:="https://github.com/scala-js/scala-js/blob/master/javalib/src/main/scala/java/util/concurrent/atomic/AtomicInteger.scala") can be written without threading/unsafe APIs because Javascript is single-threaded) or can't be ported at all (e.g. @code{java.io.File})
+    And other similar APIs will either need to be rewritten to not-use them (e.g. @lnk("AtomicIntegers", "https://github.com/scala-js/scala-js/blob/master/javalib/src/main/scala/java/util/concurrent/atomic/AtomicInteger.scala") can be written without threading/unsafe APIs because Javascript is single-threaded) or can't be ported at all (e.g. @code{java.io.File})
