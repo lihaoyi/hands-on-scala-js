@@ -7,7 +7,6 @@ import scala.language.experimental.macros
 import acyclic.file
 
 package object scalatex {
-
   /**
    * Wraps the given string as a twist fragment.
    */

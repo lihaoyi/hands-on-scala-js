@@ -3,9 +3,8 @@ package simple
 import akka.actor.ActorSystem
 import spray.http.{HttpEntity, MediaTypes}
 import spray.routing.SimpleRoutingApp
-import upickle._
-object Server extends SimpleRoutingApp{
 
+object Server extends SimpleRoutingApp{
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem()
     startServer("localhost", port = 8080){
