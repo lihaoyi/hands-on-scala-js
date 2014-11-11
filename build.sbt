@@ -35,6 +35,8 @@ lazy val book = Project(
   scalaVersion := "2.11.4",
   libraryDependencies ++= Seq(
     "org.webjars" % "highlightjs" % "8.2-1",
+    "org.webjars" % "pure" % "0.5.0",
+    "org.webjars" % "font-awesome" % "4.2.0",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
     "org.scala-lang" % "scala-compiler" % scalaVersion.value,
     "org.eclipse.jgit" % "org.eclipse.jgit" % "3.5.1.201410131835-r"

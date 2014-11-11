@@ -54,9 +54,17 @@ case class sect(name: String, subname: String = ""){
   sect.structure = newNode
   def apply(args: Frag*) = {
     val wrappedContents = contentWrap.getOrElse((x: Frag) => x)(args)
+    val headingAnchor = a(
+      href:=s"#${sect.munge(name)}",
+      cls:="content-link",
+      title:="Heading anchor"
+    )
     val res = Seq[Frag](
-      if (name == "") ""
-      else headerWrap(name, subname)(cls:="content-subhead", id:=sect.munge(name)),
+      headerWrap(name, subname)(
+        cls:="content-subhead",
+        id:=sect.munge(name),
+        headingAnchor
+      ),
       wrappedContents
     )
     sect.indent -= 1
