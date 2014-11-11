@@ -15,21 +15,21 @@ object sect{
 
   var indent = 0
 
-  val headers = Seq[((String, String) => scalatags.Text.Tag, Option[Frag => Frag])](
-    ((h, s) => div(cls:="header")(
-      h1(h),
+  val headers = Seq[((String, String, Frag) => scalatags.Text.Tag, Option[Frag => Frag])](
+    ((h, s, l) => div(cls:="header")(
+      h1(h, l),
       h2(s)
     ), Some(f => div(cls:="content", f))),
-    ((h, s) => div(cls:="header")(
-      h1(id:=munge(h), h),
+    ((h, s, l) => div(cls:="header")(
+      h1(id:=munge(h), h, l),
       br
     ), None),
-    (h1(_, _), None),
-    (h2(_, _), None),
-    (h3(_, _), None),
-    (h4(_, _), None),
-    (h5(_, _), None),
-    (h6(_, _), None)
+    (h1(_, _, _), None),
+    (h2(_, _, _), None),
+    (h3(_, _, _), None),
+    (h4(_, _, _), None),
+    (h5(_, _, _), None),
+    (h6(_, _, _), None)
   )
 
   var structure = Node("root", mutable.Buffer.empty)
@@ -54,16 +54,17 @@ case class sect(name: String, subname: String = ""){
   sect.structure = newNode
   def apply(args: Frag*) = {
     val wrappedContents = contentWrap.getOrElse((x: Frag) => x)(args)
+
     val headingAnchor = a(
+      cls:="header-link",
       href:=s"#${sect.munge(name)}",
-      cls:="content-link",
-      title:="Heading anchor"
+      " ",
+      i(cls:="fa fa-link")
     )
     val res = Seq[Frag](
-      headerWrap(name, subname)(
+      headerWrap(name, subname, headingAnchor)(
         cls:="content-subhead",
-        id:=sect.munge(name),
-        headingAnchor
+        id:=sect.munge(name)
       ),
       wrappedContents
     )

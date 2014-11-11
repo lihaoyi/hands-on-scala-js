@@ -1,7 +1,12 @@
 body {
     color: #777;
 }
-
+*{
+    position: relative;
+}
+p{
+    text-align: justify;
+}
 #main{
     position: fixed;
     max-width: 100%;
@@ -275,6 +280,27 @@ code{
 }
 .half-table th{
     width: 50%;
+}
+.header-link{
+    position: absolute;
+    right: 0px;
+}
+*:hover > .header-link:hover{
+    opacity: 1.0;
+}
+*:hover > .header-link:active{
+    opacity: 0.75;
+}
+*:hover > .header-link{
+    text-align: right;
+    text-decoration: none;
+    opacity: 0.5;
+}
+.header-link > i{
+    color: #777;
+}
+.header-link{
+    opacity: 0.05;
 }
 /*Workaround for bug in highlight.js IDEA theme*/
 .hljs-tag, .hljs-symbol{
