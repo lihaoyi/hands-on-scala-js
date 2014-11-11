@@ -4,18 +4,18 @@
   There are many reasons you may want to port a Java class to Scala.js: you want to use it directly, you may be trying to port a library which uses it. In general, we haven't been porting things "for fun", and obscure classes like @hl.scala{org.omg.corba} will likely never be ported: we've been porting things as the need arises in order to support libraries (e.g. @a("Scala.Rx", href:="https://github.com/lihaoyi/scala.rx") that need them.
 
 @sect{Available Java APIs}
-  
+
   @ul
-    @for(data <- Book.javaAPIs)
+    @for(data <- BookData.javaAPIs)
       @li
         @a(data._1, href:=data._2)
-  
+
 @sect{Porting Java APIs}
   @p
     The process for making Java library classes available in Scala.js is relatively straightforward:
   @ul
     @li
-      Find a class that you want to use in Scala.js, but is not implemented. 
+      Find a class that you want to use in Scala.js, but is not implemented.
     @li
       Write a clean-room implementation in Scala, without looking at the source code of @a("OpenJDK", href:="http://openjdk.java.net/"). This is due to legal-software-license incompatibility between OpenJDK and Scala.js. Reading the docs or specification are fine, as is looking at the source of alternate implementations such as @a("Harmony", href:="http://harmony.apache.org/")
     @li

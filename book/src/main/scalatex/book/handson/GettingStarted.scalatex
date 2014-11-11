@@ -3,15 +3,15 @@
   To get started with Scala.js, you will need to prepare a few things:
 
 @ul
-  @li 
+  @li
     @a("sbt", href:="http://www.scala-sbt.org/"): SBT is the most common build-tool in the Scala community, and is what we will use for building our Scala.js application. Their home page has a link to download and install it.
-  @li 
-    An editor for Scala: @a("IntelliJ Scala", href:="http://blog.jetbrains.com/scala/") and @a("Eclipse ScalaIDE", href:="http://scala-ide.org/") are the most popular choices and work on all platforms, though there are others. 
+  @li
+    An editor for Scala: @a("IntelliJ Scala", href:="http://blog.jetbrains.com/scala/") and @a("Eclipse ScalaIDE", href:="http://scala-ide.org/") are the most popular choices and work on all platforms, though there are others.
   @li
     @a("Git", href:="http://git-scm.com/"): This is a version-control system that we will use to download and manage our Scala.js projects.
-  @li 
+  @li
     A terminal: on OSX you have @a("Terminal.app", href:="http://guides.macrumors.com/Terminal") already installed, in Linux you have @a("Terminal", href:="https://help.ubuntu.com/community/UsingTheTerminal"), and on Windows you have @a("PowerShell", href:="http://en.wikipedia.org/wiki/Windows_PowerShell").
-  @li 
+  @li
     Your favorite web browser: @a("Chrome", href:="https://www.google.com/chrome") and @a("Firefox", href:="https://www.mozilla.org/en-US/firefox") are the most popular.
 
 @p
@@ -58,7 +58,7 @@
   [success] Total time: 11 s, completed Oct 26, 2014 3:42:21 PM
   1. Waiting for source changes... (press enter to interrupt)
 
-@p 
+@p
   The line @code{Waiting for source changes...} is telling you that your Scala.js program is ready! Now, when you go to the web URL @code{http://localhost:12345/target/scala-2.11/classes/index-dev.html} in your browser, you should see the following:
 
   @img(src:="images/Hello World.png", maxWidth:="100%")
@@ -98,7 +98,7 @@
   @p
     We've downloaded, compiled, ran, and made changes to our first Scala.js application. Let's now take a closer look at the code that we just ran:
 
-  @hl.ref("output/workbench-example-app/src/main/scala/example/ScalaJSExample.scala")      
+  @hl.ref("output/workbench-example-app/src/main/scala/example/ScalaJSExample.scala")
 
   @p
     It's a good chunk of code, though not a huge amount. To someone who didn't know about Scala.js, they would just think it's normal Scala, albeit with this unusual @hl.scala{dom} library and a few weird annotations. Let's pick it apart starting from the top:
@@ -124,7 +124,7 @@
   @p
     @hl.scala{document.getElementById} is the exact same API that's used in normal Javascript, as documented @a("here", href:="https://developer.mozilla.org/en-US/docs/Web/API/document.getElementById"). In fact, the entire @hl.scala{org.scalajs.dom} namespace (imported at the top of the file) comprises statically typed facades for the javascript APIs provided by the browser.
 
-  @p 
+  @p
     We need to perform the @hl.scala{asInstanceOf} call because depending on what you pass to @hl.scala{getElementById} and @hl.scala{getContext}, you could be returned elements and contexts of different types. Hence we need to tell the compiler explicitly that we're expecting a @hl.scala{dom.HTMLCanvasElement} and @hl.scala{dom.CanvasRenderingContext2D} back from these methods for the strings we passed in.
 
   @hl.ref("output/workbench-example-app/src/main/scala/example/ScalaJSExample.scala", "def run", "dom.setInterval")
@@ -133,13 +133,13 @@
     This is the part of the Scala.js program which does the real work. It runs 10 iterations of a @a("small algorithm", href:="http://en.wikipedia.org/wiki/Sierpinski_triangle#Chaos_game") that generates a Sierpinski Triangle point-by-point. The steps, as described by the linked article, are roughly:
 
   @ul
-    @li 
+    @li
       Pick a random corner of the large-triangle
-    @li 
+    @li
       Move your current-position @hl.scala{p} halfway between its current location and that corner
-    @li 
+    @li
       Draw a dot
-    @li 
+    @li
       Repeat
 
   @p
@@ -164,17 +164,17 @@
     @p
       Of the two, only the Scala.js plugin is really necessary. The Workbench plugin is a convenience that makes development easier. Without it you'd need to keep a terminal open to view the SBT logspam, and manually refresh the page when compilation finished. Not the end of the world.
 
-      
+
   @sect{build.sbt}
     @hl.ref("output/workbench-example-app/build.sbt")
 
     @p
       The @code{build.sbt} project file for this application is similarly unremarkable: It includes the settings for the two SBT plugins we saw earlier, as well as boilerplate @hl.scala{name}/@hl.scala{version}/@hl.scala{scalaVersion} values common to all projects.
 
-    @p 
+    @p
       Of interest is the @hl.scala{libraryDependencies}. In Scala-JVM, this key is used to declare dependencies on libraries from Maven Central, so you can use them in your Scala-JVM projects. In Scala.js, the same key is used to declare dependencies on libraries so you can use them in your Scala.js projects! Re-usable libraries can be built and published with Scala.js just as you do on Scala-JVM, and here we make use of one which provides the typed facades with which we used to access the DOM in the application code.
 
-    @p 
+    @p
       Lastly, we have two Workbench related settings: @hl.scala{bootSnippet} basically tells Workbench how to restart your application when a new compilation run finishes, and @hl.scala{updateBrowsers} actually tells it to perform this application-restarting.
 
   @sect{src/main/resources/index-dev.html}
@@ -185,7 +185,7 @@
 
     @p
       The @hl.scala{ScalaJSExample().main()} call is what kicks off the Scala.js application and starts its execution. Scala.js follows Scala semantics in that @hl.scala{object}s are evaluated lazily, with no top-level code allowed. This is in contrast to Javascript, where you can include top-level statements and object-literals in your code which execute immediately. In Scala.js, nothing happens when @code{../example-fastopt.js} is imported! We have to call the main-method first. In this case, we're passing the canvas object (attained using @hl.javascript{getElementById}) to it so it knows where to do its thing.
-    
+
     @p
       Lastly, only @hl.scala("@JSExport")ed objects and methods can be called from Javascript. Also, although this example only exports the @hl.scala{main} method which is called once, there is nothing stopping you from exporting any number of objects and methods and calling them whenever you need to. In this way, you can easily make a Scala.js "library" which is available to external Javascript as an API.
 
@@ -251,7 +251,7 @@
       haoyi-mbp:temp haoyi$ du -h target/scala-2.11/example-opt.js
       144K  target/scala-2.11/example-opt.js
 
-    @p 
+    @p
       144 Kilobytes! Better. Not great, though! In general, Scala.js does not produce tiny executables, although the output size of the compiled executables is dropping all the time. If you look inside that file, you'll see all of the long identifiers have been replaced by short ones by the Google Closure Compiler.
 
     @hl.javascript("""
@@ -269,7 +269,7 @@
       Even the fully-optimized version of our toy Scala.js app are pretty large. There are some factors that mitigate the large size of these executables:
 
     @ul
-      @li 
+      @li
         A large portion of this 144k is the Scala standard library, and so the size of the compiled blob does not grow that fast as your program grows. For example, while this ~50 line application is 144k, a much larger ~2000 line application is only 288k.
       @li
         This size is pre-@a("gzip", href:="http://en.wikipedia.org/wiki/Gzip"), and most webservers serve their contents compressed via gzip to reduce the download size. Gzip cuts the actual download size down to 43k, which is more acceptable.
@@ -293,17 +293,17 @@
     If you've made it this far, you've downloaded, made modifications to, and published a toy Scala.js application. At the same time, we've gone over many of the key concepts in the Scala.js development process:
 
   @ul
-    @li 
+    @li
       Getting a Scala.js application
     @li
       Building it and seeing it work in the browser
-    @li 
+    @li
       Made modifications to it to see it update
     @li
       Examined the source code to try and understand what it's doing
     @li
       Examined the output code, at two levels of optimization, to see how the Scala.js compiler works
-    @li 
+    @li
       Packaged the application in a form that can be easily published online
 
   @p
@@ -323,4 +323,4 @@
       Try publishing the output code somewhere. You only need @code{example-opt.js} and @code{index-opt.html}; try putting them somewhere online where the world can see it.
 
   @p
-    When you're done poking around our toy web application, read on to the next chapter, where we will explore making something more meaty using the Scala.js toolchain! 
+    When you're done poking around our toy web application, read on to the next chapter, where we will explore making something more meaty using the Scala.js toolchain!

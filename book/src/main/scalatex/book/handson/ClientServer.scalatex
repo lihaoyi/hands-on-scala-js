@@ -31,7 +31,7 @@
         └── src/main/scala/simple
                            ├── Page.scala
                            └── Server.scala
-  
+
   @p
     First, let's do the wiring in @code{build.sbt}:
 
@@ -41,7 +41,7 @@
     We have two projects: @code{client} and @code{server}, one of which is a Scala.js project (indicated by the presence of @hl.scala{scalaJSSettings}). Both projects share a number of settings: the presence of the @code{shared/} folder, which shared code can live in (similar to what we saw in Cross-platform Modules) and the settings to add Scalatags and uPickle to the build. Note that those two dependencies use the triple @code{%%%} instead of the double @code{%%} to declare: this means that for each dependency, we will pull in the Scala-JVM or Scala.js version depending on whether it's being used in a Scala.js project.
   @p
     The @code{client} subproject is uneventful, with a dependency on the by-now-familiar @code{scalajs-dom} library. The @code{server} project, on the other hand, is interesting: it contains the dependencies required for us to set up out Spray server, and one additioanl thing: we add the output of @code{fastOptJS} from the client to the @code{resources} on the server. This will allow the @code{server} to serve the compiled-javascript from our @code{client} project from its resources.
-  
+
   @p
     Next, let's kick off the Spray server in our Scala-JVM main method:
 
@@ -92,7 +92,7 @@
 
   @sect{Boilerplate-free Serialization}
     @p
-      The Ajax/RPC layer is one of the more fragile parts of web applications. Often, you have your various Ajax endpoints written once on the server, have a set of routes written to connect those Ajax endpoints to URLs, and client code (traditionally Javascript) made calls to those URLs with "raw" data: basically whatever you wanted, packed in an ad-hoc mix of CSV and JSON and raw-strings. 
+      The Ajax/RPC layer is one of the more fragile parts of web applications. Often, you have your various Ajax endpoints written once on the server, have a set of routes written to connect those Ajax endpoints to URLs, and client code (traditionally Javascript) made calls to those URLs with "raw" data: basically whatever you wanted, packed in an ad-hoc mix of CSV and JSON and raw-strings.
 
     @p
       This has always been annoying boilerplate, and Scala.js removes it. With uPickle, you can simply call @hl.scala{upickle.write(...)} and @hl.scala{upickle.read[T](...)} to convert your collections, primitives or case-classes to and from JSON. This means you do not need to constantly re-invent different ways of making Ajax calls: you can just fling the data right across the network from client to server and back again.

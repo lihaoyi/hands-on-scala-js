@@ -18,7 +18,7 @@
     @code{package}: bundling up our Scala.js IR into a @code{.jar} file, for publishing or distribution as a library
   @li
     @code{fastOptJS}: aggregating our Scala.js IR and converting it to a @code{.js} executable.
-  @li   
+  @li
     @code{fullOptJS}: aggregating our Scala.js IR and converting it to a smaller, faster @code{.js} executable.
   @li
     @code{run}: run your compiled Scala.js code as Javascript in Rhino, Node.js or Phantom.js
@@ -94,7 +94,7 @@
     @p
       Again, I won't go into much details, as exactly what this optimization does is described in the chapter on the Compilation Pipeline. This command is somewhat too-slow to be running during iterative development, and is instead typically used just before deployment to minimize the size of the file your users have to download.
 
-  @sect{The run Command} 
+  @sect{The run Command}
     @hl.bash
       > run
     @p
@@ -111,7 +111,7 @@
 
     @p
       Running @code{sbt run} with the above Scala.js code will print out
-    
+
     @hl.bash
       Hello World!
       In Scala.js, 1/0 is 0!
@@ -133,12 +133,12 @@
     @p
       Typically, the best way to get started is using Rhino and @code{sbt run}, since it's setup-free, and setting up Node.js or PhantomJS later as necessary. The next two sections elaborate on the differences between these ways of running your code. Check out the later sections on Headless Runtimes and Run Configurations to learn more about the other settings and why you would want to use them.
 
-  @sect{The test Command} 
+  @sect{The test Command}
     @hl.bash
       > test
 
     @p
-      The @code{sbt test} command behaves very similar to @code{sbt run}. It can also be prefixed e.g. @code{sbt fastOptStage::run} or @code{sbt fullOptStage::run}, or run in either Rhino, Node.js or PhantomJS. 
+      The @code{sbt test} command behaves very similar to @code{sbt run}. It can also be prefixed e.g. @code{sbt fastOptStage::run} or @code{sbt fullOptStage::run}, or run in either Rhino, Node.js or PhantomJS.
     @p
       The difference is that instead of simply running your @code{main} method, @code{sbt test} runs whatever test-suite you have set-up, which will look through your @code{tests/} folder to find suites of tests it has to run, and aggregate the results formatted nicely for you to see. The exact operation of this depends on which testing library you're using
     @p
@@ -161,7 +161,7 @@
 
   @ul
     @li
-      @code{sbt run}: this does not perform any optimization of the output Scala.js files, and does lazy-loading to minimize the amount of files being loading into the interpreter. This is necessary for Rhino because it can't handle large blobs of Javascript, but doesn't map to any compilation mode you'd use for the browser. 
+      @code{sbt run}: this does not perform any optimization of the output Scala.js files, and does lazy-loading to minimize the amount of files being loading into the interpreter. This is necessary for Rhino because it can't handle large blobs of Javascript, but doesn't map to any compilation mode you'd use for the browser.
     @li
       @code{sbt fastOptStage::run}: this performs the same compilation and optimization as @code{sbt fastOptJS}, as described under Fast Optimizations. It then takes the entire output executable (which probably weighs around 1mb) and hands it to Node.js or PhantomJS, which then run it.
     @li

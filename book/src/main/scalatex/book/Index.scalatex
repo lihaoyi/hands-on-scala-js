@@ -18,45 +18,45 @@
     This book does not spend time on pontifying a philosophy or ideology behind Scala.js or Scala. It instead spends its words on hands-on tutorials and in-depth dives into parts of the Scala.js platform, to try and get you acquainted with Scala.js as soon as possible, so you can make your own decisions about its merits or qualities.
 
   @sect("Intro to Scala.js")
-    @Intro.template
+    @Intro()
 
 @sect("Hands On", "Writing your first Scala.js programs")
   @p
     This half of the book walks you through various facets of the Scala.js development experience. From making your first app, to testing and publishing modules, to writing an integrated client-server application.
 
   @sect("Getting Started")
-    @handson.GettingStarted.template
+    @handson.GettingStarted()
 
   @sect("Making a Canvas App")
-    @handson.CanvasApp.template
+    @handson.CanvasApp()
 
   @sect("Interactive Web Pages")
-    @handson.WebPage.template
+    @handson.WebPage()
 
   @sect("The Command Line")
-    @handson.CommandLine.template
+    @handson.CommandLine()
 
   @sect("Publishing Modules")
-    @handson.PublishingModules.template
+    @handson.PublishingModules()
 
   @sect("Integrating Client-Server")
-    @handson.ClientServer.template
+    @handson.ClientServer()
 
 @sect("Scala.js in Depth", "Exploring Scala.js")
   @p
     This half of the book dives into a few aspects of Scala.js much more deeply that the hands-on introduction does. It's aimed at someone who has already used Scala.js, and wants to explore the edge-cases, how things work under-the-cover, or why it has been designed in such a way. It's not a formal specification; rather, it's aim is to be a useful reference to read instead of (or in preparation for) digging into the implementation code.
 
   @sect("Javascript Interoperability")
-    @indepth.JavascriptInterop.template
+    @indepth.JavascriptInterop()
 
   @sect("Deviations from Scala-JVM")
-    @indepth.SemanticDifferences.template
+    @indepth.SemanticDifferences()
 
   @sect("The Compilation Pipeline")
-    @indepth.CompilationPipeline.template
+    @indepth.CompilationPipeline()
 
   @sect("Scala.js' Design Space")
-    @indepth.DesignSpace.template
+    @indepth.DesignSpace()
 
   @sect("Java APIs")
-    @indepth.JavaAPIs.template
+    @indepth.JavaAPIs()

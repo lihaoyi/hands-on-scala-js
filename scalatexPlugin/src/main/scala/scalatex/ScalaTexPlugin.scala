@@ -49,11 +49,10 @@ class ScalaTexPlugin(val global: Global) extends Plugin {
 
           val shim = s"""
             $pkgName
-            import Book._
-            import Utils.sect
+            import BookData._
             import scalatags.Text.all._
             object $objectName{
-              val template = scalatex.twf("${file.getPath}")
+              def apply() = scalatex.twf("${file.getPath}")
             }
           """
           unit.body = global.newUnitParser(shim).parse()

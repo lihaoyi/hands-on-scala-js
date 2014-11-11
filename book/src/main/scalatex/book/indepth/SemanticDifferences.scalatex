@@ -36,7 +36,7 @@
         @hl.scala{2147483648} (> @hl.scala{Int.MaxValue}) matches @hl.scala{Float}, @hl.scala{Double}
       @li
         @hl.scala{1.2} matches @hl.scala{Float}, @hl.scala{Double}
-    @p      
+    @p
       As a consequence, the following apparent subtyping relationship holds:
 
     @hl.scala
@@ -111,7 +111,7 @@
       Note that this also includes calls like
     @hl.scala
       val A,B,C,D = Value
-    @p    
+    @p
       since they are desugared into separate val definitions.
     @p
       Calls to either of these two methods which could not be rewritten, or calls to constructors of the protected Val class without an explicit name as parameter, will issue a warning.
@@ -133,11 +133,11 @@
   @p
     This table gives a quick overview of the sorts of libraries you can and can't use when working on Scala.js:
 
-  @table 
+  @table
     @thead
       @th{Can Use}@th{Can't Use}
     @tbody
-      @for(tuple <- Book.myTable)
+      @for(tuple <- BookData.myTable)
         @tr
           @td{@tuple._1}@td{@tuple._2}
 
@@ -145,11 +145,11 @@
     We'll go into each section bit by bit
 
   @sect{Standard Library}
-    @table 
+    @table
       @thead
         @th{Can Use}@th{Can't Use}
       @tbody
-        @for(tuple <- Book.myTable.slice(0, 3))
+        @for(tuple <- BookData.myTable.slice(0, 3))
           @tr
             @td{@tuple._1}@td{@tuple._2}
 
@@ -159,11 +159,11 @@
       There isn't a full list of library APIs which are available from Scala.js, but a rough idea can be had from looking the the source code @a("on", href:="https://github.com/scala-js/scala-js/tree/master/javalanglib/src/main/scala/java/lang") @a("github", href:="https://github.com/scala-js/scala-js/tree/master/javalib/src/main/scala/java").
 
   @sect{Reflection v.s. Macros}
-    @table 
+    @table
       @thead
         @th{Can Use}@th{Can't Use}
       @tbody
-        @for(tuple <- Book.myTable.slice(3, 4))
+        @for(tuple <- BookData.myTable.slice(3, 4))
           @tr
             @td{@tuple._1}@td{@tuple._2}
 
@@ -171,31 +171,31 @@
       As described @a("here"), in Reflection is not supported in Scala.js, due to the way it inhibits optimization. This doesn't just mean you can't use reflection yourself: many third-party libraries also use reflection, and you won't be able to use them either.
 
     @p
-      On the other hand, Scala.js does support Macros, and macros can in many ways substitute many of the use cases that people have traditionally used reflection for. For example, instead of using a reflection-based serialization library like @code{scala-pickling}, you can use a macro-based library such as @code{upickle}. 
+      On the other hand, Scala.js does support Macros, and macros can in many ways substitute many of the use cases that people have traditionally used reflection for. For example, instead of using a reflection-based serialization library like @code{scala-pickling}, you can use a macro-based library such as @code{upickle}.
 
   @sect{Pure-Scala v.s. Java Libraries}
-    @table 
+    @table
       @thead
         @th{Can Use}@th{Can't Use}
       @tbody
-        @for(tuple <- Book.myTable.slice(4, 5))
+        @for(tuple <- BookData.myTable.slice(4, 5))
           @tr
             @td{@tuple._1}@td{@tuple._2}
     @p
       Scala.js has access to any pure-Scala libraries that you have cross-compiled to Scala.js, and cross-compiling a pure-Scala library with no dependencies is straightforward. Many of them, such as the ones listed above, have already been cross-compiled and can be used via their maven coordinates.
     @p
-      You cannot use any libraries which have a Java dependency. This means libraries like Scalatest or Scalate, which depend on a number of external Java libraries or source files, cannot be used from Scala.js. You can only use libraries which have no dependency on Java libraries or sources. 
+      You cannot use any libraries which have a Java dependency. This means libraries like Scalatest or Scalate, which depend on a number of external Java libraries or source files, cannot be used from Scala.js. You can only use libraries which have no dependency on Java libraries or sources.
 
   @sect{Javascript APIs v.s. JVM APIs}
-    @table 
+    @table
       @thead
         @th{Can Use}@th{Can't Use}
       @tbody
-        @for(tuple <- Book.myTable.slice(5, 7))
+        @for(tuple <- BookData.myTable.slice(5, 7))
           @tr
             @td{@tuple._1}@td{@tuple._2}
 
-    @p 
+    @p
       Apart from depending on Java sources, the other thing that you can't use in Scala.js are JVM-specific APIs. This means that anything which goes down to the underlying operating system, filesystem, GUI or network are unavailable in Scala.js. This makes sense when you consider that these capabilities are no provided by the browser which Scala.js runs in, and it's impossible to re-implement them ourselves.
     @p
       In exchange for this, Scala.js provides you access to Browser APIs that do related things. Although you can't set up a HTTP server to take in-bound requests, you can make out-bound requests using @hl.scala{dom.XMLHttpRequest} to other servers. You can't write to the filesystem or databases directly, but you can write to the @hl.scala{dom.localStorage} provided by the browser. You can't use Swing or AWT or WebGL but instead work with the DOM and Canvas and WebGL.
@@ -204,18 +204,18 @@
 
 
   @sect{Java tooling v.s. Scala/Browser tooling}
-    @table 
+    @table
       @thead
         @th{Can Use}@th{Can't Use}
       @tbody
-        @for(tuple <- Book.myTable.slice(7, 8))
+        @for(tuple <- BookData.myTable.slice(7, 8))
           @tr
             @td{@tuple._1}@td{@tuple._2}
 
-    
+
     @p
       Lastly, there is the matter of tools. Naturally, all the Scala tools which depend on the JVM are out. This means things like the Yourkit, VisualVM and JProfiler profilers, as well as things like the Scala command-line REPL which relies on classloaders and other such things to run on the JVM
     @p
       On the other hand, you do get to keep and continue using many tools which are build for Scala but JVM-agnostic. For example, IDEs such a IntelliJ and Eclipse work great with Scala.js; from their point of view, it's just Scala, and things like code-navigation, refactoring and error-highlighting all work out of the box. SBT works with Scala.js too, and you see the same compile-erorrs in the command-line as you would in vanilla Scala, and even things like incremental compilation work un-changed.
     @p
-      Lastly, you gain access to browser tools that don't work with normal Scala: you can use the Chrome or Firefox consoles to poke at your Scala.js application from the command line, or their profilers/debuggers. With source maps set up, you can even step-through debug your Scala.js application directly in Chrome. 
+      Lastly, you gain access to browser tools that don't work with normal Scala: you can use the Chrome or Firefox consoles to poke at your Scala.js application from the command line, or their profilers/debuggers. With source maps set up, you can even step-through debug your Scala.js application directly in Chrome.

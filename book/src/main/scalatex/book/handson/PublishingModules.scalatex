@@ -50,7 +50,7 @@
 
     @p
       In @code{Simple.scala} we have the shared, cross-platform API of our library: a single @hl.scala{object} with a single method @hl.scala{def} which does what we want, which can then be used in either Scala.js or Scala-JVM. In general, you can put as much shared logic here as you want: classes, objects, methods, anything that can run on both Javascript and on the JVM. We're chopping off the last 5 characters (the milliseconds) to keep the formatted dates slightly less verbose.
-    
+
     @p
       However, when it comes to actually formatting the date, we have a problem: Javascript and Java provide different utilities for formatting dates! They both let you format them, but they provide different APIs. Thus, to do the formatting of each individual date, we call out to the @hl.scala{Platform.format} function, which is implemented twice: once in @code{js/} and once in @code{jvm/}:
 
@@ -62,14 +62,14 @@
         @hl.ref("examples/crossBuilds/simple/jvm/src/main/scala/simple/Platform.scala")
 
     @p
-      In the @code{js/} version, we are using the Javascript @hl.javascript{Date} object to take the millis and do what we want. In the @code{jvm/} version, we instead use @hl.scala{java.text.SimpleDateFormat} with a custom formatter (The syntax is defined @a("here", href:="http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html")). 
-   
+      In the @code{js/} version, we are using the Javascript @hl.javascript{Date} object to take the millis and do what we want. In the @code{jvm/} version, we instead use @hl.scala{java.text.SimpleDateFormat} with a custom formatter (The syntax is defined @a("here", href:="http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html")).
+
     @p
       Again, you can put as much platform-specific logic in these files as you want, to account for differences in the available APIs. Maybe you want to use @hl.scala{js.JSON.parse} for parsing JSON blobs in @code{js/}, but @hl.scala{Jackson} or @hl.scala{GSON} for parsing them in @code{jvm/}.
     @p
       Lastly, you'll also have noticed the two identical @hl.scala{main} methods in the platform-specific code. This is an implementation detail around the fact that Scala.js picks up the main method differently from Scala-JVM, using @hl.scala{js.JSApp} instead of looking for a @hl.scala{main(args: Array[String]): Unit} method. These two main methods allow us to test our implementations
   @sect{Running the Module}
-    @hl.bash 
+    @hl.bash
       > ; js/run; jvm/run
       [info] Running simple.Platform
       Running on JS! 1
@@ -86,15 +86,15 @@
       As you can see, both runs printed the same results, modulo three things:
 
     @ul
-      @li 
-        The "Running on XXX!" statement which shows us we're actually running on two platforms. 
+      @li
+        The "Running on XXX!" statement which shows us we're actually running on two platforms.
       @li
         The other hint is the time taken: the second run is instant while the first takes three seconds! This is because by default we run on @a("Rhino", href:="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino"), which is a simple interpreter hundreds of times slower than running code natively on the JVM.
       @li
         In Scala-JVM the double 1.0 is printed as @code{1.0}, while in Scala.js it's printed as @code{1}. This is one of a small number of differences between Scala.js and Scala-JVM, and verifies that we are indeed running on both platforms!
 
     @p
-      You've by this point set up a basic cross-building Scala.js/Scala-JVM project! 
+      You've by this point set up a basic cross-building Scala.js/Scala-JVM project!
 
   @hr
 
@@ -106,7 +106,7 @@
       Flesh it out! Currently this module only does a single, trivial thing. If you've done any web development before, I'm sure you can find some code snippet, function or algorithm that you'd like to share between client and server. Try implementing it in the @code{shared/} folder to be usable in both Scala.js and Scala-JVM
     @li
       Publish it! Both @code{sbt publishLocal} and @code{sbt publishSigned} work on this module, for publishing either locally, Maven Central via Sonatype, or Bintray. Running the command bare should be sufficient to publish both the @code{js} or @code{jvm} projects, or you can also specify which one e.g. @code{jvm/publishLocal} to publish only one subproject.
-  
+
   @p
     This @code{jvm} project works identically to any other Scala-JVM project, and the @code{js} project works identically to the Command Line API described earlier. Thus you can do things like @code{fastOptStage::run} to run the code on Node.js, setting @hl.scala{requiresDOM := true}, run @code{fullOptStage::run} to run the code with full, aggressive optimizations. And of course, things that work in both Scala.js and Scala-JVM can be run on both, basic commands such as code{run} or @code{test}.
 
@@ -174,7 +174,7 @@
       [success] Total time: 0 s, completed Nov 8, 2014 7:42:39 PM
 
     @p
-      And you'll see that we've run our unit tests twice: once on Scala.js in Rhino, and once on Scala-JVM! As expected, the first run in Rhino took much longer (4 seconds!) than the second, as Rhino is much slower than running code directly on the JVM. You can configure the Scala.js run to run in Node.js or PhantomJS, as well as running under different optimization levels. 
+      And you'll see that we've run our unit tests twice: once on Scala.js in Rhino, and once on Scala-JVM! As expected, the first run in Rhino took much longer (4 seconds!) than the second, as Rhino is much slower than running code directly on the JVM. You can configure the Scala.js run to run in Node.js or PhantomJS, as well as running under different optimization levels.
 
   @hr
 

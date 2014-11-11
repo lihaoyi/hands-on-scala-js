@@ -3,46 +3,8 @@ package book
 import acyclic.file
 import scala.collection.mutable
 import scalatags.Text.all._
-
-case class Node(name: String, children: mutable.Buffer[Node])
-object Utils{
-  val autoResources = Seq(
-    "META-INF/resources/webjars/highlightjs/8.2-1/highlight.min.js",
-    "META-INF/resources/webjars/highlightjs/8.2-1/styles/idea.min.css",
-    "META-INF/resources/webjars/highlightjs/8.2-1/languages/scala.min.js",
-    "META-INF/resources/webjars/highlightjs/8.2-1/languages/javascript.min.js",
-    "META-INF/resources/webjars/highlightjs/8.2-1/languages/bash.min.js",
-    "META-INF/resources/webjars/highlightjs/8.2-1/languages/diff.min.js",
-    "META-INF/resources/webjars/highlightjs/8.2-1/languages/xml.min.js",
-    "css/pure-min.css",
-    "css/grids-responsive-min.css",
-    "css/layouts/side-menu.css",
-    "js/ui.js",
-    "example-fastopt.js",
-    "webpage/weather.js"
-  )
-  
-  val manualResources = Seq(
-    "images/javascript-the-good-parts-the-definitive-guide.jpg",
-    "images/Hello World.png",
-    "images/Hello World White.png",
-    "images/Hello World Console.png",
-    "images/IntelliJ Hello.png",
-    "images/Dropdown.png",
-    "images/Scalatags Downloads.png"
-  )
-  
-  val includes = for(res <- Utils.autoResources) yield {
-    if (res.endsWith(".js"))
-      script(src:=res)
-    else if (res.endsWith(".css"))
-      link(rel:="stylesheet", href:=res)
-    else
-      raw("")
-  }
-
+object sect{
   var indent = 0
-
 
   val headers = Seq[((String, String) => scalatags.Text.Tag, Option[Frag => Frag])](
     ((h, s) => div(cls:="header")(
@@ -50,7 +12,7 @@ object Utils{
       h2(s)
     ), Some(f => div(cls:="content", f))),
     ((h, s) => div(cls:="header")(
-      h1(id:=Utils.munge(h), h),
+      h1(id:=munge(h), h),
       br
     ), None),
     (h1(_, _), None),
@@ -61,27 +23,89 @@ object Utils{
     (h6(_, _), None)
   )
 
-  var structure: Node = null
-  case class sect(name: String, subname: String = ""){
-    indent += 1
-    val newNode = Node(name, mutable.Buffer.empty)
-    val (headerWrap, contentWrap) = headers(indent-1)
-    if (structure!= null) structure.children.append(newNode)
-    val prev = structure
-    structure = newNode
-    def apply(args: Frag*) = {
-      val wrappedContents = contentWrap.getOrElse((x: Frag) => x)(args)
-      val res = Seq[Frag](
-        if (name == "") ""
-        else headerWrap(name, subname)(cls:="content-subhead", id:=munge(name)),
-        wrappedContents
-      )
-      indent -= 1
-      if (prev != null) structure = prev
-      res
-    }
-  }
+  var structure = Node("root", mutable.Buffer.empty)
+
   def munge(name: String) = {
     name.replace(" ", "")
+  }
+}
+case class sect(name: String, subname: String = ""){
+  sect.indent += 1
+  val newNode = Node(name, mutable.Buffer.empty)
+  val (headerWrap, contentWrap) = sect.headers(sect.indent-1)
+  sect.structure.children.append(newNode)
+  val prev = sect.structure
+  sect.structure = newNode
+  def apply(args: Frag*) = {
+    val wrappedContents = contentWrap.getOrElse((x: Frag) => x)(args)
+    val res = Seq[Frag](
+      if (name == "") ""
+      else headerWrap(name, subname)(cls:="content-subhead", id:=sect.munge(name)),
+      wrappedContents
+    )
+    sect.indent -= 1
+    sect.structure = prev
+    res
+  }
+}
+case class Node(name: String, children: mutable.Buffer[Node])
+
+object hl{
+  def highlight(snippet: Seq[String], lang: String) = {
+    val string = snippet.mkString
+    val lines = string.split("\n", -1)
+    if (lines.length == 1){
+      code(cls:=lang + " highlight-me", lines(0), padding:=0, display:="inline")
+    }else{
+      val minIndent = lines.map(_.takeWhile(_ == ' ').length)
+        .filter(_ > 0)
+        .min
+      val stripped = lines.map(_.drop(minIndent))
+        .dropWhile(_ == "")
+        .mkString("\n")
+
+      pre(code(cls:=lang + " highlight-me", stripped))
+    }
+  }
+
+  def javascript(code: String*) = highlight(code, "javascript")
+  def scala(code: String*) = highlight(code, "scala")
+  def bash(code: String*) = highlight(code, "bash")
+  def diff(code: String*) = highlight(code, "diff")
+  def html(code: String*) = highlight(code, "xml")
+
+  def ref(filepath: String, start: String = "", end: String = "\n") = {
+
+    val lang = filepath.split('.').last match {
+      case "js" => "javascript"
+      case "scala" => "scala"
+      case "sbt" => "scala"
+      case "sh" => "bash"
+      case "html" => "xml"
+      case x =>
+        println("??? " + x)
+        ???
+    }
+
+    val lines = io.Source.fromFile(filepath).getLines().toVector
+
+    def indent(line: String) = line.takeWhile(_.isWhitespace).length
+
+    val startLine = lines.indexWhere(_.contains(start))
+    if (startLine == -1){
+      throw new Exception("Can't find marker: " + start)
+    }
+    val whitespace = indent(lines(startLine))
+    val endLine = lines.indexWhere(
+      line => line.contains(end) || (indent(line) < whitespace && line.trim != ""),
+      startLine
+    )
+    val sliced =
+      if (endLine == -1) lines.drop(startLine)
+      else lines.slice(startLine, endLine)
+    val blob = sliced.map(_.drop(whitespace)).mkString("\n")
+
+
+    pre(code(cls:=lang + " highlight-me", blob))
   }
 }

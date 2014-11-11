@@ -3,7 +3,7 @@
 
 
 @sect("Why No Reflection?")
-  @p  
+  @p
     Scala.js prohibits reflection as it makes dead-code elimination difficult, and the compiler relies heavily on dead-code elimination to generate reasonably-sized executables. The chapter on the Compilation Pipeline goes into more detail of why, but a rough estimate of the effect of various optimizations on a small application is:
 
   @ul
@@ -11,13 +11,13 @@
       @b{Full Output} - ~20mb
     @li
       @b{Naive Dead-Code-Elimnation} - ~800kb
-    @li 
+    @li
       @b{Inlining Dead-Code-Elimnation} - ~600kb
     @li
       @b{Minified by Google Closure Compiler} - ~200kb
 
   @p
-    The default output size of 20mb makes the executables difficult to work with. Even though browsers can deal with 20mb Javascript blobs, it takes the browser several seconds to even load it, and up to a minute after that for the JIT to optimize the whole thing. 
+    The default output size of 20mb makes the executables difficult to work with. Even though browsers can deal with 20mb Javascript blobs, it takes the browser several seconds to even load it, and up to a minute after that for the JIT to optimize the whole thing.
 
   @sect{Dead Code Elimination}
     @p
@@ -56,7 +56,7 @@
   @sect{Whither Reflection?}
     @p
       To imagine why reflection makes this difficult, imagine a slightly modified program which includes some reflective calls in @hl.scala{App.main}
-    
+
     @hl.scala
       @@JSExport
       object App extends js.JSApp{
@@ -74,7 +74,7 @@
     @p
       Here, we're assuming @hl.scala{userInput()} is some method which returns a @hl.scala{String} that was input by the user or otherwise somehow decided at runtime.
     @p
-      We can start the same process: @hl.scala{App.main} is live since we @hl.scala{@@JSExport}ed it, but what objects or methods are reachable from @hl.scala{App.main}? The answer is: it depends on the values of @hl.scala{userInput()}, which we don't know. And hence we don't know which classes or methods are reachable! Depending on what @hl.scala{userInput()} returns, any or all methods and classes could be used by @hl.scala{App.main()}. 
+      We can start the same process: @hl.scala{App.main} is live since we @hl.scala{@@JSExport}ed it, but what objects or methods are reachable from @hl.scala{App.main}? The answer is: it depends on the values of @hl.scala{userInput()}, which we don't know. And hence we don't know which classes or methods are reachable! Depending on what @hl.scala{userInput()} returns, any or all methods and classes could be used by @hl.scala{App.main()}.
     @p
       This leaves us a few options:
 
@@ -90,7 +90,7 @@
       All three are possible options: Scala.js started off with #1. #3 is the approach used by @a("Proguard", href:="http://proguard.sourceforge.net/manual/examples.html#annotated"), which lets you annotate things e.g. @hl.scala{@@KeepApplication} to preserve things for reflection and preventing Proguard from eliminating them as dead code.
 
     @p
-      In the end, Scala.js chose #2. This is helped by the fact that overall, Scala code tends not to use reflection as heavily as Java, or dynamic languages which use it heavily. Scala uses techniques such as @a("lambdas", href:="http://docs.scala-lang.org/tutorials/tour/anonymous-function-syntax.html") or @a("implicits", href:="http://docs.scala-lang.org/tutorials/tour/implicit-parameters.html") to satisfy many use cases which Java has traditionally used reflection for, while friendly to the optimizer. 
+      In the end, Scala.js chose #2. This is helped by the fact that overall, Scala code tends not to use reflection as heavily as Java, or dynamic languages which use it heavily. Scala uses techniques such as @a("lambdas", href:="http://docs.scala-lang.org/tutorials/tour/anonymous-function-syntax.html") or @a("implicits", href:="http://docs.scala-lang.org/tutorials/tour/implicit-parameters.html") to satisfy many use cases which Java has traditionally used reflection for, while friendly to the optimizer.
 
     @p
       There are a range of use-cases for reflection where you want to inspect an object's structure or methods, where lambdas or implicits don't help. People use reflection to @a("serialize objects", href:="http://jackson.codehaus.org/DataBindingDeepDive"), or for @a("routing messages to methods", href:="https://access.redhat.com/documentation/en-US/Fuse_ESB_Enterprise/7.1/html/Implementing_Enterprise_Integration_Patterns/files/BasicPrinciples-BeanIntegration.html"). However, both these cases can be satisfied by...
@@ -110,14 +110,14 @@
       import upickle._
 
       case class Thing(a: Int, b: String)
-      write(Thing(1, "gg"))           
+      write(Thing(1, "gg"))
       // res23: String = {"a": 1, "b": "gg"}
 
     @p
-      Or to @a("route messages to the appropiate methods", href:="https://github.com/lihaoyi/autowire") without boilerplate, and @i{without} using reflection! 
+      Or to @a("route messages to the appropiate methods", href:="https://github.com/lihaoyi/autowire") without boilerplate, and @i{without} using reflection!
 
     @p
-      The fact that you can satisfy these use cases with macros is non-obvious: in dynamic languages, macros only get an AST, which is basically opaque when you're only passing a single value to it. With Scala, you get the value @i{together with it's type}, which lets you inspect the type and generate the proper serialization/routing code that is impossible to do in a dynamic language with macros. 
+      The fact that you can satisfy these use cases with macros is non-obvious: in dynamic languages, macros only get an AST, which is basically opaque when you're only passing a single value to it. With Scala, you get the value @i{together with it's type}, which lets you inspect the type and generate the proper serialization/routing code that is impossible to do in a dynamic language with macros.
 
     @p
       Using macros here also plays well with the Scala.js optimizer: the macros are fully expanded before the optimizer is run, so by the time the optimizer sees the code, there is no more magic left: it is then free to do dead-code-elimination/inlining/other-optimizations without worrying about reflection causing the code to do weird things at runtime. Thus, we've managed to substitute most of the main use-cases of reflection, and so can do without it.
@@ -140,12 +140,12 @@
 
     @p
       Scala.js works around this in the general case by adding a @hl.javascript{| 0} to the translation, e.g.
-    
+
     @hl.scala
       /*JVM*/
       15 / 4              // 3
     @hl.javascript
-      /*JS*/  
+      /*JS*/
       (15 / 4) | 0        // 3
 
     @p
@@ -183,13 +183,13 @@
     @p
       The decision to not support these exceptional cases comes down to a value judgement: how often do people actually depend on an exception being thrown as part of their program semantics, e.g. by catching it and performing actions? And how often are they just a way of indicating bugs? It turns out that very few @hl.scala{ArithmeticException}s, @hl.scala{ArrayIndexOutOfBoundsException}s, or similar are actually a necessary part of the program! They exist during debugging, but after that, these code paths are never relied upon "in production".
     @p
-      Thus Scala.js goes for a compromise: in the Fast Optimization mode, we run the code with all these checks in place, so as to catch cases where these errors occur close-to-the-source and make it easy for you to debug them. In Full Optimization mode, on the other hand, we remove these checks, assuming you've already ran through these cases and found any bugs during development. 
+      Thus Scala.js goes for a compromise: in the Fast Optimization mode, we run the code with all these checks in place, so as to catch cases where these errors occur close-to-the-source and make it easy for you to debug them. In Full Optimization mode, on the other hand, we remove these checks, assuming you've already ran through these cases and found any bugs during development.
     @p
       This is a common pattern in situations where there's a tradeoff between debuggability and speed. In Scala.js' case, it allows us to get good debuggability in development, as well as good performance in production. There's some loss in debuggability in development, sacrificed in exchange for greater performance.
 
-  
-@sect("Why Jars instead of RequireJS/CommonJS") 
-  @p 
+
+@sect("Why Jars instead of RequireJS/CommonJS")
+  @p
     In JVM-land, the standard method for distributing these libraries is as @a("Maven Artifacts", href:="http://stackoverflow.com/questions/2487485/what-is-maven-artifact"). These are typically published in a public location such as @a("Maven Central", href:="http://search.maven.org/"), where others can find and download them for use. Typically downloads are done automatically by the build-tool: in Scala-JVM typically this is SBT.
   @p
     In Javascript-land, there are multiple ways of acquiring dependencies: @a("CommonJS", href:="http://en.wikipedia.org/wiki/CommonJS") and @a("RequireJS/AMD", href:="http://requirejs.org/") are two competing standards with a host of implementations. Historically, a third approach has been most common: the developer would simply download the modules himself, check it into source-control and manually add a @hl.html{<script>} tag to the HTML page that will make the functionality available through some global variable.

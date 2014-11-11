@@ -2,7 +2,7 @@
 @p
   By this point, you've already cloned and got your hands dirty fiddling around with the toy @a("workbench-example-app", href:="https://github.com/lihaoyi/workbench-example-app"). You have your editor set up, SBT installed, and have published the example application in a way you can host online for other people to see. Maybe you've even made some changes to the application to see what happens. Hopefully you're curious, and want to learn more.
 
-@p 
+@p
   In this section of the book, we will walk through making a small canvas application. This will expose you to important concepts like:
 
 @ul
@@ -49,7 +49,7 @@
     Apart from mouse events, keyboard events, scroll events, input events, etc. are all usable from Scala.js as you'd expect
 
 @sect{Making a Clock using setInterval}
-  
+
   @p
     You've already seen this in the previous example, but @hl.scala{dom.setInterval} can be used to schedule recurring, periodic events in your program. Common use cases include running the event loop for a game, making smooth animations, and other tasks of that sort which require some work to happen over a period of time.
 
@@ -84,7 +84,7 @@
     In this example we will make a spiritual clone of the popular @a("Flappy Bird", href:="http://en.wikipedia.org/wiki/Flappy_Bird") video game. This game involves a few simple rules
 
   @ul
-    @li 
+    @li
       Your character starts in the middle of the screen
     @li
       Gravity pulls your character down
@@ -111,7 +111,7 @@
     @hl.ref("examples/demos/src/main/scala/canvasapp/FlappyLine.scala", "/*variables*/", end="def runLive")
 
     @p
-      This is where we start defining things that are relevant to Flappy Box. There are roughly two groups of values here: immutable constants in the top group, and mutable variables in the bottom. The rough meaning of each variable is documented in the comments, and we'll see exactly how we use them later. 
+      This is where we start defining things that are relevant to Flappy Box. There are roughly two groups of values here: immutable constants in the top group, and mutable variables in the bottom. The rough meaning of each variable is documented in the comments, and we'll see exactly how we use them later.
 
     @p
       One notable thing is that we're using a @hl.scala{collection.mutable.Queue} to store the list of obstacles. This is defined in the Scala standard library; in general, all the collections in the Scala standard library can be used without issue in Scala.js.
@@ -134,7 +134,7 @@
       @li
         Rendering everything, including the player as the namesake box
 
-    @p    
+    @p
       This function basically contains all the game logic, from motion, to collision-detection, to rendering, so it's pretty large. Not that large though! And entirely understandable, even if it takes a few moments to read through.
 
     @hl.ref("examples/demos/src/main/scala/canvasapp/FlappyLine.scala", "def runDead", "def run()")
@@ -181,14 +181,14 @@
         @hl.scala{obstacles} is a Scala @hl.scala{mutable.Queue}, as we defined it earlier, and all the methods on it are Scala method calls
       @li
         @hl.scala{renderer} is a Javascript @hl.javascript{CanvasRenderingContext2D}, and all the methods on it are Javascript method calls directly on the Javascript object
-      @li 
+      @li
         @hl.scala{frame} is a Scala @hl.scala{Int}, and obeys Scala semantics, though it is implemented as a Javascript @hl.javascript{Number} under the hood.
-      @li 
+      @li
         @hl.scala{playerY} and @hl.scala{playerV} are Scala @hl.scala{Double}s, implemented directly as Javascript @hl.javascript{Number}s
 
     @p
-      This reveals something pretty interesting about Scala.js: even though Scala at-first-glance is a very different language from Javascript, the interoperation with Javascript is so seamless that you can't even tell from the code which values/methods are defined in Scala and which values/methods come from Javascript! 
-    @p  
+      This reveals something pretty interesting about Scala.js: even though Scala at-first-glance is a very different language from Javascript, the interoperation with Javascript is so seamless that you can't even tell from the code which values/methods are defined in Scala and which values/methods come from Javascript!
+    @p
       These two classes of values/methods are treated very differently by the compiler when it comes to emitting the executable Javascript blob, but the compiler does not need extra syntax telling it which things belong to Scala and which to Javascript: the types are sufficient. @hl.scala{renderer}, for example is of type @hl.scala{dom.CanvasRenderContext2D} which is a subtype of @hl.scala{scalajs.js.Object}, indicating to the compiler that it needs special treatment. Primitives like @hl.scala{Double}s and @hl.scala{Int}s have similar treatment
 
     @p
@@ -209,5 +209,5 @@
     @li
       Draw something pretty! We have a working canvas, a nice programming language, and a way to easily publish the results online. @a("Various", href:="http://www.scala-js-fiddle.com/gist/77a3840678d154257ca1/KochSnowflake.scala") @a("fractals", href:="http://www.scala-js-fiddle.com/gist/77a3840678d154257ca1/KochCurve.scala"), or @a("colorful visualizations", href:="http://www.scala-js-fiddle.com/gist/9443f8e0ecc68d1058ad/RayTracer.scala") are all possibilities.
 
-  @p  
+  @p
     By this point you've some experience building stand-alone, single-canvas Scala.js applications, which has hopefully given you a feel for how Scala.js works. The problem is that few web applications satisfy the criteria of being stand-alone single-page canvas applications! Most web applications need to deal with the DOM of the HTML page, need to fetch data from web services, and generally need to do a lot of other messy things. We'll go into that in the next chapter
