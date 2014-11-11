@@ -12,7 +12,7 @@
     @a("Scala.js", href:="http://www.scala-js.org/") is a compiler that compiles Scala source code to equivalent Javascript code. That lets you write Scala code that you can run in a web browser, or other environments (Chrome plugins, Node.js, etc.) where Javascript is supported.
 
   @p
-    This book contains something for all levels of experience with Scala.js: absolute beginners can get started with the Introduction and Hands-on tutorial, people who have used it before can skip ahead to the later parts of the tutorial, building a canvas app or dynamic HTML page. Intermediate users will find the chapters on cross-publishing a Scala.js library interesting, and even experienced users will find the In-depth Documention useful.
+    This book contains something for all levels of experience with Scala.js: absolute beginners can get started with the @sect.ref{Intro to Scala.js} and @sect.ref{Hands On} tutorial, people who have used it before can skip ahead to the later parts of the tutorial, @sect.ref{Making a Canvas App} or @sect.ref{Interactive Web Pages}. Intermediate users will find the chapters on @sect.ref{Cross Publishing Libraries} with Scala.js or @sect.ref{Integrating Client-Server}, and even experienced users will find the @sect.ref{In Depth} documention useful.
 
   @p
     This book does not spend time on pontifying a philosophy or ideology behind Scala.js or Scala. It instead spends its words on hands-on tutorials and in-depth dives into parts of the Scala.js platform, to try and get you acquainted with Scala.js as soon as possible, so you can make your own decisions about its merits or qualities.
@@ -36,13 +36,13 @@
   @sect("The Command Line")
     @handson.CommandLine()
 
-  @sect("Publishing Modules")
+  @sect("Cross Publishing Libraries")
     @handson.PublishingModules()
 
   @sect("Integrating Client-Server")
     @handson.ClientServer()
 
-@sect("Scala.js in Depth", "Exploring Scala.js")
+@sect("In Depth", "Exploring Scala.js")
   @p
     This half of the book dives into a few aspects of Scala.js much more deeply that the hands-on introduction does. It's aimed at someone who has already used Scala.js, and wants to explore the edge-cases, how things work under-the-cover, or why it has been designed in such a way. It's not a formal specification; rather, it's aim is to be a useful reference to read instead of (or in preparation for) digging into the implementation code.
 

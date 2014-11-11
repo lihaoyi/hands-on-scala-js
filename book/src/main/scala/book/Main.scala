@@ -25,7 +25,25 @@ object Main {
     for(res <- Book.autoResources ++ Book.manualResources) {
       copy(getClass.getResourceAsStream("/" + res), "output/" + res)
     }
-    sect.structure
+
+    val allNames = {
+      def rec(n: Node): Seq[String] = {
+        n.name +: n.children.flatMap(rec)
+      }
+      rec(sect.structure).toSet
+    }
+    val dupes = allNames.groupBy(x => x)
+                        .values
+                        .filter(_.size > 1)
+                        .map(_.head)
+                        .toSet
+
+    assert(dupes.size == 0, s"Duplicate names: $dupes")
+
+    val dangling = sect.usedRefs -- allNames
+
+    assert(dangling.size == 0, s"Dangling Refs: $dangling")
+
     println("Writing Done")
   }
 

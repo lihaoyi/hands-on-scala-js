@@ -4,6 +4,7 @@ import acyclic.file
 import scala.collection.mutable
 import scalatags.Text.all._
 object sect{
+
   var indent = 0
 
   val headers = Seq[((String, String) => scalatags.Text.Tag, Option[Frag => Frag])](
@@ -24,6 +25,13 @@ object sect{
   )
 
   var structure = Node("root", mutable.Buffer.empty)
+
+  val usedRefs = mutable.Set.empty[String]
+
+  def ref(s: String) = {
+    usedRefs += s
+    a(s, href:=s"#${munge(s)}")
+  }
 
   def munge(name: String) = {
     name.replace(" ", "")
