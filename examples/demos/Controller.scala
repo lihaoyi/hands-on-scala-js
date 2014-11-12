@@ -5,24 +5,31 @@ import org.scalajs.dom
 import org.scalajs.dom.extensions._
 import scala.collection.mutable
 import scalatags.JsDom.all._
-import rx._
-import util.{Success, Failure}
-case class Node(name: String, children: mutable.Buffer[Node])
+
+case class Tree[T](name: T, children: Seq[Tree[T]])
 @JSExport
 object Controller{
 
   def munge(name: String) = {
     name.replace(" ", "")
   }
+  def addClass(el: dom.HTMLElement, cls: String) = {
+    println("Adding Class " + cls)
+    removeClass(el, cls)
+    el.className = el.className + " " + cls
+  }
+  def removeClass(el: dom.HTMLElement, cls: String) = {
+    el.className = el.className.split(' ').filter(_ != cls).mkString(" ")
+  }
   def toggleClass(el: dom.HTMLElement, cls: String) = {
     val frags = el.className.split(' ')
-    if (!frags.contains(cls)) el.className = el.className + " " + cls
-    else el.className = el.className.split(' ').filter(_ != cls).mkString(" ")
+    if (!frags.contains(cls)) addClass(el, cls)
+    else removeClass(el, cls)
   }
   @JSExport
   def main(data: scala.scalajs.js.Any) = {
 
-    val structure = upickle.readJs[Node](upickle.json.readJs(data))
+    val structure = upickle.readJs[Tree[String]](upickle.json.readJs(data))
 
     val Seq(main, menu, layout, menuLink) = Seq(
       "main", "menu", "layout", "menuLink"
@@ -32,26 +39,30 @@ object Controller{
 
     snippets.foreach(js.Dynamic.global.hljs.highlightBlock(_))
 
-    val contentBar = {
-      def rec(current: Node, depth: Int): Seq[dom.HTMLLIElement] = {
-        println("\t"*depth + current.name)
+    val contentTree = {
+      def rec(current: Tree[String], depth: Int): Tree[dom.HTMLElement] = {
         val myCls =
           "menu-item" +
-          (if (depth == 1) " menu-item-divided" else "")
+          (if (depth <= 1) " menu-item-divided" else "")
 
         val frag =
           li(
             a(
               current.name,
               href:="#"+munge(current.name),
-              paddingLeft := s"${depth * 10 + 10}px",
+              paddingLeft := s"${depth * 15}px",
               cls:=myCls
             )
           ).render
-
-        frag +: current.children.flatMap(rec(_, depth + 1))
+        Tree(frag, current.children.map(rec(_, depth + 1)))
       }
-      structure.children.flatMap(rec(_, 0))
+      rec(structure, 0)
+    }
+    val contentList = {
+      def rec(current: Tree[dom.HTMLElement]): Seq[dom.HTMLElement] = {
+        current.name +: current.children.flatMap(rec)
+      }
+      rec(contentTree).toVector
     }
 
     val frag = div(cls:="pure-menu pure-menu-open")(
@@ -59,7 +70,7 @@ object Controller{
         "Contents"
       ),
       ul(cls:="menu-item-list")(
-        contentBar
+        contentList.drop(1)
       )
     )
     menu.appendChild(frag.render)
@@ -71,7 +82,7 @@ object Controller{
         else el.offsetTop + offset(el.offsetParent.asInstanceOf[dom.HTMLElement], parent)
       }
       val menuItems = {
-        def rec(current: Node): Seq[String] = {
+        def rec(current: Tree[String]): Seq[String] = {
           current.name +: current.children.flatMap(rec)
         }
         rec(structure).tail
@@ -82,7 +93,7 @@ object Controller{
         .toArray
     }
 
-    scrollSpy(main, headers, contentBar)
+    scrollSpy(main, headers, contentList, contentTree)
 
     menuLink.onclick = (e: dom.MouseEvent) => {
       toggleClass(layout, "active")
@@ -98,7 +109,8 @@ object Controller{
    */
   def scrollSpy(main: dom.HTMLElement,
                 headers: Seq[Double],
-                contentBar: Seq[dom.HTMLElement]) = {
+                contentList: Seq[dom.HTMLElement],
+                contentTree: Tree[dom.HTMLElement]) = {
 
     def isElementInViewport(el: dom.HTMLElement) = {
       val rect = el.getBoundingClientRect()
@@ -110,6 +122,7 @@ object Controller{
     def run() = {
       scrolling = false
       val threshold = main.scrollTop + main.clientHeight
+
       var index = 0
       while(index < headers.length && index >= 0){
         index += 1
@@ -117,12 +130,23 @@ object Controller{
       }
       index = -index - 1
       if (index != lastIndex){
-        if (!isElementInViewport(contentBar(index))) {
-          contentBar(index).scrollIntoView(lastIndex > index)
+        if (!isElementInViewport(contentList(index))) {
+          contentList(index).scrollIntoView(lastIndex > index)
         }
-        if (lastIndex != -1)
-          toggleClass(contentBar(lastIndex), "pure-menu-selected")
-        toggleClass(contentBar(index), "pure-menu-selected")
+        def rec(curr: Tree[dom.HTMLElement]): Boolean = {
+          if (curr.children.map(rec).contains(true) ||
+              curr.name == contentList(index)){
+            addClass(curr.name, "pure-menu-selected")
+            curr.children.map(_.name).foreach(removeClass(_, "hide"))
+            true
+          }else{
+            removeClass(curr.name, "pure-menu-selected")
+            addClass(curr.name, "hide")
+            false
+          }
+        }
+        rec(contentTree)
+
         lastIndex = index
       }
     }

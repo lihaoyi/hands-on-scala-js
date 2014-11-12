@@ -302,6 +302,11 @@ code{
 .header-link{
     opacity: 0.05;
 }
+.hide{
+    display: none;
+}
+
+
 /*Workaround for bug in highlight.js IDEA theme*/
 .hljs-tag, .hljs-symbol{
     background: none;
