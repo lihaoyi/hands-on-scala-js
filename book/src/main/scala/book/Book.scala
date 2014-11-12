@@ -25,7 +25,6 @@ object Book {
     "META-INF/resources/webjars/font-awesome/4.2.0/fonts/fontawesome-webfont.ttf",
     "META-INF/resources/webjars/font-awesome/4.2.0/fonts/fontawesome-webfont.woff",
     "css/side-menu.css",
-    "js/ui.js",
     "example-fastopt.js",
     "webpage/weather.js",
     "favicon.svg",
@@ -52,24 +51,8 @@ object Book {
   }
 
   val txt = Index()
-  val contentBar = {
-    def rec(current: Node, depth: Int): Seq[Frag] = {
-      println("\t"*depth + current.name)
-      Seq(
-        li(
-          a(
-            current.name,
-            href:="#"+sect.munge(current.name),
-            paddingLeft := s"${depth * 10 + 10}px",
-            cls := "menu-item" + (if (depth == 1) " menu-item-divided " else "")
-          )
-        )
-      ) ++ current.children.flatMap(rec(_, depth + 1))
-    }
+  val data = upickle.write(sect.structure)
 
-    println("TABLE OF CONTENTS")
-    rec(sect.structure, 0)
-  }
   val site = Seq(
     raw("<!doctype html>"),
     html(
@@ -80,26 +63,18 @@ object Book {
         tags2.title("Hands-on Scala.js"),
         includes
       ),
-
-      div(id:="layout")(
-        a(href:="#menu", id:="menuLink", cls:="menu-link")(
-          span
+      body(
+        onload:=s"Controller().main($data)",
+        div(id:="layout")(
+          a(href:="#menu", id:="menuLink", cls:="menu-link")(
+            span
+          ),
+          div(id:="menu")
         ),
-
-        div(id:="menu")(
-          div(cls:="pure-menu pure-menu-open")(
-            a(cls:="pure-menu-heading", href:="#")(
-              "Contents"
-            ),
-            ul(cls:="menu-item-list")(
-              contentBar
-            )
+        div(id:="main",
+          div(id:="main-box")(
+            txt
           )
-        )
-      ),
-      div(id:="main",
-        div(id:="main-box")(
-          txt
         )
       )
     )

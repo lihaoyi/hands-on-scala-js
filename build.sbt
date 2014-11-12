@@ -39,7 +39,8 @@ lazy val book = Project(
     "org.webjars" % "font-awesome" % "4.2.0",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
     "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-    "org.eclipse.jgit" % "org.eclipse.jgit" % "3.5.1.201410131835-r"
+    "org.eclipse.jgit" % "org.eclipse.jgit" % "3.5.1.201410131835-r",
+    "com.lihaoyi" %%% "upickle" % "0.2.5"
   ),
   (resources in Compile) += {
     (fastOptJS in (demos, Compile)).value
@@ -66,7 +67,6 @@ lazy val book = Project(
   autoCompilerPlugins := true,
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2")
 )
-
 
 lazy val demos = project.in(file("examples/demos"))
 
