@@ -19,7 +19,6 @@
       @div(id:="div1")
       @script("HelloWorld0().main(document.getElementById('div1'))")
 
-
   @p
     This approach works, as the above example shows, but has a couple of disadvantages:
 
@@ -65,7 +64,7 @@
         @script("Inputs().main(document.getElementById('div3'))")
 
     @p
-      In Scalatags, you build up fragments of type @hl.scala{Frag} using functions like @hl.scala{div}, @hl.scala{h1}, etc., and call @hl.scala{.render} on it to turn it into a real @hl.scala{dom.Element}. Different fragments render to different things: e.g. @hl.scala{input.render} gives you a @hl.scala{dom.HTMLInputElement}, @hl.scala{span.render} gives you a @hl.scala{dom.HTMLSpanElement}. You can then access the properties of these elements: adding callbacks, checking their value, anything you want.
+      In Scalatags, you build up fragments of type @hl.scala{Frag} using functions like @hl.scala{div}, @hl.scala{h1}, etc., and call @hl.scala{.render} on it to turn it into a real @lnk.dom.Element. Different fragments render to different things: e.g. @hl.scala{input.render} gives you a @lnk.dom.HTMLInputElement, @hl.scala{span.render} gives you a @lnk.dom.HTMLSpanElement. You can then access the properties of these elements: adding callbacks, checking their value, anything you want.
 
     @p
       In this example, we render and @hl.scala{input} element and a @hl.scala{span}, wire up the input to set the value of the span whenever you press a key in the input, and then stuff both of them into a larger HTML fragment that forms the contents of our @hl.scala{target} element.
@@ -88,7 +87,7 @@
       Using a @hl.scala{for}-loop with a filter inside the Scalatags fragment is just normal Scala, since you can nest arbitrary Scala expressions inside a Scalatags snippet. In this case, we're converting both the fruit and the search query to lower case so we can compare them case-insensitively.
 
     @p
-      Lastly, we just need to define the input box and output-container (as we did earlier), set the @hl.scala{onkeyup} event handler, and place it in a larger fragment, and then into our target:
+      Lastly, we just need to define the input box and output-container (as we did earlier), set the @lnk.dom.onkeyup event handler, and place it in a larger fragment, and then into our target:
 
     @div(cls:="pure-g")
       @div(cls:="pure-u-1 pure-u-md-13-24")
@@ -180,7 +179,7 @@
     @hl.ref("examples/demos/src/main/scala/webpage/Weather1.scala", "import dom", "val url =")
 
     @p
-      The first import brings in Scala adapters to several DOM APIs, which allow you to use them more idiomatically from Scala. The second brings in an implicit @hl.scala{ExecutionContext} that we'll need to run our asynchronous operations.
+      The first import brings in Scala adapters to several DOM APIs, which allow you to use them more idiomatically from Scala. The second brings in an implicit @hl.scala{scala.concurrent.ExecutionContext} that we'll need to run our asynchronous operations.
 
     @p
       Then we need the code itself:

@@ -94,7 +94,7 @@
       While not useful for small applications, where most of the logic is gluing together external APIs, this comes in very useful in large applications where a lot of the complexity and room-for-error is entirely internal. With larger apps, you can no longer blame browser vendors for confusing APIs that make your code terrible: these confusing APIs only lurk in the peripherals around a larger, complex application. One thing you learn working in large-ish web client-side code-bases is that the bulk of the confusion and complexity is no-one's fault but your own, as a team.
 
     @p
-      At this point, all of Google, Facebook, and Microsoft have all announced work on a typed variant of Javascript. These are not academic exercises: Dart/AtScript/Flow/Typescript are all problems that solve a real need, that these large companies have all faced once they've grown beyond a certain size. Clearly, Javascript isn't cutting it anymore, and the convenience and "native-ness" of the language is more than made up for in the constant barrage of self-inflicted problems. Scala.js takes this idea and runs with it!
+      At this point, all of Google, Facebook, and Microsoft have all announced work on a typed variant of Javascript. These are not academic exercises: @lnk("Dart", "https://www.dartlang.org/")/@lnk("AtScript", "https://docs.google.com/document/d/11YUzC-1d0V1-Q3V0fQ7KSit97HnZoKVygDxpWzEYW0U/edit")/@lnk("Flow", "https://lobste.rs/s/fp9ibi/flow_facebook_s_new_javascript_type_checker")/@lnk("Typescript", "http://www.typescriptlang.org/") are all problems that solve a real need, that these large companies have all faced once they've grown beyond a certain size. Clearly, Javascript isn't cutting it anymore, and the convenience and "native-ness" of the language is more than made up for in the constant barrage of self-inflicted problems. Scala.js takes this idea and runs with it!
 
   @sect{Sharing Code}
     @p
@@ -116,7 +116,7 @@
         Not having to resort to awkward Ajax-calls or pre-computation to avoid duplicating logic between the client and server
 
     @p
-      Shared code doesn't just mean sharing pre-made libraries between the client and server. You can easily publish your own libraries that can be used on both Scala-JVM and Scala.js. This means that as a library author, you can at once target two completely different platforms, and (with some work) take advantage of the intricacies of each platform to optimize your library for each one. Take Scalatags as an example: as the first client-server Scala.js-ScalaJVM shared libraries, it enjoys a roughly event split of downloads from people using it on both platforms:
+      Shared code doesn't just mean sharing pre-made libraries between the client and server. You can easily @sect.ref("Cross Publishing Libraries", "publish your own libraries") that can be used on both Scala-JVM and Scala.js. This means that as a library author, you can at once target two completely different platforms, and (with some work) take advantage of the intricacies of each platform to optimize your library for each one. Take Scalatags as an example: as the first client-server Scala.js-ScalaJVM shared libraries, it enjoys a roughly event split of downloads from people using it on both platforms:
 
     @img(src:="images/Scalatags Downloads.png", width:="100%")
 
@@ -132,7 +132,7 @@
     @p
       One common theme in all these platforms is that their main selling point is their tight, seamless client-server integration, to the point where you can just make method calls across the client-server boundary and the platform/language/compiler figures out what to do.
     @p
-      With Scala.js and Scala-JVM, such conveniences like making method calls across the client-server boundary is the boring reality. Not only are the calls transparent, they are also statically checked, so any mistake in the route name or the parameters it expects, or the result type it returns to you, will be caught by the compiler long before even manual testing.
+      With Scala.js and Scala-JVM, such conveniences like making method calls across the client-server boundary is the @sect.ref("Integrating Client-Server", "boring reality"). Not only are the calls transparent, they are also statically checked, so any mistake in the route name or the parameters it expects, or the result type it returns to you, will be caught by the compiler long before even manual testing.
 
   @hr
 
@@ -149,27 +149,27 @@
 
   @sect{Part 1: Hands On}
     @p
-      A whirlwind tour of the various things that Scala.js can be used for. We will cover:
+      A @sect.ref("Hands On", "whirlwind tour") of the various things that Scala.js can be used for. We will cover:
 
     @ul
       @li
-        Your first Scala.js application: setting up your development environment, cloning the example repository, debugging and finally publishing your first toy application
+        @sect.ref("Getting Started"): setting up your development environment, cloning the example repository, debugging and finally publishing your first toy application
       @li
-        An interactive web app using Scala.js: how you interact with the HTML DOM, how you utilize Ajax calls and other browser APIs that are common in Javascript-heavy applications
+        @sect.ref("Interactive Web Pages"): how you interact with the HTML DOM, how you utilize Ajax calls and other browser APIs that are common in Javascript-heavy applications
       @li
-        A Scala.js library: how to write a module that can be depended on by applications both your own and by others, and be used both with Scala.js and Scala-on-the-JVM
+        @sect.ref("Cross Publishing Libraries"): how to write a module that can be depended on by applications both your own and by others, and be used both with Scala.js and Scala-on-the-JVM
       @li
-        Client-Server integration: We will build a simple web application with a Scala server and Scala.js client. In the process, we'll explore how to share code between client and server, how to get compiler-checked/boilerplate-free Ajax calls between client and server, and many other long-standing holy-grails of web development
+        @sect.ref("Client-Server Integration"): We will build a simple web application with a Scala server and Scala.js client. In the process, we'll explore how to share code between client and server, how to get compiler-checked/boilerplate-free Ajax calls between client and server, and many other long-standing holy-grails of web development
 
     @p
       After going through this chapter and following along with the exercises, you should have a good sense of how Scala.js works and how it feels building things in Scala.js. You would not be an expert, but you'll know where to get started if you decide to try out Scala.js for your next project.
 
   @sect{Part 2: In Depth}
     @p
-      This section of the book will cover lots of content that does not fit in the earlier Hands-On portion of the book. Things that aren't immediately necessary to get something up and running, things that only advanced users would care about, things that you probably don't need to know but you'd like to know out of intellectual curiosity.
+      @sect.ref("In Depth", "This section of the book") will cover lots of content that does not fit in the earlier Hands-On portion of the book. Things that aren't immediately necessary to get something up and running, things that only advanced users would care about, things that you probably don't need to know but you'd like to know out of intellectual curiosity.
 
     @p
-      In general, this section of the book will go much deeper into Scala.js, much more than is necessary to get your first applications built. We will talk about the small number of semantic differences between Scala.js and Scala, details of the foreign-function-interface with Javascript, the various optimization levels and what they do. Nothing pressing or urgently needed, but all very interesting, and worth reading if you want to really understand Scala.js in depth.
+      In general, this section of the book will go much deeper into Scala.js, much more than is necessary to get your first applications built. We will talk about the small number of @sect.ref("Deviations from Scala-JVM", "Semantic Differences") between Scala.js and Scala, details of the foreign-function-interface used for @sect.ref("Javascript Interoperability"), @sect.ref("The Compilation Pipeline") with its various optimization levels and what they do. Nothing pressing or urgently needed, but all very interesting, and worth reading if you want to really understand Scala.js in depth.
 
   @hr
 

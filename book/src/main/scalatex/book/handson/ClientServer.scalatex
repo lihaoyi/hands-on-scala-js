@@ -15,7 +15,7 @@
 
 @sect{A Client-Server Setup}
   @p
-    Getting started with client-server integration, let's go with the simplest configuration possible: a Spray server and a Scala.js client. Most of the other web-frameworks (Play, Scalatra, etc.) will have more complex configurations, but the basic mechanism of wiring up Scala.js to your web framework will be the same. Our project will look like this:
+    Getting started with client-server integration, let's go with the simplest configuration possible: a Spray server and a Scala.js client. Most of the other web-frameworks (@lnk.misc.Play, @lnk.misc.Scalatra, etc.) will have more complex configurations, but the basic mechanism of wiring up Scala.js to your web framework will be the same. Our project will look like this:
 
   @hl.bash
     $ tree
@@ -38,7 +38,7 @@
   @hl.ref("examples/crossBuilds/clientserver/build.sbt")
 
   @p
-    We have two projects: @code{client} and @code{server}, one of which is a Scala.js project (indicated by the presence of @hl.scala{scalaJSSettings}). Both projects share a number of settings: the presence of the @code{shared/} folder, which shared code can live in (similar to what we saw in Cross-platform Modules) and the settings to add Scalatags and uPickle to the build. Note that those two dependencies use the triple @code{%%%} instead of the double @code{%%} to declare: this means that for each dependency, we will pull in the Scala-JVM or Scala.js version depending on whether it's being used in a Scala.js project.
+    We have two projects: @code{client} and @code{server}, one of which is a Scala.js project (indicated by the presence of @hl.scala{scalaJSSettings}). Both projects share a number of settings: the presence of the @code{shared/} folder, which shared code can live in (similar to what we saw in @sect.ref{Cross Publishing Libraries}) and the settings to add @lnk.github.Scalatags and @lnk.github.uPickle to the build. Note that those two dependencies use the triple @code{%%%} instead of the double @code{%%} to declare: this means that for each dependency, we will pull in the Scala-JVM or Scala.js version depending on whether it's being used in a Scala.js project.
   @p
     The @code{client} subproject is uneventful, with a dependency on the by-now-familiar @code{scalajs-dom} library. The @code{server} project, on the other hand, is interesting: it contains the dependencies required for us to set up out Spray server, and one additioanl thing: we add the output of @code{fastOptJS} from the client to the @code{resources} on the server. This will allow the @code{server} to serve the compiled-javascript from our @code{client} project from its resources.
 
@@ -56,7 +56,7 @@
   @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Page.scala")
 
   @p
-    This is a typical Scalatags HTML snippet. Note that since we're serving it directly from the server in Scala code, we do not need to leave a @code{.html} file somewhere on the filesystem! We can declare all HTML, including the skeleton of the page, in Scalatags. Otherwise it's the same as what we saw in earlier chapters: A simple HTML page which includes a script tag to run our Scala.js application.
+    This is a typical @lnk.github.Scalatags HTML snippet. Note that since we're serving it directly from the server in Scala code, we do not need to leave a @code{.html} file somewhere on the filesystem! We can declare all HTML, including the skeleton of the page, in Scalatags. Otherwise it's the same as what we saw in earlier chapters: A simple HTML page which includes a script tag to run our Scala.js application.
   @p
     Lastly, we'll set up the Scala.js main method, which we are calling in the @hl.html{<script>} tag above to kick off the client-side application.
 
@@ -82,7 +82,7 @@
     @p
       In both the client code and the server code, we made use of the same Scalatags HTML generation library. This is pretty neat: transferring rendering logic between client and server no longer means an annoying/messy rewrite! You can simply C&P the Scalatags snippet over. That means it's easy if you want to e.g. shift the logic from one side to the other in order to optimize for performance or time-to-load or other things.
     @p
-      One thing to take note of is that we're actually using subtly @i{different} implementations of Scalatags on both sides: on the server, we're importing from @hl.scala{scalatags.Text}, while on the client we're using @hl.scala{scalatags.JsDom}. The @hl.scala{Text} backend renders directly to Strings, and is available on both Scala-JVM and Scala.js. The @hl.scala{JsDom} backend, on the other hand, renders to @hl.scala{dom.HTMLElement}s which only exist on Scala.js. Thus while on the client you can do things like attach event listeners to the rendered @hl.scala{dom.HTMLElement} objects, or checking their runtime @code{.value}, on the server you can't. And that's exactly what you want!
+      One thing to take note of is that we're actually using subtly @i{different} implementations of Scalatags on both sides: on the server, we're importing from @hl.scala{scalatags.Text}, while on the client we're using @hl.scala{scalatags.JsDom}. The @hl.scala{Text} backend renders directly to Strings, and is available on both Scala-JVM and Scala.js. The @hl.scala{JsDom} backend, on the other hand, renders to @lnk.dom.HTMLElement-s which only exist on Scala.js. Thus while on the client you can do things like attach event listeners to the rendered @lnk.dom.HTMLElement objects, or checking their runtime @code{.value}, on the server you can't. And that's exactly what you want!
 
   @sect{Shared Code}
     @p
@@ -95,7 +95,7 @@
       The Ajax/RPC layer is one of the more fragile parts of web applications. Often, you have your various Ajax endpoints written once on the server, have a set of routes written to connect those Ajax endpoints to URLs, and client code (traditionally Javascript) made calls to those URLs with "raw" data: basically whatever you wanted, packed in an ad-hoc mix of CSV and JSON and raw-strings.
 
     @p
-      This has always been annoying boilerplate, and Scala.js removes it. With uPickle, you can simply call @hl.scala{upickle.write(...)} and @hl.scala{upickle.read[T](...)} to convert your collections, primitives or case-classes to and from JSON. This means you do not need to constantly re-invent different ways of making Ajax calls: you can just fling the data right across the network from client to server and back again.
+      This has always been annoying boilerplate, and Scala.js removes it. With @lnk.github.uPickle, you can simply call @hl.scala{upickle.write(...)} and @hl.scala{upickle.read[T](...)} to convert your collections, primitives or case-classes to and from JSON. This means you do not need to constantly re-invent different ways of making Ajax calls: you can just fling the data right across the network from client to server and back again.
 
 @hr
 

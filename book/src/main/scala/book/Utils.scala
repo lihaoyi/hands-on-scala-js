@@ -3,6 +3,8 @@ package book
 import acyclic.file
 import scala.collection.mutable
 import scalatags.Text.all._
+import scalatags.text.Builder
+
 case class pureTable(header: Frag*){
   def apply(content: Frag*) = {
     table(cls:="pure-table pure-table-horizontal half-table")(
@@ -36,9 +38,9 @@ object sect{
 
   val usedRefs = mutable.Set.empty[String]
 
-  def ref(s: String) = {
+  def ref(s: String, txt: String = "") = {
     usedRefs += s
-    a(s, href:=s"#${munge(s)}")
+    a(if (txt == "") s else txt, href:=s"#${munge(s)}")
   }
 
   def munge(name: String) = {
@@ -79,6 +81,51 @@ object lnk{
   def apply(name: String, url: String) = {
     usedLinks.add(url)
     a(name, href:=url)
+  }
+  object dom{
+    class MdnThing(name: String = toString) extends Frag{
+      def render = lnk.apply(name, "https://developer.mozilla.org/en-US/docs/Web/API/" + name).render
+      def applyTo(t: Builder) = t.addChild(render)
+    }
+    class MdnEvent extends Frag {
+      def render = lnk.apply(toString, "https://developer.mozilla.org/en-US/docs/Web/Events/" + toString).render
+      def applyTo(t: Builder) = t.addChild(render)
+    }
+    object CanvasRenderingContext2D extends MdnThing()
+    object HTMLCanvasElement extends MdnThing()
+    object Element extends MdnThing()
+    object HTMLElement extends MdnThing()
+    object HTMLInputElement extends MdnThing()
+    object HTMLSpanElement extends MdnThing()
+    object XMLHttpRequest extends MdnThing()
+    object getElementById extends MdnThing("document.getElementById")
+    object setInterval extends MdnThing("WindowTimers.setInterval")
+    object mousedown extends MdnThing
+    object mouseup extends MdnThing
+    object onclick extends MdnThing
+    object onkeyup extends MdnThing
+    val JSONparse = lnk("Json.parse", "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse")
+  }
+  object scala{
+    def apply(s: String) = {
+      lnk(s, "http://www.scala-lang.org/files/archive/nightly/docs/library/index.html#" + s)
+    }
+  }
+  object misc{
+    val IntelliJ = lnk("IntelliJ", "http://blog.jetbrains.com/scala/")
+    val Eclipse = lnk("Eclipse", "http://scala-ide.org/")
+    val Rhino = lnk("Rhino", "https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino")
+    val Nodejs = lnk("Nodejs", "http://nodejs.org/")
+    val PhantomJS = lnk("PhantomJS", "http://phantomjs.org/")
+    val Play = lnk("Play", "https://www.playframework.com/")
+    val Scalatra = lnk("Scalatra", "http://www.scalatra.org/")
+    val ScalaTest = lnk("ScalaTest", "http://www.scalatest.org/")
+    val Scalate = lnk("Scalate", "https://github.com/scalate/scalate")
+  }
+  object github{
+    val Scalatags = lnk("Scalatags", "https://github.com/lihaoyi/scalatags")
+    val uPickle= lnk("Scalatags", "https://github.com/lihaoyi/upickle")
+    val scalaPickling = lnk("scala-pickling", "https://github.com/scala/pickling")
   }
 }
 

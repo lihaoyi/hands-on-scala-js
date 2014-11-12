@@ -78,12 +78,12 @@
     @li
       @b{Initial Compilation}: @code{.scala} files to @code{.class} and @code{.sjsir} files
     @li
-      @b{Optimization}: @code{.sjsir} files to smallish/fast @code{.js} files
+      @b{Fast Optimization}: @code{.sjsir} files to smallish/fast @code{.js} files
     @li
-      @b{Closure-Compiler}: @code{.js} files to smaller/faster @code{.js} files
+      @b{Full Optimization}: @code{.js} files to smaller/faster @code{.js} files
 
   @p
-    @code{.scala} files are the source code you're familiar with. @code{.class} files are the JVM-targetted artifacts which aren't used, but we keep around: tools such as IntelliJ or Eclipse use these files to provide IDE support for Scala.js code, even if they take no part in compilation. @code{.js} files are the output Javascript, which we can execute in a web browser.
+    @code{.scala} files are the source code you're familiar with. @code{.class} files are the JVM-targetted artifacts which aren't used, but we keep around: tools such as @lnk.misc.IntelliJ or @lnk.misc.Eclipse use these files to provide IDE support for Scala.js code, even if they take no part in compilation. @code{.js} files are the output Javascript, which we can execute in a web browser.
   @p
     @code{.sjsir} files are worth calling out: the name stands for "ScalaJS Intermediate Representation", and these files contain compiled code half-way between Scala and Javascript: most Scala features have by this point been replaced their Java/Javascript equivalents, but it still contains Types (which have all been inferred) that can aid in analysis. Many Scala.js specific optimizations take place on this IR.
 
@@ -97,7 +97,7 @@
   @p
     But produced far larger (20mb) and slower executables. This section will explore each stage and we'll learn what these stages do.
 
-  @sect{Initial Compilation}
+  @sect{Compilation}
     @p
       As described earlier, the Scala.js compiler is implemented as a Scala compiler plugin, and lives in the main repository in @lnk("compiler/", "https://github.com/scala-js/scala-js/tree/master/compiler"). The bulk of the plugin runs after the @code{mixin} phase in the @lnk("Scala compilation pipeline", "http://stackoverflow.com/a/4528092/871202"). By this point:
 
@@ -135,7 +135,7 @@
     @p
       This is the only phase in the Scala.js compilation pipeline that separate compilation is possible: you can compile many different sets of Scala.js @code{.scala} files separately, only to combine them later. This is used e.g. for distributing Scala.js libraries as Maven Jars, which are compiled separately by library authors to be combined into a final executable later.
 
-  @sect{Optimization}
+  @sect{Fast Optimization}
     @p
       This phase is a whole-program optimization of the @code{.sjsir} files, and lives in the @lnk("tools/", "https://github.com/scala-js/scala-js/tree/master/tools") folder of the Scala.js repository. The rough operations that get performed are:
 
@@ -150,7 +150,7 @@
     @p
       While the input for this phase is the aggregate @code{.sjsir} files from your project and all your dependencies, the output is executable Javascript. This phase usually runs in less than a second, outputs a Javascript blob in the 700kb-1mb range, and is suitable for repeated use during development. This corresponds to the @code{fastOptJS} command in SBT.
 
-  @sect{Closure-Compiler}
+  @sect{Full Optimization}
     @p
       The @lnk("Google Closure Compiler", "https://developers.google.com/closure/compiler/") (GCC) is a set of tools that work with Javascript. It has multiple @lnk("levels of optimization", "https://developers.google.com/closure/compiler/docs/compilation_levels"), doing everything from basic whitespace-removal to heavy optimization. It is a old, relatively mature project that is relied on both inside and outside google to optimize the delivery of Javascript to the browser.
     @p

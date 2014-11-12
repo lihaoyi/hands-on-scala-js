@@ -65,7 +65,7 @@
       In the @code{js/} version, we are using the Javascript @hl.javascript{Date} object to take the millis and do what we want. In the @code{jvm/} version, we instead use @hl.scala{java.text.SimpleDateFormat} with a custom formatter (The syntax is defined @lnk("here", "http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html")).
 
     @p
-      Again, you can put as much platform-specific logic in these files as you want, to account for differences in the available APIs. Maybe you want to use @hl.scala{js.JSON.parse} for parsing JSON blobs in @code{js/}, but @hl.scala{Jackson} or @hl.scala{GSON} for parsing them in @code{jvm/}.
+      Again, you can put as much platform-specific logic in these files as you want, to account for differences in the available APIs. Maybe you want to use @lnk.dom.JSONparse for parsing JSON blobs in @code{js/}, but @lnk("Jackson", "http://jackson.codehaus.org/") or @lnk("GSON", "https://code.google.com/p/google-gson/") for parsing them in @code{jvm/}.
     @p
       Lastly, you'll also have noticed the two identical @hl.scala{main} methods in the platform-specific code. This is an implementation detail around the fact that Scala.js picks up the main method differently from Scala-JVM, using @hl.scala{js.JSApp} instead of looking for a @hl.scala{main(args: Array[String]): Unit} method. These two main methods allow us to test our implementations
   @sect{Running the Module}
@@ -89,7 +89,7 @@
       @li
         The "Running on XXX!" statement which shows us we're actually running on two platforms.
       @li
-        The other hint is the time taken: the second run is instant while the first takes three seconds! This is because by default we run on @lnk("Rhino", "https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino"), which is a simple interpreter hundreds of times slower than running code natively on the JVM.
+        The other hint is the time taken: the second run is instant while the first takes three seconds! This is because by default we run on @lnk.misc.Rhino, which is a simple interpreter hundreds of times slower than running code natively on the JVM.
       @li
         In Scala-JVM the double 1.0 is printed as @code{1.0}, while in Scala.js it's printed as @code{1}. This is one of a small number of differences between Scala.js and Scala-JVM, and verifies that we are indeed running on both platforms!
 
@@ -190,7 +190,7 @@
       @code{js/src/main/scala} Scala.js only code
 
   @p
-    It is entirely possible for your modules to have slightly different implementations and APIs on Scala.js and Scala-JVM. @lnk("Scalatags", "https://github.com/lihaoyi/scalatags") exposes additional DOM-related functionality only for it's Scala.js version, while @lnk("uPickle", "https://github.com/lihaoyi/upickle") uses different JSON libraries (@lnk("Jawn", "https://github.com/non/jawn") v.s. @lnk("DOM", "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse")) on the backend while the exposed interface remains the same. You have the flexibility to pick and choose which bits of your library you wish to share and which bits will be different.
+    It is entirely possible for your modules to have slightly different implementations and APIs on Scala.js and Scala-JVM. @lnk.github.Scalatags exposes additional DOM-related functionality only for it's Scala.js version, while @lnk.github.uPickle uses different JSON libraries (@lnk("Jawn", "https://github.com/non/jawn") v.s. @lnk("DOM", "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse")) on the backend while the exposed interface remains the same. You have the flexibility to pick and choose which bits of your library you wish to share and which bits will be different.
 
   @p
     Everything above also applies to your unit tests, which fall in @code{test/} folders mirroring the @code{main/} folders listed above. You can also choose to share or not-share your unit test code as you see fit.

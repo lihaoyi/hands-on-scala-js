@@ -114,18 +114,18 @@
     This @hl.scala("@JSExport") annotation is used to tell Scala.js that you want this method to be visible and callable from Javascript. By default, Scala.js does dead code elimination and removes any methods or classes which are not used. This is done to keep the compiled executables a reasonable size, since most projects use only a small fraction of e.g. the standard library. @hl.scala("@JSExport") is used to tell Scala.js that the @hl.scala{ScalaJSExample} object and its @hl.scala{def main} method are entry points to the program. Even if they aren't called anywhere internally, they are called externally by Javascript that the Scala.js compiler is not aware of, and should not be removed.
 
   @p
-    Apart from this annotation, @hl.scala{ScalaJSExample} is just a normal Scala @hl.scala{object}, and behaves like one in every way. Note that the main-method in this case takes a @hl.scala{dom.HTMLCanvasElement}: your exported methods can have any signature, with arbitrary arity or types for parameters or the return value. This is in contrast to the main method on the JVM which always takes an @hl.scala{Array[String]} and returns @hl.scala{Unit}. In fact, there's nothing special about this method at all! It's like any other exported method, we just happen to attribute it the "main" entry point.
+    Apart from this annotation, @hl.scala{ScalaJSExample} is just a normal Scala @hl.scala{object}, and behaves like one in every way. Note that the main-method in this case takes a @lnk.dom.HTMLCanvasElement: your exported methods can have any signature, with arbitrary arity or types for parameters or the return value. This is in contrast to the main method on the JVM which always takes an @hl.scala{Array[String]} and returns @hl.scala{Unit}. In fact, there's nothing special about this method at all! It's like any other exported method, we just happen to attribute it the "main" entry point.
 
   @hl.ref("output/workbench-example-app/src/main/scala/example/ScalaJSExample.scala", "val ctx", "var count")
 
   @p
-    Here we are retrieving a handle to the canvas we will draw on using @hl.scala{document.getElementById}, and from it we can get a @hl.scala{dom.CanvasRenderingContext2D} which we actually use to draw on it.
+    Here we are retrieving a handle to the canvas we will draw on using @hl.scala{document.getElementById}, and from it we can get a @lnk.dom.CanvasRenderingContext2D which we actually use to draw on it.
 
   @p
     @hl.scala{document.getElementById} is the exact same API that's used in normal Javascript, as documented @lnk("here", "https://developer.mozilla.org/en-US/docs/Web/API/document.getElementById"). In fact, the entire @hl.scala{org.scalajs.dom} namespace (imported at the top of the file) comprises statically typed facades for the javascript APIs provided by the browser.
 
   @p
-    We need to perform the @hl.scala{asInstanceOf} call because depending on what you pass to @hl.scala{getElementById} and @hl.scala{getContext}, you could be returned elements and contexts of different types. Hence we need to tell the compiler explicitly that we're expecting a @hl.scala{dom.HTMLCanvasElement} and @hl.scala{dom.CanvasRenderingContext2D} back from these methods for the strings we passed in.
+    We need to perform the @hl.scala{asInstanceOf} call because depending on what you pass to @hl.scala{getElementById} and @hl.scala{getContext}, you could be returned elements and contexts of different types. Hence we need to tell the compiler explicitly that we're expecting a @lnk.dom.HTMLCanvasElement and @lnk.dom.CanvasRenderingContext2D back from these methods for the strings we passed in.
 
   @hl.ref("output/workbench-example-app/src/main/scala/example/ScalaJSExample.scala", "def run", "dom.setInterval")
 
@@ -252,7 +252,7 @@
       144K  target/scala-2.11/example-opt.js
 
     @p
-      144 Kilobytes! Better. Not great, though! In general, Scala.js does not produce tiny executables, although the output size of the compiled executables is dropping all the time. If you look inside that file, you'll see all of the long identifiers have been replaced by short ones by the Google Closure Compiler.
+      144 Kilobytes! Better. Not great, though! In general, Scala.js does not produce tiny executables, although the output size of the compiled executables is dropping all the time. If you look inside that file, you'll see all of the long identifiers have been replaced by short ones by the @lnk("Google Closure Compiler", "https://developers.google.com/closure/compiler/").
 
     @hl.javascript("""
       Rb(P(),N(r(L(Ea),["rgb(",", ",", ",")"])))),Sb(P(),r(L(K),[n,s,C])));fe().te.fillRect(fe().Oc.jc,fe().Oc.kc,1,1);e=e+1|0;c=c+k|0}},50))}ae.prototype.Zf=function(){this.te.fillStyle="black";this.te.fillRect(0,0,255,255)};ae.prototype.main=function(){return ee(),void 0};ae.prototype.a=new I({lj:0},!1,"example.ScalaJSExample$",K,{lj:1,b:1});var be=void 0;function fe(){be||(be=(new ae).c());return be}ba.ScalaJSExample=fe;function le(){}le.prototype=new J;function me(){}me.prototype=le.prototype;
@@ -270,14 +270,14 @@
 
     @ul
       @li
-        A large portion of this 144k is the Scala standard library, and so the size of the compiled blob does not grow that fast as your program grows. For example, while this ~50 line application is 144k, a much larger ~2000 line application is only 288k.
+        A large portion of this 144k is the Scala standard library, and so the size of the compiled blob does not grow that fast as your program grows. For example, while this ~50 line application is 144k, a @lnk("much larger ~2000 line application", "https://github.com/lihaoyi/roll") is only 288k.
       @li
         This size is pre-@lnk("gzip", "http://en.wikipedia.org/wiki/Gzip"), and most webservers serve their contents compressed via gzip to reduce the download size. Gzip cuts the actual download size down to 43k, which is more acceptable.
       @li
         You will likely have other portions of the page that are of similar size: e.g. @lnk("JQuery", "http://jquery.com/") is extremely popular, and weights in at a comparable 32kb minified and gzipped, while @lnk("React.js", "http://facebook.github.io/react/downloads.html") weighs in at a cool 150kb gzipped. Scala.js arguably provides more than either of these libraries.
 
     @p
-      Regardless, there is ongoing work to shrink the size of these executables. If you want to read more about this, check out the section on the Scala.js File Encoding and the Optimization Pipeline.
+      Regardless, there is ongoing work to shrink the size of these executables. If you want to read more about this, check out the section on @sect.ref("The Compilation Pipeline") to learn about what we currently do to crunch the executables down.
 
   @hr
 
@@ -285,7 +285,7 @@
     In general, all the output of the Scala.js compiler is bundled up into the @code{example-fastopt.js} and @code{example-opt.js} files. As a first approximation, these files can be included directly on a HTML page (as we have here, with @code{index-dev.html} and @code{index-opt.html}) and published together as a working web app. Even zipping them up and emailing them to a friend is sufficient to give someone a working, live version of your hard work!
 
   @p
-    More advanced users would want to integrate them into their build process or serve them from a web server, all of which is entirely possible. You just need to run the Scala.js compiler and place the output @code{.js} file somewhere your web server can pick it up, e.g. in some static-resource folder. We cover an example setup of this with a Scala webserver in our Client Server Integration chapter.
+    More advanced users would want to integrate them into their build process or serve them from a web server, all of which is entirely possible. You just need to run the Scala.js compiler and place the output @code{.js} file somewhere your web server can pick it up, e.g. in some static-resource folder. We cover an example setup of this with a Scala webserver in our chapter @sect.ref("Integrating Client-Server").
 
 @sect{Recap}
 
@@ -316,7 +316,7 @@
     @li
       Javascript includes APIs for @lnk("getting the size of the window", "http://stackoverflow.com/questions/1248081/get-the-browser-viewport-dimensions-with-javascript") and @lnk("changing the size of a canvas", "http://stackoverflow.com/questions/9251480/set-canvas-size-using-javascript"). These Javascript APIs are available in Scala.js, and we've already used some of them in the course of this example. Try making the Canvas full-screen, and re-positioning the corners of the triangle to match.
     @li
-      The @hl.scala{dom.CanvasRenderingContext2D} has a bunch of methods on it that can be used to draw things. Here we only draw 1x1 rectangles to put points on the canvas; try modifying the code to make it draw something else.
+      The @lnk.dom.CanvasRenderingContext2D has a bunch of methods on it that can be used to draw things. Here we only draw 1x1 rectangles to put points on the canvas; try modifying the code to make it draw something else.
     @li
       We've look at the @code{master} branch of @code{workbench-example-app}, but this project also has several other branches showing off different facets of Scala.js: @lnk("dodge-the-dots", "https://github.com/lihaoyi/workbench-example-app/tree/dodge-the-dots") and @lnk("space-invaders", "https://github.com/lihaoyi/workbench-example-app/tree/space-invaders") are both interesting branches worth playing with as a beginner. Check them out!
     @li

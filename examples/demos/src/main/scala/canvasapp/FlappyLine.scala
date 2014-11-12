@@ -11,7 +11,6 @@ object FlappyLine extends{
   @JSExport
   def main(canvas: dom.HTMLCanvasElement) = {
     /*setup*/
-
     val renderer = canvas.getContext("2d")
                          .asInstanceOf[dom.CanvasRenderingContext2D]
 

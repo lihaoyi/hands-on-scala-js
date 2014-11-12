@@ -60,7 +60,7 @@
       // Scala.js: 1.0
   @sect{Unit}
     @p
-      scala.Unit is represented using JavaScript's undefined. Therefore, calling toString() on Unit will return undefined rather than ().
+      scala.Unit is represented using JavaScript's undefined. Therefore, calling @hl.scala{toString()} on @hl.scala{Unit} will return @hl.scala{"undefined"} rather than @hl.scala{"()""}.
 
   @sect{Strings}
     @p
@@ -68,7 +68,7 @@
 
   @sect{Reflection}
     @p
-      Java reflection and, a fortiori, Scala reflection, are not supported. There is limited support for java.lang.Class, e.g., obj.getClass.getName will work for any Scala.js object (not for objects that come from JavaScript interop).
+      Java reflection and, a fortiori, Scala reflection, are not supported. There is limited support for @lnk("java.lang.Class", "https://docs.oracle.com/javase/7/docs/api/java/lang/Class.html"), e.g., obj.getClass.getName will work for any Scala.js object (not for objects that come from JavaScript interop).
 
   @sect{Exceptions}
     @p
@@ -96,7 +96,7 @@
 
   @sect{Enumerations}
     @p
-      The methods @hl.scala{Value()} and @hl.scala{Value(i: Int)} on @hl.scala{scala.Enumeration} use reflection to retrieve a string representation of the member name and are therefore -- in principle -- unsupported. However, since Enumerations are an integral part of the Scala library, Scala.js adds limited support for these two methods:
+      The methods @hl.scala{Value()} and @hl.scala{Value(i: Int)} on @lnk.scala{scala.Enumeration} use reflection to retrieve a string representation of the member name and are therefore -- in principle -- unsupported. However, since Enumerations are an integral part of the Scala library, Scala.js adds limited support for these two methods:
     @p
       Calls to either of these two methods of the forms:
     @hl.scala
@@ -152,7 +152,7 @@
     @p
       You can use more-or-less the whole Scala standard library in Scala.js, sans some more esoteric components like the parallel collections or the tools. Furthermore, we've ported some subset of the Java standard library that many common Scala libraries depends on, including most of @hl.scala{java.lang.*} and some of @hl.scala{java.util.*}.
     @p
-      There isn't a full list of library APIs which are available from Scala.js, but a rough idea can be had from looking the the source code @lnk("on", "https://github.com/scala-js/scala-js/tree/master/javalanglib/src/main/scala/java/lang") @lnk("github", "https://github.com/scala-js/scala-js/tree/master/javalib/src/main/scala/java").
+      There isn't a full list of standard library library APIs which are available from Scala.js, but it should be enough to give you a rough idea of what is supported. The full list of classes that have been ported to Scala.js is available under @sect.ref{Available Java APIs}
 
   @sect{Reflection v.s. Macros}
     @tableHead
@@ -161,10 +161,10 @@
           @td{@tuple._1}@td{@tuple._2}
 
     @p
-      As described @a("here"), in Reflection is not supported in Scala.js, due to the way it inhibits optimization. This doesn't just mean you can't use reflection yourself: many third-party libraries also use reflection, and you won't be able to use them either.
+      As described @sect.ref("Why No Reflection?", "here"), Reflection is not supported in Scala.js, due to the way it inhibits optimization. This doesn't just mean you can't use reflection yourself: many third-party libraries also use reflection, and you won't be able to use them either.
 
     @p
-      On the other hand, Scala.js does support Macros, and macros can in many ways substitute many of the use cases that people have traditionally used reflection for. For example, instead of using a reflection-based serialization library like @code{scala-pickling}, you can use a macro-based library such as @code{upickle}.
+      On the other hand, Scala.js does support Macros, and macros can in many ways substitute many of the use cases that people have traditionally used reflection for (see @sect.ref("Macros", "here"). For example, instead of using a reflection-based serialization library like @lnk.github.scalaPickling, you can use a macro-based library such as @lnk.github.uPickle.
 
   @sect{Pure-Scala v.s. Java Libraries}
     @tableHead
@@ -174,7 +174,7 @@
     @p
       Scala.js has access to any pure-Scala libraries that you have cross-compiled to Scala.js, and cross-compiling a pure-Scala library with no dependencies is straightforward. Many of them, such as the ones listed above, have already been cross-compiled and can be used via their maven coordinates.
     @p
-      You cannot use any libraries which have a Java dependency. This means libraries like Scalatest or Scalate, which depend on a number of external Java libraries or source files, cannot be used from Scala.js. You can only use libraries which have no dependency on Java libraries or sources.
+      You cannot use any libraries which have a Java dependency. This means libraries like @lnk.misc.ScalaTest or @lnk.misc.Scalate, which depend on a number of external Java libraries or source files, cannot be used from Scala.js. You can only use libraries which have no dependency on Java libraries or sources.
 
   @sect{Javascript APIs v.s. JVM APIs}
     @tableHead
@@ -185,7 +185,7 @@
     @p
       Apart from depending on Java sources, the other thing that you can't use in Scala.js are JVM-specific APIs. This means that anything which goes down to the underlying operating system, filesystem, GUI or network are unavailable in Scala.js. This makes sense when you consider that these capabilities are no provided by the browser which Scala.js runs in, and it's impossible to re-implement them ourselves.
     @p
-      In exchange for this, Scala.js provides you access to Browser APIs that do related things. Although you can't set up a HTTP server to take in-bound requests, you can make out-bound requests using @hl.scala{dom.XMLHttpRequest} to other servers. You can't write to the filesystem or databases directly, but you can write to the @hl.scala{dom.localStorage} provided by the browser. You can't use Swing or AWT or WebGL but instead work with the DOM and Canvas and WebGL.
+      In exchange for this, Scala.js provides you access to Browser APIs that do related things. Although you can't set up a HTTP server to take in-bound requests, you can make out-bound requests using @lnk.dom.XMLHttpRequest to other servers. You can't write to the filesystem or databases directly, but you can write to the @hl.scala{dom.localStorage} provided by the browser. You can't use Swing or AWT or WebGL but instead work with the DOM and Canvas and WebGL.
     @p
       Naturally, none of these are an exact replacement, as the browser environment is fundamentally different from that of a desktop application running on the JVM. Nonetheless, there are many analogues, and if so desired you can write code to abstract away these differences and run on both Scala.js and Scala-JVM
 
@@ -198,8 +198,8 @@
 
 
     @p
-      Lastly, there is the matter of tools. Naturally, all the Scala tools which depend on the JVM are out. This means things like the Yourkit, VisualVM and JProfiler profilers, as well as things like the Scala command-line REPL which relies on classloaders and other such things to run on the JVM
+      Lastly, there is the matter of tools. Naturally, all the Scala tools which depend on the JVM are out. This means things like the @lnk("Yourkit", "http://www.yourkit.com/"), @lnk("VisualVM", "http://visualvm.java.net/") and @lnk("JProfiler", "https://www.ej-technologies.com/products/jprofiler/overview.html") profilers, as well as things like the Scala command-line REPL which relies on classloaders and other such things to run on the JVM
     @p
-      On the other hand, you do get to keep and continue using many tools which are build for Scala but JVM-agnostic. For example, IDEs such a IntelliJ and Eclipse work great with Scala.js; from their point of view, it's just Scala, and things like code-navigation, refactoring and error-highlighting all work out of the box. SBT works with Scala.js too, and you see the same compile-erorrs in the command-line as you would in vanilla Scala, and even things like incremental compilation work un-changed.
+      On the other hand, you do get to keep and continue using many tools which are build for Scala but JVM-agnostic. For example, IDEs such a @lnk.misc.IntelliJ and @lnk.misc.Eclipse work great with Scala.js; from their point of view, it's just Scala, and things like code-navigation, refactoring and error-highlighting all work out of the box. SBT works with Scala.js too, and you see the same compile-erorrs in the command-line as you would in vanilla Scala, and even things like incremental compilation work un-changed.
     @p
       Lastly, you gain access to browser tools that don't work with normal Scala: you can use the Chrome or Firefox consoles to poke at your Scala.js application from the command line, or their profilers/debuggers. With source maps set up, you can even step-through debug your Scala.js application directly in Chrome.

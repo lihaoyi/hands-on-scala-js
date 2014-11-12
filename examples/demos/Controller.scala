@@ -24,11 +24,10 @@ object Controller{
 
     val structure = upickle.readJs[Node](upickle.json.readJs(data))
 
-    val main = dom.document.getElementById("main")
-    val menu = dom.document.getElementById("menu")
+    val Seq(main, menu, layout, menuLink) = Seq(
+      "main", "menu", "layout", "menuLink"
+    ).map(dom.document.getElementById)
 
-    val layout   = dom.document.getElementById("layout")
-    val menuLink = dom.document.getElementById("menuLink")
     val snippets = dom.document.getElementsByClassName("highlight-me")
 
     snippets.foreach(js.Dynamic.global.hljs.highlightBlock(_))
@@ -54,12 +53,7 @@ object Controller{
       }
       structure.children.flatMap(rec(_, 0))
     }
-    def menuItems = {
-      def rec(current: Node): Seq[String] = {
-        current.name +: current.children.flatMap(rec)
-      }
-      rec(structure).tail
-    }
+
     val frag = div(cls:="pure-menu pure-menu-open")(
       a(cls:="pure-menu-heading", href:="#")(
         "Contents"
@@ -70,14 +64,23 @@ object Controller{
     )
     menu.appendChild(frag.render)
 
-    def offset(el: dom.HTMLElement, parent: dom.HTMLElement): Double = {
-      if (el == parent) 0
-      else el.offsetTop + offset(el.offsetParent.asInstanceOf[dom.HTMLElement], parent)
+
+    val headers = {
+      def offset(el: dom.HTMLElement, parent: dom.HTMLElement): Double = {
+        if (el == parent) 0
+        else el.offsetTop + offset(el.offsetParent.asInstanceOf[dom.HTMLElement], parent)
+      }
+      val menuItems = {
+        def rec(current: Node): Seq[String] = {
+          current.name +: current.children.flatMap(rec)
+        }
+        rec(structure).tail
+      }
+      menuItems.map(munge)
+        .map(dom.document.getElementById)
+        .map(offset(_, main))
+        .toArray
     }
-    val headers = menuItems.map(munge)
-                           .map(dom.document.getElementById)
-                           .map(offset(_, main))
-                           .toArray
 
     scrollSpy(main, headers, contentBar)
 
@@ -85,14 +88,18 @@ object Controller{
       toggleClass(layout, "active")
       toggleClass(menu, "active")
       toggleClass(menuLink, "active")
-    };
+    }
   }
 
-
-
+  /**
+   * Needs to be done in a sketchy imperative fashion for performance:
+   * onscroll gets called quite a lot, so any additional work makes it
+   * noticeable jerky
+   */
   def scrollSpy(main: dom.HTMLElement,
                 headers: Seq[Double],
                 contentBar: Seq[dom.HTMLElement]) = {
+
     def isElementInViewport(el: dom.HTMLElement) = {
       val rect = el.getBoundingClientRect()
       rect.top >= 0 && rect.bottom <= dom.innerHeight
