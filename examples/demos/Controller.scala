@@ -6,7 +6,16 @@ import org.scalajs.dom.extensions._
 import scala.collection.mutable
 import scalatags.JsDom.all._
 
-case class Tree[T](name: T, children: Seq[Tree[T]])
+object Renderer{
+  import japgolly.scalajs.react._ // React
+  import vdom.ReactVDom._         // Scalatags → React virtual DOM
+  import vdom.ReactVDom.all._     // Scalatags html & css (div, h1, textarea, etc.)
+
+  val Menu = ReactComponentB[Int]("Menu").render{ p =>
+
+  }.build
+}
+case class Tree[T](name: T, children: Vector[Tree[T]])
 @JSExport
 object Controller{
 
@@ -14,7 +23,6 @@ object Controller{
     name.replace(" ", "")
   }
   def addClass(el: dom.HTMLElement, cls: String) = {
-    println("Adding Class " + cls)
     removeClass(el, cls)
     el.className = el.className + " " + cls
   }
@@ -47,10 +55,10 @@ object Controller{
 
         val frag =
           li(
+            paddingLeft := s"${depth * 15}px",
             a(
               current.name,
               href:="#"+munge(current.name),
-              paddingLeft := s"${depth * 15}px",
               cls:=myCls
             )
           ).render
@@ -90,7 +98,7 @@ object Controller{
       menuItems.map(munge)
         .map(dom.document.getElementById)
         .map(offset(_, main))
-        .toArray
+        .toVector
     }
 
     scrollSpy(main, headers, contentList, contentTree)
@@ -108,14 +116,11 @@ object Controller{
    * noticeable jerky
    */
   def scrollSpy(main: dom.HTMLElement,
-                headers: Seq[Double],
-                contentList: Seq[dom.HTMLElement],
+                headers: Vector[Double],
+                contentList: Vector[dom.HTMLElement],
                 contentTree: Tree[dom.HTMLElement]) = {
 
-    def isElementInViewport(el: dom.HTMLElement) = {
-      val rect = el.getBoundingClientRect()
-      rect.top >= 0 && rect.bottom <= dom.innerHeight
-    }
+
 
     var scrolling = false
     var lastIndex = -1
@@ -128,25 +133,10 @@ object Controller{
         index += 1
         if (headers(index) > threshold) index *= -1
       }
-      index = -index - 1
-      if (index != lastIndex){
-        if (!isElementInViewport(contentList(index))) {
-          contentList(index).scrollIntoView(lastIndex > index)
-        }
-        def rec(curr: Tree[dom.HTMLElement]): Boolean = {
-          if (curr.children.map(rec).contains(true) ||
-              curr.name == contentList(index)){
-            addClass(curr.name, "pure-menu-selected")
-            curr.children.map(_.name).foreach(removeClass(_, "hide"))
-            true
-          }else{
-            removeClass(curr.name, "pure-menu-selected")
-            addClass(curr.name, "hide")
-            false
-          }
-        }
-        rec(contentTree)
+      index = -index
 
+      if (index != lastIndex){
+        updateSideBar(lastIndex, index, contentList, contentTree)
         lastIndex = index
       }
     }
@@ -157,5 +147,69 @@ object Controller{
         dom.requestAnimationFrame((d: Double) => run())
       }
     }
+  }
+  def isElementInViewport(el: dom.HTMLElement) = {
+    val rect = el.getBoundingClientRect()
+    rect.top >= 0 && rect.bottom <= dom.innerHeight
+  }
+  val lastShown = new js.Array[dom.HTMLElement](0)
+  val lastLined = new js.Array[dom.HTMLElement](0)
+  def updateSideBar(lastIndex: Int,
+                    index: Int,
+                    contentList: Vector[dom.HTMLElement],
+                    contentTree: Tree[dom.HTMLElement]) = {
+
+    println(s"MOVING $lastIndex -> $index")
+    if (!isElementInViewport(contentList(index))) {
+      contentList(index).scrollIntoView(lastIndex > index)
+    }
+    val shown = new js.Array[dom.HTMLElement](0)
+    val lined = new js.Array[dom.HTMLElement](0)
+    /**
+     * Makes two passes over the children list; once to determine if
+     * the current element is a parent of the current header, and another
+     * to mark all the children of the current element with the correct
+     * CSS classes.
+     */
+    def rec(curr: Tree[dom.HTMLElement]): Boolean = {
+
+      var found = false
+      var i = 0
+      var j = 0
+      while (j < curr.children.length){
+        val x = curr.children(j)
+        j+= 1
+        val f = rec(x)
+        found |= f
+        if (!found) i += 1
+      }
+
+      if (found || curr.name == contentList(index)){
+        var j = 0
+        while (j < curr.children.length){
+          val x = curr.children(j)
+          if (found && i > 0){
+            lined.push(x.name)
+            i -= 1
+          }
+
+          j+= 1
+          shown.push(x.name)
+        }
+        lined.push(curr.name)
+        true
+      }else false
+
+    }
+    rec(contentTree)
+    for(el <- contentList){
+      if (shown.indexOf(el) != -1) removeClass(el, "hide")
+      else addClass(el, "hide")
+
+      if (lined.indexOf(el) == -1) removeClass(el, "lined")
+      else addClass(el, "lined")
+    }
+    if (lastIndex != -1) removeClass(contentList(lastIndex), "pure-menu-selected")
+    addClass(contentList(index), "pure-menu-selected")
   }
 }
