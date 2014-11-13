@@ -37,14 +37,15 @@ lazy val book = Project(
     "org.webjars" % "highlightjs" % "8.2-1",
     "org.webjars" % "pure" % "0.5.0",
     "org.webjars" % "font-awesome" % "4.2.0",
+    "org.webjars" % "react" % "0.11.1",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
     "org.scala-lang" % "scala-compiler" % scalaVersion.value,
     "org.eclipse.jgit" % "org.eclipse.jgit" % "3.5.1.201410131835-r",
     "com.lihaoyi" %%% "upickle" % "0.2.5"
   ),
   (resources in Compile) += {
-    (fastOptJS in (demos, Compile)).value
-    (artifactPath in (demos, Compile, fastOptJS)).value
+    (fullOptJS in (demos, Compile)).value
+    (artifactPath in (demos, Compile, fullOptJS)).value
   },
   (unmanagedResourceDirectories in Compile) ++=
     (unmanagedResourceDirectories in (demos, Compile)).value,

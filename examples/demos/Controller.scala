@@ -1,4 +1,7 @@
 
+import japgolly.scalajs.react.React
+import japgolly.scalajs.react.vdom.VDomBuilder
+
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 import org.scalajs.dom
@@ -6,15 +9,7 @@ import org.scalajs.dom.extensions._
 import scala.collection.mutable
 import scalatags.JsDom.all._
 
-object Renderer{
-  import japgolly.scalajs.react._ // React
-  import vdom.ReactVDom._         // Scalatags → React virtual DOM
-  import vdom.ReactVDom.all._     // Scalatags html & css (div, h1, textarea, etc.)
 
-  val Menu = ReactComponentB[Int]("Menu").render{ p =>
-
-  }.build
-}
 case class Tree[T](name: T, children: Vector[Tree[T]])
 @JSExport
 object Controller{
@@ -38,6 +33,14 @@ object Controller{
   def main(data: scala.scalajs.js.Any) = {
 
     val structure = upickle.readJs[Tree[String]](upickle.json.readJs(data))
+    var i = 0
+    def recurse(t: Tree[String]): Tree[(String, String, Int)] = {
+      val curr = (t.name, munge(t.name), i)
+      i += 1
+      val children = t.children.map(recurse)
+      Tree(curr, children)
+    }
+
 
     val Seq(main, menu, layout, menuLink) = Seq(
       "main", "menu", "layout", "menuLink"
@@ -46,43 +49,6 @@ object Controller{
     val snippets = dom.document.getElementsByClassName("highlight-me")
 
     snippets.foreach(js.Dynamic.global.hljs.highlightBlock(_))
-
-    val contentTree = {
-      def rec(current: Tree[String], depth: Int): Tree[dom.HTMLElement] = {
-        val myCls =
-          "menu-item" +
-          (if (depth <= 1) " menu-item-divided" else "")
-
-        val frag =
-          li(
-            paddingLeft := s"${depth * 15}px",
-            a(
-              current.name,
-              href:="#"+munge(current.name),
-              cls:=myCls
-            )
-          ).render
-        Tree(frag, current.children.map(rec(_, depth + 1)))
-      }
-      rec(structure, 0)
-    }
-    val contentList = {
-      def rec(current: Tree[dom.HTMLElement]): Seq[dom.HTMLElement] = {
-        current.name +: current.children.flatMap(rec)
-      }
-      rec(contentTree).toVector
-    }
-
-    val frag = div(cls:="pure-menu pure-menu-open")(
-      a(cls:="pure-menu-heading", href:="#")(
-        "Contents"
-      ),
-      ul(cls:="menu-item-list")(
-        contentList.drop(1)
-      )
-    )
-    menu.appendChild(frag.render)
-
 
     val headers = {
       def offset(el: dom.HTMLElement, parent: dom.HTMLElement): Double = {
@@ -101,50 +67,33 @@ object Controller{
         .toVector
     }
 
-    scrollSpy(main, headers, contentList, contentTree)
 
+    val menuBar = React.renderComponent(
+      Menu(recurse(structure)),
+      menu
+    )
     menuLink.onclick = (e: dom.MouseEvent) => {
       toggleClass(layout, "active")
       toggleClass(menu, "active")
       toggleClass(menuLink, "active")
     }
-  }
-
-  /**
-   * Needs to be done in a sketchy imperative fashion for performance:
-   * onscroll gets called quite a lot, so any additional work makes it
-   * noticeable jerky
-   */
-  def scrollSpy(main: dom.HTMLElement,
-                headers: Vector[Double],
-                contentList: Vector[dom.HTMLElement],
-                contentTree: Tree[dom.HTMLElement]) = {
-
-
 
     var scrolling = false
-    var lastIndex = -1
-    def run() = {
-      scrolling = false
-      val threshold = main.scrollTop + main.clientHeight
-
-      var index = 0
-      while(index < headers.length && index >= 0){
-        index += 1
-        if (headers(index) > threshold) index *= -1
-      }
-      index = -index
-
-      if (index != lastIndex){
-        updateSideBar(lastIndex, index, contentList, contentTree)
-        lastIndex = index
-      }
-    }
-    run()
     main.onscroll = (e: dom.UIEvent) => {
       if (!scrolling){
         scrolling = true
-        dom.requestAnimationFrame((d: Double) => run())
+        dom.requestAnimationFrame{(d: Double) =>
+          scrolling = false
+          val threshold = main.scrollTop + main.clientHeight
+
+          var index = 0
+          while(index < headers.length && index >= 0){
+            index += 1
+            if (headers(index) > threshold) index *= -1
+          }
+          index = -index
+          menuBar.setState(index)
+        }
       }
     }
   }
@@ -152,64 +101,65 @@ object Controller{
     val rect = el.getBoundingClientRect()
     rect.top >= 0 && rect.bottom <= dom.innerHeight
   }
-  val lastShown = new js.Array[dom.HTMLElement](0)
-  val lastLined = new js.Array[dom.HTMLElement](0)
-  def updateSideBar(lastIndex: Int,
-                    index: Int,
-                    contentList: Vector[dom.HTMLElement],
-                    contentTree: Tree[dom.HTMLElement]) = {
 
-    println(s"MOVING $lastIndex -> $index")
-    if (!isElementInViewport(contentList(index))) {
-      contentList(index).scrollIntoView(lastIndex > index)
-    }
-    val shown = new js.Array[dom.HTMLElement](0)
-    val lined = new js.Array[dom.HTMLElement](0)
-    /**
-     * Makes two passes over the children list; once to determine if
-     * the current element is a parent of the current header, and another
-     * to mark all the children of the current element with the correct
-     * CSS classes.
-     */
-    def rec(curr: Tree[dom.HTMLElement]): Boolean = {
+  import japgolly.scalajs.react._ // React
+  import vdom.ReactVDom._         // Scalatags → React virtual DOM
+  import vdom.ReactVDom.all._     // Scalatags html & css (div, h1, textarea, etc.)
 
-      var found = false
+  val Menu = ReactComponentB[Tree[(String, String, Int)]]("Menu")
+                            .getInitialState(_ => 0)
+                            .render{ (structure, _, index) =>
+
+    val contentList = {
       var i = 0
-      var j = 0
-      while (j < curr.children.length){
-        val x = curr.children(j)
-        j+= 1
-        val f = rec(x)
-        found |= f
-        if (!found) i += 1
+      def rec1(current: Tree[(String, String, Int)]): Tree[(String, String, Int, Boolean)] = {
+        val initialI = i
+        i += 1
+        val children = current.children.map(rec1)
+
+        val win = i >= index && initialI < index
+        Tree(
+          (current.name._1, current.name._2, current.name._3, win),
+          children
+        )
       }
+      def rec(current: Tree[(String, String, Int, Boolean)],
+              depth: Int,
+              classes: String): Iterator[Tag] = {
 
-      if (found || curr.name == contentList(index)){
-        var j = 0
-        while (j < curr.children.length){
-          val x = curr.children(j)
-          if (found && i > 0){
-            lined.push(x.name)
-            i -= 1
-          }
+        val winIndex = current.children.indexWhere(_.name._4)
+        val (before, after) = current.children.splitAt(winIndex)
 
-          j+= 1
-          shown.push(x.name)
-        }
-        lined.push(curr.name)
-        true
-      }else false
+        val myCls =
+          "menu-item" +
+          (if (depth <= 1) " menu-item-divided" else "")
 
+        val (name, munged, currIndex, win) = current.name
+        val frag =
+          li(paddingLeft := s"${depth * 15}px")(
+            a(
+              name,
+              href:="#"+munged,
+              cls:=myCls
+            ),
+            cls:=classes + (if (win) " pure-menu-selected" else "")
+          )
+        val afterCls = if (!win) "hide" else ""
+        Iterator(frag) ++
+        before.flatMap(rec(_, depth+1, "lined")) ++
+        after.flatMap(rec(_, depth+1, afterCls))
+      }
+      rec(rec1(structure), 0, "")
     }
-    rec(contentTree)
-    for(el <- contentList){
-      if (shown.indexOf(el) != -1) removeClass(el, "hide")
-      else addClass(el, "hide")
 
-      if (lined.indexOf(el) == -1) removeClass(el, "lined")
-      else addClass(el, "lined")
-    }
-    if (lastIndex != -1) removeClass(contentList(lastIndex), "pure-menu-selected")
-    addClass(contentList(index), "pure-menu-selected")
-  }
+    val frag = div(cls:="pure-menu  pure-menu-open")(
+      a(cls:="pure-menu-heading", href:="#")(
+        "Contents"
+      ),
+      ul(cls:="menu-item-list")(
+        contentList.drop(1).toVector
+      )
+    )
+    frag
+  }.build
 }
