@@ -80,7 +80,4 @@ object Book {
       )
     )
   ).render
-
-
-
 }

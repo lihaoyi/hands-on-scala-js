@@ -14,29 +14,15 @@ object Controller{
   def munge(name: String) = {
     name.replace(" ", "")
   }
-  def addClass(el: dom.HTMLElement, cls: String) = {
-    removeClass(el, cls)
-    el.className = el.className + " " + cls
-  }
-  def removeClass(el: dom.HTMLElement, cls: String) = {
-    el.className = el.className.split(' ')
-                               .iterator
-                               .filter(_ != cls)
-                               .mkString(" ")
-  }
-  def toggleClass(el: dom.HTMLElement, cls: String) = {
-    val frags = el.className.split(' ')
-    if (!frags.contains(cls)) addClass(el, cls)
-    else removeClass(el, cls)
-  }
+
   @JSExport
   def main(data: scala.scalajs.js.Any) = {
 
     val structure = upickle.readJs[Tree[String]](upickle.json.readJs(data))
     var i = 0
-    def recurse(t: Tree[String], depth: Int): Tree[(dom.HTMLElement, Int)] = {
+    def recurse(t: Tree[String], depth: Int): Tree[(dom.HTMLElement, Int, Int)] = {
       val curr =
-        li(paddingLeft := "15px")(
+        li(
           a(
             t.name,
             href:="#"+munge(t.name),
@@ -48,8 +34,9 @@ object Controller{
       val children = t.children.map(recurse(_, depth + 1))
       Tree(
         (
-          curr(ul(children.map(_.name._1))).render,
-          originalI
+          curr(ul(paddingLeft := "15px",children.map(_.name._1))).render,
+          originalI,
+          if (children.length > 0) children.map(_.name._3).max else originalI + 1
         ),
         children
       )
@@ -79,8 +66,9 @@ object Controller{
         .map(offset(_, main))
         .toVector
     }
+    println(headers)
 
-    val domTrees = recurse(structure, 0).children
+    val domTrees = structure.children.map(recurse(_, 0))
 
     menu.appendChild(
       div(cls:="pure-menu  pure-menu-open")(
@@ -93,34 +81,43 @@ object Controller{
       ).render
     )
     menuLink.onclick = (e: dom.MouseEvent) => {
-      toggleClass(layout, "active")
-      toggleClass(menu, "active")
-      toggleClass(menuLink, "active")
+      layout.classList.toggle("active")
+      menu.classList.toggle("active")
+      menuLink.classList.toggle("active")
     }
 
     var scrolling = false
-
+    var lastSelected: dom.HTMLElement = null
     def start() ={
       scrolling = false
       val threshold = main.scrollTop + main.clientHeight
-      println("")
-      def walkTree(tree: Tree[(dom.HTMLElement, Int)]): Unit = {
-        val Tree((menuItem, index), children) = tree
+      def walkTree(tree: Tree[(dom.HTMLElement, Int, Int)]): Boolean = {
+        val Tree((menuItem, index, next), children) = tree
         val before = headers(index) < threshold
-
-        val next = children.lastOption
-                           .fold(index)(_.name._2)
-
-        val win = before && headers.lift(next + 1).getOrElse(999999.0) > threshold
-
+        val after = (next >= headers.length) || headers(next) > threshold
+        val win = before && after
         if (win){
-          removeClass(menuItem, "hide")
-          addClass(menuItem, "selected")
-          tree.children.foreach(walkTree)
+          menuItem.classList.remove("hide")
+          var winFound = false
+
+          for(c <- tree.children){
+            val newWinFound = walkTree(c)
+            if (!winFound) c.name._1.classList.add("selected")
+            else c.name._1.classList.remove("selected")
+            winFound = winFound | newWinFound
+          }
+          if (!winFound) {
+            tree.children.foreach(_.name._1.classList.remove("selected"))
+            if (lastSelected != null)
+              lastSelected.children(0).classList.remove("pure-menu-selected")
+            menuItem.children(0).classList.add("pure-menu-selected")
+            lastSelected = menuItem
+          }
         }else{
-          addClass(menuItem, "hide")
-          removeClass(menuItem, "selected")
+          menuItem.classList.add("hide")
+          menuItem.classList.remove("selected")
         }
+        win
       }
       domTrees.map(walkTree)
     }
