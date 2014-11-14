@@ -27,8 +27,8 @@ object Main {
     }
 
     val allNames = {
-      def rec(n: Node): Seq[String] = {
-        n.name +: n.children.flatMap(rec)
+      def rec(n: Tree[String]): Seq[String] = {
+        n.value +: n.children.flatMap(rec)
       }
       rec(sect.structure).toSet
     }

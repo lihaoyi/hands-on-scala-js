@@ -8,9 +8,7 @@ version := "0.1-SNAPSHOT"
 
 scalaVersion := "2.11.4"
 
-libraryDependencies += "com.github.japgolly.scalajs-react" %%% "core" % "0.5.1"
-
-
+libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided"
 
 libraryDependencies += "com.lihaoyi" %%% "upickle" % "0.2.5"
 

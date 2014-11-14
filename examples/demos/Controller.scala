@@ -1,4 +1,4 @@
-
+import acyclic.file
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 import org.scalajs.dom
@@ -6,7 +6,7 @@ import org.scalajs.dom.extensions._
 import scala.collection.mutable
 import scalatags.JsDom.all._
 
-case class Tree[T](name: T, children: Vector[Tree[T]])
+
 
 @JSExport
 object Controller{
@@ -20,12 +20,12 @@ object Controller{
 
     val structure = upickle.readJs[Tree[String]](upickle.json.readJs(data))
     var i = 0
-    def recurse(t: Tree[String], depth: Int): Tree[(dom.HTMLElement, Int, Int)] = {
+    def recurse(t: Tree[String], depth: Int): Tree[MenuNode] = {
       val curr =
         li(
           a(
-            t.name,
-            href:="#"+munge(t.name),
+            t.value,
+            href:="#"+munge(t.value),
             cls:="menu-item"
           )
         )
@@ -33,10 +33,10 @@ object Controller{
       i += 1
       val children = t.children.map(recurse(_, depth + 1))
       Tree(
-        (
-          curr(ul(paddingLeft := "15px",children.map(_.name._1))).render,
+        MenuNode(
+          curr(ul(paddingLeft := "15px",children.map(_.value.frag))).render,
           originalI,
-          if (children.length > 0) children.map(_.name._3).max else originalI + 1
+          if (children.length > 0) children.map(_.value.end).max else originalI + 1
         ),
         children
       )
@@ -57,7 +57,7 @@ object Controller{
 
       val menuItems = {
         def rec(current: Tree[String]): Seq[String] = {
-          current.name +: current.children.flatMap(rec)
+          current.value +: current.children.flatMap(rec)
         }
         rec(structure).tail
       }
@@ -68,15 +68,17 @@ object Controller{
     }
     println(headers)
 
-    val domTrees = structure.children.map(recurse(_, 0))
 
+
+    val domTrees = structure.children.map(recurse(_, 0))
+    val scrollSpy = new ScrollSpy(headers, domTrees)
     menu.appendChild(
       div(cls:="pure-menu  pure-menu-open")(
         a(cls:="pure-menu-heading", href:="#")(
           "Contents"
         ),
         ul(cls:="menu-item-list")(
-          domTrees.map(_.name._1)
+          domTrees.map(_.value.frag)
         )
       ).render
     )
@@ -86,50 +88,13 @@ object Controller{
       menuLink.classList.toggle("active")
     }
 
-    var scrolling = false
-    var lastSelected: dom.HTMLElement = null
-    def start() ={
-      scrolling = false
-      val threshold = main.scrollTop + main.clientHeight
-      def walkTree(tree: Tree[(dom.HTMLElement, Int, Int)]): Boolean = {
-        val Tree((menuItem, index, next), children) = tree
-        val before = headers(index) < threshold
-        val after = (next >= headers.length) || headers(next) > threshold
-        val win = before && after
-        if (win){
-          menuItem.classList.remove("hide")
-          var winFound = false
 
-          for(c <- tree.children){
-            val newWinFound = walkTree(c)
-            if (!winFound) c.name._1.classList.add("selected")
-            else c.name._1.classList.remove("selected")
-            winFound = winFound | newWinFound
-          }
-          if (!winFound) {
-            tree.children.foreach(_.name._1.classList.remove("selected"))
-            if (lastSelected != null)
-              lastSelected.children(0).classList.remove("pure-menu-selected")
-            menuItem.children(0).classList.add("pure-menu-selected")
-            lastSelected = menuItem
-          }
-        }else{
-          menuItem.classList.add("hide")
-          menuItem.classList.remove("selected")
-        }
-        win
-      }
-      domTrees.map(walkTree)
-    }
-    main.onscroll = (e: dom.UIEvent) => if (!scrolling){
-      scrolling = true
-      dom.requestAnimationFrame((d: Double) => start())
+    main.onscroll = (e: dom.UIEvent) => {
+      scrollSpy(main.scrollTop + main.clientHeight)
     }
   }
   def isElementInViewport(el: dom.HTMLElement) = {
     val rect = el.getBoundingClientRect()
     rect.top >= 0 && rect.bottom <= dom.innerHeight
   }
-
-
 }

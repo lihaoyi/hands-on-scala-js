@@ -34,7 +34,7 @@ object sect{
     (h6(_, _, _), None)
   )
 
-  var structure = Node("root", mutable.Buffer.empty)
+  var structure = Tree[String]("root", mutable.Buffer.empty)
 
   val usedRefs = mutable.Set.empty[String]
 
@@ -49,7 +49,7 @@ object sect{
 }
 case class sect(name: String, subname: String = ""){
   sect.indent += 1
-  val newNode = Node(name, mutable.Buffer.empty)
+  val newNode = Tree[String](name, mutable.Buffer.empty)
   val (headerWrap, contentWrap) = sect.headers(sect.indent-1)
   sect.structure.children.append(newNode)
   val prev = sect.structure
@@ -75,7 +75,7 @@ case class sect(name: String, subname: String = ""){
     res
   }
 }
-case class Node(name: String, children: mutable.Buffer[Node])
+case class Tree[T](value: T, children: mutable.Buffer[Tree[T]])
 object lnk{
   val usedLinks = mutable.Set.empty[String]
   def apply(name: String, url: String) = {
