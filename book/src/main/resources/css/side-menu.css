@@ -310,19 +310,26 @@ code{
 .header-link{
     opacity: 0.05;
 }
-.menu-item-list > li {
-    height: 43px;
-}
-.menu-item-list > li.hide{
+.menu-item-list li.hide > ul{
     height: 0px;
     overflow: hidden;
+    opacity: 0;
 }
-#menu .menu-item-list > li.pure-menu-selected > a{
+
+#menu .menu-item-list li.selected > a{
     border-left: 2px solid white;
 }
-#menu .menu-item-list > li.lined > a{
+#menu .menu-item-list li.lined > a{
     border-left: 2px solid white;
 }
+
+.pure-menu li > ul{
+    position:relative;
+    visibility:visible;
+    left: 0px;
+    top: 0px;
+}
+
 /*Workaround for bug in highlight.js IDEA theme*/
 .hljs-tag, .hljs-symbol{
     background: none;

@@ -26,7 +26,7 @@ object Book {
     "META-INF/resources/webjars/font-awesome/4.2.0/fonts/fontawesome-webfont.woff",
     "META-INF/resources/webjars/react/0.11.1/react.min.js",
     "css/side-menu.css",
-    "example-opt.js",
+    "example-fastopt.js",
     "webpage/weather.js",
     "favicon.svg",
     "favicon.png"
