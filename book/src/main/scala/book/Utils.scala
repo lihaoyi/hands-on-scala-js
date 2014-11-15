@@ -83,27 +83,21 @@ object lnk{
     a(name, href:=url)
   }
   object dom{
-    class MdnThing(name: String = toString) extends Frag{
-      def render = lnk.apply(name, "https://developer.mozilla.org/en-US/docs/Web/API/" + name).render
-      def applyTo(t: Builder) = t.addChild(render)
-    }
-    class MdnEvent extends Frag {
-      def render = lnk.apply(toString, "https://developer.mozilla.org/en-US/docs/Web/Events/" + toString).render
-      def applyTo(t: Builder) = t.addChild(render)
-    }
-    object CanvasRenderingContext2D extends MdnThing()
-    object HTMLCanvasElement extends MdnThing()
-    object Element extends MdnThing()
-    object HTMLElement extends MdnThing()
-    object HTMLInputElement extends MdnThing()
-    object HTMLSpanElement extends MdnThing()
-    object XMLHttpRequest extends MdnThing()
-    object getElementById extends MdnThing("document.getElementById")
-    object setInterval extends MdnThing("WindowTimers.setInterval")
-    object mousedown extends MdnThing
-    object mouseup extends MdnThing
-    object onclick extends MdnThing
-    object onkeyup extends MdnThing
+    def mdnThing(name: String) = lnk(name, "https://developer.mozilla.org/en-US/docs/Web/API/" + name)
+    def mdnEvent(name: String) = lnk(name, "https://developer.mozilla.org/en-US/docs/Web/Events/" + name)
+    val CanvasRenderingContext2D = mdnThing("CanvasRenderingContext2D")
+    val HTMLCanvasElement = mdnThing("HTMLCanvasElement")
+    val Element = mdnThing("Element")
+    val HTMLElement = mdnThing("HTMLElement")
+    val HTMLInputElement = mdnThing("HTMLInputElement")
+    val HTMLSpanElement = mdnThing("HTMLSpanElement")
+    val XMLHttpRequest = mdnThing("XMLHttpRequest")
+    val getElementById = mdnThing("document.getElementById")
+    val setInterval = mdnThing("WindowTimers.setInterval")
+    val mousedown = mdnEvent("mousedown")
+    val mouseup = mdnEvent("mouseup")
+    val onclick = mdnEvent("onclick")
+    val onkeyup = mdnEvent("onkeyup")
     val JSONparse = lnk("Json.parse", "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse")
   }
   object scala{

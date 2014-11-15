@@ -32,13 +32,6 @@ Add transition to containers so they can push in and out.
     -o-transition: all 0.2s ease-out;
     transition: all 0.2s ease-out;
 }
-.menu-item-list li > ul{
-    -webkit-transition: all 0.2s ease-out;
-    -moz-transition: all 0.2s ease-out;
-    -ms-transition: all 0.2s ease-out;
-    -o-transition: all 0.2s ease-out;
-    transition: all 0.2s ease-out;
-}
 
 /*
 This is the parent `<div>` that contains the menu and the content area.
@@ -319,14 +312,19 @@ code{
     overflow: hidden;
 }
 
-
 #menu .menu-item-list li.selected > a{
     border-left: 2px solid white;
 }
-#menu .menu-item-list li.lined > a{
-    border-left: 2px solid white;
+
+.menu-item-list li > a{
+    -webkit-transition: background-color 0.2s ease-out;
+    -moz-transition: background-color 0.2s ease-out;
+    -ms-transition: background-color 0.2s ease-out;
+    -o-transition: background-color 0.2s ease-out;
+    transition: background-color 0.2s ease-out;
 }
 
+/*Override stuff from pure =/ it's not doing what I want*/
 .pure-menu li > ul{
     position:relative;
     visibility:visible;
