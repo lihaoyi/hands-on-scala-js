@@ -1,4 +1,5 @@
-import acyclic.file
+package scrollmenu
+
 import org.scalajs.dom
 
 case class Tree[T](value: T, children: Vector[Tree[T]])
@@ -6,11 +7,11 @@ case class Tree[T](value: T, children: Vector[Tree[T]])
 case class MenuNode(frag: dom.HTMLElement, start: Int, end: Int)
 
 /**
- * High performance scrollspy to
+ * High performance scrollspy to work keep the left menu bar in sync.
+ * Lots of sketchy imperative code in order to maximize performance.
  */
 class ScrollSpy(headers: Vector[Double], domTrees: Seq[Tree[MenuNode]]){
   var scrolling = false
-  var lastSelected: dom.HTMLElement = null
   def apply(threshold: Double) = if (!scrolling){
     scrolling = true
     dom.requestAnimationFrame((d: Double) => start(threshold))
@@ -34,12 +35,10 @@ class ScrollSpy(headers: Vector[Double], domTrees: Seq[Tree[MenuNode]]){
         }
         if (!winFound) {
           tree.children.foreach(_.value.frag.classList.remove("selected"))
-          if (lastSelected != null)
-            lastSelected.children(0).classList.remove("pure-menu-selected")
-          menuItem.children(0).classList.add("pure-menu-selected")
-          lastSelected = menuItem
         }
+        menuItem.children(0).classList.add("pure-menu-selected")
       }else{
+        menuItem.children(0).classList.remove("pure-menu-selected")
         menuItem.classList.add("hide")
         menuItem.classList.remove("selected")
       }

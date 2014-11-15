@@ -32,8 +32,7 @@ Add transition to containers so they can push in and out.
     -o-transition: all 0.2s ease-out;
     transition: all 0.2s ease-out;
 }
-.hide,
-.menu-item-list > li{
+.menu-item-list li > ul{
     -webkit-transition: all 0.2s ease-out;
     -moz-transition: all 0.2s ease-out;
     -ms-transition: all 0.2s ease-out;
@@ -311,10 +310,15 @@ code{
     opacity: 0.05;
 }
 .menu-item-list li.hide > ul{
-    height: 0px;
+    opacity: 1;
     overflow: hidden;
-    opacity: 0;
+    height: 0px;
 }
+.menu-item-list li > ul{
+    opacity: 1;
+    overflow: hidden;
+}
+
 
 #menu .menu-item-list li.selected > a{
     border-left: 2px solid white;

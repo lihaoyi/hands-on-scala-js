@@ -1,9 +1,10 @@
-import acyclic.file
-import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExport
+package scrollmenu
+
 import org.scalajs.dom
 import org.scalajs.dom.extensions._
-import scala.collection.mutable
+
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
 
 
@@ -66,12 +67,10 @@ object Controller{
         .map(offset(_, main))
         .toVector
     }
-    println(headers)
-
-
 
     val domTrees = structure.children.map(recurse(_, 0))
     val scrollSpy = new ScrollSpy(headers, domTrees)
+
     menu.appendChild(
       div(cls:="pure-menu  pure-menu-open")(
         a(cls:="pure-menu-heading", href:="#")(
@@ -82,12 +81,12 @@ object Controller{
         )
       ).render
     )
+
     menuLink.onclick = (e: dom.MouseEvent) => {
       layout.classList.toggle("active")
       menu.classList.toggle("active")
       menuLink.classList.toggle("active")
     }
-
 
     main.onscroll = (e: dom.UIEvent) => {
       scrollSpy(main.scrollTop + main.clientHeight)
