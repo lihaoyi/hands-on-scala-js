@@ -8,32 +8,53 @@ import utest.util.Tree
 import scala.util.{Failure, Success}
 
 object SyntaxTest extends TestSuite{
-  def check[T](input: String, parse: ScalaSyntax => scala.util.Try[T], expected: T) = {
-    parse(new ScalaSyntax(input)) match{
+  def check[T](input: String) = {
+    new ScalaSyntax(input).CompilationUnit.run() match{
       case Failure(f: ParseError) =>
         println(f.formatTraces)
-        throw new Exception(f.formatTraces)
+        throw new Exception(f.position + "\t" + f.formatTraces)
       case Success(parsed) =>
-        assert(parsed == expected)
+        assert(parsed == input)
     }
-
   }
   def tests = TestSuite{
 
     * - check(
-      """(1
-        |)""".stripMargin,
-      _.ArgumentExprs().run(), ()
+      "package torimatomeru"
+
     )
     * - check(
-      """(1,
-        |1)""".stripMargin,
-      _.ArgumentExprs().run(), ()
+      """
+        |package torimatomeru
+        |
+        |import org.parboiled2.ParseError
+        |import utest._
+        |import utest.framework.Test
+      """.stripMargin
+
     )
     * - check(
-      """val omg = "omg"
-        |omg * 2""".stripMargin,
-      _.Block.run(), ()
+      """
+        |package torimatomeru
+        |
+        |import org.parboiled2.ParseError
+        |import utest._
+        |import utest.framework.Test
+        |import utest.util.Tree
+        |
+        |import scala.util.{Failure, Success}
+        |
+        |object SyntaxTest extends TestSuite
+      """.stripMargin
+    )
+    * - check(
+      """
+        |object SyntaxTest extends TestSuite{
+        |  def check[T](input: String) = {
+        |
+        |  }
+        |}
+      """.stripMargin
     )
   }
 }

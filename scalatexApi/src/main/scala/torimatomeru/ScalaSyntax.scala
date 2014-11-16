@@ -207,7 +207,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Import(G: B = true): Rule0 = rule { "import" ~ oneOrMore(ImportExpr(G)).separatedBy(',') }
 
   //ImportExpr is slightly changed wrt spec because StableId always consumes all the Ids possible, so there is no need to one at the end
-  def ImportExpr(G: B = true): Rule0 = rule { StableId(G) ~ optional('.' ~ ('_' | ImportSelectors(G))) }
+  def ImportExpr(G: B = true): Rule0 = rule { StableId(G) ~ optional('.' ~ (wspStrG("_", G) | ImportSelectors(G))) }
   def ImportSelectors(G: B = true): Rule0 = rule { '{' ~ zeroOrMore(ImportSelector ~ ',') ~ (ImportSelector | '_') ~ wspStrG("}", G) }
   def ImportSelector: Rule0 = rule { IdS() ~ optional("=>" ~ (IdS() | '_')) }
 
@@ -250,9 +250,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def ConstrBlock: Rule0 = rule { '{' ~ SelfInvocation ~ zeroOrMore(SemiS ~ BlockStat) ~ '}' }
   def SelfInvocation: Rule0 = rule { "this" ~ oneOrMore(ArgumentExprs()) }
 
-  def TopStatSeq: Rule0 = rule { oneOrMore(TopStat).separatedBy(SemiS) }
+  def TopStatSeq: Rule0 = rule { zeroOrMore(TopStat).separatedBy(SemiS) }
   def TopStat: Rule0 = rule { Packaging | PackageObject(false) | Import(false) | zeroOrMore(Annotation ~ optional(NewlineS)) ~ zeroOrMore(Modifier) ~ TmplDef(false) | MATCH }
   def Packaging: Rule0 = rule { "package" ~ QualId ~ optional(NewlineS) ~ '{' ~ TopStatSeq ~ '}' }
   def PackageObject(G: B = true): Rule0 = rule { "package" ~ "object" ~ ObjectDef(G) }
-  def CompilationUnit: Rule0 = rule { zeroOrMore("package" ~ QualId ~ SemiS) ~ TopStatSeq }
+  def CompilationUnit: Rule1[String] = rule { capture(zeroOrMore(SemiS) ~ zeroOrMore("package" ~ QualId).separatedBy(SemiS) ~ TopStatSeq) }
 }
