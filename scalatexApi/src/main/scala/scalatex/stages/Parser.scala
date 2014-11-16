@@ -99,7 +99,7 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
     (push(offsetCursor) ~ capture(ArgumentExprs2) ~> ((x, y) => Ast.Chain.Args(y, x))) |
     BraceBlock
   }
-  def Ws = Whitespace
+  def Ws = WhiteLines
   // clones of the version in ScalaSyntax, but without tailing whitespace or newlines
   def TypeArgs2 = rule { '[' ~ Ws ~ Types ~ ']' }
   def ArgumentExprs2 = rule {
@@ -107,7 +107,7 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
     (optional(Exprs ~ ',' ~ Ws) ~ PostfixExpr() ~ ':' ~ Ws ~ '_' ~ Ws ~ '*' ~ Ws | optional(Exprs) ) ~
     ')'
   }
-  def BlockExpr2: Rule0 = rule { '{' ~ Ws ~ (CaseClauses | Block) ~ '}' }
+  def BlockExpr2: Rule0 = rule { '{' ~ Ws ~ (CaseClauses | Block) ~ Ws ~ '}' }
   def BraceBlock: Rule1[Ast.Block] = rule{ '{' ~ BodyNoBrace ~ '}' }
 
   def BodyItem(exclusions: String): Rule1[Seq[Ast.Block.Sub]] = rule{

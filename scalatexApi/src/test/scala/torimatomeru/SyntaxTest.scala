@@ -31,12 +31,9 @@ object SyntaxTest extends TestSuite{
       _.ArgumentExprs().run(), ()
     )
     * - check(
-      """(1, 2,
-        |3
-        |,
-        |4
-        |)""".stripMargin,
-      _.ArgumentExprs().run(), ()
+      """val omg = "omg"
+        |omg * 2""".stripMargin,
+      _.Block.run(), ()
     )
   }
 }

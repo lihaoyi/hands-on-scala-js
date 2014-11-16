@@ -129,7 +129,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def SimpleExpr1(G: B = true) = rule{
     "new" ~ (ClassTemplate(G) | TemplateBody(G)) |
     BlockExpr(G) |
-    LiteralS() ~ drop[String] |
+    LiteralS(G) ~ drop[String] |
     Path(G) |
     '_' |
     '(' ~ optional(Exprs) ~ wspStrG(")", G)
@@ -144,7 +144,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def BlockExpr(G: B = true): Rule0 = rule { '{' ~ (CaseClauses | Block) ~ wspStrG("}", G) }
   def Block: Rule0 = rule { zeroOrMore(BlockStat ~ SemiS) ~ optional(ResultExpr()) }
   def BlockStat: Rule0 = rule {
-    &(SemiS) ~ MATCH | //shortcircuit when Semi is found
+    SemiS |
     Import(false) |
     zeroOrMore(Annotation) ~ (optional("implicit" | "lazy") ~ Def(false) | zeroOrMore(LocalModifier) ~ TmplDef(false)) |
     Expr1(false)

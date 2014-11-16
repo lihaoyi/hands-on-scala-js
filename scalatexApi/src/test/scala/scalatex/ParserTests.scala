@@ -366,15 +366,27 @@ object ParserTests extends utest.TestSuite{
           |bbq""".stripMargin,
         _.Body.run(),
         Block(Seq(
+          Text("\n", 0),
           Chain("omg",Seq(
-            Args("(\"lol\",\n1,\n       2\n    )"),
+            Args("(\"lol\",\n1,\n       2\n    )", 5),
             Block(Seq(
-              Text("\n  "), Text("wtf")
-            ))
-          )),
-          Text("\n"),
-          Text("bbq")
-        ))
+              Text("\n  ", 30), Text("wtf", 33)
+            ), 30)
+          ), 1),
+          Text("\n", 36),
+          Text("bbq", 37)
+        ), 0)
+      )
+      'codeBlock - check(
+        """@{
+          |  val omg = "omg"
+          |  omg * 2
+          |}""".stripMargin,
+        _.Code.run(),
+        """{
+        |  val omg = "omg"
+        |  omg * 2
+        |}""".stripMargin
       )
       'codeBlocks - check(
         """
