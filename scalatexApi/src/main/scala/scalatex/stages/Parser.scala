@@ -41,11 +41,11 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
     "@" ~ capture(Id | BlockExpr2 | ('(' ~ optional(Exprs) ~ ')'))
   }
   def Header = rule {
-    "@" ~ capture(Def(false) | Import)
+    "@" ~ capture(Def(false) | Import(false))
   }
 
   def HeaderBlock: Rule1[Ast.Header] = rule{
-    Header ~ zeroOrMore(capture(NewlineS) ~ Header ~> (_ + _)) ~ runSubParser{new Parser(_, indent, cursor).Body0} ~> {
+    Header ~ zeroOrMore(capture(WhiteLines) ~ Header ~> (_ + _)) ~ runSubParser{new Parser(_, indent, cursor).Body0} ~> {
       (start: String, heads: Seq[String], body: Ast.Block) => Ast.Header(start + heads.mkString, body)
     }
   }

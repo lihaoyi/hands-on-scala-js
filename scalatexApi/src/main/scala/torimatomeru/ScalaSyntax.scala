@@ -6,10 +6,12 @@ import org.parboiled2._
 
 class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identifiers with Literals {
 
+  type B = Boolean
+  
   def Whitespace = rule { zeroOrMore(WhitespaceChar | Comment) }
   def WhiteLines = rule{ zeroOrMore(WhitespaceChar | Comment | Newline) }
-  def White(greedy: Boolean = true) =
-    if (greedy) WhiteLines
+  def White(G: B = true) =
+    if (G) WhiteLines
     else Whitespace
 
   /**
@@ -19,8 +21,8 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   implicit private[this] def wspStr(s: String): Rule0 = rule {
     str(s) ~ WhiteLines
   }
-  def wspStrG(s: String, greedy: Boolean): Rule0 = rule {
-    str(s) ~ White(greedy)
+  def wspStrG(s: String, G: B): Rule0 = rule {
+    str(s) ~ White(G)
   }
 
   implicit private[this] def wspChar(s: Char): Rule0 = rule {
@@ -41,9 +43,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   // only capture super.rule and not the whitespace
   //////////////////////////////////////////////////
 
-  def IdS(greedy: Boolean = true) = rule { super.Id ~ White(greedy)}
-  def VarIdS(greedy: Boolean = true) = rule { super.VarId ~ White(greedy) }
-  def LiteralS(greedy: Boolean = true) = rule { super.Literal ~ White(greedy) }
+  def IdS(G: B = true) = rule { super.Id ~ White(G)}
+  def VarIdS(G: B = true) = rule { super.VarId ~ White(G) }
+  def LiteralS(G: B = true) = rule { super.Literal ~ White(G) }
   def SemiS = rule { super.Semi ~ WhiteLines }
   def NewlineS = rule { super.Newline ~ WhiteLines }
 
@@ -55,10 +57,10 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Ids = rule { oneOrMore(IdS()) separatedBy ',' }
 
   //path and stableId were refactored (wrt spec) to avoid recursiveness and be more specific 
-  def Path: Rule0 = rule { zeroOrMore(IdS() ~ '.') ~ "this" ~ zeroOrMore(IdS()).separatedBy('.') | StableId }
-  def StableId: Rule0 = rule {
-    zeroOrMore(IdS() ~ '.') ~ ("this" | "super" ~ optional(ClassQualifier)) ~ '.' ~ oneOrMore(IdS()).separatedBy('.') |
-      IdS() ~ zeroOrMore('.' ~ IdS())
+  def Path(G: B = true): Rule0 = rule { zeroOrMore(IdS(G) ~ '.') ~ "this" ~ zeroOrMore(IdS(G)).separatedBy('.') | StableId(G) }
+  def StableId(G: B = true): Rule0 = rule {
+    zeroOrMore(IdS() ~ '.') ~ ("this" | "super" ~ optional(ClassQualifier)) ~ '.' ~ oneOrMore(IdS(G)).separatedBy('.') |
+      IdS(G) ~ zeroOrMore('.' ~ IdS(G))
   }
 //    def StableId: Rule0 = rule { zeroOrMore(Id ~ '.') ~ optional("this" | "super" ~ optional(ClassQualifier)) ~ oneOrMore(Id).separatedBy('.') }
   def ClassQualifier = rule { '[' ~ IdS() ~ ']' }
@@ -81,8 +83,8 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
   def BasicType: Rule0 = rule {
     '(' ~ Types ~ ')' |
-      Path ~ '.' ~ "type" |
-      StableId
+      Path() ~ '.' ~ "type" |
+      StableId()
   }
   def TypeArgs = rule { '[' ~ Types ~ ']' }
   def Types = rule { oneOrMore(Type).separatedBy(',') }
@@ -97,57 +99,57 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   // Declarations, Expressions and Pattern Matching
   /////////////////////////////////////////////////
 
-  def Expr(greedy: Boolean = true): Rule0 = rule { (Bindings | optional("implicit") ~ IdS() | "_") ~ "=>" ~ Expr(greedy) | Expr1(greedy) }
-  def Expr1(greedy: Boolean = true): Rule0 = rule {
-    IfCFlow(greedy) |
-    WhileCFlow(greedy) |
-    TryCFlow(greedy) |
-    DoWhileCFlow(greedy) |
-    ForCFlow(greedy) |
-    "throw" ~ Expr(greedy) |
-    "return" ~ optional(Expr(greedy)) |
-    SimpleExpr() ~ ArgumentExprs() ~ '=' ~ Expr(greedy) |
-    optional(SimpleExpr() ~ '.') ~ IdS() ~ '=' ~ Expr(greedy) |
-    PostfixExpr(greedy) ~ optional("match" ~ '{' ~ CaseClauses ~ '}' | Ascription)
+  def Expr(G: B = true): Rule0 = rule { (Bindings | optional("implicit") ~ IdS() | "_") ~ "=>" ~ Expr(G) | Expr1(G) }
+  def Expr1(G: B = true): Rule0 = rule {
+    IfCFlow(G) |
+    WhileCFlow(G) |
+    TryCFlow(G) |
+    DoWhileCFlow(G) |
+    ForCFlow(G) |
+    "throw" ~ Expr(G) |
+    "return" ~ optional(Expr(G)) |
+    SimpleExpr() ~ ArgumentExprs() ~ '=' ~ Expr(G) |
+    optional(SimpleExpr() ~ '.') ~ IdS() ~ '=' ~ Expr(G) |
+    PostfixExpr(G) ~ optional("match" ~ '{' ~ CaseClauses ~ '}' | Ascription)
   }
 
-  def IfCFlow(greedy: Boolean = true) = rule { "if" ~ '(' ~ Expr() ~ ')' ~ zeroOrMore(NewlineS) ~ Expr(greedy) ~ optional(optional(SemiS) ~ "else" ~ Expr(greedy)) }
-  def WhileCFlow(greedy: Boolean = true) = rule { "while" ~ '(' ~ Expr() ~ ')' ~ zeroOrMore(NewlineS) ~ Expr(greedy) }
-  def TryCFlow(greedy: Boolean = true) = rule { "try" ~ '{' ~ Block ~ wspStrG("}", greedy) ~ optional("catch" ~ '{' ~ CaseClauses ~ wspStrG("}", greedy)) ~ optional("finally" ~ Expr(greedy)) }
-  def DoWhileCFlow(greedy: Boolean = true) = rule { "do" ~ Expr() ~ optional(SemiS) ~ "while" ~ '(' ~ Expr() ~ wspStrG(")", greedy) }
-  def ForCFlow(greedy: Boolean = true) = rule { "for" ~ ('(' ~ Enumerators ~ ')' | '{' ~ Enumerators ~ '}') ~ zeroOrMore(NewlineS) ~ optional("yield") ~ Expr(greedy) }
-  def PostfixExpr(greedy: Boolean = true): Rule0 = rule { InfixExpr(greedy) ~ optional(IdS() ~ optional(NewlineS)) }
-  def InfixExpr(greedy: Boolean = true): Rule0 = rule { PrefixExpr(greedy) ~ zeroOrMore(IdS() ~ optional(NewlineS) ~ PrefixExpr(greedy)) }
-  def PrefixExpr(greedy: Boolean = true) = rule { optional(anyOf("-+~!")) ~ SimpleExpr(greedy) }
+  def IfCFlow(G: B = true) = rule { "if" ~ '(' ~ Expr() ~ ')' ~ zeroOrMore(NewlineS) ~ Expr(G) ~ optional(optional(SemiS) ~ "else" ~ Expr(G)) }
+  def WhileCFlow(G: B = true) = rule { "while" ~ '(' ~ Expr() ~ ')' ~ zeroOrMore(NewlineS) ~ Expr(G) }
+  def TryCFlow(G: B = true) = rule { "try" ~ '{' ~ Block ~ wspStrG("}", G) ~ optional("catch" ~ '{' ~ CaseClauses ~ wspStrG("}", G)) ~ optional("finally" ~ Expr(G)) }
+  def DoWhileCFlow(G: B = true) = rule { "do" ~ Expr() ~ optional(SemiS) ~ "while" ~ '(' ~ Expr() ~ wspStrG(")", G) }
+  def ForCFlow(G: B = true) = rule { "for" ~ ('(' ~ Enumerators ~ ')' | '{' ~ Enumerators ~ '}') ~ zeroOrMore(NewlineS) ~ optional("yield") ~ Expr(G) }
+  def PostfixExpr(G: B = true): Rule0 = rule { InfixExpr(G) ~ optional(IdS() ~ optional(NewlineS)) }
+  def InfixExpr(G: B = true): Rule0 = rule { PrefixExpr(G) ~ zeroOrMore(IdS() ~ optional(NewlineS) ~ PrefixExpr(G)) }
+  def PrefixExpr(G: B = true) = rule { optional(anyOf("-+~!")) ~ SimpleExpr(G) }
 
-  def SimpleExpr(greedy: Boolean = true): Rule0 = rule {
-    SimpleExpr1(greedy) ~ zeroOrMore('.' ~ IdS() | TypeArgs | ArgumentExprs(greedy)) ~ optional('_')
+  def SimpleExpr(G: B = true): Rule0 = rule {
+    SimpleExpr1(G) ~ zeroOrMore('.' ~ IdS() | TypeArgs | ArgumentExprs(G)) ~ optional('_')
   }
 
-  def SimpleExpr1(greedy: Boolean = true) = rule{
-    "new" ~ (ClassTemplate | TemplateBody) |
-    BlockExpr(greedy) |
+  def SimpleExpr1(G: B = true) = rule{
+    "new" ~ (ClassTemplate(G) | TemplateBody(G)) |
+    BlockExpr(G) |
     LiteralS() ~ drop[String] |
-    Path |
+    Path(G) |
     '_' |
-    '(' ~ optional(Exprs) ~ wspStrG(")", greedy)
+    '(' ~ optional(Exprs) ~ wspStrG(")", G)
   }
 
 
   def Exprs: Rule0 = rule { oneOrMore(Expr()).separatedBy(',') }
-  def ArgumentExprs(greedy: Boolean = true): Rule0 = rule {
+  def ArgumentExprs(G: B = true): Rule0 = rule {
     '(' ~ (optional(Exprs ~ ',') ~ PostfixExpr() ~ ':' ~ '_' ~ '*' | optional(Exprs)) ~ ')' |
-      optional(NewlineS) ~ BlockExpr(greedy)
+      optional(NewlineS) ~ BlockExpr(G)
   }
-  def BlockExpr(greedy: Boolean = true): Rule0 = rule { '{' ~ (CaseClauses | Block) ~ wspStrG("}", greedy) }
+  def BlockExpr(G: B = true): Rule0 = rule { '{' ~ (CaseClauses | Block) ~ wspStrG("}", G) }
   def Block: Rule0 = rule { zeroOrMore(BlockStat ~ SemiS) ~ optional(ResultExpr()) }
   def BlockStat: Rule0 = rule {
     &(SemiS) ~ MATCH | //shortcircuit when Semi is found
-    Import |
-    zeroOrMore(Annotation) ~ (optional("implicit" | "lazy") ~ Def(false) | zeroOrMore(LocalModifier) ~ TmplDef) |
+    Import(false) |
+    zeroOrMore(Annotation) ~ (optional("implicit" | "lazy") ~ Def(false) | zeroOrMore(LocalModifier) ~ TmplDef(false)) |
     Expr1(false)
   }
-  def ResultExpr(greedy: Boolean = true): Rule0 = rule { (Bindings | optional("implicit") ~ IdS() | "_") ~ "=>" ~ Block | Expr1(true) }
+  def ResultExpr(G: B = true): Rule0 = rule { (Bindings | optional("implicit") ~ IdS() | "_") ~ "=>" ~ Block | Expr1(true) }
   def Enumerators: Rule0 = rule { Generator ~ zeroOrMore(SemiS ~ Enumerator) }
   def Enumerator: Rule0 = rule { Generator | Guard | Pattern1 ~ '=' ~ Expr() }
   def Generator: Rule0 = rule { Pattern1 ~ "<-" ~ Expr() ~ optional(Guard) }
@@ -162,7 +164,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     '_' |
       LiteralS() ~ drop[String] | //literal currently captures, so it can be used outside. but since all our rules lack AST, we drop its value in order to be able to compose them
       '(' ~ optional(Patterns) ~ ')' |
-      StableId ~ '(' ~ (optional(Patterns ~ ',') ~ optional(VarIdS() ~ '@') ~ '_' ~ '*' | optional(Patterns)) ~ ')' |
+      StableId() ~ '(' ~ (optional(Patterns ~ ',') ~ optional(VarIdS() ~ '@') ~ '_' ~ '*' | optional(Patterns)) ~ ')' |
       VarIdS() /*|
     XmlPattern*/
   }
@@ -176,8 +178,8 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def ParamClause: Rule0 = rule { optional(NewlineS) ~ '(' ~ optional(Params) ~ ')' }
   def Params: Rule0 = rule { zeroOrMore(Param).separatedBy(',') }
   def Param: Rule0 = rule { zeroOrMore(Annotation) ~ IdS() ~ optional(':' ~ ParamType) ~ optional('=' ~ Expr()) }
-  def ClassParamClauses: Rule0 = rule { zeroOrMore(ClassParamClause) ~ optional(optional(NewlineS) ~ '(' ~ "implicit" ~ ClassParam ~ ')') }
-  def ClassParamClause: Rule0 = rule { optional(NewlineS) ~ '(' ~ optional(ClassParams) ~ ')' }
+  def ClassParamClauses(G: B = true): Rule0 = rule { zeroOrMore(ClassParamClause(G)) ~ optional(optional(NewlineS) ~ '(' ~ "implicit" ~ ClassParam ~ wspStrG(")", G)) }
+  def ClassParamClause(G: B = true): Rule0 = rule { optional(NewlineS) ~ '(' ~ optional(ClassParams) ~ wspStrG(")", G) }
   def ClassParams: Rule0 = rule { oneOrMore(ClassParam).separatedBy(',') }
   def ClassParam: Rule0 = rule { zeroOrMore(Annotation) ~ optional(zeroOrMore(Modifier) ~ ("val" | "var")) ~ IdS() ~ ":" ~ ParamType ~ optional("=" ~ Expr()) }
 
@@ -192,21 +194,21 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Annotation: Rule0 = rule { '@' ~ SimpleType ~ zeroOrMore(ArgumentExprs()) }
   def ConstrAnnotation: Rule0 = rule { '@' ~ SimpleType ~ ArgumentExprs() }
 
-  def TemplateBody: Rule0 = rule { optional(NewlineS) ~ '{' ~ optional(SelfType) ~ TemplateStat(false) ~ zeroOrMore(SemiS ~ TemplateStat(false)) ~ '}' }
-  def TemplateStat(greedy: Boolean = true): Rule0 = rule {
-    Import |
-    zeroOrMore(Annotation ~ optional(NewlineS)) ~ zeroOrMore(Modifier) ~ (Def(greedy) | Dcl) |
+  def TemplateBody(G: B = true): Rule0 = rule { optional(NewlineS) ~ '{' ~ optional(SelfType) ~ TemplateStat(false) ~ zeroOrMore(SemiS ~ TemplateStat(false)) ~ wspStrG("}", G) }
+  def TemplateStat(G: B = true): Rule0 = rule {
+    Import(false) |
+    zeroOrMore(Annotation ~ optional(NewlineS)) ~ zeroOrMore(Modifier) ~ (Def(G) | Dcl) |
     Expr(false) |
     MATCH
   }
 
   def SelfType: Rule0 = rule { "this" ~ ':' ~ Type ~ "=>" | IdS() ~ optional(':' ~ Type) ~ "=>" }
 
-  def Import: Rule0 = rule { "import" ~ oneOrMore(ImportExpr).separatedBy(',') }
+  def Import(G: B = true): Rule0 = rule { "import" ~ oneOrMore(ImportExpr(G)).separatedBy(',') }
 
   //ImportExpr is slightly changed wrt spec because StableId always consumes all the Ids possible, so there is no need to one at the end
-  def ImportExpr: Rule0 = rule { StableId ~ optional('.' ~ ('_' | ImportSelectors)) }
-  def ImportSelectors: Rule0 = rule { '{' ~ zeroOrMore(ImportSelector ~ ',') ~ (ImportSelector | '_') ~ '}' }
+  def ImportExpr(G: B = true): Rule0 = rule { StableId(G) ~ optional('.' ~ ('_' | ImportSelectors(G))) }
+  def ImportSelectors(G: B = true): Rule0 = rule { '{' ~ zeroOrMore(ImportSelector ~ ',') ~ (ImportSelector | '_') ~ wspStrG("}", G) }
   def ImportSelector: Rule0 = rule { IdS() ~ optional("=>" ~ (IdS() | '_')) }
 
   def Dcl: Rule0 = rule {
@@ -221,24 +223,24 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def FunSig: Rule0 = rule { IdS() ~ optional(FunTypeParamClause) ~ ParamClauses }
   def TypeDcl: Rule0 = rule { IdS() ~ optional(TypeParamClause) ~ optional(">:" ~ Type) ~ optional("<:" ~ Type) }
 
-  def PatVarDef(greedy: Boolean = true): Rule0 = rule { "val" ~ PatDef(greedy) | "var" ~ VarDef(greedy) }
-  def Def(greedy: Boolean = true): Rule0 = rule { "def" ~ FunDef(greedy) | "type" ~ zeroOrMore(NewlineS) ~ TypeDef | PatVarDef(greedy) | TmplDef }
-  def PatDef(greedy: Boolean = true): Rule0 = rule { oneOrMore(Pattern2).separatedBy(',') ~ optional(':' ~ Type) ~ '=' ~ Expr(greedy) }
-  def VarDef(greedy: Boolean = true): Rule0 = rule { Ids ~ ':' ~ Type ~ '=' ~ '_' | PatDef(greedy) }
-  def FunDef(greedy: Boolean = true): Rule0 = rule {
+  def PatVarDef(G: B = true): Rule0 = rule { "val" ~ PatDef(G) | "var" ~ VarDef(G) }
+  def Def(G: B = true): Rule0 = rule { "def" ~ FunDef(G) | "type" ~ zeroOrMore(NewlineS) ~ TypeDef | PatVarDef(G) | TmplDef(G) }
+  def PatDef(G: B = true): Rule0 = rule { oneOrMore(Pattern2).separatedBy(',') ~ optional(':' ~ Type) ~ '=' ~ Expr(G) }
+  def VarDef(G: B = true): Rule0 = rule { Ids ~ ':' ~ Type ~ '=' ~ '_' | PatDef(G) }
+  def FunDef(G: B = true): Rule0 = rule {
     "this" ~ ParamClause ~ ParamClauses ~ ('=' ~ ConstrExpr | optional(NewlineS) ~ ConstrBlock) |
-      FunSig ~ (optional(':' ~ Type) ~ '=' ~ Expr(greedy) | optional(NewlineS) ~ '{' ~ Block ~ '}')
+      FunSig ~ (optional(':' ~ Type) ~ '=' ~ Expr(G) | optional(NewlineS) ~ '{' ~ Block ~ '}')
   }
   def TypeDef: Rule0 = rule { IdS() ~ optional(TypeParamClause) ~ '=' ~ Type }
 
-  def TmplDef: Rule0 = rule { "trait" ~ TraitDef | optional("case") ~ ("class" ~ ClassDef | "object" ~ ObjectDef) }
-  def ClassDef: Rule0 = rule { IdS() ~ optional(TypeParamClause) ~ zeroOrMore(ConstrAnnotation) ~ optional(AccessModifier) ~ ClassParamClauses ~ ClassTemplateOpt }
-  def TraitDef: Rule0 = rule { IdS() ~ optional(TypeParamClause) ~ TraitTemplateOpt }
-  def ObjectDef: Rule0 = rule { IdS() ~ ClassTemplateOpt }
-  def ClassTemplateOpt: Rule0 = rule { "extends" ~ ClassTemplate | optional(optional("extends") ~ TemplateBody) }
-  def TraitTemplateOpt: Rule0 = rule { "extends" ~ TraitTemplate | optional(optional("extends") ~ TemplateBody) }
-  def ClassTemplate: Rule0 = rule { optional(EarlyDefs) ~ ClassParents ~ optional(TemplateBody) }
-  def TraitTemplate: Rule0 = rule { optional(EarlyDefs) ~ TraitParents ~ optional(TemplateBody) }
+  def TmplDef(G: B = true): Rule0 = rule { "trait" ~ TraitDef(G) | optional("case") ~ ("class" ~ ClassDef(G) | "object" ~ ObjectDef(G)) }
+  def ClassDef(G: B = true): Rule0 = rule { IdS() ~ optional(TypeParamClause) ~ zeroOrMore(ConstrAnnotation) ~ optional(AccessModifier) ~ ClassParamClauses(G) ~ ClassTemplateOpt(G) }
+  def TraitDef(G: B = true): Rule0 = rule { IdS() ~ optional(TypeParamClause) ~ TraitTemplateOpt(G) }
+  def ObjectDef(G: B = true): Rule0 = rule { IdS() ~ ClassTemplateOpt(G) }
+  def ClassTemplateOpt(G: B = true): Rule0 = rule { "extends" ~ ClassTemplate(G) | optional(optional("extends") ~ TemplateBody(G)) }
+  def TraitTemplateOpt(G: B = true): Rule0 = rule { "extends" ~ TraitTemplate(G) | optional(optional("extends") ~ TemplateBody(G)) }
+  def ClassTemplate(G: B = true): Rule0 = rule { optional(EarlyDefs) ~ ClassParents ~ optional(TemplateBody(G)) }
+  def TraitTemplate(G: B = true): Rule0 = rule { optional(EarlyDefs) ~ TraitParents ~ optional(TemplateBody(G)) }
   def ClassParents: Rule0 = rule { Constr ~ zeroOrMore("with" ~ AnnotType) }
   def TraitParents: Rule0 = rule { AnnotType ~ zeroOrMore("with" ~ AnnotType) }
   def Constr: Rule0 = rule { AnnotType ~ zeroOrMore(ArgumentExprs()) }
@@ -249,8 +251,8 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def SelfInvocation: Rule0 = rule { "this" ~ oneOrMore(ArgumentExprs()) }
 
   def TopStatSeq: Rule0 = rule { oneOrMore(TopStat).separatedBy(SemiS) }
-  def TopStat: Rule0 = rule { Packaging | PackageObject | Import | zeroOrMore(Annotation ~ optional(NewlineS)) ~ zeroOrMore(Modifier) ~ TmplDef | MATCH }
+  def TopStat: Rule0 = rule { Packaging | PackageObject(false) | Import(false) | zeroOrMore(Annotation ~ optional(NewlineS)) ~ zeroOrMore(Modifier) ~ TmplDef(false) | MATCH }
   def Packaging: Rule0 = rule { "package" ~ QualId ~ optional(NewlineS) ~ '{' ~ TopStatSeq ~ '}' }
-  def PackageObject: Rule0 = rule { "package" ~ "object" ~ ObjectDef }
+  def PackageObject(G: B = true): Rule0 = rule { "package" ~ "object" ~ ObjectDef(G) }
   def CompilationUnit: Rule0 = rule { zeroOrMore("package" ~ QualId ~ SemiS) ~ TopStatSeq }
 }

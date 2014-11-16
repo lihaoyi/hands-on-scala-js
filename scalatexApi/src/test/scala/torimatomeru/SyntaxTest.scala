@@ -27,16 +27,16 @@ object SyntaxTest extends TestSuite{
     )
     * - check(
       """(1,
+        |1)""".stripMargin,
+      _.ArgumentExprs().run(), ()
+    )
+    * - check(
+      """(1, 2,
+        |3
+        |,
+        |4
         |)""".stripMargin,
       _.ArgumentExprs().run(), ()
     )
-//    * - check(
-//      """(1, 2,
-//        |3
-//        |,
-//        |4
-//        |)""".stripMargin,
-//      _.ArgumentExprs().run(), ()
-//    )
   }
 }
