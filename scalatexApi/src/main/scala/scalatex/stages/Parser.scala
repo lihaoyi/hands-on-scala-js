@@ -41,7 +41,7 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
     "@" ~ capture(Id | BlockExpr2 | ('(' ~ optional(Exprs) ~ ')'))
   }
   def Header = rule {
-    "@" ~ capture(Def | Import)
+    "@" ~ capture(Def(false) | Import)
   }
 
   def HeaderBlock: Rule1[Ast.Header] = rule{
@@ -65,7 +65,7 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
     test(cursorNextIndent() > indent) ~
     runSubParser(new Parser(_, cursorNextIndent(), cursor).Body)
   }
-  def IfHead = rule{ "@" ~ capture("if" ~ "(" ~ Expr ~ ")") }
+  def IfHead = rule{ "@" ~ capture("if" ~ "(" ~ Expr() ~ ")") }
   def IfElse1 = rule{
     push(offsetCursor) ~ IfHead ~ BraceBlock ~ optional("else" ~ (BraceBlock | IndentBlock))
   }
@@ -104,7 +104,7 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
   def TypeArgs2 = rule { '[' ~ Ws ~ Types ~ ']' }
   def ArgumentExprs2 = rule {
     '(' ~ Ws ~
-    (optional(Exprs ~ ',' ~ Ws) ~ PostfixExpr ~ ':' ~ Ws ~ '_' ~ Ws ~ '*' ~ Ws | optional(Exprs) ) ~
+    (optional(Exprs ~ ',' ~ Ws) ~ PostfixExpr() ~ ':' ~ Ws ~ '_' ~ Ws ~ '*' ~ Ws | optional(Exprs) ) ~
     ')'
   }
   def BlockExpr2: Rule0 = rule { '{' ~ Ws ~ (CaseClauses | Block) ~ '}' }
