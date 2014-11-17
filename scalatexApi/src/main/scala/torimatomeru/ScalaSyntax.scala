@@ -34,7 +34,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   /**
    * helper printing function
    */
-  def pr(s: String) = rule { run(print(s)) }
+  def pr(s: String) = rule { run(println(s"LOGGING $cursor: $s")) }
 
   //////////////////////////////////////////////////
   // Override rules from dependencies
@@ -123,7 +123,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def PrefixExpr(G: B = true) = rule { optional(anyOf("-+~!")) ~ SimpleExpr(G) }
 
   def SimpleExpr(G: B = true): Rule0 = rule {
-    SimpleExpr1(G) ~ zeroOrMore('.' ~ IdS() | TypeArgs | ArgumentExprs(G)) ~ optional('_')
+    SimpleExpr1(G) ~
+    zeroOrMore('.' ~ IdS() | TypeArgs | ArgumentExprs(G)) ~
+    optional('_')
   }
 
   def SimpleExpr1(G: B = true) = rule{
@@ -138,11 +140,15 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def Exprs: Rule0 = rule { oneOrMore(Expr()).separatedBy(',') }
   def ArgumentExprs(G: B = true): Rule0 = rule {
-    '(' ~ (optional(Exprs ~ ',') ~ PostfixExpr() ~ ':' ~ '_' ~ '*' | optional(Exprs)) ~ ')' |
-      optional(NewlineS) ~ BlockExpr(G)
+    '(' ~ (optional(Exprs ~ ',') ~ PostfixExpr() ~ ':' ~ '_' ~ '*' | optional(Exprs)) ~ wspStrG(")", G) |
+    optional(NewlineS) ~ BlockExpr(G)
   }
+
   def BlockExpr(G: B = true): Rule0 = rule { '{' ~ (CaseClauses | Block) ~ wspStrG("}", G) }
-  def Block: Rule0 = rule { zeroOrMore(BlockStat ~ SemiS) ~ optional(ResultExpr()) }
+  def Block: Rule0 = rule {
+    zeroOrMore(BlockStat ~ SemiS) ~ optional(ResultExpr())
+  }
+
   def BlockStat: Rule0 = rule {
     SemiS |
     Import(false) |
@@ -162,10 +168,10 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Pattern3: Rule0 = rule { SimplePattern ~ zeroOrMore(IdS() ~ optional(NewlineS) ~ SimplePattern) } // this pattern doesn't make sense to me...
   def SimplePattern: Rule0 = rule {
     '_' |
-      LiteralS() ~ drop[String] | //literal currently captures, so it can be used outside. but since all our rules lack AST, we drop its value in order to be able to compose them
-      '(' ~ optional(Patterns) ~ ')' |
-      StableId() ~ '(' ~ (optional(Patterns ~ ',') ~ optional(VarIdS() ~ '@') ~ '_' ~ '*' | optional(Patterns)) ~ ')' |
-      VarIdS() /*|
+    LiteralS() ~ drop[String] | //literal currently captures, so it can be used outside. but since all our rules lack AST, we drop its value in order to be able to compose them
+    '(' ~ optional(Patterns) ~ ')' |
+    StableId() ~ '(' ~ (optional(Patterns ~ ',') ~ optional(VarIdS() ~ '@') ~ '_' ~ '*' | optional(Patterns)) ~ ')' |
+    VarIdS() /*|
     XmlPattern*/
   }
   def Patterns: Rule0 = rule { '_' ~ '*' | oneOrMore(Pattern).separatedBy(',') }
@@ -194,7 +200,15 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Annotation: Rule0 = rule { '@' ~ SimpleType ~ zeroOrMore(ArgumentExprs()) }
   def ConstrAnnotation: Rule0 = rule { '@' ~ SimpleType ~ ArgumentExprs() }
 
-  def TemplateBody(G: B = true): Rule0 = rule { optional(NewlineS) ~ '{' ~ optional(SelfType) ~ TemplateStat(false) ~ zeroOrMore(SemiS ~ TemplateStat(false)) ~ wspStrG("}", G) }
+  def TemplateBody(G: B = true): Rule0 = rule {
+    WhiteLines ~
+    '{' ~
+    optional(SelfType) ~
+    TemplateStat(false) ~
+    zeroOrMore(SemiS ~ TemplateStat(false)) ~
+    WhiteLines ~
+    wspStrG("}", G)
+  }
   def TemplateStat(G: B = true): Rule0 = rule {
     Import(false) |
     zeroOrMore(Annotation ~ optional(NewlineS)) ~ zeroOrMore(Modifier) ~ (Def(G) | Dcl) |
@@ -213,9 +227,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def Dcl: Rule0 = rule {
     "val" ~ ValDcl |
-      "var" ~ VarDcl |
-      "def" ~ FunDcl |
-      "type" ~ zeroOrMore(NewlineS) ~ TypeDcl
+    "var" ~ VarDcl |
+    "def" ~ FunDcl |
+    "type" ~ zeroOrMore(NewlineS) ~ TypeDcl
   }
   def ValDcl: Rule0 = rule { Ids ~ ':' ~ Type }
   def VarDcl: Rule0 = rule { Ids ~ ':' ~ Type }
@@ -229,22 +243,39 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def VarDef(G: B = true): Rule0 = rule { Ids ~ ':' ~ Type ~ '=' ~ '_' | PatDef(G) }
   def FunDef(G: B = true): Rule0 = rule {
     "this" ~ ParamClause ~ ParamClauses ~ ('=' ~ ConstrExpr | optional(NewlineS) ~ ConstrBlock) |
-      FunSig ~ (optional(':' ~ Type) ~ '=' ~ Expr(G) | optional(NewlineS) ~ '{' ~ Block ~ '}')
+      FunSig ~ (optional(':' ~ Type) ~ '=' ~ optional("macro") ~ Expr(G) | optional(NewlineS) ~ '{' ~ Block ~ '}')
   }
   def TypeDef: Rule0 = rule { IdS() ~ optional(TypeParamClause) ~ '=' ~ Type }
 
   def TmplDef(G: B = true): Rule0 = rule { "trait" ~ TraitDef(G) | optional("case") ~ ("class" ~ ClassDef(G) | "object" ~ ObjectDef(G)) }
-  def ClassDef(G: B = true): Rule0 = rule { IdS() ~ optional(TypeParamClause) ~ zeroOrMore(ConstrAnnotation) ~ optional(AccessModifier) ~ ClassParamClauses(G) ~ ClassTemplateOpt(G) }
+  def ClassDef(G: B = true): Rule0 = rule {
+    IdS() ~
+    optional(TypeParamClause) ~
+    zeroOrMore(ConstrAnnotation) ~
+    optional(AccessModifier) ~
+    ClassParamClauses(G) ~
+    ClassTemplateOpt(G)
+  }
   def TraitDef(G: B = true): Rule0 = rule { IdS() ~ optional(TypeParamClause) ~ TraitTemplateOpt(G) }
   def ObjectDef(G: B = true): Rule0 = rule { IdS() ~ ClassTemplateOpt(G) }
-  def ClassTemplateOpt(G: B = true): Rule0 = rule { "extends" ~ ClassTemplate(G) | optional(optional("extends") ~ TemplateBody(G)) }
+  def ClassTemplateOpt(G: B = true): Rule0 = rule {
+    "extends" ~ ClassTemplate(G) |
+    optional(optional("extends") ~ TemplateBody(G))
+  }
   def TraitTemplateOpt(G: B = true): Rule0 = rule { "extends" ~ TraitTemplate(G) | optional(optional("extends") ~ TemplateBody(G)) }
-  def ClassTemplate(G: B = true): Rule0 = rule { optional(EarlyDefs) ~ ClassParents ~ optional(TemplateBody(G)) }
+  def ClassTemplate(G: B = true): Rule0 = rule {
+    optional(EarlyDefs) ~
+    ClassParents ~
+    optional(TemplateBody(G))
+  }
+
   def TraitTemplate(G: B = true): Rule0 = rule { optional(EarlyDefs) ~ TraitParents ~ optional(TemplateBody(G)) }
   def ClassParents: Rule0 = rule { Constr ~ zeroOrMore("with" ~ AnnotType) }
   def TraitParents: Rule0 = rule { AnnotType ~ zeroOrMore("with" ~ AnnotType) }
   def Constr: Rule0 = rule { AnnotType ~ zeroOrMore(ArgumentExprs()) }
-  def EarlyDefs: Rule0 = rule { '{' ~ optional(oneOrMore(EarlyDef).separatedBy(SemiS)) ~ '}' ~ "with" }
+  def EarlyDefs: Rule0 = rule {
+    '{' ~ optional(oneOrMore(EarlyDef).separatedBy(SemiS)) ~ '}' ~ "with"
+  }
   def EarlyDef: Rule0 = rule { zeroOrMore(Annotation ~ optional(NewlineS)) ~ zeroOrMore(Modifier) ~ PatVarDef(false) }
   def ConstrExpr: Rule0 = rule { ConstrBlock | SelfInvocation }
   def ConstrBlock: Rule0 = rule { '{' ~ SelfInvocation ~ zeroOrMore(SemiS ~ BlockStat) ~ '}' }
@@ -254,5 +285,5 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def TopStat: Rule0 = rule { Packaging | PackageObject(false) | Import(false) | zeroOrMore(Annotation ~ optional(NewlineS)) ~ zeroOrMore(Modifier) ~ TmplDef(false) | MATCH }
   def Packaging: Rule0 = rule { "package" ~ QualId ~ optional(NewlineS) ~ '{' ~ TopStatSeq ~ '}' }
   def PackageObject(G: B = true): Rule0 = rule { "package" ~ "object" ~ ObjectDef(G) }
-  def CompilationUnit: Rule1[String] = rule { capture(zeroOrMore(SemiS) ~ zeroOrMore("package" ~ QualId).separatedBy(SemiS) ~ TopStatSeq) }
+  def CompilationUnit: Rule1[String] = rule { capture(zeroOrMore(SemiS) ~ zeroOrMore("package" ~ QualId).separatedBy(SemiS) ~ TopStatSeq ~ EOI) }
 }
