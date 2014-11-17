@@ -22,7 +22,7 @@ trait Literals { self: Parser with Basic with Identifiers =>
     def MultilineComment: Rule0 = rule { "/*" ~ zeroOrMore(MultilineComment | !"*/" ~ ANY) ~ "*/" }
     def Comment: Rule0 = rule {
       MultilineComment |
-        "//" ~ zeroOrMore(!Basic.Newline ~ ANY) ~ (Basic.Newline | EOI)
+        "//" ~ zeroOrMore(!Basic.Newline ~ ANY) ~ &(Basic.Newline | EOI)
     }
 
     def Literal = rule {

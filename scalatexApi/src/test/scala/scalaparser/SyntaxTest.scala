@@ -261,18 +261,10 @@ object SyntaxTest extends TestSuite{
       )
       * - check(
         """
-          |object SyntaxTest extends TestSuite{
-          |  def check[T](input: String) = {
-          |    new ScalaSyntax(input).CompilationUnit.run() match{
-          |      case Failure(f: ParseError) =>
-          |        println(f.position)
-          |        println(f.formatExpectedAsString)
-          |        println(f.formatTraces)
-          |        throw new Exception(f.position + "\t" + f.formatTraces)
-          |      case Success(parsed) =>
-          |        assert(parsed == input)
-          |    }
-          |  }
+          |object Foo{
+          |    val a = d // g
+          |    val b = e // h
+          |    val c = f
           |}
         """.stripMargin
       )
