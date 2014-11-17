@@ -197,16 +197,13 @@ object SyntaxTest extends TestSuite{
       )
       * - check(
         """
-          |object ParserTests {
-          |    Vector(
-          |      Text(),
-          |      Chain("p",Vector(Block(Vector(
-          |        Text("\n  ", 3),
-          |        IfElse("if(true)",
-          |          Block(),
-          |          Some(),
-          |          6
-          |        )), 3)), 1)
+          |object O {
+          |    A(
+          |      A(),
+          |      A(A(A(A(
+          |        A(
+          |          A(A())
+          |        )))))
           |    )
           |}
           |
