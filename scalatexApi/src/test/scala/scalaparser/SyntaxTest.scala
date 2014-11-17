@@ -322,6 +322,13 @@ object SyntaxTest extends TestSuite{
           |}
         """.stripMargin
       )
+      * - check(
+        """
+          |object K{
+          |  val trueA = 1
+          |}
+        """.stripMargin
+      )
     }
     def checkFile(path: String) = check(io.Source.fromFile(path).mkString)
     'file{

@@ -25,7 +25,6 @@ class ScalaTexPlugin(val global: Global) extends Plugin {
     override def newPhase(prev: Phase) = new GlobalPhase(prev) {
       override def run() = {
         def recursiveListFiles(f: java.io.File): Array[java.io.File] = {
-          val these = f.listFiles
           val (dirs, files) = f.listFiles().partition(_.isDirectory)
           files ++ dirs.flatMap(recursiveListFiles)
         }

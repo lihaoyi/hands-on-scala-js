@@ -17,7 +17,7 @@ trait Literals { self: Parser with Basic with Identifiers =>
 
     def IntegerLiteral = rule { capture((DecimalNumeral | HexNumeral) ~ optional(anyOf("Ll"))) }
 
-    def BooleanLiteral = rule { capture("true" | "false") }
+    def BooleanLiteral = rule { capture("true" | "false") ~ !Letter }
 
     def MultilineComment: Rule0 = rule { "/*" ~ zeroOrMore(MultilineComment | !"*/" ~ ANY) ~ "*/" }
     def Comment: Rule0 = rule {

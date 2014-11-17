@@ -40,6 +40,8 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
    */
   def WL = rule{ zeroOrMore(Basic.WhitespaceChar | Literals.Comment | Basic.Newline) }
 
+  def Gap = rule{ oneOrMore(Basic.WhitespaceChar | Literals.Comment | Basic.Newline) }
+
   /**
    * Whitespace which captures or doesn't-capture
    * newlines depending on the G that gets passed in
@@ -156,7 +158,12 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
 
   def DoWhileCFlow(G: B = t) = rule { "do" ~ Expr() ~ optional(Semi) ~ "while" ~ '(' ~ Expr() ~ StrW(")", G) }
-  def ForCFlow(G: B = t) = rule { "for" ~ ('(' ~ Enumerators ~ ')' | '{' ~ Enumerators ~ '}') ~ zeroOrMore(Newline) ~ optional("yield") ~ Expr(G) }
+  def ForCFlow(G: B = t) = rule {
+    "for" ~
+    ('(' ~ Enumerators ~ ')' | '{' ~ Enumerators ~ '}') ~
+    zeroOrMore(Newline) ~
+    optional("yield") ~
+    Expr(G) }
   def PostfixExpr(G: B = t): R0 = rule { InfixExpr(G) ~ optional(Id() ~ optional(Newline)) }
   def InfixExpr(G: B = t): R0 = rule { PrefixExpr(G) ~ zeroOrMore(Id() ~ optional(Newline) ~ PrefixExpr(G)) }
   def PrefixExpr(G: B = t) = rule { optional(anyOf("-+~!")) ~ SimpleExpr(G) }
@@ -207,7 +214,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     oneOrMore(Pattern1).separatedBy('|')
   }
   def Pattern1: R0 = rule {
-    '_' ~ TypeColon ~ TypePat |VarId() ~ TypeColon ~ TypePat | Pattern2
+    '_' ~ TypeColon ~ TypePat | VarId() ~ TypeColon ~ TypePat | Pattern2
   }
   def Pattern2: R0 = rule {
     VarId() ~ "@" ~ Pattern3 | Pattern3 | VarId()
@@ -215,7 +222,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Pattern3: R0 = rule {
     SimplePattern ~ zeroOrMore(Id() ~ SimplePattern)
   }
-  def SimplePattern: R0 = rule { 
+  def SimplePattern: R0 = rule {
     '_' |
     Literal() ~ drop[String] |
     '(' ~ optional(Patterns) ~ ')' |
