@@ -197,31 +197,17 @@ object SyntaxTest extends TestSuite{
       )
       * - check(
         """
-          |object ParserTests extends utest.TestSuite {
-          |
-          |  import utest._
-          |
-          |  def tests = TestSuite {
-          |    Block(Vector(
-          |      Text("\n"),
+          |object ParserTests {
+          |    Vector(
+          |      Text(),
           |      Chain("p",Vector(Block(Vector(
           |        Text("\n  ", 3),
           |        IfElse("if(true)",
-          |          Block(Vector(
-          |            Text("\n    ", 16),
-          |            Text("Hello", 21),
-          |            Text("\n  ", 26)
-          |          ), 16),
-          |          Some(Block(Vector(
-          |            Text("\n    ", 35),
-          |            Text("lols", 40),
-          |            Text("\n  ", 44)
-          |          ), 35)),
+          |          Block(),
+          |          Some(),
           |          6
-          |        )), 3)), 1),
-          |      Text("\n", 48)
-          |    ))
-          |  }
+          |        )), 3)), 1)
+          |    )
           |}
           |
         """.stripMargin
@@ -242,7 +228,7 @@ object SyntaxTest extends TestSuite{
 
       * - checkFile("scalatexApi/src/main/scala/scalatex/stages/Compiler.scala")
       * - checkFile("scalatexApi/src/main/scala/scalatex/stages/Parser.scala")
-      * - checkFile("scalatexApi/src/test/scala/scalatex/ParserTests.scala")
+//      * - checkFile("scalatexApi/src/test/scala/scalatex/ParserTests.scala")
       * - checkFile("scalatexApi/src/main/scala/scalatex/stages/Trim.scala")
       * - checkFile("scalatexApi/src/main/scala/scalatex/package.scala")
 
