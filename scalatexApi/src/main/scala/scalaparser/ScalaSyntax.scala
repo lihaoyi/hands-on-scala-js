@@ -15,7 +15,8 @@ import org.parboiled2._
  * consume whitespace.
  *
  * The vast majority of terminals will consume newlines; only rules
- * which occur in {} blocks won't have their terminals consume newlines.
+ * which occur in {} blocks won't have their terminals consume newlines,
+ * and only the *last* terminal in the rule will be affected.
  * That's why the parser does terminals-consume-newlines-by-default,
  * and leaves it up to the dev to thread the `G` variable where-ever
  * we want the opposite behavior.
@@ -61,7 +62,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
    */
   def StrW(s: String, G: B): R0 = rule { str(s) ~ W(G) }
 
-
+  def TypeColon = rule{ ":" ~ !Basic.OperatorChar }
 
   def pos = cursor -> cursorChar
 
@@ -127,7 +128,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
   def RefineStat = rule { "type" ~ TypeDef(false) | Dcl(false) | MATCH }
   def TypePat = rule { CompoundType() }
-  def Ascription(G: B = t) = rule { ":" ~ (InfixType(G) | oneOrMore(Annotation(G)) | "_" ~ StrW("*", G)) }
+  def Ascription(G: B = t) = rule {
+    ":" ~ ("_" ~ StrW("*", G) | InfixType(G) | oneOrMore(Annotation(G)))
+  }
 
   def ParamType = rule { "=>" ~ Type() | Type() ~ "*" | Type() }
 
@@ -175,6 +178,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
 
 
+
   def Exprs: R0 = rule { oneOrMore(Expr()).separatedBy(',') }
   def ArgumentExprs(G: B = t): R0 = rule {
     '(' ~ optional(Exprs ~ optional(':' ~ '_' ~ '*')) ~ StrW(")", G) |
@@ -202,9 +206,11 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Pattern: R0 = rule {
     oneOrMore(Pattern1).separatedBy('|')
   }
-  def Pattern1: R0 = rule { '_' ~ ':' ~ TypePat | VarId() ~ ':' ~ TypePat | Pattern2 }
+  def Pattern1: R0 = rule {
+    '_' ~ TypeColon ~ TypePat |VarId() ~ TypeColon ~ TypePat | Pattern2
+  }
   def Pattern2: R0 = rule {
-     VarId() ~ "@" ~ Pattern3 | Pattern3 | VarId()
+    VarId() ~ "@" ~ Pattern3 | Pattern3 | VarId()
   }
   def Pattern3: R0 = rule {
     SimplePattern ~ zeroOrMore(Id() ~ SimplePattern)
@@ -234,19 +240,19 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     optional(">:" ~ Type()) ~
     optional("<:" ~ Type()) ~
     zeroOrMore("<%" ~ Type()) ~
-    zeroOrMore(':' ~ Type())
+    zeroOrMore(TypeColon ~ Type())
   }
   def ParamClauses: R0 = rule { zeroOrMore(ParamClause) ~ optional(optional(Newline) ~ '(' ~ "implicit" ~ Params ~ ')') }
   def ParamClause: R0 = rule { optional(Newline) ~ '(' ~ optional(Params) ~ ')' }
   def Params: R0 = rule { zeroOrMore(Param).separatedBy(',') }
-  def Param: R0 = rule { zeroOrMore(Annotation()) ~ Id() ~ optional(':' ~ ParamType) ~ optional('=' ~ Expr()) }
+  def Param: R0 = rule { zeroOrMore(Annotation()) ~ Id() ~ optional(TypeColon ~ ParamType) ~ optional('=' ~ Expr()) }
   def ClassParamClauses(G: B = t): R0 = rule { zeroOrMore(ClassParamClause(G)) ~ optional(optional(Newline) ~ '(' ~ "implicit" ~ ClassParam ~ StrW(")", G)) }
   def ClassParamClause(G: B = t): R0 = rule { optional(Newline) ~ '(' ~ optional(ClassParams) ~ StrW(")", G) }
   def ClassParams: R0 = rule { oneOrMore(ClassParam).separatedBy(',') }
-  def ClassParam: R0 = rule { zeroOrMore(Annotation()) ~ optional(zeroOrMore(Modifier) ~ ("val" | "var")) ~ Id() ~ ":" ~ ParamType ~ optional("=" ~ Expr()) }
+  def ClassParam: R0 = rule { zeroOrMore(Annotation()) ~ optional(zeroOrMore(Modifier) ~ ("val" | "var")) ~ Id() ~ TypeColon ~ ParamType ~ optional("=" ~ Expr()) }
 
   def Bindings: R0 = rule { '(' ~ oneOrMore(Binding).separatedBy(',') ~ ')' }
-  def Binding: R0 = rule { (Id() | '_') ~ optional(':' ~ Type()) }
+  def Binding: R0 = rule { (Id() | '_') ~ optional(TypeColon ~ Type()) }
 
   def Modifier: R0 = rule { LocalModifier | AccessModifier | "override" }
   def LocalModifier: R0 = rule { "abstract" | "final" | "sealed" | "implicit" | "lazy" }
@@ -272,7 +278,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     MATCH
   }
 
-  def SelfType: R0 = rule { "this" ~ ':' ~ Type() ~ "=>" | Id() ~ optional(':' ~ Type()) ~ "=>" }
+  def SelfType: R0 = rule { "this" ~ TypeColon ~ Type() ~ "=>" | Id() ~ optional(TypeColon ~ Type()) ~ "=>" }
 
   def Import(G: B = t): R0 = rule { "import" ~ oneOrMore(ImportExpr(G)).separatedBy(',') }
 
@@ -286,9 +292,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     "def" ~ FunDcl(G) |
     "type" ~ zeroOrMore(Newline) ~ TypeDcl(G)
   }
-  def ValDcl(G: B = t): R0 = rule { Ids ~ ':' ~ Type(G) }
-  def VarDcl(G: B = t): R0 = rule { Ids ~ ':' ~ Type(G) }
-  def FunDcl(G: B = t): R0 = rule { FunSig(false) ~ optional(WL ~ ':' ~ Type(G)) }
+  def ValDcl(G: B = t): R0 = rule { Ids ~ TypeColon ~ Type(G) }
+  def VarDcl(G: B = t): R0 = rule { Ids ~ TypeColon ~ Type(G) }
+  def FunDcl(G: B = t): R0 = rule { FunSig(false) ~ optional(WL ~ TypeColon ~ Type(G)) }
   def FunSig(G: B = t): R0 = rule { Id() ~ optional(FunTypeParamClause) ~ ParamClauses }
   def TypeDcl(G: B = t): R0 = rule {
     Id(false) ~
@@ -300,13 +306,13 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def PatVarDef(G: B = t): R0 = rule { "val" ~ PatDef(G) | "var" ~ VarDef(G) }
   def Def(G: B = t): R0 = rule { "def" ~ FunDef(G) | "type" ~ zeroOrMore(Newline) ~ TypeDef(G) | PatVarDef(G) | TmplDef(G) }
-  def PatDef(G: B = t): R0 = rule { oneOrMore(Pattern2).separatedBy(',') ~ optional(':' ~ Type()) ~ '=' ~ Expr(G) }
-  def VarDef(G: B = t): R0 = rule { Ids ~ ':' ~ Type() ~ '=' ~ '_' | PatDef(G) }
+  def PatDef(G: B = t): R0 = rule { oneOrMore(Pattern2).separatedBy(',') ~ optional(TypeColon ~ Type()) ~ '=' ~ Expr(G) }
+  def VarDef(G: B = t): R0 = rule { Ids ~ TypeColon ~ Type() ~ '=' ~ '_' | PatDef(G) }
   def FunDef(G: B = t): R0 = rule {
     "this" ~ ParamClause ~ ParamClauses ~ ('=' ~ ConstrExpr | optional(Newline) ~ ConstrBlock) |
     FunSig() ~
     (
-      optional(':' ~ Type()) ~ '=' ~ optional("macro") ~ Expr(G) |
+      optional(TypeColon ~ Type()) ~ '=' ~ optional("macro") ~ Expr(G) |
       optional(Newline) ~ '{' ~ Block ~ StrW("}", G)
     )
   }

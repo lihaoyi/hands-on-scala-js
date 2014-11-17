@@ -13,12 +13,13 @@ object SyntaxTest extends TestSuite{
       case Failure(f: ParseError) =>
         println(f.position)
         println(f.formatExpectedAsString)
-        println(f.formatTraces)
+//        println(f.formatTraces)
         throw new Exception(f.position + "\t" + f.formatTraces)
       case Success(parsed) =>
         assert(parsed == input)
     }
   }
+  println("running")
   def tests = TestSuite{
     'unit {
       * - check(
@@ -300,6 +301,24 @@ object SyntaxTest extends TestSuite{
         """
           |object O{
           |  a =:= b.c
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """
+          |object K{
+          |  a(
+          |    1: _*
+          |  )
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """
+          |object P{
+          |      tree match {
+          |        case stats :+ expr  => 1
+          |      }
           |}
         """.stripMargin
       )
