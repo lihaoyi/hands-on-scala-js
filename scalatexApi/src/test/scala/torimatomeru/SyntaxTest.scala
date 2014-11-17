@@ -182,14 +182,19 @@ object SyntaxTest extends TestSuite{
       )
     }
     'file{
-      * - check(io.Source.fromFile("scalatexApi/src/test/scala/torimatomeru/SyntaxTest.scala").mkString)
-      * - check(io.Source.fromFile("scalatexApi/src/test/scala/scalatex/TestUtil.scala").mkString)
+      def checkFile(path: String) =
+        check(io.Source.fromFile(path).mkString)
+      * - checkFile("scalatexApi/src/test/scala/torimatomeru/SyntaxTest.scala")
+      * - checkFile("scalatexApi/src/test/scala/scalatex/TestUtil.scala")
+      * - checkFile("scalatexApi/src/main/scala/torimatomeru/syntax/Basic.scala")
+      * - checkFile("scalatexApi/src/main/scala/torimatomeru/syntax/Identifiers.scala")
+      * - checkFile("scalatexApi/src/main/scala/torimatomeru/syntax/Literals.scala")
 
-//      Seems to run forever? There's probably some exponential performance
-//      somewhere in there, but I can't see it =/
+//      All the larget files seem to make the parser run forever. There's probably
+//      some exponential performance somewhere in there, but I can't see it =/
 //      * - check(io.Source.fromFile("scalatexApi/src/test/scala/scalatex/ParserTests.scala").mkString)
 //      * - check(io.Source.fromFile("scalatexApi/src/main/scala/scalatex/package.scala").mkString)
-      * - check(io.Source.fromFile("scalatexApi/src/main/scala/torimatomeru/syntax/Basic.scala").mkString)
+//      * - check(io.Source.fromFile("scalatexApi/src/main/scala/torimatomeru/ScalaSyntax.scala").mkString)
     }
   }
 
