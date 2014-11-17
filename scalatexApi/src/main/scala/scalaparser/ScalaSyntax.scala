@@ -62,7 +62,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
    */
   def StrW(s: String, G: B): R0 = rule { str(s) ~ W(G) }
 
-  def TypeColon = rule{ ":" ~ !Basic.OperatorChar }
+  def TypeColon = rule{ str(":") ~ !Basic.OperatorChar ~ WL}
 
   def pos = cursor -> cursorChar
 
