@@ -1,9 +1,9 @@
 package torimatomeru
 package syntax
-
+import acyclic.file
 import org.parboiled2._
 
-trait Literals { self: ScalaSyntax =>
+trait Literals { self: Parser with Basic with Identifiers =>
   object Literals{
     import Basic._
     def FloatingPointLiteral = rule {

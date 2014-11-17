@@ -1,5 +1,5 @@
 package torimatomeru
-
+import acyclic.file
 import language.implicitConversions
 import syntax._
 import org.parboiled2._
@@ -193,7 +193,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def CaseClause: R0 = rule { "case" ~ Pattern ~ optional(Guard) ~ "=>" ~ Block }
   def Guard: R0 = rule { "if" ~ PostfixExpr() }
   def Pattern: R0 = rule {
-    pr("Pattern!") ~ oneOrMore(pr("Pattern! oom") ~ Pattern1 ~ pr("Pattern! oom2") ).separatedBy('|')
+    oneOrMore(Pattern1 ).separatedBy('|')
   }
   def Pattern1: R0 = rule { '_' ~ ':' ~ TypePat | VarId() ~ ':' ~ TypePat | Pattern2 }
   def Pattern2: R0 = rule { VarId() ~ optional("@" ~ Pattern3) | Pattern3 }

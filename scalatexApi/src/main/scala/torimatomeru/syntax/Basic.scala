@@ -1,9 +1,9 @@
 package torimatomeru
 package syntax
-
+import acyclic.file
 import org.parboiled2._
 
-trait Basic { self: ScalaSyntax =>
+trait Basic { self: Parser =>
   object Basic{
     def UnicodeExcape = rule { "\\u" ~ 4.times(HexDigit) }
 
