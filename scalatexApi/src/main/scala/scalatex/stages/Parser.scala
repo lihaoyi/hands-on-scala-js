@@ -45,7 +45,7 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
   }
 
   def HeaderBlock: Rule1[Ast.Header] = rule{
-    Header ~ zeroOrMore(capture(WhiteLines) ~ Header ~> (_ + _)) ~ runSubParser{new Parser(_, indent, cursor).Body0} ~> {
+    Header ~ zeroOrMore(capture(WL) ~ Header ~> (_ + _)) ~ runSubParser{new Parser(_, indent, cursor).Body0} ~> {
       (start: String, heads: Seq[String], body: Ast.Block) => Ast.Header(start + heads.mkString, body)
     }
   }
@@ -99,7 +99,7 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
     (push(offsetCursor) ~ capture(ArgumentExprs2) ~> ((x, y) => Ast.Chain.Args(y, x))) |
     BraceBlock
   }
-  def Ws = WhiteLines
+  def Ws = WL
   // clones of the version in ScalaSyntax, but without tailing whitespace or newlines
   def TypeArgs2 = rule { '[' ~ Ws ~ Types ~ ']' }
   def ArgumentExprs2 = rule {

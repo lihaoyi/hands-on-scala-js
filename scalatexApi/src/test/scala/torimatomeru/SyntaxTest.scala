@@ -105,15 +105,72 @@ object SyntaxTest extends TestSuite{
           |}
         """.stripMargin
       )
+      * - check(
+        """
+          |object Moo{
+          |  a
+          |  .b
+          |
+          |  c
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """
+          |object Moo{
+          | filename
+          |        .asInstanceOf[Literal]
+          |10
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """
+          |object Cow{
+          |  ().mkString
+          |
+          |  1
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """
+          |object O{
+          | private[this] val applyMacroFull = 1
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """
+          |object O{
+          | private[this] def applyMacroFull(c: Context)
+          |                      (expr: c.Expr[String],
+          |                       runtimeErrors: Boolean,
+          |                       debug: Boolean)
+          |                      : c.Expr[Frag] = {
+        |                      }
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """
+          |object O{
+          |  class DebugFailure extends Exception
+          |
+          |  1
+          |}
+        """.stripMargin
+      )
     }
     'file{
       * - check(io.Source.fromFile("scalatexApi/src/test/scala/torimatomeru/SyntaxTest.scala").mkString)
       * - check(io.Source.fromFile("scalatexApi/src/test/scala/scalatex/TestUtil.scala").mkString)
 
-//      Seems to run forever? Maybe exponential performance
+//      Seems to run forever? There's probably some exponential performance
+//      somewhere in there, but I can't see it =/
 //      * - check(io.Source.fromFile("scalatexApi/src/test/scala/scalatex/ParserTests.scala").mkString)
-
-      * - check(io.Source.fromFile("scalatexApi/src/main/scala/scalatex/package.scala").mkString)
+//      * - check(io.Source.fromFile("scalatexApi/src/main/scala/scalatex/package.scala").mkString)
     }
   }
+
 }
