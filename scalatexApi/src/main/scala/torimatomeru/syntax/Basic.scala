@@ -23,7 +23,12 @@ trait Basic { self: ScalaSyntax =>
   def WhitespaceChar = rule { "\u0020" | "\u0009" }
   def Newline = rule { "\r\n" | "\n" }
   def Semi = rule { ';' | oneOrMore(NewlineS) }
-  def OperatorChar = rule { anyOf("""!#$%&*+-/:<=>?@\^|~""") | CharPredicate.from(c => c.getType match { case Character.OTHER_SYMBOL | Character.MATH_SYMBOL => true; case _ => false}) }
+  def OperatorChar = rule {
+    anyOf("""!#$%&*+-/:<=>?@\^|~""") |
+    CharPredicate.from(_.getType match {
+      case Character.OTHER_SYMBOL | Character.MATH_SYMBOL => true; case _ => false
+    })
+  }
   def Letter = rule { Upper | Lower | CharPredicate.from(c => c.isLetter | c.isDigit) }
   def Lower = rule { "a" - "z" | "$" | "_" | CharPredicate.from(_.isLower) }
   def Upper = rule { "A" - "Z" | CharPredicate.from(_.isUpper) }

@@ -148,7 +148,7 @@ object SyntaxTest extends TestSuite{
           |                       runtimeErrors: Boolean,
           |                       debug: Boolean)
           |                      : c.Expr[Frag] = {
-        |                      }
+          |                      }
           |}
         """.stripMargin
       )
@@ -161,6 +161,25 @@ object SyntaxTest extends TestSuite{
           |}
         """.stripMargin
       )
+      * - check(
+        """
+          |package torimatomeru
+          |
+          |package syntax
+          |
+          |import org.parboiled2._
+          |
+        """.stripMargin
+      )
+      * - check(
+        """
+          |object Foo{
+          |  0 match {
+          |    case A | B => 0
+          |  }
+          |}
+        """.stripMargin
+      )
     }
     'file{
       * - check(io.Source.fromFile("scalatexApi/src/test/scala/torimatomeru/SyntaxTest.scala").mkString)
@@ -170,6 +189,7 @@ object SyntaxTest extends TestSuite{
 //      somewhere in there, but I can't see it =/
 //      * - check(io.Source.fromFile("scalatexApi/src/test/scala/scalatex/ParserTests.scala").mkString)
 //      * - check(io.Source.fromFile("scalatexApi/src/main/scala/scalatex/package.scala").mkString)
+      * - check(io.Source.fromFile("scalatexApi/src/main/scala/torimatomeru/syntax/Basic.scala").mkString)
     }
   }
 

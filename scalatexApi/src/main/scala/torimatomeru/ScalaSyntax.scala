@@ -71,7 +71,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   // Qualifiers and Ids
   ///////////////////////////////////////////
 
-  def QualId = rule { oneOrMore(IdS()) separatedBy '.' }
+  def QualId(G: B = t) = rule { oneOrMore(IdS(false)) separatedBy '.' ~ W(G) }
   def Ids = rule { oneOrMore(IdS()) separatedBy ',' }
 
   //path and stableId were refactored (wrt spec) to avoid recursiveness and be more specific 
@@ -332,7 +332,14 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def TopStatSeq: Rule0 = rule { zeroOrMore(TopStat).separatedBy(SemiS) }
   def TopStat: Rule0 = rule { Packaging | PackageObject(false) | Import(false) | zeroOrMore(Annotation ~ optional(NewlineS)) ~ zeroOrMore(Modifier) ~ TmplDef(false) | MATCH }
-  def Packaging: Rule0 = rule { "package" ~ QualId ~ optional(NewlineS) ~ '{' ~ TopStatSeq ~ '}' }
+  def Packaging: Rule0 = rule { "package" ~ QualId() ~ '{' ~ TopStatSeq ~ '}' }
   def PackageObject(G: B = t): Rule0 = rule { "package" ~ "object" ~ ObjectDef(G) }
-  def CompilationUnit: Rule1[String] = rule { capture(zeroOrMore(SemiS) ~ zeroOrMore("package" ~ QualId).separatedBy(SemiS) ~ TopStatSeq ~ EOI) }
+  def CompilationUnit: Rule1[String] = rule {
+    capture(
+      zeroOrMore(SemiS) ~
+      zeroOrMore("package" ~ QualId(false)).separatedBy(SemiS) ~
+      TopStatSeq ~
+      EOI
+    )
+  }
 }
