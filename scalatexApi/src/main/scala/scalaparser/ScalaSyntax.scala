@@ -167,7 +167,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def Exprs: R0 = rule { oneOrMore(Expr()).separatedBy(',') }
   def ArgumentExprs(G: B = t): R0 = rule {
-    '(' ~ (optional(Exprs ~ ',') ~ PostfixExpr() ~ ':' ~ '_' ~ '*' | optional(Exprs)) ~ StrW(")", G) |
+    '(' ~ optional(Exprs ~ optional(':' ~ '_' ~ '*')) ~ StrW(")", G) |
     optional(Newline) ~ BlockExpr(G)
   }
 
