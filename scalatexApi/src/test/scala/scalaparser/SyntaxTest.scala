@@ -1,4 +1,4 @@
-package torimatomeru
+package scalaparser
 
 import org.parboiled2.ParseError
 import utest._
@@ -184,17 +184,21 @@ object SyntaxTest extends TestSuite{
     'file{
       def checkFile(path: String) =
         check(io.Source.fromFile(path).mkString)
-      * - checkFile("scalatexApi/src/test/scala/torimatomeru/SyntaxTest.scala")
+      * - checkFile("scalatexApi/src/test/scala/scalaparser/SyntaxTest.scala")
+      * - checkFile("scalatexApi/src/main/scala/scalaparser/syntax/Basic.scala")
+      * - checkFile("scalatexApi/src/main/scala/scalaparser/syntax/Identifiers.scala")
+      * - checkFile("scalatexApi/src/main/scala/scalaparser/syntax/Literals.scala")
+      // All the commented files seem to make the parser run forever. There's probably
+      // some exponential performance somewhere in there, but I can't see it =/
+      // * - check(io.Source.fromFile("scalatexApi/src/main/scala/scalaparser/ScalaSyntax.scala").mkString)
       * - checkFile("scalatexApi/src/test/scala/scalatex/TestUtil.scala")
-      * - checkFile("scalatexApi/src/main/scala/torimatomeru/syntax/Basic.scala")
-      * - checkFile("scalatexApi/src/main/scala/torimatomeru/syntax/Identifiers.scala")
-      * - checkFile("scalatexApi/src/main/scala/torimatomeru/syntax/Literals.scala")
 
-//      All the larget files seem to make the parser run forever. There's probably
-//      some exponential performance somewhere in there, but I can't see it =/
-//      * - check(io.Source.fromFile("scalatexApi/src/test/scala/scalatex/ParserTests.scala").mkString)
-//      * - check(io.Source.fromFile("scalatexApi/src/main/scala/scalatex/package.scala").mkString)
-//      * - check(io.Source.fromFile("scalatexApi/src/main/scala/torimatomeru/ScalaSyntax.scala").mkString)
+
+      // * - check(io.Source.fromFile("scalatexApi/src/main/scala/scalatex/stages/Compiler.scala").mkString)
+      * - check(io.Source.fromFile("scalatexApi/src/main/scala/scalatex/stages/Parser.scala").mkString)       // * - check(io.Source.fromFile("scalatexApi/src/test/scala/scalatex/ParserTests.scala").mkString)
+      // * - check(io.Source.fromFile("scalatexApi/src/main/scala/scalatex/stages/Trim.scala").mkString)
+      // * - check(io.Source.fromFile("scalatexApi/src/main/scala/scalatex/package.scala").mkString)
+
     }
   }
 

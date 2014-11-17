@@ -1,4 +1,4 @@
-package torimatomeru
+package scalaparser
 package syntax
 import acyclic.file
 import org.parboiled2._
@@ -27,11 +27,11 @@ trait Literals { self: Parser with Basic with Identifiers =>
 
     def Literal = rule {
       (capture(optional("-")) ~ (FloatingPointLiteral | IntegerLiteral) ~> ((sign: String, number) => sign + number)) |
-        BooleanLiteral |
-        CharacterLiteral |
-        StringLiteral |
-        SymbolLiteral |
-        capture("null")
+      BooleanLiteral |
+      CharacterLiteral |
+      StringLiteral |
+      SymbolLiteral |
+      capture("null")
     }
 
 
@@ -43,8 +43,8 @@ trait Literals { self: Parser with Basic with Identifiers =>
 
     def MultiLineChars = rule { zeroOrMore(optional('"') ~ optional('"') ~ noneOf("\"")) }
     def StringLiteral = rule {
-      ("\"\"\"" ~ capture(MultiLineChars) ~ capture("\"\"\"" ~ zeroOrMore('"')) ~> ((multilineChars: String, quotes) => multilineChars + quotes.dropRight(3))) |
-        ('"' ~ capture(zeroOrMore("\\\"" | noneOf("\n\""))) ~ '"')
+      (optional(Identifiers.Id) ~ "\"\"\"" ~ capture(MultiLineChars) ~ capture("\"\"\"" ~ zeroOrMore('"')) ~> ((multilineChars: String, quotes) => multilineChars + quotes.dropRight(3))) |
+      (optional(Identifiers.Id) ~ '"' ~ capture(zeroOrMore("\\\"" | noneOf("\n\""))) ~ '"')
     }
 
     def isPrintableChar(c: Char): Boolean = {

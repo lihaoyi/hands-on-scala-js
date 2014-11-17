@@ -1,9 +1,25 @@
-package torimatomeru
+package scalaparser
 import acyclic.file
 import language.implicitConversions
 import syntax._
 import org.parboiled2._
 
+/**
+ * Parser for Scala syntax.
+ *
+ * The `G` parameter that gets passed in to each rule stands for
+ * "Greedy", and determines whether or not that rule is to consume
+ * newlines after the last terminal in that rule. We need to pass it
+ * everywhere so it can go all the way to the last terminal deep
+ * inside the parse tree, which can then decide whether or not to
+ * consume whitespace.
+ *
+ * The vast majority of terminals will consume newlines; only rules
+ * which occur in {} blocks won't have their terminals consume newlines.
+ * That's why the parser does terminals-consume-newlines-by-default,
+ * and leaves it up to the dev to thread the `G` variable where-ever
+ * we want the opposite behavior.
+ */
 class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identifiers with Literals {
   // Aliases for common things. These things are used in almost every parser
   // in the file, so it makes sense to keep them short.
@@ -54,22 +70,11 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
    */
   def pr(s: String) = rule { run(println(s"LOGGING $cursor: $s")) }
 
-  //////////////////////////////////////////////////
-  // Override rules from dependencies
-  // in order to handle white spaces
-  // Note: when you add your AST, make sure to
-  // only capture super.rule and not the whitespace
-  //////////////////////////////////////////////////
-
   def Id(G: B = t) = rule { Identifiers.Id ~ W(G) }
   def VarId(G: B = t) = rule { Identifiers.VarId ~ W(G) }
   def Literal(G: B = t) = rule { Literals.Literal ~ W(G) }
   def Semi = rule { Basic.Semi ~ WL }
   def Newline = rule { Basic.Newline ~ WL }
-
-  ///////////////////////////////////////////
-  // Qualifiers and Ids
-  ///////////////////////////////////////////
 
   def QualId(G: B = t) = rule { oneOrMore(Id(false)) separatedBy '.' ~ W(G) }
   def Ids = rule { oneOrMore(Id()) separatedBy ',' }
@@ -84,10 +89,6 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
 
   def ClassQualifier = rule { '[' ~ Id() ~ ']' }
-
-  ///////////////////////////////////////////
-  // Types and more Types
-  ///////////////////////////////////////////
 
   def Type: R0 = rule { FunctionArgTypes ~ "=>" ~ Type | InfixType ~ optional(ExistentialClause) }
   def FunctionArgTypes = rule { InfixType | '(' ~ optional(oneOrMore(ParamType) separatedBy ',') ~ ')' }
@@ -121,10 +122,6 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Ascription = rule { ":" ~ (InfixType | oneOrMore(Annotation) | "_" ~ "*") }
 
   def ParamType = rule { "=>" ~ Type | Type ~ "*" | Type }
-
-  /////////////////////////////////////////////////
-  // Declarations, Expressions and Pattern Matching
-  /////////////////////////////////////////////////
 
   def Expr(G: B = t): R0 = rule { (Bindings | optional("implicit") ~ Id() | "_") ~ "=>" ~ Expr(G) | Expr1(G) }
   def Expr1(G: B = t): R0 = rule {
@@ -254,7 +251,6 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def Import(G: B = t): R0 = rule { "import" ~ oneOrMore(ImportExpr(G)).separatedBy(',') }
 
-  //ImportExpr is slightly changed wrt spec because StableId always consumes all the Ids possible, so there is no need to one at the end
   def ImportExpr(G: B = t): R0 = rule { StableId(G) ~ optional('.' ~ (StrW("_", G) | ImportSelectors(G))) }
   def ImportSelectors(G: B = t): R0 = rule { '{' ~ zeroOrMore(ImportSelector ~ ',') ~ (ImportSelector | '_') ~ StrW("}", G) }
   def ImportSelector: R0 = rule { Id() ~ optional("=>" ~ (Id() | '_')) }

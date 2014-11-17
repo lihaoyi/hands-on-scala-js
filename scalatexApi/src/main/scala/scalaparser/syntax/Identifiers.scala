@@ -1,4 +1,4 @@
-package torimatomeru
+package scalaparser
 package syntax
 import acyclic.file
 import org.parboiled2._
