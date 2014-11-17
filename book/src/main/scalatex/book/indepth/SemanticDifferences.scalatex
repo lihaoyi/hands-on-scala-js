@@ -128,6 +128,17 @@
       We believe that this covers most use cases of scala.Enumeration. Please let us know if another (generalized) rewrite would make your life easier.
 
 @sect{Library Differences}
+  @val myTable = Seq(
+    ("Most of java.lang.*", "j.l.Thread, j.l.Runtime, ..."),
+    ("Almost all of scala.*", "s.c.parallel, s.tools.nsc"),
+    ("Some of java.util.*", "org.omg.CORBA, sun.misc.*"),
+    ("Scala Macros: upickle, scala-async, scalaxy, etc", "Reflection: scala-pickling, scala-reflect"),
+    ("Pure-Scala ecosystem: shapeless, scalaz, scalatags, utest", "Java-dependent: Scalatest, Scalate"),
+    ("JS stuff: XmlHttpRequest, Websockets. Localstorage", " JVM stuff: Netty, akka, spray, file IO, JNI"),
+    ("HTML DOM, Canvas, WebGL", "AWT, Swing, SWT, OpenGL"),
+    ("JavaScript libraries: chipmunk.js, hand.js, react.js, jquery", "Java ecosystem: guice, junit, apache-commons, log4j"),
+    ("IntelliJ, Eclipse, SBT, Chrome console, firebug", "Scala REPL, Yourkit, VisualVM, JProfiler")
+  )
   @p
     Scala.js differs from Scala-JVM not just in the corner-cases of the language, but also in the libraries available. Scala-JVM has access to JVM APIs and the wealth of the Java libraries, while Scala.js has access to Javascript APIs and Javascript libraries. It's also possible to write pure-Scala libraries that run on both Scala.js and Scala-JVM, as detailed @a("here").
   @p
@@ -136,7 +147,7 @@
   @val tableHead = pureTable(th("Can Use"), th("Can't Use"))
 
   @tableHead
-    @for(tuple <- BookData.myTable)
+    @for(tuple <- myTable)
       @tr
         @td{@tuple._1}@td{@tuple._2}
 
@@ -145,7 +156,7 @@
 
   @sect{Standard Library}
     @tableHead
-      @for(tuple <- BookData.myTable.slice(0, 3))
+      @for(tuple <- myTable.slice(0, 3))
         @tr
           @td{@tuple._1}@td{@tuple._2}
 
@@ -156,7 +167,7 @@
 
   @sect{Reflection v.s. Macros}
     @tableHead
-      @for(tuple <- BookData.myTable.slice(3, 4))
+      @for(tuple <- myTable.slice(3, 4))
         @tr
           @td{@tuple._1}@td{@tuple._2}
 
@@ -168,7 +179,7 @@
 
   @sect{Pure-Scala v.s. Java Libraries}
     @tableHead
-      @for(tuple <- BookData.myTable.slice(4, 5))
+      @for(tuple <- myTable.slice(4, 5))
         @tr
           @td{@tuple._1}@td{@tuple._2}
     @p
@@ -178,7 +189,7 @@
 
   @sect{Javascript APIs v.s. JVM APIs}
     @tableHead
-      @for(tuple <- BookData.myTable.slice(5, 7))
+      @for(tuple <- myTable.slice(5, 7))
         @tr
           @td{@tuple._1}@td{@tuple._2}
 
@@ -192,7 +203,7 @@
 
   @sect{Java tooling v.s. Scala/Browser tooling}
     @tableHead
-      @for(tuple <- BookData.myTable.slice(7, 8))
+      @for(tuple <- myTable.slice(7, 8))
         @tr
           @td{@tuple._1}@td{@tuple._2}
 
