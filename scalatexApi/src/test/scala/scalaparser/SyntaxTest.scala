@@ -180,41 +180,22 @@ object SyntaxTest extends TestSuite{
           |}
         """.stripMargin
       )
-//      * - check(io.Source.fromFile("scalatexApi/src/main/scala/scalatex/stages/Trim.scala").mkString)
-//      * - check(
-//        """
-//          |package scalatex.stages
-//          |import acyclic.file
-//          |
-//          |/**
-//          | * Preprocesses the input string to normalize things related to whitespace
-//          | *
-//          | * Find the "first" non-whitespace-line of the text and remove the front
-//          | * of every line to align that first line with the left margin.
-//          | *
-//          | * Remove all trailing whitespace from each line.
-//          | */
-//          |object Trim extends (String => (String, Int)){
-//          |  def apply(str: String) = {
-//          |    val lines = str.split("\n", -1)
-//          |    val offset = lines.iterator
-//          |                      .filter(_.length > 0)
-//          |                      .next()
-//          |                      .takeWhile(_ == ' ')
-//          |                      .length
-//          |    val res = lines.iterator
-//          |                   .map(_.replaceFirst("\\s+$", ""))
-//          |                   .mkString("\n")
-//          |    (res, offset)
-//          |  }
-//          |  def old(str: String) = {
-//          |    val (res, offset) = this.apply(str)
-//          |    res.split("\n", -1).map(_.drop(offset)).mkString("\n")
-//          |  }
-//          |}
-//          |
-//        """.stripMargin
-//      )
+      * - check(
+      """
+        |object Compiler{
+        |
+        |  def apply = {
+        |    def rec = t match {
+        |      case 0 => 0
+        |    }
+        |
+        |    rec(tree)
+        |  }
+        |}
+        |
+      """.stripMargin
+      )
+
     }
     'file{
       def checkFile(path: String) =
@@ -225,15 +206,15 @@ object SyntaxTest extends TestSuite{
       * - checkFile("scalatexApi/src/main/scala/scalaparser/syntax/Literals.scala")
       // All the commented files seem to make the parser run forever. There's probably
       // some exponential performance somewhere in there, but I can't see it =/
-      // * - check(io.Source.fromFile("scalatexApi/src/main/scala/scalaparser/ScalaSyntax.scala").mkString)
+      * - checkFile("scalatexApi/src/main/scala/scalaparser/ScalaSyntax.scala")
       * - checkFile("scalatexApi/src/test/scala/scalatex/TestUtil.scala")
 
 
-      // * - check(io.Source.fromFile("scalatexApi/src/main/scala/scalatex/stages/Compiler.scala").mkString)
+      * - checkFile("scalatexApi/src/main/scala/scalatex/stages/Compiler.scala")
       * - checkFile("scalatexApi/src/main/scala/scalatex/stages/Parser.scala")
       // * - check(io.Source.fromFile("scalatexApi/src/test/scala/scalatex/ParserTests.scala").mkString)
       * - checkFile("scalatexApi/src/main/scala/scalatex/stages/Trim.scala")
-      // * - check(io.Source.fromFile("scalatexApi/src/main/scala/scalatex/package.scala").mkString)
+      * - checkFile("scalatexApi/src/main/scala/scalatex/package.scala")
 
     }
   }

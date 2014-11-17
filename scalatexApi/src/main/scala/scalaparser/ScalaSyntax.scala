@@ -119,7 +119,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Refinement = rule { optional(Newline) ~ '{' ~ oneOrMore(RefineStat).separatedBy(Semi) ~ '}' }
   def RefineStat = rule { "type" ~ TypeDef | Dcl | MATCH }
   def TypePat = rule { Type }
-  def Ascription = rule { ":" ~ (InfixType | oneOrMore(Annotation) | "_" ~ "*") }
+  def Ascription(G: B = t) = rule { ":" ~ (InfixType | oneOrMore(Annotation) | "_" ~ StrW("*", G)) }
 
   def ParamType = rule { "=>" ~ Type | Type ~ "*" | Type }
 
@@ -134,7 +134,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     "return" ~ optional(Expr(G)) |
     SimpleExpr() ~ ArgumentExprs() ~ '=' ~ Expr(G) |
     optional(SimpleExpr() ~ '.') ~ Id() ~ '=' ~ Expr(G) |
-    PostfixExpr(G) ~ optional("match" ~ '{' ~ CaseClauses ~ '}' | Ascription)
+    PostfixExpr(false) ~ optional("match" ~ '{' ~ CaseClauses ~ StrW("}", false) | Ascription(false)) ~ W(G)
   }
 
   def IfCFlow(G: B = t) = rule { "if" ~ '(' ~ Expr() ~ ')' ~ zeroOrMore(Newline) ~ Expr(G) ~ optional(optional(Semi) ~ "else" ~ Expr(G)) }
