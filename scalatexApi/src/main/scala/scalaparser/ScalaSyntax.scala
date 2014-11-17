@@ -130,14 +130,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     ForCFlow(G) |
     "throw" ~ Expr(G) |
     "return" ~ optional(Expr(G)) |
-    NaiveAssignment(G) |
-    SimpleExpr() ~ (
-      ArgumentExprs() ~ '=' ~ Expr(G) |
-      '.' ~ NaiveAssignment(G)
-    ) |
+    SimpleExpr() ~ '=' ~ Expr(G) |
     PostfixExpr(false) ~ optional("match" ~ '{' ~ CaseClauses ~ StrW("}", false) | Ascription(false)) ~ W(G)
   }
-  def NaiveAssignment(G: B = t) = rule{ Id() ~ '=' ~ Expr(G) }
   def IfCFlow(G: B = t) = rule { "if" ~ '(' ~ Expr() ~ ')' ~ zeroOrMore(Newline) ~ Expr(G) ~ optional(optional(Semi) ~ "else" ~ Expr(G)) }
   def WhileCFlow(G: B = t) = rule { "while" ~ '(' ~ Expr() ~ ')' ~ zeroOrMore(Newline) ~ Expr(G) }
   def TryCFlow(G: B = t) = rule { "try" ~ '{' ~ Block ~ StrW("}", G) ~ optional("catch" ~ '{' ~ CaseClauses ~ StrW("}", G)) ~ optional("finally" ~ Expr(G)) }

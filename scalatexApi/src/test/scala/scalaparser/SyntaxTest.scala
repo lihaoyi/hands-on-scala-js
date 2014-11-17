@@ -209,7 +209,14 @@ object SyntaxTest extends TestSuite{
           |   A(A(A(A(A(A(A(A(A(A(A(A(A(A(A(A())))))))))))))))
           |}
         """.stripMargin
-
+      )
+      * - check(
+        """
+          |object L{
+          |  a.b = c
+          |  a().b = c
+          |}
+        """.stripMargin
       )
     }
     println("Checking")
@@ -224,7 +231,6 @@ object SyntaxTest extends TestSuite{
       * - checkFile("scalatexApi/src/test/scala/scalaparser/SyntaxTest.scala")
 
 
-
       * - checkFile("scalatexApi/src/main/scala/scalatex/stages/Compiler.scala")
       * - checkFile("scalatexApi/src/main/scala/scalatex/stages/Parser.scala")
       * - checkFile("scalatexApi/src/main/scala/scalatex/stages/Trim.scala")
@@ -234,6 +240,8 @@ object SyntaxTest extends TestSuite{
       * - checkFile("scalatexApi/src/test/scala/scalatex/BasicTests.scala")
       * - checkFile("scalatexApi/src/test/scala/scalatex/ErrorTests.scala")
       * - checkFile("scalatexApi/src/test/scala/scalatex/TestUtil.scala")
+
+      * - checkFile("scalatexPlugin/src/main/scala/scalatex/ScalaTexPlugin.scala")
     }
   }
 
