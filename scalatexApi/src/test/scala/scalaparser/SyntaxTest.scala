@@ -268,7 +268,41 @@ object SyntaxTest extends TestSuite{
           |}
         """.stripMargin
       )
-
+      * - check(
+        """
+          |object L{
+          |  x match{
+          |    case y.Y(z) => z
+          |  }
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """object K{
+          |  val a: B {
+          |    val c: D
+          |  }
+          |
+          |  1
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """
+          |object LOLS{
+          |    def run() {}
+          |
+          |    def apply() {}
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """
+          |object O{
+          |  a =:= b.c
+          |}
+        """.stripMargin
+      )
     }
     def checkFile(path: String) = check(io.Source.fromFile(path).mkString)
     'file{
