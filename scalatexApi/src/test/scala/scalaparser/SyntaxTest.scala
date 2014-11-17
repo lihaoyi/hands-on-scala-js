@@ -195,11 +195,41 @@ object SyntaxTest extends TestSuite{
         |
       """.stripMargin
       )
-
+      * - check(
+        """
+          |object ParserTests extends utest.TestSuite {
+          |
+          |  import utest._
+          |
+          |  def tests = TestSuite {
+          |    Block(Vector(
+          |      Text("\n"),
+          |      Chain("p",Vector(Block(Vector(
+          |        Text("\n  ", 3),
+          |        IfElse("if(true)",
+          |          Block(Vector(
+          |            Text("\n    ", 16),
+          |            Text("Hello", 21),
+          |            Text("\n  ", 26)
+          |          ), 16),
+          |          Some(Block(Vector(
+          |            Text("\n    ", 35),
+          |            Text("lols", 40),
+          |            Text("\n  ", 44)
+          |          ), 35)),
+          |          6
+          |        )), 3)), 1),
+          |      Text("\n", 48)
+          |    ))
+          |  }
+          |}
+          |
+        """.stripMargin
+      )
     }
+    println("Checking")
     'file{
-      def checkFile(path: String) =
-        check(io.Source.fromFile(path).mkString)
+      def checkFile(path: String) = check(io.Source.fromFile(path).mkString)
       * - checkFile("scalatexApi/src/test/scala/scalaparser/SyntaxTest.scala")
       * - checkFile("scalatexApi/src/main/scala/scalaparser/syntax/Basic.scala")
       * - checkFile("scalatexApi/src/main/scala/scalaparser/syntax/Identifiers.scala")
@@ -212,7 +242,7 @@ object SyntaxTest extends TestSuite{
 
       * - checkFile("scalatexApi/src/main/scala/scalatex/stages/Compiler.scala")
       * - checkFile("scalatexApi/src/main/scala/scalatex/stages/Parser.scala")
-      // * - check(io.Source.fromFile("scalatexApi/src/test/scala/scalatex/ParserTests.scala").mkString)
+      * - checkFile("scalatexApi/src/test/scala/scalatex/ParserTests.scala")
       * - checkFile("scalatexApi/src/main/scala/scalatex/stages/Trim.scala")
       * - checkFile("scalatexApi/src/main/scala/scalatex/package.scala")
 
