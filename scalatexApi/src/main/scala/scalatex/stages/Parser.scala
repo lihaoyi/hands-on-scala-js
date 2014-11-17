@@ -38,7 +38,7 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
   }
   def Text = TextNot("@")
   def Code = rule {
-    "@" ~ capture(Id | BlockExpr2 | ('(' ~ optional(Exprs) ~ ')'))
+    "@" ~ capture(Identifiers.Id | BlockExpr2 | ('(' ~ optional(Exprs) ~ ')'))
   }
   def Header = rule {
     "@" ~ capture(Def(false) | Import(false))
@@ -94,7 +94,7 @@ class Parser(input: ParserInput, indent: Int = 0, offset: Int = 0) extends Scala
     push(offsetCursor) ~ Code ~ zeroOrMore(Extension) ~> { (a, b, c) => Ast.Chain(b, c, a)}
   }
   def Extension: Rule1[Ast.Chain.Sub] = rule {
-    (push(offsetCursor) ~ '.' ~ capture(Id) ~> ((x, y) => Ast.Chain.Prop(y, x))) |
+    (push(offsetCursor) ~ '.' ~ capture(Identifiers.Id) ~> ((x, y) => Ast.Chain.Prop(y, x))) |
     (push(offsetCursor) ~ capture(TypeArgs2) ~> ((x, y) => Ast.Chain.TypeArgs(y, x))) |
     (push(offsetCursor) ~ capture(ArgumentExprs2) ~> ((x, y) => Ast.Chain.Args(y, x))) |
     BraceBlock
