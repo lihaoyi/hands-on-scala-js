@@ -218,10 +218,69 @@ object SyntaxTest extends TestSuite{
           |}
         """.stripMargin
       )
+      * - check(
+        """/*                     __                                               *\
+          |**     ________ ___   / /  ___      __ ____  Scala.js CLI               **
+          |**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
+          |**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+          |** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+          |**                          |/____/                                     **
+          |\*                                                                      */
+          |
+          |package scala.scalajs.cli
+          |
+        """.stripMargin
+      )
+      * - check(
+        """
+          |object O{
+          |  for {
+          |      a  <- b
+          |      c <- d
+          |  } {
+          |    1
+          |  }
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """
+          |object O{
+          |  val jarFile =
+          |      try { 1 }
+          |      catch { case _: F => G }
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """
+          |object F{
+          |  func{ case _: F => fail }
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """
+          |object SyntaxTest extends TestSuite{
+          |  def check[T](input: String) = {
+          |    new ScalaSyntax(input).CompilationUnit.run() match{
+          |      case Failure(f: ParseError) =>
+          |        println(f.position)
+          |        println(f.formatExpectedAsString)
+          |        println(f.formatTraces)
+          |        throw new Exception(f.position + "\t" + f.formatTraces)
+          |      case Success(parsed) =>
+          |        assert(parsed == input)
+          |    }
+          |  }
+          |}
+        """.stripMargin
+      )
+
     }
-    println("Checking")
+    def checkFile(path: String) = check(io.Source.fromFile(path).mkString)
     'file{
-      def checkFile(path: String) = check(io.Source.fromFile(path).mkString)
+
 
       * - checkFile("scalatexApi/src/main/scala/scalaparser/syntax/Basic.scala")
       * - checkFile("scalatexApi/src/main/scala/scalaparser/syntax/Identifiers.scala")
@@ -243,6 +302,17 @@ object SyntaxTest extends TestSuite{
 
       * - checkFile("scalatexPlugin/src/main/scala/scalatex/ScalaTexPlugin.scala")
     }
-  }
 
+    'omg{
+      val root = new java.io.File("../scala-js/")
+      def listFiles(s: java.io.File): Iterator[String] = {
+        val (dirs, files) = s.listFiles().toIterator.partition(_.isDirectory)
+        files.map(_.getPath) ++ dirs.flatMap(listFiles)
+      }
+      for(f <- listFiles(root).filter(_.endsWith(".scala"))){
+        println("CHECKING " + f)
+        checkFile(f)
+      }
+    }
+  }
 }
