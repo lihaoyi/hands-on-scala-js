@@ -215,22 +215,25 @@ object SyntaxTest extends TestSuite{
     println("Checking")
     'file{
       def checkFile(path: String) = check(io.Source.fromFile(path).mkString)
-      * - checkFile("scalatexApi/src/test/scala/scalaparser/SyntaxTest.scala")
+
       * - checkFile("scalatexApi/src/main/scala/scalaparser/syntax/Basic.scala")
       * - checkFile("scalatexApi/src/main/scala/scalaparser/syntax/Identifiers.scala")
       * - checkFile("scalatexApi/src/main/scala/scalaparser/syntax/Literals.scala")
-      // All the commented files seem to make the parser run forever. There's probably
-      // some exponential performance somewhere in there, but I can't see it =/
       * - checkFile("scalatexApi/src/main/scala/scalaparser/ScalaSyntax.scala")
-      * - checkFile("scalatexApi/src/test/scala/scalatex/TestUtil.scala")
+
+      * - checkFile("scalatexApi/src/test/scala/scalaparser/SyntaxTest.scala")
+
 
 
       * - checkFile("scalatexApi/src/main/scala/scalatex/stages/Compiler.scala")
       * - checkFile("scalatexApi/src/main/scala/scalatex/stages/Parser.scala")
-//      * - checkFile("scalatexApi/src/test/scala/scalatex/ParserTests.scala")
       * - checkFile("scalatexApi/src/main/scala/scalatex/stages/Trim.scala")
       * - checkFile("scalatexApi/src/main/scala/scalatex/package.scala")
 
+      * - checkFile("scalatexApi/src/test/scala/scalatex/ParserTests.scala")
+      * - checkFile("scalatexApi/src/test/scala/scalatex/BasicTests.scala")
+      * - checkFile("scalatexApi/src/test/scala/scalatex/ErrorTests.scala")
+      * - checkFile("scalatexApi/src/test/scala/scalatex/TestUtil.scala")
     }
   }
 

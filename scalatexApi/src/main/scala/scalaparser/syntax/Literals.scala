@@ -37,7 +37,7 @@ trait Literals { self: Parser with Basic with Identifiers =>
 
     def EscapedChars = rule { '\\' ~ anyOf("rnt\\\"") }
 
-    def SymbolLiteral = rule { ''' ~ capture(Identifiers.PlainId) }
+    def SymbolLiteral = rule { ''' ~ capture(Identifiers.PlainId | Identifiers.Keywords) }
 
     def CharacterLiteral = rule { ''' ~ capture(UnicodeExcape | EscapedChars | !'\\' ~ CharPredicate.from(isPrintableChar)) ~ ''' }
 
