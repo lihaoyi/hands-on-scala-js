@@ -198,13 +198,7 @@ object SyntaxTest extends TestSuite{
       * - check(
         """
           |object O {
-          |    A(
-          |      A(),
-          |      A(A(A(A(
-          |        A(
-          |          A(A())
-          |        )))))
-          |    )
+          |    A(A(A(A(A(A(A(A())))))))
           |}
           |
         """.stripMargin
