@@ -203,6 +203,14 @@ object SyntaxTest extends TestSuite{
           |
         """.stripMargin
       )
+      * - check(
+        """
+          |object O{
+          |   A(A(A(A(A(A(A(A(A(A(A(A(A(A(A(A())))))))))))))))
+          |}
+        """.stripMargin
+
+      )
     }
     println("Checking")
     'file{

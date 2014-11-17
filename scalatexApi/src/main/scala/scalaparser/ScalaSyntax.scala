@@ -103,10 +103,8 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
   def SimpleType(G: B = t): R0 = rule {
     BasicType(false) ~
-    optional(WL ~
-    '#' ~ Id(false)) ~
-    optional(WL ~
-    TypeArgs(false)) ~
+    optional(WL ~ '#' ~ Id(false)) ~
+    optional(WL ~ TypeArgs(false)) ~
     W(G)
   }
   def BasicType(G: B = t): R0 = rule {
@@ -148,9 +146,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def SimpleExpr(G: B = t): R0 = rule {
     SimpleExpr1(false) ~
-    zeroOrMore(
-      WL ~ ('.' ~ Id(false) | TypeArgs(false) | ArgumentExprs(false))
-    ) ~
+    zeroOrMore(WL ~ ('.' ~ Id(false) | TypeArgs(false) | ArgumentExprs(false))) ~
     optional(WL ~ StrW("_", false)) ~
     W(G)
   }
