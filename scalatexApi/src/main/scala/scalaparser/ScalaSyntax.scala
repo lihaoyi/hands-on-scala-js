@@ -57,11 +57,20 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   implicit private[this] def wspStr(s: String): R0 = rule { str(s) ~ WL }
   implicit private[this] def wspChar(s: Char): R0 = rule { ch(s) ~ WL }
 
-  def KW(s: String) = rule{
-    str(s) ~ !(Basic.Letter | Basic.Digit) ~ WL
-  }
-  def KO(s: String) = rule{
-    str(s) ~ !Basic.OperatorChar ~ WL
+  /**
+   * Most keywords don't just require the correct characters to match,
+   * they have to ensure that subsequent characters *don't* match in
+   * order for it to be a keyword. This enforces that rule for key-words
+   * (W) and key-operators (O) which have different non-match criteria.
+   */
+  object K {
+    def W(s: String) = rule {
+      str(s) ~ !(Basic.Letter | Basic.Digit) ~ WL
+    }
+
+    def O(s: String) = rule {
+      str(s) ~ !Basic.OperatorChar ~ WL
+    }
   }
   /**
    * Occasionally, you want to decide whether or not to
@@ -89,31 +98,31 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Ids = rule { oneOrMore(Id()) separatedBy ',' }
 
   def Path(G: B = t): R0 = rule {
-    zeroOrMore(Id(G) ~ '.') ~ KW("this") ~ zeroOrMore(Id(G)).separatedBy('.') |
+    zeroOrMore(Id(G) ~ '.') ~ K.W("this") ~ zeroOrMore(Id(G)).separatedBy('.') |
     StableId(G)
   }
   def StableId(G: B = t): R0 = rule {
-    zeroOrMore(Id() ~ '.') ~ (KW("this") | KW("super") ~ optional(ClassQualifier)) ~ '.' ~ oneOrMore(Id(G)).separatedBy('.') |
+    zeroOrMore(Id() ~ '.') ~ (K.W("this") | K.W("super") ~ optional(ClassQualifier)) ~ '.' ~ oneOrMore(Id(G)).separatedBy('.') |
     Id(false) ~ zeroOrMore(WL ~ '.' ~ WL ~ Id(false)) ~ W(G)
   }
 
   def ClassQualifier = rule { '[' ~ Id() ~ ']' }
 
   def Type(G: B = t): R0 = rule {
-    FunctionArgTypes ~ KO("=>") ~ Type(G) | InfixType(false) ~ optional(WL ~ ExistentialClause) ~ W(G)
+    FunctionArgTypes ~ K.O("=>") ~ Type(G) | InfixType(false) ~ optional(WL ~ ExistentialClause) ~ W(G)
   }
   def FunctionArgTypes = rule {
     InfixType() | '(' ~ optional(oneOrMore(ParamType) separatedBy ',') ~ ')'
   }
 
   def ExistentialClause = rule { "forSome" ~ '{' ~ oneOrMore(ExistentialDcl(false)).separatedBy(Semi) }
-  def ExistentialDcl(G: B = t) = rule { KW("type") ~ TypeDcl(G) | KW("val") ~ ValDcl(G) }
+  def ExistentialDcl(G: B = t) = rule { K.W("type") ~ TypeDcl(G) | K.W("val") ~ ValDcl(G) }
 
   def InfixType(G: B = t) = rule {
     CompoundType(false) ~ zeroOrMore(WL ~ Id() ~ optional(Newline) ~ CompoundType(false)) ~ W(G)
   }
   def CompoundType(G: B = t) = rule {
-    oneOrMore(AnnotType(false)).separatedBy(WL ~ KW("with")) ~ optional(Refinement(false)) ~ W(G)
+    oneOrMore(AnnotType(false)).separatedBy(WL ~ K.W("with")) ~ optional(Refinement(false)) ~ W(G)
   }
   def AnnotType(G: B = t) = rule {
     SimpleType(false) ~ zeroOrMore(WL ~ Annotation(false)) ~ W(G)
@@ -126,7 +135,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
   def BasicType(G: B = t): R0 = rule {
     '(' ~ Types ~ ')' |
-    Path() ~ '.' ~ KW("type") |
+    Path() ~ '.' ~ K.W("type") |
     StableId(G)
   }
   def TypeArgs(G: B = t) = rule { '[' ~ Types ~ StrW("]", G) }
@@ -140,35 +149,35 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     ":" ~ ("_" ~ StrW("*", G) | InfixType(G) | oneOrMore(Annotation(G)))
   }
 
-  def ParamType = rule { KO("=>") ~ Type() | Type() ~ "*" | Type() }
+  def ParamType = rule { K.O("=>") ~ Type() | Type() ~ "*" | Type() }
 
-  def Expr(G: B = t): R0 = rule { (Bindings | optional(KW("implicit")) ~ Id() | "_") ~ KO("=>") ~ Expr(G) | Expr1(G) }
+  def Expr(G: B = t): R0 = rule { (Bindings | optional(K.W("implicit")) ~ Id() | "_") ~ K.O("=>") ~ Expr(G) | Expr1(G) }
   def Expr1(G: B = t): R0 = rule {
     IfCFlow(G) |
     WhileCFlow(G) |
     TryCFlow(G) |
     DoWhileCFlow(G) |
     ForCFlow(G) |
-    KW("throw") ~ Expr(G) |
-    KW("return") ~ optional(Expr(G)) |
+    K.W("throw") ~ Expr(G) |
+    K.W("return") ~ optional(Expr(G)) |
     SimpleExpr() ~ '=' ~ !Basic.OperatorChar ~ Expr(G) |
     PostfixExpr(false) ~ optional("match" ~ '{' ~ CaseClauses ~ StrW("}", false) | Ascription(false)) ~ W(G)
   }
-  def IfCFlow(G: B = t) = rule { "if" ~ '(' ~ Expr() ~ ')' ~ zeroOrMore(Newline) ~ Expr(G) ~ optional(optional(Semi) ~ KW("else") ~ Expr(G)) }
+  def IfCFlow(G: B = t) = rule { "if" ~ '(' ~ Expr() ~ ')' ~ zeroOrMore(Newline) ~ Expr(G) ~ optional(optional(Semi) ~ K.W("else") ~ Expr(G)) }
   def WhileCFlow(G: B = t) = rule { "while" ~ '(' ~ Expr() ~ ')' ~ zeroOrMore(Newline) ~ Expr(G) }
   def TryCFlow(G: B = t) = rule {
-    KW("try") ~ Expr(false) ~
-    optional(WL ~ KW("catch") ~ Expr(false)) ~
-    optional(WL ~ KW("finally") ~ Expr(false)) ~
+    K.W("try") ~ Expr(false) ~
+    optional(WL ~ K.W("catch") ~ Expr(false)) ~
+    optional(WL ~ K.W("finally") ~ Expr(false)) ~
     W(G)
   }
 
-  def DoWhileCFlow(G: B = t) = rule { KW("do") ~ Expr() ~ optional(Semi) ~ "while" ~ '(' ~ Expr() ~ StrW(")", G) }
+  def DoWhileCFlow(G: B = t) = rule { K.W("do") ~ Expr() ~ optional(Semi) ~ "while" ~ '(' ~ Expr() ~ StrW(")", G) }
   def ForCFlow(G: B = t) = rule {
     "for" ~
     ('(' ~ Enumerators ~ ')' | '{' ~ Enumerators ~ '}') ~
     zeroOrMore(Newline) ~
-    optional(KW("yield")) ~
+    optional(K.W("yield")) ~
     Expr(G) }
   def PostfixExpr(G: B = t): R0 = rule { InfixExpr(G) ~ optional(Id() ~ optional(Newline)) }
   def InfixExpr(G: B = t): R0 = rule { PrefixExpr(G) ~ zeroOrMore(Id() ~ optional(Newline) ~ PrefixExpr(G)) }
@@ -182,7 +191,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
 
   def SimpleExpr1(G: B = t) = rule{
-    KW("new") ~ (ClassTemplate(G) | TemplateBody(G)) |
+    K.W("new") ~ (ClassTemplate(G) | TemplateBody(G)) |
     BlockExpr(G) |
     Literal(G) ~ drop[String] |
     Path(G) |
@@ -206,16 +215,16 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def BlockStat: R0 = rule {
     Semi |
     Import(false) |
-    zeroOrMore(Annotation(false)) ~ (optional(KW("implicit") | KW("lazy")) ~ Def(false) | zeroOrMore(LocalModifier) ~ TmplDef(false)) |
+    zeroOrMore(Annotation(false)) ~ (optional(K.W("implicit") | K.W("lazy")) ~ Def(false) | zeroOrMore(LocalModifier) ~ TmplDef(false)) |
     Expr1(false)
   }
-  def ResultExpr(G: B = t): R0 = rule { (Bindings | optional(KW("implicit")) ~ Id() | "_") ~ KW("=>") ~ Block | Expr1(t) }
+  def ResultExpr(G: B = t): R0 = rule { (Bindings | optional(K.W("implicit")) ~ Id() | "_") ~ K.W("=>") ~ Block | Expr1(t) }
   def Enumerators: R0 = rule { Generator(false) ~ zeroOrMore(Semi ~ Enumerator(false)) ~ WL }
-  def Enumerator(G: B = t): R0 = rule { Generator(G) | Guard(G) | Pattern1 ~ KO("=") ~ Expr(G) }
-  def Generator(G: B = t): R0 = rule { Pattern1 ~ KO("<-") ~ Expr(false) ~ optional(WL ~ Guard(false)) ~ W(G) }
+  def Enumerator(G: B = t): R0 = rule { Generator(G) | Guard(G) | Pattern1 ~ K.O("=") ~ Expr(G) }
+  def Generator(G: B = t): R0 = rule { Pattern1 ~ K.O("<-") ~ Expr(false) ~ optional(WL ~ Guard(false)) ~ W(G) }
   def CaseClauses: R0 = rule { oneOrMore(CaseClause) }
-  def CaseClause: R0 = rule { KW("case") ~ Pattern ~ optional(Guard(true)) ~ KO("=>") ~ Block }
-  def Guard(G: B = t): R0 = rule { KW("if") ~ PostfixExpr(G) }
+  def CaseClause: R0 = rule { K.W("case") ~ Pattern ~ optional(Guard(true)) ~ K.O("=>") ~ Block }
+  def Guard(G: B = t): R0 = rule { K.W("if") ~ PostfixExpr(G) }
   def Pattern: R0 = rule {
     oneOrMore(Pattern1).separatedBy('|')
   }
@@ -250,27 +259,27 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def TypeParam: R0 = rule {
     (Id() | '_') ~
     optional(TypeParamClause) ~
-    optional(KO(">:") ~ Type()) ~
-    optional(KO("<:") ~ Type()) ~
-    zeroOrMore(KO("<%") ~ Type()) ~
+    optional(K.O(">:") ~ Type()) ~
+    optional(K.O("<:") ~ Type()) ~
+    zeroOrMore(K.O("<%") ~ Type()) ~
     zeroOrMore(TypeColon ~ Type())
   }
-  def ParamClauses: R0 = rule { zeroOrMore(ParamClause) ~ optional(optional(Newline) ~ '(' ~ KW("implicit") ~ Params ~ ')') }
+  def ParamClauses: R0 = rule { zeroOrMore(ParamClause) ~ optional(optional(Newline) ~ '(' ~ K.W("implicit") ~ Params ~ ')') }
   def ParamClause: R0 = rule { optional(Newline) ~ '(' ~ optional(Params) ~ ')' }
   def Params: R0 = rule { zeroOrMore(Param).separatedBy(',') }
   def Param: R0 = rule { zeroOrMore(Annotation()) ~ Id() ~ optional(TypeColon ~ ParamType) ~ optional('=' ~ Expr()) }
-  def ClassParamClauses(G: B = t): R0 = rule { zeroOrMore(ClassParamClause(G)) ~ optional(optional(Newline) ~ '(' ~ KW("implicit") ~ ClassParam ~ StrW(")", G)) }
+  def ClassParamClauses(G: B = t): R0 = rule { zeroOrMore(ClassParamClause(G)) ~ optional(optional(Newline) ~ '(' ~ K.W("implicit") ~ ClassParam ~ StrW(")", G)) }
   def ClassParamClause(G: B = t): R0 = rule { optional(Newline) ~ '(' ~ optional(ClassParams) ~ StrW(")", G) }
   def ClassParams: R0 = rule { oneOrMore(ClassParam).separatedBy(',') }
-  def ClassParam: R0 = rule { zeroOrMore(Annotation()) ~ optional(zeroOrMore(Modifier) ~ (KW("val") | KW("var"))) ~ Id() ~ TypeColon ~ ParamType ~ optional(KO("=") ~ Expr()) }
+  def ClassParam: R0 = rule { zeroOrMore(Annotation()) ~ optional(zeroOrMore(Modifier) ~ (K.W("val") | K.W("var"))) ~ Id() ~ TypeColon ~ ParamType ~ optional(K.O("=") ~ Expr()) }
 
   def Bindings: R0 = rule { '(' ~ oneOrMore(Binding).separatedBy(',') ~ ')' }
   def Binding: R0 = rule { (Id() | '_') ~ optional(TypeColon ~ Type()) }
 
-  def Modifier: R0 = rule { LocalModifier | AccessModifier | KW("override") }
-  def LocalModifier: R0 = rule { KW("abstract") | KW("final") | KW("sealed") | KW("implicit") | KW("lazy") }
-  def AccessModifier: R0 = rule { (KW("private") | KW("protected")) ~ optional(AccessQualifier) }
-  def AccessQualifier: R0 = rule { '[' ~ (KW("this") | Id()) ~ ']' }
+  def Modifier: R0 = rule { LocalModifier | AccessModifier | K.W("override") }
+  def LocalModifier: R0 = rule { K.W("abstract") | K.W("final") | K.W("sealed") | K.W("implicit") | K.W("lazy") }
+  def AccessModifier: R0 = rule { (K.W("private") | K.W("protected")) ~ optional(AccessQualifier) }
+  def AccessQualifier: R0 = rule { '[' ~ (K.W("this") | Id()) ~ ']' }
 
   def Annotation(G: B = t): R0 = rule { '@' ~ SimpleType(false) ~ zeroOrMore(WL ~ ArgumentExprs(false)) ~ W(G) }
   def ConstrAnnotation: R0 = rule { '@' ~ SimpleType() ~ ArgumentExprs() }
@@ -291,19 +300,19 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     MATCH
   }
 
-  def SelfType: R0 = rule { KW("this") ~ TypeColon ~ Type() ~ KO("=>") | Id() ~ optional(TypeColon ~ Type()) ~ KO("=>") }
+  def SelfType: R0 = rule { K.W("this") ~ TypeColon ~ Type() ~ K.O("=>") | Id() ~ optional(TypeColon ~ Type()) ~ K.O("=>") }
 
-  def Import(G: B = t): R0 = rule { KW("import") ~ oneOrMore(ImportExpr(G)).separatedBy(',') }
+  def Import(G: B = t): R0 = rule { K.W("import") ~ oneOrMore(ImportExpr(G)).separatedBy(',') }
 
   def ImportExpr(G: B = t): R0 = rule { StableId(G) ~ optional('.' ~ (StrW("_", G) | ImportSelectors(G))) }
   def ImportSelectors(G: B = t): R0 = rule { '{' ~ zeroOrMore(ImportSelector ~ ',') ~ (ImportSelector | '_') ~ StrW("}", G) }
-  def ImportSelector: R0 = rule { Id() ~ optional(KO("=>") ~ (Id() | '_')) }
+  def ImportSelector: R0 = rule { Id() ~ optional(K.O("=>") ~ (Id() | '_')) }
 
   def Dcl(G: B = t): R0 = rule {
-    KW("val") ~ ValDcl(G) |
-    KW("var") ~ VarDcl(G) |
-    KW("def") ~ FunDcl(G) |
-    KW("type") ~ zeroOrMore(Newline) ~ TypeDcl(G)
+    K.W("val") ~ ValDcl(G) |
+    K.W("var") ~ VarDcl(G) |
+    K.W("def") ~ FunDcl(G) |
+    K.W("type") ~ zeroOrMore(Newline) ~ TypeDcl(G)
   }
   def ValDcl(G: B = t): R0 = rule { Ids ~ TypeColon ~ Type(G) }
   def VarDcl(G: B = t): R0 = rule { Ids ~ TypeColon ~ Type(G) }
@@ -312,29 +321,29 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def TypeDcl(G: B = t): R0 = rule {
     Id(false) ~
     optional(WL ~ TypeParamClause) ~
-    optional(WL ~ KO(">:") ~ Type(false)) ~
-    optional(WL ~ KO("<:") ~ Type(false)) ~
+    optional(WL ~ K.O(">:") ~ Type(false)) ~
+    optional(WL ~ K.O("<:") ~ Type(false)) ~
     W(G)
   }
 
-  def PatVarDef(G: B = t): R0 = rule { KW("val") ~ PatDef(G) | KW("var") ~ VarDef(G) }
-  def Def(G: B = t): R0 = rule { KW("def") ~ FunDef(G) | KW("type") ~ zeroOrMore(Newline) ~ TypeDef(G) | PatVarDef(G) | TmplDef(G) }
-  def PatDef(G: B = t): R0 = rule { oneOrMore(Pattern2).separatedBy(',') ~ optional(TypeColon ~ Type()) ~ KO("=") ~ Expr(G) }
-  def VarDef(G: B = t): R0 = rule { Ids ~ TypeColon ~ Type() ~ KO("=") ~ '_' | PatDef(G) }
+  def PatVarDef(G: B = t): R0 = rule { K.W("val") ~ PatDef(G) | K.W("var") ~ VarDef(G) }
+  def Def(G: B = t): R0 = rule { K.W("def") ~ FunDef(G) | K.W("type") ~ zeroOrMore(Newline) ~ TypeDef(G) | PatVarDef(G) | TmplDef(G) }
+  def PatDef(G: B = t): R0 = rule { oneOrMore(Pattern2).separatedBy(',') ~ optional(TypeColon ~ Type()) ~ K.O("=") ~ Expr(G) }
+  def VarDef(G: B = t): R0 = rule { Ids ~ TypeColon ~ Type() ~ K.O("=") ~ '_' | PatDef(G) }
   def FunDef(G: B = t): R0 = rule {
-    KW("this") ~ ParamClause ~ ParamClauses ~ (KO("=") ~ ConstrExpr | optional(Newline) ~ ConstrBlock) |
+    K.W("this") ~ ParamClause ~ ParamClauses ~ (K.O("=") ~ ConstrExpr | optional(Newline) ~ ConstrBlock) |
     FunSig() ~
     (
-      optional(TypeColon ~ Type()) ~ KO("=") ~ optional(KW("macro")) ~ Expr(G) |
+      optional(TypeColon ~ Type()) ~ K.O("=") ~ optional(K.W("macro")) ~ Expr(G) |
       optional(Newline) ~ '{' ~ Block ~ StrW("}", G)
     )
   }
-  def TypeDef(G: B = t): R0 = rule { Id() ~ optional(TypeParamClause) ~ KO("=") ~ Type(G) }
+  def TypeDef(G: B = t): R0 = rule { Id() ~ optional(TypeParamClause) ~ K.O("=") ~ Type(G) }
 
   def TmplDef(G: B = t): R0 = rule {
-    KW("trait") ~ TraitDef(G) |
-    optional(KW("case")) ~ (KW("class") ~ ClassDef(G) |
-    KW("object") ~ ObjectDef(G))
+    K.W("trait") ~ TraitDef(G) |
+    optional(K.W("case")) ~ (K.W("class") ~ ClassDef(G) |
+    K.W("object") ~ ObjectDef(G))
   }
   def ClassDef(G: B = t): R0 = rule {
     Id() ~
@@ -349,10 +358,10 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def TraitDef(G: B = t): R0 = rule { Id() ~ optional(TypeParamClause) ~ TraitTemplateOpt(G) }
   def ObjectDef(G: B = t): R0 = rule { Id() ~ ClassTemplateOpt(G) }
   def ClassTemplateOpt(G: B = t): R0 = rule {
-    WL ~ KW("extends") ~ ClassTemplate(G) |
-    optional(WL ~ optional(KW("extends")) ~ TemplateBody(G))
+    WL ~ K.W("extends") ~ ClassTemplate(G) |
+    optional(WL ~ optional(K.W("extends")) ~ TemplateBody(G))
   }
-  def TraitTemplateOpt(G: B = t): R0 = rule { KW("extends") ~ TraitTemplate(G) | optional(optional(KW("extends")) ~ TemplateBody(G)) }
+  def TraitTemplateOpt(G: B = t): R0 = rule { K.W("extends") ~ TraitTemplate(G) | optional(optional(K.W("extends")) ~ TemplateBody(G)) }
   def ClassTemplate(G: B = t): R0 = rule {
     optional(EarlyDefs) ~
     ClassParents(false) ~
@@ -364,24 +373,24 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     optional(EarlyDefs) ~ TraitParents(false) ~ optional(TemplateBody(false)) ~ W(G)
   }
   def ClassParents(G: B = t): R0 = rule {
-    Constr(false) ~ zeroOrMore(WL ~ KW("with") ~ AnnotType(G)) ~ W(G)
+    Constr(false) ~ zeroOrMore(WL ~ K.W("with") ~ AnnotType(G)) ~ W(G)
   }
   def TraitParents(G: B = t): R0 = rule {
-    AnnotType(false) ~ zeroOrMore(WL ~ KW("with") ~ AnnotType(false)) ~ W(G)
+    AnnotType(false) ~ zeroOrMore(WL ~ K.W("with") ~ AnnotType(false)) ~ W(G)
   }
   def Constr(G: B = t): R0 = rule {
     AnnotType(false) ~ zeroOrMore(WL ~ ArgumentExprs(false)) ~
     W(G)
   }
   def EarlyDefs: R0 = rule {
-    '{' ~ optional(oneOrMore(EarlyDef).separatedBy(Semi)) ~ '}' ~ KW("with")
+    '{' ~ optional(oneOrMore(EarlyDef).separatedBy(Semi)) ~ '}' ~ K.W("with")
   }
   def EarlyDef: R0 = rule {
     zeroOrMore(Annotation() ~ optional(Newline)) ~ zeroOrMore(Modifier) ~ PatVarDef(false)
   }
   def ConstrExpr: R0 = rule { ConstrBlock | SelfInvocation }
   def ConstrBlock: R0 = rule { '{' ~ SelfInvocation ~ zeroOrMore(Semi ~ BlockStat) ~ '}' }
-  def SelfInvocation: R0 = rule { KW("this") ~ oneOrMore(ArgumentExprs()) }
+  def SelfInvocation: R0 = rule { K.W("this") ~ oneOrMore(ArgumentExprs()) }
 
   def TopStatSeq: R0 = rule { zeroOrMore(TopStat).separatedBy(Semi) }
   def TopStat: R0 = rule {
@@ -391,13 +400,13 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     zeroOrMore(Annotation(false) ~ optional(Newline)) ~ zeroOrMore(Modifier) ~ TmplDef(false) |
     MATCH
   }
-  def Packaging: R0 = rule { KW("package") ~ QualId() ~ '{' ~ TopStatSeq ~ '}' }
-  def PackageObject(G: B = t): R0 = rule { KW("package") ~ KW("object") ~ ObjectDef(G) }
+  def Packaging: R0 = rule { K.W("package") ~ QualId() ~ '{' ~ TopStatSeq ~ '}' }
+  def PackageObject(G: B = t): R0 = rule { K.W("package") ~ K.W("object") ~ ObjectDef(G) }
   def CompilationUnit: Rule1[String] = rule {
     capture(
       WL ~
       zeroOrMore(Semi) ~
-      zeroOrMore(KW("package") ~ QualId(false)).separatedBy(Semi) ~
+      zeroOrMore(K.W("package") ~ QualId(false)).separatedBy(Semi) ~
       TopStatSeq ~
       EOI
     )
