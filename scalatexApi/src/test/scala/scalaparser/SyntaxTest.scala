@@ -351,6 +351,15 @@ object SyntaxTest extends TestSuite{
           |}
         """.stripMargin
       )
+      * - check(
+        """
+          |object O{
+          |  c match {
+          |    case b_  => 1
+          |  }
+          |}
+        """.stripMargin
+      )
     }
     def checkFile(path: String) = check(io.Source.fromFile(path).mkString)
     'file{
@@ -378,15 +387,15 @@ object SyntaxTest extends TestSuite{
     }
 
     'omg{
-//      val root = new java.io.File("../scala-js/")
-//      def listFiles(s: java.io.File): Iterator[String] = {
-//        val (dirs, files) = s.listFiles().toIterator.partition(_.isDirectory)
-//        files.map(_.getPath) ++ dirs.flatMap(listFiles)
-//      }
-//      for(f <- listFiles(root).filter(_.endsWith(".scala"))){
-//        println("CHECKING " + f)
-//        checkFile(f)
-//      }
+      val root = new java.io.File("../scala-js/")
+      def listFiles(s: java.io.File): Iterator[String] = {
+        val (dirs, files) = s.listFiles().toIterator.partition(_.isDirectory)
+        files.map(_.getPath) ++ dirs.flatMap(listFiles)
+      }
+      for(f <- listFiles(root).filter(_.endsWith(".scala"))){
+        println("CHECKING " + f)
+        checkFile(f)
+      }
     }
   }
 }

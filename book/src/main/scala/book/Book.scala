@@ -71,6 +71,7 @@ object Book {
             span
           ),
           div(id:="menu")
+
         ),
         div(id:="main",
           div(id:="main-box")(

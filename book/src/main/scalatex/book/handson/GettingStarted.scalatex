@@ -243,7 +243,7 @@
   @p
     As you can see, this code is still very verbose, with lots of unnecessarily long identifiers such as @hl.javascript{Lexample_ScalaJSExample} in it. This is because we've only performed the @i{fast optimization} on this file, to try and keep the time taken to edit -> compile while developing reasonably short.
 
-  @sect{Full Optimization}
+  @sect{Optimization}
     @p
       If we're planning on publishing the app for real, we can run the @i{full optimization}. This takes several seconds longer than the @i{fast optimization}, but results in a significantly smaller and leaner output file @code{example-opt.js}.
 

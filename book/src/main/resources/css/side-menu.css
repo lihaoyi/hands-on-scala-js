@@ -302,17 +302,17 @@ code{
 .header-link{
     opacity: 0.05;
 }
-.menu-item-list li.hide > ul{
+.collapsed.menu-item-list li.hide > ul{
     opacity: 1;
     overflow: hidden;
     height: 0px;
 }
-.menu-item-list li > ul{
+.collapsed.menu-item-list li > ul{
     opacity: 1;
     overflow: hidden;
 }
 
-#menu .menu-item-list li.selected > a{
+#menu .collapsed.menu-item-list li.selected > a{
     border-left: 2px solid white;
 }
 
