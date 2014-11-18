@@ -329,7 +329,28 @@ object SyntaxTest extends TestSuite{
           |}
         """.stripMargin
       )
-
+      * - check(
+        """
+          |object K{
+          |  val nullo :: cow = 1
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """
+          |object K{
+          |  val omg_+ = 1
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """
+          |object K{
+          |  val + = 1
+          |  var * = 2
+          |}
+        """.stripMargin
+      )
     }
     def checkFile(path: String) = check(io.Source.fromFile(path).mkString)
     'file{
