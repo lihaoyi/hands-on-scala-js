@@ -15,3 +15,7 @@ libraryDependencies += "com.lihaoyi" %%% "upickle" % "0.2.5"
 libraryDependencies += "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"
 
 libraryDependencies += "com.scalatags" %%% "scalatags" % "0.4.2"
+
+libraryDependencies += "com.scalarx" %%% "scalarx" % "0.2.6"
+
+libraryDependencies += "org.scala-lang.modules" %% "scala-async" % "0.9.2"

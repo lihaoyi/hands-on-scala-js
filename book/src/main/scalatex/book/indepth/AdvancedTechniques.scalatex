@@ -1,0 +1,252 @@
+@p
+  @sect.ref{Getting Started} walks you through how to set up some basic Scala.js applications, but that only scratches the surface of the things you can do with Scala.js. Apart from being able to use the same techniques you're used to in Scala-JVM in the browser, Scala.js opens up a whole range of possibilities and novel techniques that are not found in typical Scala-JVM applications.
+
+@p
+  Although these techniques may technically be possible on the JVM, very few Scala-JVM applications are built in a way that can take advantage of them. Most Scala-JVM code runs on back-end servers which have a completely different structure from the client-side apps that Scala.js allows.
+@p
+  This client-side user-interface-focused code lends itself to completely different design patterns from those used to develop server-side code. This section will explore a number of techniques which are present
+
+@ul
+  @li
+    @sect.ref("Functional-Reactive UIs", "Functional-reactive user interfaces")
+  @li
+    @sect.ref("Transparent RPCs", "Transparent client-server RPCs")
+  @li
+    @sect.ref("Asynchronous Workflows", "Asynchronous user-interation workflows")
+
+@p
+  One note is that these are "Techniques" rather than "Libraries" because they have not been packaged up in a way that is sufficiently nice that you can use them out-of-the-box just by adding a dependency somewhere. Thus, they each require some small amount of boilerplate before use, though the amount of boilerplate is fixed: it does not grow with the size of your program, and anyway gives you a chance to tweak it to do exactly what you want.
+
+@sect{Functional-Reactive UIs}
+  @p
+    @lnk("Functional-reactive Programming", "http://en.wikipedia.org/wiki/Functional_reactive_programming") (FRP) is a field with encompasses several things:
+
+  @ul
+    @li
+      @b{Discrete}: Handling of first-class event-streams like in @link("RxJS", "https://github.com/Reactive-Extensions/RxJS")
+    @li
+      @b{Continuous}: Handling of first-class signals, like in @link("Elm", "http://elm-lang.org/learn/What-is-FRP.elm")
+
+  @sect{Why FPR}
+    @p
+      The value proposition of FRP is that in a "traditional" program, when an event occurs, events and changes propagate throughout the program in an ad-hoc manner. An event-listener may trigger additional events, call some callbacks, or set some mutable variables that subsequent code will read and react to.
+
+    @p
+      This works, but the ad-hoc nature is both free-ing and limiting. You are free to do whatever you want in response to any action, but in return the developer who maintains your code (e.g. yourself 6 months from now) has no idea what your code is doing in response to any action: the possible consequence of an action is basically "Anything"!
+
+    @p
+      Furthermore, because the propagation is ad-hoc, there is no way for the code to help ensure that you are propagating changes in a "valid" manner: it is thus easy for programmer errors to result in changes or events being incorrectly propagated. This most often results in data falling out of sync: a UI widget may forget to update when an action is taken, resulting in an inconsistent state being shown to the user, ultimately resulting in confused users.
+
+    @p
+      FRP basically structures these event- or change-propagations as first-class values within the program, either as an @hl.scala{EventSource[T]} type that represents a discrete source of individual @hl.scala{T} events, or as a @hl.scala{Signal[T]} type which represents a continuous time-varying value @hl.scala{T}. This comes at some cost within the program: you now have to program using these @hl.scala{EventSource}s or @hl.scala{Signal}s, rather than just ad-hoc running callbacks or listening-to/triggering events all over the place. In exchange, you get more powerful tools to work with these values, making it easy for the library to e.g. ensure that changes always propagate correctly throughout your program, and that all values are always kept in sync.
+
+  @sect{FRP with Scala.Rx}
+    @p
+      @lnk("Scala.Rx", "https://github.com/lihaoyi/scala.rx") is a change-propagation library that implements the @b{Continuous} style of FRP. To begin with, we need to include it in our @code{build.sbt} dependencies:
+
+    @hl.ref("examples/demos/build.sbt", "com.scalarx")
+
+    @p
+      Scala.Rx provides you with smart variables that automatically track dependencies with each other, such that if one smart variable changes, the rest re-compute immediately and automatically. The main primitives in Scala.Rx are:
+
+    @ul
+      @li
+        @b{Var}s: Smart variables that can be set manually, and automatically notify their dependents that they need to recompute
+      @li
+        @b{Rx}s: Smart values which are set as some computation of other @b{Rx}s or @b{Var}s, which recompute automatically when their dependencies change, and notify their dependents
+      @li
+        @b{Obs}s: Observers on either an @b{Rx} or a @b{Var}, which performs some action when it changes
+
+    @p
+      @hl.scala{Var}s and @hl.scala{Rx}s roughly correspond to the idea of a @hl.scala{Signal} described earlier. The documentation for Scala.Rx goes into this in much more detail, so if you're curious you should read it. This section will jump straight into how to use Scala.Rx with Scala.js.
+
+    @p
+      To begin with, let's set up our imports:
+
+    @hl.ref("examples/demos/src/main/scala/advanced/BasicRx.scala", "package advanced", "@JSExport")
+
+    @p
+      Here we are seeing the same @hl.scala{dom} and @hl.scala{scalatags}, imports we saw in the hands-on tutorial, as well a new @hl.scala{import rx._} which bring all the Scala.Rx names into the local namespace.
+
+    @p
+      Scala.Rx does not "natively" bind to Scalatags, but integrating them yourself is simple enough that it's not worth putting into a separate library. He's a simple integration:
+
+    @hl.ref("examples/demos/src/main/scala/advanced/BasicRx.scala", "implicit def")
+
+    @p
+      Scalatags requires that anything you want to embed in a Scalatags fragment be implicitly convertible to @hl.scala{Frag}; here we are providing one for any Scala.Rx @hl.scala{Rx[T]}s, as long as the @hl.scala{T} provided is itself convertible to a @hl.scala{Frag}. We call @hl.scala{r().render} to extract the "current" value of the @hl.scala{Rx}, and then set up an @hl.scala{Obs} that watches the @hl.scala{Rx}, replacing the previous value with the current one every time its value changes.
+
+    @p
+      Now that the set-up is out of the way, let's consider a simple HTML widhet that lets you enter text in a @hl.html{<textarea>}, and keeps track of the number of words, characters, and counts how long each word is.
+
+    @div(cls:="pure-g")
+      @div(cls:="pure-u-1 pure-u-md-13-24")
+        @hl.ref("examples/demos/src/main/scala/advanced/BasicRx.scala", "val txt =")
+
+      @div(cls:="pure-u-1 pure-u-md-11-24")
+        @div(id:="div19", display:="block")
+        @script("BasicRx().main(document.getElementById('div19'))")
+
+    @p
+      This snippet sets up a basic data-flow graph. We have our @hl.scala{txt} @hl.scala{Var}, and a bunch of @hl.scala{Rx}s (@hl.scala{numChars}, @hl.scala{numWords}, @hl.scala{avgWordLength}) that are computed based on @hl.scala{txt}.
+
+    @p
+      Next, we construct our Scalatags fragment: a @hl.scala{textarea} tag with a listener that updates @hl.scala{txt}, and a @hl.scala{div} containing the @hl.scala{textarea} and a list containing the bound values of our @hl.scala{Rx}s.
+
+    @p
+      That's all we need to end up with a live-updating widget, which re-renders the necessary bits of the page when the contents of the text box changes! Note how the code basically flows top-to-bottom, like a batch-rendering program, but at the end of it we get a live widget. The code is much simpler than a similar widget built up using jQuery or Backbone.
+
+    @p
+      Furthermore, there is no chance for the parts of the DOM which are "live" to fall out of sync. There is no visible logic that handles the individual re-calulations and re-renders: that is all done by Scala.Rx and by our @hl.scala{rxFrag} implicit. Because we do not need to write code for each site to keep each individual @hl.scala{Rx} and each DOM fragment in sync, that means there is no chance of the developer screwing it up and resulting in an out-of-sync page.
+
+  @sect{More Rx}
+    @p
+      That was a pretty simple example to get you started with a simple Scala.Rx application. Let's look at a more meaty example to see how we can use Scala.Rx to help structure our interactive web application:
+
+
+    @div(cls:="pure-g")
+      @div(cls:="pure-u-1 pure-u-md-13-24")
+        @hl.ref("examples/demos/src/main/scala/advanced/BasicRx.scala", "val fruits =")
+
+      @div(cls:="pure-u-1 pure-u-md-11-24")
+        @div(id:="div20", display:="block")
+        @script("BasicRx().main2(document.getElementById('div20'))")
+
+    @p
+      This is a basic re-implementation of the autocomplete widget we created in the chapter @sect.ref{Interactive Web Pages}, except done using Scala.Rx. Note that unlike the original implementation, we don't need to manage the clearing of the output area via @hl.scala{innerHTML = ""} and the re-rendering via @hl.scala{appendChild(...)}. All this is handled by the same @hl.scala{rxFrag} code we wrote earlier. 
+
+    @p
+      Furthermore, this implementation is more efficient than the original: In the original, everything is always re-rendered every time, which can be a problem if the number of things being rendered is large. In this implementation, only when a fruit appears-in/disappears-from the list does re-rendering happen, and only for that particular fruit. For the bulk of the fruits which did not experience any change in appearance, the DOM is left entirely untouched.
+
+    @p
+      Again, there is no chance for the developer to make a mistake updating things, because all this rendering and re-rendering is hidden from view inside the library.
+
+  @hr
+
+  @p
+    Hopefully this has given you a sense of how you can use Scala.Rx to help build complex, interactive web applications. The implementation is tricky, but the basic value proposition is clear: you get to write your code top-to-bottom, like the most old-fashioned static pages, and have it transformed by Scala.Rx into an interactive, always-consistent web app. By abstracting away the whole event-propagation, manual-updating process inside the library, we have ensured that there is no place where the developer can screw it up, and the application's UI will forever be in sync with its data.
+
+@sect{Transparent RPCs}
+  @p
+    In our chapter on @sect.ref{Integrating Client-Server}, we built a small client-server web application with a Scala.js web-client that makes Ajax calls to a Scala-JVM web-server running on Spray. We performed these Ajax calls using uPickle to serialize the data back and forth, so serializing the arguments and return-value was boilerplate-free and correct.
+
+  @p
+    However, there is still some amount of duplication in the code. In particular, 
+
+@sect{Asynchronous Workflows}
+  @p
+    In a traditional setting, Scala applications tend to have a mix of concurrency models: some spawn multiple threads and use thread-blocking operations or libraries, others do things with Actors or Futures, trying hard to stay non-blocking throughout, while most are a mix of these two paradigms.
+
+  @p
+    On Scala.js, things are different: multi-threaded concurrency is a non-starter, since Javascript engines are all single-threaded. As a result, there are virtually no blocking APIs in Javascript: all operations need to be asynchronous if you don't want them to freeze the user interface of the browser while the operation is happening. Scala.js uses standard Javascript APIs and is no different.
+
+  @p
+    However, Scala.js has much more powerful tools to work with than your typical Javascript libraries. The Scala standard library comes wiith a rich API for Futures and Promises, which are thankfully 100% asynchronous. Though this design was chosen for performance on the JVM, it perfectly fits our 100% asynchronous Javascript APIs. We have tools like Scala-Async, which works perfectly with Scala.js, and lets you create asynchronous computations in a much less confusing manner.
+
+  @sect{Futures & Promises}
+    @p
+      A Future represents an in-progress computation that may or may not have completed. It may encapsulate a web request, or an RPC, or a task happening on another thread. They are not a novel concept, and Scala provides a good in-built implementation of Futures that works well with Scala.js.
+
+    @p
+      To motivate this, let's consider a simple example application that:
+
+    @ul
+      @li 
+        Takes as user input a space-separated list of city-names
+      @li
+        Fetches the weather in each city from @code{api.openweathermap.org}
+      @li
+        Displays the results when they are all back
+
+    @p
+      We'll work through a few implementations of this.
+
+    @sect{Direct Use of XMLHttpRequest}
+      TODO
+    @sect{Using dom.extensions.Ajax}
+      TODO
+    @sect{Future Combinators}
+      TODO
+
+  @sect{Scala-Async}
+    @p
+      Let's look at how to use Scala-Async. To motivate us, let's consider a simple paint-like canvas application similar to the one we built in the section @sect.ref{Making a Sketchpad using Mouse Input}. This application will have a few properties:
+
+    @ul
+      @li
+        The user clicks and drags to begin drawing a line on the canvas
+      @li
+        When the user releases the mouse, we fill the shape that was formed by the dragging
+      @li
+        The user clicks again to clear the canvas; like most clicks, the action happens when the button is released
+      @li
+        And can repeat the process from the top, indefinitely
+
+    @p
+      This is a toy example, but is enough to bring out the difficulty of doing things the "traditional" way, and why using Scala-Async with Scala.js is superior. To begin with, let's set the stage:
+
+    @hl.ref("examples/demos/src/main/scala/advanced/Async.scala", "val renderer")
+
+    @p
+      To initialize the canvas with the part of the code which will remain the same, so we can look more closely at the code which differs.
+
+    @sect{Traditional Asynchrony}
+      @p
+        Let's look at a traditional implementation, using Scala.js but no special features. We'll just use the Javascript @hl.scala{canvas.onmouveXXX} operations directly. 
+
+      @div(cls:="pure-g")
+        @div(cls:="pure-u-1 pure-u-md-13-24")
+          @hl.ref("examples/demos/src/main/scala/advanced/Async.scala", "// traditional")
+
+        @div(cls:="pure-u-1 pure-u-md-11-24")
+          @canvas(id:="canvas211", display:="block")
+          @script("Async().main0(document.getElementById('canvas211'))")
+      @p
+        This is a working implementation, and you can play with it on the right. We basically set the three listeners: 
+
+      @ul
+        @li 
+          @hl.scala{canvas.onmousemove}
+        @li 
+          @hl.scala{canvas.onmousedown}
+        @li   
+          @hl.scala{canvas.onmouseup}
+
+      @p
+        And each listener is in charge of deciding what to do when it is it's turn to fire. 
+
+      @p
+        This code is pretty tricky and hard to follow. It's not immediately clear what it is doing. One thing you may notice is the presence of this @hl.scala{dragState} variable, which seems to add a lot to the confusion with branches all over the place. At first you may think you can simplify the code to do without it, but attempts to do so will reveal why it is necessary.
+
+      @p
+        This variable is necessary because each mouse event could mean different things at different times. For example, @hl.scala{canvas.onmousemove} should do nothing it occurs between an @hl.scala{canvas.onmousedown} and @hl.scala{canvas.onmouseup}. @hl.scala{canvas.onmouseup} itself has two tasks: it either ends the dragging phase (which necessitates the fill-current-shape call) or it serves to clear the canvas if happening after a drag. And @hl.scala{canvas.onmousedown} should not start a new drag if the previous drawing hasn't been cleared from the canvas.
+
+      @p
+        This is a pretty simple workflow for the user, and yet the code is already tricky enough it's not obvious that it's correct at first glance. More complex tools will have correspondingly more complex workflows, and it is easy to see how just another 1 or 2 more states can get out of hand. 
+
+    @sect{Using Scala-Async}
+      @p
+        Now we've seen what a "traditional" approach looks like, let's look at how we would do this using Scala-Async. 
+
+      @div(cls:="pure-g")
+        @div(cls:="pure-u-1 pure-u-md-13-24")
+          @hl.ref("examples/demos/src/main/scala/advanced/Async.scala", "// async")
+
+        @div(cls:="pure-u-1 pure-u-md-11-24")
+          @canvas(id:="canvas222", display:="block")
+          @script("Async().main(document.getElementById('canvas222'))")
+    
+
+      @p
+        We have an @hl.scala{async} block, which contains a while loop. Each round around the loop, we wait for the @hl.scala{mousedown} channel to start the path, waiting for either @hl.scala{mousedown} or @hl.scala{mousedown} (which continues the path or ends it respectively), fill the shape, and then wait for another @hl.scala{mousedown} before clearing the canvas and going again.
+
+      @p
+        Hopefully you'd agree that this code is much simpler to read and understand than the previous version. In particular, the control-flow of the code goes from top to bottom in a "natural" fashion, rather than jumping around ad-hoc like in the previous callback-based design.
+      @p
+        You may be wondering what these @hl.scala{Channel} things are, and where they are coming from. Although these are not provided by Scala, they are pretty straightforward to define ourselves:
+
+      @hl.ref("examples/demos/src/main/scala/advanced/Async.scala", "case class Channel")
+
+      @p
+        The point of @hl.scala{Channel} is to allow us to turn event-callbacks (like those provided by the DOM's @hl.scala{onmouseXXX} properties) into some kind of event-stream, that we can listen to asynchronously (via @hl.scala{apply} that returns a @hl.scala{Future}) or merge via @hl.scala{|}. This is a minimal implementation for what we need now, but it would be easy to provide more functionality (filter, map, etc.) as necessary.
+

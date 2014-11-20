@@ -70,6 +70,9 @@ object Controller{
 
     menu.appendChild(
       div(cls:="pure-menu  pure-menu-open")(
+        a(cls:="pure-menu-heading")(
+          "Contents"
+        ),
         list
       ).render
     )
