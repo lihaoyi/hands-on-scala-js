@@ -152,21 +152,82 @@
 
     @ul
       @li 
-        Takes as user input a space-separated list of city-names
+        Takes as user input a comma-separated list of city-names
       @li
-        Fetches the weather in each city from @code{api.openweathermap.org}
+        Fetches the temperature in each city from @code{api.openweathermap.org}
       @li
         Displays the results when they are all back
 
     @p
       We'll work through a few implementations of this.
 
+    @p
+      To begin with, let's write the scaffolding code, that will display the input box, deal with the listeners, and all that:
+    
+    @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "val myInput")
+
+    @p
+      So far so good. The only thing that's missing here is the mysterious @hl.scala{handle} function, which is given the list of names and the @hl.scala{output} div, and must handle the Ajax requests, aggregating the results, and displaying them in @hl.scala{output}. Let's also define a small number of helper functions that we'll use later:
+
+    @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def urlFor", "def parseTemp")
+
+    @p
+      @hl.scala{urlFor} encapsulates the messy URL-construction logic that we need to make the Ajax call to the right place.
+
+    @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "parseTemp", "def formatResults")    
+
+    @p
+      @hl.scala{parseTemp} encapsulates the messy result-extraction logic that we need to get the data we want (current temperature, in celsius) out of the structured JSON return blob.
+
+    @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def formatResults", "def main")
+
+    @p
+      @hl.scala{formatResults} encapsulates the conversion of the final @hl.scala{(name, celsius)} data back into readable HTML.
+
+    @p
+      Overall, these helper functions do nothing special, btu we're defining them first to avoid having to copy-&-paste code throughout the subsequent examples. Now that we've defined all the relevant scaffolding, let's walk through a few ways that we can implement the all-important @hl.scala{handle} method.
+
+
     @sect{Direct Use of XMLHttpRequest}
-      TODO
+      @div(id:="div123", display:="block")
+      @script("Futures().main0(document.getElementById('div123'))")
+      @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def handle0", "main")
+
+      @p
+        This is a simple solution that directly uses the @hl.scala{XMLHttpRequest} class that is available in Javascript in order to perform the Ajax call. Every Ajax call that returns, we aggregate in a @hl.scala{results} buffer, and when the @hl.scala{results} buffer is full we then append the formatted results to the output div.
+      @p
+        This is relatively straightforward, though maybe knottier than people would be used to. For example, we have to "construct" the Ajax call via calling mutating methods and setting properties on the @hl.scala{XMLHttpRequest} object, where it's easy to make a mistake. Furthermore, we need to manually aggregate the @hl.scala{results} and keep track ourselves whether or not the calls have all completed, which again is messy and error-prone.
+
+      @p
+        This solution is basically equivalent to the initial code given in the @sect.ref{Raw Javascript} section of @sect.ref{Interactive Web Pages}, with the additional code necessary for aggregation. As described in @sect.ref{dom.extensions}, we can make use of the @hl.scala{Ajax} object to make it slightly tidier.
+
     @sect{Using dom.extensions.Ajax}
-      TODO
+      @div(id:="div124", display:="block")
+      @script("Futures().main1(document.getElementById('div124'))")
+      @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def handle1", "main")
+
+      @p
+        This solution uses the @hl.scala{dom.extensions.Ajax} object, as described in @hl.scala{dom.extensions}. This basically wraps the messy @hl.scala{XMLHttpRequest} interface in a single function that returns a @hl.scala{scala.concurrent.Future}, which you can then map/foreach over to perform the action when the @hl.scala{Future} is complete.
+      @p
+        However, we still have the messiness inherent in the result aggregation: we don't actually want to perform our action (writing to the @hl.scala{output} div) when one @hl.scala{Future} is complete, but only when @i{all} the @hl.scala{Future}s are complete. Thus we still need to do some amount of manual book-keeping in the @hl.scala{results} buffer.
+
     @sect{Future Combinators}
-      TODO
+      @div(id:="div125", display:="block")
+      @script("Futures().main2(document.getElementById('div125'))")
+      @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def handle2", "main")
+
+      @p
+        Since we're using Scala's @hl.scala{Future}s, we aren't limited to just map/foreach-ing over them. @hl.scala{scala.concurrent.Future} provides a @lnk("rich api", "http://www.scala-lang.org/files/archive/nightly/docs/library/scala/concurrent/Future.html") that can be used to deal with common tasks like working with lists of futures in parallel, or aggregating the result of futures together.
+      @p
+        Here, instead of manually counting until all the @hl.scala{Future}s are complete, we instead create the Futures which will contain what we want (name and temperature) and store them in a list. Then we can use the @hl.scala{Future.sequence} function to invert the @hl.scala{Seq[Future[T]]} into a @hl.scala{Future[Seq[T]]}, a single Future that will provide all the results in a single list when every Future is complete. We can then simply foreach- over the single Future to get the data we need to feed to @hl.scala{formatResults}/@hl.scala{appendChild}.
+
+      @p
+        This approach is significantly neater than the previous two examples: we no longer have any mutation going on, and the logic is expressed in a very high-level, simple manner. "Make a bunch of Futures, join them, use the result" is much less error-prone than the imperative result-aggregation-and-counting logic used in the previous examples.
+
+    @hr
+
+    @p
+      @hl.scala{scala.concurrent.Future} isn't limited to just calling @hl.scala{.sequence} on lists. It provides the ability to @hl.scala{.zip} two Futures of different types together to get their result, or @hl.scala{.recover} in the case where Futures fail. Although these tools were originally built for Scala-JVM, all of them work unchanged on Scala.js, and serve their purpose well in simplifying messy asynchronous computations. 
 
   @sect{Scala-Async}
     @p
@@ -250,3 +311,7 @@
       @p
         The point of @hl.scala{Channel} is to allow us to turn event-callbacks (like those provided by the DOM's @hl.scala{onmouseXXX} properties) into some kind of event-stream, that we can listen to asynchronously (via @hl.scala{apply} that returns a @hl.scala{Future}) or merge via @hl.scala{|}. This is a minimal implementation for what we need now, but it would be easy to provide more functionality (filter, map, etc.) as necessary.
 
+    @hr
+
+    @p
+      Scala-Async is a Macro; that means that it is both more flexible and more limited than normal Scala, e.g. you cannot put the @hl.scala{await} call inside a lambda or higher-order-function like @hl.scala{.map}. Like Futures, it doesn't provide any fundamental capabilities, but is a tool that can be used to simplify otherwise messy asynchronous workflows. 
