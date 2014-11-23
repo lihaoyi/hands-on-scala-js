@@ -97,6 +97,137 @@
     @p
       This has always been annoying boilerplate, and Scala.js removes it. With @lnk.github.uPickle, you can simply call @hl.scala{upickle.write(...)} and @hl.scala{upickle.read[T](...)} to convert your collections, primitives or case-classes to and from JSON. This means you do not need to constantly re-invent different ways of making Ajax calls: you can just fling the data right across the network from client to server and back again.
 
+@sect{What's Left?}
+  @p
+    We've built a small client-server web application with a Scala.js web-client that makes Ajax calls to a Scala-JVM web-server running on Spray. We performed these Ajax calls using uPickle to serialize the data back and forth, so serializing the arguments and return-value was boilerplate-free and correct.
+
+  @p
+    However, there is still some amount of duplication in the code. In particular, the definition of the endpoint name "list" is duplicated 4 times:
+
+  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala", """path("ajax" / "list")""", "extract")
+  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala", "list(", "}")
+  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala", "def list", "val")
+  @hl.ref("examples/crossBuilds/clientserver/client/src/main/scala/simple/Client.scala", "ajax/list", "val")
+
+  @p
+    Three times on the server and once on the client! What's worse, two of the appearances of @i{list} are in string literals, which are not checked by the compiler to match up with themselves or the name of the method @hl.scala{list}. Apart from this, there is one other piece of duplication that is unchecked: the type being returned from @hl.scala{list} (@hl.scala{Seq[FileData]} is being repeated on the client in @hl.scala{upickle.read[Seq[FileData]]} in order to de-serialize the serialized data. This leaves three wide-open opportunities for error:
+
+  @ul
+    @li
+      You could change the string literals "list" and forget to change the method-name @hl.scala{list}, thus confusing future maintainers of the code.
+    @li
+      You could change one of literal "list"s but forget to change the other, thus causing an error at run-time (e.g. a 404 NOT FOUND response)
+    @li
+      You could update the return type of @hl.scala{list} and forget to update the deserialization call on the client, resulting in a deserialization failure at runtime.
+
+  @p
+
+  @p
+    Neither of these scenarios is great! Although we've already made great progress in making our client-server application type-safe (via Scala.js on the client) and DRY (via shared code in @code{shared/}) we still have this tiny bit of annoying, un-checked duplication and danger lurking in the code-base. The basic problem is that what is normally called the "routing layer" in the web application is still unsafe, and so these silly errors can go un-caught and blow up on unsuspecting developers at run-time. Let's see how we can fix it.
+
+@sect{Autowire}
+
+  @p
+    @lnk("Autowire", "https://github.com/lihaoyi/autowire") is a library that turns your request routing layer from a fragile, hand-crafted mess into a solid, type-checked, boilerplate-free experience. Autowire basically turns what was previously a stringly-typed, hand-crafted Ajax call and route:
+
+  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala", """path("ajax" / "list")""", "extract")
+  @hl.ref("examples/crossBuilds/clientserver/client/src/main/scala/simple/Client.scala", "ajax/list", "val")
+
+  @p
+    Into a single, type-checked function call:
+
+  @hl.ref("examples/crossBuilds/clientserver2/client/src/main/scala/simple/Client.scala", ".call()", "outputBox")
+
+  @p
+    Let's see how we can do that.
+
+  @sect{Setting up Autowire}
+
+    @p
+      To begin with, Autowire requires you to provide three things:
+
+    @ul
+      @li
+        An @hl.scala{autowire.Server} on the Server, set up to feed the incoming request into Autowire's routing logic
+      @li
+        An @hl.scala{autowire.Client} on the Client, set up to take a serialized request and send it across the network to the server.
+      @li
+        An interface (A Scala @hl.scala{trait}) which defines the interface between these two
+
+    @p
+      Let's start with our client-server interface definition
+
+    @hl.ref("examples/crossBuilds/clientserver2/client/shared/main/scala/simple/Shared.scala")
+
+    @p
+      Here, you can see that in addition to sharing the @hl.scala{FileData} class, we are also creating an @hl.scala{Api} trait which contains the signature of our @hl.scala{list} method. The exact name of the trait doesn't matter. We need it to be in @code{shared/} so that the code in both client and server can reference it.
+
+    @p
+      Next, let's look at modifying our server code to make use of Autowire:
+
+    @hl.ref("examples/crossBuilds/clientserver2/server/src/main/scala/simple/Server.scala")
+
+    @p
+      Now, instead of hard-coding the route @hl.scala{"ajax" / "list"}, we now take in any route matching @hl.scala{"ajax" / Segments}, feeding the resultant path segments into the @hl.scala{Router} object:
+
+    @hl.ref("examples/crossBuilds/clientserver2/server/src/main/scala/simple/Server.scala", "path(")
+    @p
+      The @hl.scala{Router} object in turn simply defines how you intend the objects to be serialized and deserialized:
+
+   @hl.ref("examples/crossBuilds/clientserver2/server/src/main/scala/simple/Server.scala", "object Router", "object")
+
+   @p
+    In this case using uPickle. Note how the @hl.scala{route} call explicitly states the type (here @hl.scala{Api}) that it is to generate routes against; this ensures that only methods which you explicitly put in your public interface @hl.scala{Api} are publically reachable.
+
+    @p
+      Next, let's look at the modified client code:
+
+    @hl.ref("examples/crossBuilds/clientserver2/client/src/main/scala/simple/Client.scala")
+
+    @p
+      There are two main modifications here: the existence of the new @hl.scala{Ajaxer} object, and the modification to the Ajax call-site. Let's first look at @hl.scala{Ajaxer}:
+
+    @hl.ref("examples/crossBuilds/clientserver2/client/src/main/scala/simple/Client.scala", "object Ajaxer", "object")
+
+    @p
+      Like the @hl.scala{Router} object, @hl.scala{Ajaxer} also defines how you perform the serialization and deserialization of data-structures, again using uPickle. Unlike the @hl.scala{Router} object, @hl.scala{Ajaxer} also defines how the out-going Ajax call gets sent over the network. Here we're doing it using the @hl.scala{Ajax.post} method.
+
+    @p
+      Lastly, let's look at the modified callsite for the ajax call itself:
+
+    @hl.ref("examples/crossBuilds/clientserver2/client/src/main/scala/simple/Client.scala", "def update", "inputBox")
+
+    @p
+      There are a few things of note here:
+
+    @ul
+      @li
+        The previous call to @hl.scala{Ajax.post} with the path as a string has been replaced by calling @hl.scala{Ajaxer[Api].list(...).call()}, since the logic of actually performing the POST is specified once-and-only-once in the @hl.scala{Ajaxer} object.
+      @li
+        While @hl.scala{Ajax.post} returned a @hl.scala{Future[dom.XMLHttpRequest]} and left us to call @hl.scala{upickle.read} and deserialize the data ourselves, @hl.scala{Ajaxer[Api].list(...).call()} now returns a @hl.scala{Future[Seq[FileData]]}! Thus we don't need to worry about making a mistake in the deserialization logic when we write it by hand.
+
+    @p
+      Other than that, nothing much has changed. If you've done this correctly, the web application will look and behave exactly as it did earlier! So why did we do this in the first place?
+
+  @sect{Why Autowire?}
+    @p
+      Overall, this set up requires some boilerplate to define the @hl.scala{Ajaxer} and @hl.scala{Router} objects, as well as the @hl.scala{Api} trait. However, these can be defined just once and used over and over; while it might be wasteful/unnecessary for making a single Ajax call, the cost is much less amortized over a number of Ajax calls. In a non-trivial web application with dozens of routes being called all over the place, spending a dozen lines setting up things up-front isn't a huge cost.
+
+    @p
+      What have we gotten in exchange? It turns out that by using Autowire, we have eliminated the three failure modes described earlier, that could:
+
+    @ul
+      @li
+        It is impossible for the route and the endpoint method-name to diverge accidentally: if the endpoint is called @hl.scala{list}, the requests will go through the @code{/list} URL. No room for discussion, or to make a mistake
+      @li
+        You cannot accidentally rename the route on the server without changing the client, or vice versa. Attempts to do so will cause a compilation error, and even your IDE should highlight it as red. Try it out!
+
+      @li
+        There is no chance of messing up the serialization/deserialization code, e.g. writing a response of type A on the server and trying to read a data-structure of type B on the client. You have no opportunity to make an error: you pass arguments to the Ajax call, and they are serialized/deserialized automatically, such that by the time you get access to the value on the server, it is already of the correct type! The same applies to serializing/deserializing the return-value on the client. There is simply no place for you as a developer to accidentally make a mistake!
+
+    @p
+      Although the functionality of the web application is the same, it is mostly in terms of @i{safety} that we have made the biggest gains. All of the common failure modes described earlier have been guarded against, and you as a developer will have a hard time trying to make a mal-formed Ajax call. It's worth taking some time to poke at the source code to see the boundaries of the type-safety provided by autowire, as it is a very different experience from the traditional "route it manually" approach to making interactive client-server applications.
+
 @hr
 
 @p

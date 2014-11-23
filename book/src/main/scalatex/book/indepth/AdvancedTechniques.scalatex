@@ -10,8 +10,6 @@
   @li
     @sect.ref("Functional-Reactive UIs", "Functional-reactive user interfaces")
   @li
-    @sect.ref("Transparent RPCs", "Transparent client-server RPCs")
-  @li
     @sect.ref("Asynchronous Workflows", "Asynchronous user-interation workflows")
 
 @p
@@ -126,13 +124,6 @@
   @p
     Hopefully this has given you a sense of how you can use Scala.Rx to help build complex, interactive web applications. The implementation is tricky, but the basic value proposition is clear: you get to write your code top-to-bottom, like the most old-fashioned static pages, and have it transformed by Scala.Rx into an interactive, always-consistent web app. By abstracting away the whole event-propagation, manual-updating process inside the library, we have ensured that there is no place where the developer can screw it up, and the application's UI will forever be in sync with its data.
 
-@sect{Transparent RPCs}
-  @p
-    In our chapter on @sect.ref{Integrating Client-Server}, we built a small client-server web application with a Scala.js web-client that makes Ajax calls to a Scala-JVM web-server running on Spray. We performed these Ajax calls using uPickle to serialize the data back and forth, so serializing the arguments and return-value was boilerplate-free and correct.
-
-  @p
-    However, there is still some amount of duplication in the code. In particular, 
-
 @sect{Asynchronous Workflows}
   @p
     In a traditional setting, Scala applications tend to have a mix of concurrency models: some spawn multiple threads and use thread-blocking operations or libraries, others do things with Actors or Futures, trying hard to stay non-blocking throughout, while most are a mix of these two paradigms.
@@ -189,7 +180,12 @@
 
 
     @sect{Direct Use of XMLHttpRequest}
-      @div(id:="div123", display:="block")
+      @div(
+        id:="div123",
+        display:="block",
+        height:="200px",
+        overflow:="scroll"
+      )
       @script("Futures().main0(document.getElementById('div123'))")
       @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def handle0", "main")
 
@@ -202,7 +198,12 @@
         This solution is basically equivalent to the initial code given in the @sect.ref{Raw Javascript} section of @sect.ref{Interactive Web Pages}, with the additional code necessary for aggregation. As described in @sect.ref{dom.extensions}, we can make use of the @hl.scala{Ajax} object to make it slightly tidier.
 
     @sect{Using dom.extensions.Ajax}
-      @div(id:="div124", display:="block")
+      @div(
+        id:="div124",
+        display:="block",
+        height:="200px",
+        overflow:="scroll"
+      )
       @script("Futures().main1(document.getElementById('div124'))")
       @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def handle1", "main")
 
@@ -212,7 +213,12 @@
         However, we still have the messiness inherent in the result aggregation: we don't actually want to perform our action (writing to the @hl.scala{output} div) when one @hl.scala{Future} is complete, but only when @i{all} the @hl.scala{Future}s are complete. Thus we still need to do some amount of manual book-keeping in the @hl.scala{results} buffer.
 
     @sect{Future Combinators}
-      @div(id:="div125", display:="block")
+      @div(
+        id:="div125",
+        display:="block",
+        height:="200px",
+        overflow:="scroll"
+      )
       @script("Futures().main2(document.getElementById('div125'))")
       @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def handle2", "main")
 

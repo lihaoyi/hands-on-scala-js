@@ -22,8 +22,6 @@ object Futures {
     }
     container.appendChild(
       div(
-        height:="200px",
-        overflow:="scroll",
         i("Press Enter in the box to fetch temperatures "),
         myInput,
         output

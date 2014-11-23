@@ -3,8 +3,14 @@ package simple
 import akka.actor.ActorSystem
 import spray.http.{HttpEntity, MediaTypes}
 import spray.routing.SimpleRoutingApp
+import scala.concurrent.ExecutionContext.Implicits.global
 
-object Server extends SimpleRoutingApp{
+object Router extends autowire.Server[String, upickle.Reader, upickle.Writer]{
+  def read[Result: upickle.Reader](p: String) = upickle.read[Result](p)
+  def write[Result: upickle.Writer](r: Result) = upickle.write(r)
+}
+
+object Server extends SimpleRoutingApp with Api{
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem()
     startServer("localhost", port = 8080){
@@ -20,10 +26,12 @@ object Server extends SimpleRoutingApp{
         getFromResourceDirectory("")
       } ~
       post{
-        path("ajax" / "list"){
+        path("ajax" / Segments){ s =>
           extract(_.request.entity.asString) { e =>
             complete {
-              upickle.write(list(e))
+              Router.route[Api](Server)(
+                autowire.Core.Request(s, upickle.read[Map[String, String]](e))
+              )
             }
           }
         }
