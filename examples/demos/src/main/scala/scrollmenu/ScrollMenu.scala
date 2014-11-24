@@ -7,7 +7,7 @@ import scalatags.JsDom.all._
 
 case class Tree[T](value: T, children: Vector[Tree[T]])
 
-case class MenuNode(frag: dom.HTMLElement, start: Int, end: Int)
+case class MenuNode(frag: dom.HTMLElement, id: String, start: Int, end: Int)
 
 /**
  * High performance scrollspy to work keep the left menu bar in sync.
@@ -33,6 +33,7 @@ class ScrollSpy(structure: Tree[String],
       Tree(
         MenuNode(
           curr(ul(paddingLeft := "15px",children.map(_.value.frag))).render,
+          Controller.munge(t.value),
           originalI,
           if (children.length > 0) children.map(_.value.end).max else originalI + 1
         ),
@@ -75,7 +76,7 @@ class ScrollSpy(structure: Tree[String],
         el.scrollIntoView(false)
     }
     def walkTree(tree: Tree[MenuNode]): Boolean = {
-      val Tree(MenuNode(menuItem, start, end), children) = tree
+      val Tree(MenuNode(menuItem, itemId, start, end), children) = tree
       val before = headers(start) < threshold
       val after = (end >= headers.length) || headers(end) > threshold
 
@@ -95,7 +96,7 @@ class ScrollSpy(structure: Tree[String],
           // This means it's the leaf element, because it won but there
           // aren't any children which won, so it must be the actual leaf
           tree.children.foreach(_.value.frag.classList.remove("selected"))
-
+          dom.location.hash = itemId
           scroll(menuItem.children(0))
 
         }

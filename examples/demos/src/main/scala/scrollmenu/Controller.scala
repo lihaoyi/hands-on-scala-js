@@ -43,6 +43,9 @@ object Controller{
           marginLeft := "0px",
           paddingLeft := "15px",
           paddingRight := "15px",
+          position.absolute,
+          top := "0px",
+          right := "0px",
           cls := "pure-menu-selected",
           onclick := { (e: dom.Event) =>
             expandIcon.classList.toggle("fa-caret-down")
@@ -55,24 +58,9 @@ object Controller{
 
 
       menu.appendChild(
-        div(
-          zIndex := 10,
-          position := "absolute",
-          cls := "pure-menu pure-menu-open",
-          ul(cls := "menu-item-list")(
-            li(
-              width := "43px",
-              float := "right",
-              expandLink
-            )
-          )
-        ).render
-      )
-
-      menu.appendChild(
         div(cls := "pure-menu  pure-menu-open")(
           a(cls := "pure-menu-heading")(
-            "Contents"
+            "Contents", expandLink
           ),
           list
         ).render
