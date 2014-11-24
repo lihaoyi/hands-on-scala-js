@@ -47,7 +47,16 @@ object Book {
 
   val txt = Index()
   val data = upickle.write(sect.structure)
-
+  val googleAnalytics =
+    """
+      |(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      |    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      |  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      |  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      |
+      |  ga('create', 'UA-27464920-4', 'auto');
+      |  ga('send', 'pageview');
+    """.stripMargin
   val site = Seq(
     raw("<!doctype html>"),
     html(
@@ -58,7 +67,8 @@ object Book {
         link(rel:="stylesheet", href:=fontAwesomeCss),
         link(rel:="stylesheet", href:="styles.css"),
         tags2.title("Hands-on Scala.js"),
-        script(src:="scripts.js")
+        script(src:="scripts.js"),
+        script(raw(googleAnalytics))
       ),
       body(
         onload:=s"Controller().main($data)",
