@@ -1,4 +1,11 @@
 @import BookData._
+
+@val firstHalfDescription = """
+is a set of tutorials that walks you through getting started with Scala.js. You'll build a range of small projects, from Making a Canvas App to Interactive Web Pages to Integrating Client-Server, and in the process will get a good overview of both Scala.js's use cases as well as the development experience
+"""
+@val secondHalfDescription = """
+is a set of detailed expositions on various parts of the Scala.js platform. Nothing in here is necessary for you to make your first demos, but as you dig deeper into the platform, you will likely need or want to care about these things so you can properly understand what's going on "under the hood"
+"""
 @sect("Hands-on Scala.js", "Writing client-side web applications in Scala")
   @split
     @more
@@ -8,61 +15,72 @@
       @BookData.example(canvas, "Splash().main")
 
   @p
-    @lnk("Scala.js", "http://www.scala-js.org/") is a compiler that compiles Scala source code to equivalent Javascript code. That lets you write Scala code that you can run in a web browser, or other environments (Chrome plugins, Node.js, etc.) where Javascript is supported.
+    @lnk("Scala.js", "http://www.scala-js.org/") is a compiler that compiles Scala source code to equivalent Javascript code. That lets you write Scala code that you can run in a web browser, or other environments (Chrome plugins, Node.js, etc.) where Javascript is supported. This book is an introduction to Scala.js, which aims to get you from knowing-nothing about it to being relatively proficient.
 
   @p
     This book contains something for all levels of experience with Scala.js: absolute beginners can get started with the @sect.ref{Intro to Scala.js} and @sect.ref{Hands On} tutorial, people who have used it before can skip ahead to the later parts of the tutorial: @sect.ref{Making a Canvas App} or @sect.ref{Interactive Web Pages}. Intermediate users will find interest in the chapters on @sect.ref{Cross Publishing Libraries} with Scala.js or @sect.ref{Integrating Client-Server}, and even experienced users will find the @sect.ref{In Depth} documention useful.
 
   @p
-    Many of the code samples are taken from examples available on the book's @lnk("Github Page", "https://github.com/lihaoyi/scala-js-book"); for those code samples (e.g. the animation above), there is a link in the bottom-right corner of the snippet that you can click on to go to the original code. These come in handy if you find you need additional context around the snippet, and find yourself asking questions like "what imports do I need for this to work" or "I need the working example in its entirety to see what I'm doing wrong".
+    Even if we do not require any familiarity of Scala.js, this book nonetheless assumes a good amount of background knowledge: of Scala, of Javascript, and of web development as a whole. In general, you will not need deep knowledge of any of these subjects, though if you are coming in entirely without knowledge of any one of them, you'll have to be willing to spend time Google-ing things and picking things up as we go along. Someone who comes in without previous web-dev experience may miss or not-notice many of the nice touches and benefits that Scala.js brings to the table, having never done web-dev any other way,
 
   @p
-    This book does not spend time on pontifying a philosophy or ideology behind Scala.js or Scala. It instead spends its words on hands-on tutorials and in-depth dives into parts of the Scala.js platform, to try and get you acquainted with Scala.js as soon as possible, so you can make your own decisions about its merits or qualities.
+    Many of the code samples are taken from examples available on the book's @lnk("Github Page", "https://github.com/lihaoyi/scala-js-book"); for those code samples (e.g. the animation above), there is a link in the bottom-right corner of the snippet that you can click on to go to the original code. These come in handy if you find you need additional context around the snippet, e.g. what imports you need for the code to work, or what the complete executable example looks like.
 
+  @p
+    This book is roughly divided into two sections:
 
-@sect("Intro to Scala.js")
+  @ul
+    @li
+      @sect.ref{Hands On} @firstHalfDescription
+    @li
+      @sect.ref{In Depth} @secondHalfDescription
+
+  @p
+    Feel free to jump ahead to either of them if you have some prior exposure to Scala.js. If not, it is best to start with the introduction...
+
+@sect{Intro to Scala.js}
   @Intro()
 
 @sect("Hands On", "Writing your first Scala.js programs")
   @p
-    This half of the book walks you through various facets of the Scala.js development experience. From making your first app, to testing and publishing modules, to writing an integrated client-server application.
+    This half of the book @firstHalfDescription
 
-  @sect("Getting Started")
+  @sect{Getting Started}
     @handson.GettingStarted()
 
-  @sect("Making a Canvas App")
+  @sect{Making a Canvas App}
     @handson.CanvasApp()
 
-  @sect("Interactive Web Pages")
+  @sect{Interactive Web Pages}
     @handson.WebPage()
 
-  @sect("The Command Line")
+  @sect{The Command Line}
     @handson.CommandLine()
 
-  @sect("Cross Publishing Libraries")
+  @sect{Cross Publishing Libraries}
     @handson.PublishingModules()
 
-  @sect("Integrating Client-Server")
+  @sect{Integrating Client-Server}
     @handson.ClientServer()
 
 @sect("In Depth", "Exploring Scala.js")
   @p
-    This half of the book dives into a few aspects of Scala.js much more deeply that the hands-on introduction does. It's aimed at someone who has already used Scala.js, and wants to explore the edge-cases, how things work under-the-cover, or why it has been designed in such a way. It's not a formal specification; rather, it's aim is to be a useful reference to read instead of (or in preparation for) digging into the implementation code.
+    This half of the book @secondHalfDescription
 
-  @sect("Advanced Techniques")
+  @sect{Advanced Techniques}
     @indepth.AdvancedTechniques()
 
-  @sect("Javascript Interoperability")
+  @sect{Javascript Interoperability}
     @indepth.JavascriptInterop()
 
-  @sect("Deviations from Scala-JVM")
+  @sect{Deviations from Scala-JVM}
     @indepth.SemanticDifferences()
 
-  @sect("The Compilation Pipeline")
+  @sect{The Compilation Pipeline}
     @indepth.CompilationPipeline()
 
-  @sect("Scala.js' Design Space")
+  @sect{Scala.js' Design Space}
     @indepth.DesignSpace()
 
-  @sect("Java APIs")
+  @sect{Java APIs}
     @indepth.JavaAPIs()

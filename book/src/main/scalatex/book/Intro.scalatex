@@ -9,7 +9,7 @@
         def main() = {
           var x = 0
           while(x < 10) x += 3
-          println(x)
+          println(x) // 12
         }
       }
 
@@ -20,14 +20,14 @@
         while ((x < 10)) {
           x = ((x + 3) | 0)
         };
-        ScalaJS.m.s_Predef().println__O__V(x)
+        ScalaJS.m.s_Predef().println__O__V(x) // 12
       });
 
 @p
-  As you can see, both of the above programs do identical things: it's just that the one on the left is written in Scala and the one on the right is in Javascript.
+  As you can see, both of the above programs do identical things: they'll count the variable @hl.scala{x} from @hl.scala{0}, @hl.scala{3}, @hl.scala{9}, and @hl.scala{12} before finally printing it out. It's just that the first is written in Scala and the second is in Javascript.
 
 @p
-  Traditionally, Scala has been a language which runs on the JVM. This eliminates it from consideration in many cases, e.g. when you need to build interactive web apps, you need to fall back to Javascript to run your client-side code, at a great loss in terms of toolability and maintainability. Scala.js lets you to develop web applications with the safety and toolability that comes with a statically typed language:
+  Traditionally, Scala has been a language which runs on the JVM. This eliminates it from consideration in many cases, e.g. when you need to build interactive web apps, the browser-client only runs Javascript. Even if your back-end is all written in Scala, you need to fall back to Javascript to run your client-side code, at a great loss in terms of toolability and maintainability. Scala.js lets you to develop web applications with the safety and toolability that comes with a statically typed language:
 
 @ul
   @li
@@ -35,24 +35,40 @@
   @li
     In-editor support for autocomplete, error-highlghting, refactors, and intelligent navigation
   @li
-    Very small compiled executables, in the 100-400kb range
+    Moderate sized compiled executables, in the 100-400kb range
   @li
     Source-maps for ease of debugging
 
 @p
-  The value proposition is that due to the superior language and tooling, writing a web application in Scala.js will result in a codebase that is more flexible and robust than an equivalent application written in Javascript.
+  The value proposition is that due to the superior language and tooling, writing a web application in Scala.js will result in a codebase that is more flexible and robust than an equivalent application written in Javascript. The hope is that the benefits of using Scala.js will outweigh the additional (non-trivial) messiness of adding a whole new toolchain, as compared to directly writing raw Javascript.
+
+@p
+  I won't spend time on a detailed discussion on why Scala is good or why Javascript is bad; people's opinions on both sides can be found on the internet. The assumption is, going in, that you either already know and like Scala, or you are familiar with Javascript and are willing to try something new.
 
 @sect{About Javascript}
   @p
-    Javascript is the language supported by web browsers, and is the only language available if you wish to write interactive web applications. As more and more activity moves online, the importance of web apps will only increase over time.
+    Javascript is the language supported by web browsers, and is the only language available if you wish to write interactive web applications. As more and more activity moves online, the importance of web apps will only increase over time. Adobe Flash, Java Applets and Silverlight (which have historically allowed browser-client development in other languages) are all but dead: historically they have been the source of security vulnerabilities, none of them are available on the mobile browsers of Android or iOS or Windows8+. That leaves Javascript.
 
   @sect{Javascript-the-language}
     @p
-      However, Javascript is not an easy language to work in. Apart from being untyped (which some people don't mind) Javascript is also extremely verbose, has a lot of surprising behavior, and has a culture that make even the simplest of patterns (e.g. instantiating an object) a debate between a dozen different and equally-bad options.
+      Javascript is an OK language to do small-scale development: an animation here, an on-click transition there. There are a number of warts in the language, e.g. its verbosity, and a large amount of surprising behavior, but while your code-base doesn't extend past a few hundred lines of code, you often will not mind or care.
+
+    @p
+      However, Javascript is not an easy language to work in at scale: when your code-base extends to thousands, tens or hundreds of thousands of lines of code. The un-typed nature of the language, which is fine for small applications, becomes an issue when you are mainly working with code that you did not write.
+
+    @p
+      In a large code-base, finding out what methods or properties a variable has is often a long chase through dozens of files to see how it ended up being passed to the current function. Refactorings, which are OK when you can just test the code see if it works, become dangerous when your code base is large enough that "just test all the code" would take hours. Language-warts which are slightly annoying in small programs become a minefield in large ones: it's only a matter of time before you hit one, often in code you did-not/cannot test, resulting in breakages in production.
+
+    @p
+      Apart from the inherent danger of the language, Javascript has another major problem: the language has left so many things unspecified, yet at the same time provides the ability to emulate these things in a variety of ways. This means that rather than having a single way of e.g. defining a class and instantiating an object, there is a decade-long debate between a dozen different and equally-bad, hand-crafted alternatives. Large code-bases use third-party libraries, and most are guaranteed (purely due to how stastistics work) to do these basic things differently from your own code, making understanding these disparate code-bases (e.g. when something goes wrong) very difficult.
+
     @p
       To work in Javascript, you need the discipline to limit yourself to the sane subset of the language, avoiding all the pitfalls along the way:
 
     @img(src:="images/javascript-the-good-parts-the-definitive-guide.jpg")
+
+    @p
+      Even if you manage to do so, what constitutes a pitfall and what constitutes a clever-language-feature changes yearly, making it difficult to maintain cohesiveness over time. This is compounded by the fact that refactoring is difficult, and so removing "unwanted" patterns from a large code-base a difficult (often multi-year) process.
 
   @sect{Javascript-the-platform}
     @p
@@ -64,32 +80,45 @@
       @li
         Hyperlinks: being able to link to a particular page or item within a web app is a feature other platforms lack, and makes it much easier to cross-reference between different systems
       @li
-        Sandboxed security: before the advent of mobile apps, web apps were the most secure runtime available, offering none of the risk or worry that comes with installing desktop software
+        Sandboxed security: web applications are secure by default. No matter how sketchy the websites you visit, you can be sure that once you close the page, they're gone
 
     @p
-      These features are all very nice to have, and together have made the web platform the success it is today.
+      These features are all very nice to have, and together have made the web platform the success it is today. When you compare it to traditional applications, you can see the draw:
+    @ul
+      @li
+        Installing traditional desktop applications is usually a several-minute-long process. If something goes wrong in the installation, that often leaves a botched half-install on your computer which makes installing, uninstalling, or running the program impossible without manual surgery to excise the broken files.
+      @li
+        Desktop applications generally do not talk to each other at all. While on the web you can easily link a page to someone, trying to get someone to a particular screen in desktop software often involves a chain of screenshots with detailed instructions of which buttons to click at each stage.
+      @li
+        Desktop application security is non-existent. Install one rogue application and it can take over your computer, steal your credit card number, use your email for sending spam, and all sorts of other nasty things. Removing these for-good sometimes involves re-installing your entire operating system. Hence people are much more wary about only installing desktop software from people they "trust".
+
+    @p
+      In many ways, mobile App platforms like Android and iOS have closed the gap between "native" and "web" applications. Installing a new App may take 30 seconds, you can often deep-link to certain pages within an App, and Apps a much tighter security model than desktop software does. Nevertheless, 30 seconds is still much longer than the 0.5 seconds it takes to open a web page, deep-linking in apps is not very prevalent, and the security model still often leaves space for rogue Apps to misbehave and steal data.
 
   @hr
-
   @p
-    This is where Scala.js comes in. As developers we want Javascript-the-platform, with its ease-of-distribution, hyperlinks and security characteristics. We do not want Javascript-the-language, with its propensity for bugs, verbosity, and fragility.
+    Despite the problems with Javascript (and other tools like HTML an CSS, which have their own problems) the Web platform got a lot of things right, and the Desktop and Mobile platforms have a lot of catching up to do. If only we could improve upon the parts that aren't so great. This is where Scala.js comes in.
 
 @sect{The Promise}
 
   @p
-    Scala.js promises to save us from this mess: with Scala.js, you can cross compile your Scala code to a Javascript executable that can run on all major web browsers, thus saving you from the endless stream of gotcha's like the one below:
-
-  @hl.javascript
-    javascript> ["10", "10", "10", "10"].map(parseInt)
-    [10, NaN, 2, 3] // WTF
-
-  @hl.scala
-    scala> List("10", "10", "10", "10").map(parseInt)
-    List(10, 10, 10, 10) // Yay!
+    With Scala.js, you can cross compile your Scala code to a Javascript executable that can run on all major web browsers. You get all the benefits of the web platform in terms of deployability, security, and hyperlinking, with none of the problems of writing your software in Javascript. Scala.js provides a @sect.ref("The Language", "better language") to do your work in, but also provides some other goodies that have in-so-far never been seen in mainstream web development: @sect.ref("Sharing Code", "shared-code") and @sect.ref("Client-Server Integration", "client-server integration").
 
   @sect{The Language}
     @p
-      At a first approximation, Scala.js provides you a sane language to do development in the web browser. Not only do you have an expressive language with static types, you also have great tooling with IDEs like IntelliJ and Eclipse, a rich library of standard collections, and many other modern conveniences that we take for granted but are curiously missing when working in the wild west of web development: the browser!
+      At a first approximation, Scala.js provides you a sane language to do development in the web browser. This saves you from an endless stream of Javascript warts like this one:
+
+    @hl.javascript
+      javascript> ["10", "10", "10", "10"].map(parseInt)
+      [10, NaN, 2, 3] // WTF
+
+    @hl.scala
+      scala> List("10", "10", "10", "10").map(parseInt)
+      List(10, 10, 10, 10) // Yay!
+
+
+    @p
+      Not only do you have an expressive language with static types, you also have great tooling with IDEs like IntelliJ and Eclipse, a rich library of standard collections, and many other modern conveniences that we take for granted but are curiously missing when working in the wild west of web development: the browser! You get all of the upside of developing for the web platform,
 
     @p
       While not useful for small applications, where most of the logic is gluing together external APIs, this comes in very useful in large applications where a lot of the complexity and room-for-error is entirely internal. With larger apps, you can no longer blame browser vendors for confusing APIs that make your code terrible: these confusing APIs only lurk in the peripherals around a larger, complex application. One thing you learn working in large-ish web client-side code-bases is that the bulk of the confusion and complexity is no-one's fault but your own, as a team.
@@ -99,7 +128,10 @@
 
   @sect{Sharing Code}
     @p
-      Scala.js does not just stop at writing code on the client, though! Scala itself is a very successful, capable language for writing all sorts of systems, from web servers to backend infrastructure. With Scala.js, you can utilize the same libraries you use writing your Scala servers when writing your Scala web clients! On one end, you are sharing your templating language with @lnk("Scalatags", "https://github.com/lihaoyi/scalatags") or sharing your serialization logic with @lnk("uPickle", "https://github.com/lihaoyi/upickle"). At the other, you are sharing large, abstract libraries like @lnk("Scalaz", "https://github.com/japgolly/scalaz") or @lnk("Shapeless", "https://groups.google.com/forum/#!searchin/scala-js/shapeless/scala-js/5Sf2up0z3PU/9F9SYB0qHEcJ").
+      Shared code is one of the holy-grails of web development. Traditionally the client-side code and server-side code has been written in separate languages: PHP or Perl or Python or Ruby or Java on the server, with only Javascript on the client. This means that algorithms were often implemented twice, constants copied-&-pasted, or awkward Ajax calls are made in an attempt to centralize the logic in one place (the server). With the advent of Node.js in the last few years, you can finally re-use the same code on the server as you can on the client, but with the cost of having all the previously client-only @sect.ref("Javascript-the-language", "problems with Javascript") now inflicted upon your server code base. Node.js expanded your range-of-options for writing shared client/server logic from "Write everything twice" to "Write everything twice, or write everything in Javascript". More options is always good, but it's not clear which of the two choices is more painful!
+
+    @p
+      Scala.js provides an alternative to this dilemma. With Scala.js, you can utilize the same libraries you use writing your Scala servers when writing your Scala web clients! On one end, you are sharing your templating language with @lnk("Scalatags", "https://github.com/lihaoyi/scalatags") or sharing your serialization logic with @lnk("uPickle", "https://github.com/lihaoyi/upickle"). At the other, you are sharing large, abstract libraries like @lnk("Scalaz", "https://github.com/japgolly/scalaz") or @lnk("Shapeless", "https://groups.google.com/forum/#!searchin/scala-js/shapeless/scala-js/5Sf2up0z3PU/9F9SYB0qHEcJ").
 
     @p
       Sharing code means several things:
@@ -122,10 +154,10 @@
     @img(src:="images/Scalatags Downloads.png", width:="100%")
 
     @p
-      Shared code means that if you, as an application writer, want some logic to be available on both the client and server, you simply put it in a "shared" folder, and that's the end of the discussion. No architectural patterns to follow, no clever techniques need to be involved. Shared logic, whether that means constants, functions, data structures, all the way to algorithms and entire libraries, can simply be placed in "shared" and be instantly accessible from both your client-side web code and your server.
+      Shared code means that if you, as an application writer, want some logic to be available on both the client and server, you simply @sect.ref("A Client-Server Setup", "put it in a shared/ folder"), and that's the end of the discussion. No architectural patterns to follow, no clever techniques need to be involved. Shared logic, whether that means constants, functions, data structures, all the way to algorithms and entire libraries, can simply be placed in @code{shared/} and be instantly accessible from both your client-side web code and your server.
 
     @p
-      Shared code has long been the holy-grail of web development. Even now, people speak of shared code as if it were a myth. With Scala.js, shared code is the simple, boring reality. And there's a lot to like in that!
+      Shared code has long been the holy-grail of web development. Even now, people speak of shared code as if it were a myth. With Scala.js, shared code is the simple, boring reality. And all this while, just as importantly, you don't need to re-write your large enterprise back-end systems in a language that doesn't scale well beyond 100s of lines of code.
 
   @sect{Client-Server Integration}
     @p
@@ -133,7 +165,11 @@
     @p
       One common theme in all these platforms is that their main selling point is their tight, seamless client-server integration, to the point where you can just make method calls across the client-server boundary and the platform/language/compiler figures out what to do.
     @p
-      With Scala.js and Scala-JVM, such conveniences like making method calls across the client-server boundary is the @sect.ref("Integrating Client-Server", "boring reality"). Not only are the calls transparent, they are also statically checked, so any mistake in the route name or the parameters it expects, or the result type it returns to you, will be caught by the compiler long before even manual testing.
+      With Scala.js and Scala-JVM, such conveniences like making method calls across the client-server boundary is the @sect.ref("Integrating Client-Server", "boring reality"). Not only are the calls transparent, they are also statically checked, so any mistake in the route name or the parameters it expects, or the result type it returns to you, will be caught by the compiler long before even manual testing. It becomes @sect.ref("What's Left?", "impossible to make a malformed Ajax call").
+    @p
+      There's a lot to be said for automating things using a computer. The entire field of software engineering is basically about automating tasks that were previously done manually: accounting, banking, making travel arrangements, and all that. However, in the world of web-development, there has always been one set of tasks that has traditionally be done manually: the task of ensuring the web-clients are properly synchronized with the web-servers. Communication between the two has always been a manual, tedious, error-prone process, and mistakes often end un-noticed until something breaks in production.
+    @p
+      With Scala.js, like the other experimental platforms that have come before us, we attempt to provide a way forward from this manual-tedium.
 
   @hr
 
@@ -141,40 +177,7 @@
     In many ways, Scala.js all-at-once provides many of the traditional holy-grails of web development: People have always dreamed about doing web development in a sane, best-of-breed language that compiles to both client and server. Of not having to worry too hard about whether code goes on the client or on the server, and being able to move or share it if necessary. Of having a compiler that will verify and check that your entire system is correct.
 
   @p
-    Scala.js provides all these things, and much more.
+    Scala.js provides all these things, and much more. If you're interested enough to want to make use of Scala.js, read on!
 
-@sect{The Agenda}
-
-  @p
-    This book will be roughly divided into three sections. These sections can be read in any order. Although the later chapters will make references to earlier chapters, there'll be hyperlinks so you can quickly go back and catch up on what you missed skipping over ,
-
-  @sect{Part 1: Hands On}
-    @p
-      A @sect.ref("Hands On", "whirlwind tour") of the various things that Scala.js can be used for. We will cover:
-
-    @ul
-      @li
-        @sect.ref("Getting Started"): setting up your development environment, cloning the example repository, debugging and finally publishing your first toy application
-      @li
-        @sect.ref("Interactive Web Pages"): how you interact with the HTML DOM, how you utilize Ajax calls and other browser APIs that are common in Javascript-heavy applications
-      @li
-        @sect.ref("Cross Publishing Libraries"): how to write a module that can be depended on by applications both your own and by others, and be used both with Scala.js and Scala-on-the-JVM
-      @li
-        @sect.ref("Client-Server Integration"): We will build a simple web application with a Scala server and Scala.js client. In the process, we'll explore how to share code between client and server, how to get compiler-checked/boilerplate-free Ajax calls between client and server, and many other long-standing holy-grails of web development
-
-    @p
-      After going through this chapter and following along with the exercises, you should have a good sense of how Scala.js works and how it feels building things in Scala.js. You would not be an expert, but you'll know where to get started if you decide to try out Scala.js for your next project.
-
-  @sect{Part 2: In Depth}
-    @p
-      @sect.ref("In Depth", "This section of the book") will cover lots of content that does not fit in the earlier Hands-On portion of the book. Things that aren't immediately necessary to get something up and running, things that only advanced users would care about, things that you probably don't need to know but you'd like to know out of intellectual curiosity.
-
-    @p
-      In general, this section of the book will go much deeper into Scala.js, much more than is necessary to get your first applications built. We will talk about the small number of @sect.ref("Deviations from Scala-JVM", "Semantic Differences") between Scala.js and Scala, details of the foreign-function-interface used for @sect.ref("Javascript Interoperability"), @sect.ref("The Compilation Pipeline") with its various optimization levels and what they do. Nothing pressing or urgently needed, but all very interesting, and worth reading if you want to really understand Scala.js in depth.
-
-  @hr
-
-  @p
-    As mentioned earlier, these chapters can be read in any order. In keeping with the spirit of the book, we'll jump right into the Hands On to give you the experience, and save the talking and philosophizing for later. Let's go!
 
 
