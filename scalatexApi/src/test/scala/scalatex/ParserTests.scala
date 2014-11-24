@@ -2,7 +2,7 @@ package scalatex
 
 
 import org.parboiled2._
-import scalaparser.ScalaSyntax
+import scalaParser.ScalaSyntax
 
 import scalatex.stages.{Trim, Parser, Ast}
 import scalatex.stages.Ast.Block.{IfElse, For, Text}

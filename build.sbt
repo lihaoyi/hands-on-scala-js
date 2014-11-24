@@ -2,7 +2,16 @@
 import scala.scalajs.sbtplugin.ScalaJSPlugin._
 import ScalaJSKeys._
 
-
+lazy val scalaParser = project.in(file("scalaParser")).settings(
+  scalaVersion := "2.11.4",
+  libraryDependencies ++= Seq(
+    "com.lihaoyi" %% "utest" % "0.2.4",
+    "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
+    "org.parboiled" %% "parboiled" % "2.0.1"
+  ),
+  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
+  testFrameworks += new TestFramework("utest.runner.JvmFramework")
+)
 lazy val scalatexApi = project.in(file("scalatexApi"))
                        .settings(
   scalaVersion := "2.11.4",

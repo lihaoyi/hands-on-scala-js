@@ -2,7 +2,7 @@ package scalatex
 package stages
 import acyclic.file
 import org.parboiled2._
-import scalaparser.ScalaSyntax
+import scalaParser.ScalaSyntax
 
 /**
  * Parses the input text into a roughly-structured AST. This AST
