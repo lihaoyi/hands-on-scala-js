@@ -104,10 +104,10 @@
   @p
     However, there is still some amount of duplication in the code. In particular, the definition of the endpoint name "list" is duplicated 4 times:
 
-  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala", """path("ajax" / "list")""", "extract")
-  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala", "list(", "}")
-  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala", "def list", "val")
-  @hl.ref("examples/crossBuilds/clientserver/client/src/main/scala/simple/Client.scala", "ajax/list", "val")
+  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala", """path("ajax" / "list")""", "")
+  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala", "list(", "")
+  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala", "def list", "")
+  @hl.ref("examples/crossBuilds/clientserver/client/src/main/scala/simple/Client.scala", "ajax/list", "")
 
   @p
     Three times on the server and once on the client! What's worse, two of the appearances of @i{list} are in string literals, which are not checked by the compiler to match up with themselves or the name of the method @hl.scala{list}. Apart from this, there is one other piece of duplication that is unchecked: the type being returned from @hl.scala{list} (@hl.scala{Seq[FileData]} is being repeated on the client in @hl.scala{upickle.read[Seq[FileData]]} in order to de-serialize the serialized data. This leaves three wide-open opportunities for error:
@@ -130,13 +130,13 @@
   @p
     @lnk("Autowire", "https://github.com/lihaoyi/autowire") is a library that turns your request routing layer from a fragile, hand-crafted mess into a solid, type-checked, boilerplate-free experience. Autowire basically turns what was previously a stringly-typed, hand-crafted Ajax call and route:
 
-  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala", """path("ajax" / "list")""", "extract")
-  @hl.ref("examples/crossBuilds/clientserver/client/src/main/scala/simple/Client.scala", "ajax/list", "val")
+  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala", """path("ajax" / "list")""", "")
+  @hl.ref("examples/crossBuilds/clientserver/client/src/main/scala/simple/Client.scala", "ajax/list", "")
 
   @p
     Into a single, type-checked function call:
 
-  @hl.ref("examples/crossBuilds/clientserver2/client/src/main/scala/simple/Client.scala", ".call()", "outputBox")
+  @hl.ref("examples/crossBuilds/clientserver2/client/src/main/scala/simple/Client.scala", ".call()", "")
 
   @p
     Let's see how we can do that.
@@ -174,10 +174,10 @@
     @p
       The @hl.scala{Router} object in turn simply defines how you intend the objects to be serialized and deserialized:
 
-   @hl.ref("examples/crossBuilds/clientserver2/server/src/main/scala/simple/Server.scala", "object Router", "object")
+    @hl.ref("examples/crossBuilds/clientserver2/server/src/main/scala/simple/Server.scala", "object Router", "object Server")
 
-   @p
-    In this case using uPickle. Note how the @hl.scala{route} call explicitly states the type (here @hl.scala{Api}) that it is to generate routes against; this ensures that only methods which you explicitly put in your public interface @hl.scala{Api} are publically reachable.
+    @p
+      In this case using uPickle. Note how the @hl.scala{route} call explicitly states the type (here @hl.scala{Api}) that it is to generate routes against; this ensures that only methods which you explicitly put in your public interface @hl.scala{Api} are publically reachable.
 
     @p
       Next, let's look at the modified client code:
@@ -187,7 +187,7 @@
     @p
       There are two main modifications here: the existence of the new @hl.scala{Ajaxer} object, and the modification to the Ajax call-site. Let's first look at @hl.scala{Ajaxer}:
 
-    @hl.ref("examples/crossBuilds/clientserver2/client/src/main/scala/simple/Client.scala", "object Ajaxer", "object")
+    @hl.ref("examples/crossBuilds/clientserver2/client/src/main/scala/simple/Client.scala", "object Ajaxer", "@JSExport")
 
     @p
       Like the @hl.scala{Router} object, @hl.scala{Ajaxer} also defines how you perform the serialization and deserialization of data-structures, again using uPickle. Unlike the @hl.scala{Router} object, @hl.scala{Ajaxer} also defines how the out-going Ajax call gets sent over the network. Here we're doing it using the @hl.scala{Ajax.post} method.
@@ -195,7 +195,7 @@
     @p
       Lastly, let's look at the modified callsite for the ajax call itself:
 
-    @hl.ref("examples/crossBuilds/clientserver2/client/src/main/scala/simple/Client.scala", "def update", "inputBox")
+    @hl.ref("examples/crossBuilds/clientserver2/client/src/main/scala/simple/Client.scala", "def update", "")
 
     @p
       There are a few things of note here:

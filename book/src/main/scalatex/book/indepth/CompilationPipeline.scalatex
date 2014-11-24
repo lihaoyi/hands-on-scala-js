@@ -95,7 +95,16 @@
       @b{Compilation}: @code{.scala} files to @code{.js} files
 
   @p
-    But produced far larger (20mb) and slower executables. This section will explore each stage and we'll learn what these stages do.
+    But produced far larger (20mb) and slower executables. This section will explore each stage and we'll learn what these stages do, starting with a small example program:
+
+  @hl.scala
+    def main() = {
+      var x = 0
+      while(x < 999){
+        x = x + "2".toInt
+      }
+      println(x)
+    }
 
   @sect{Compilation}
     @p
@@ -136,8 +145,39 @@
       This is the only phase in the Scala.js compilation pipeline that separate compilation is possible: you can compile many different sets of Scala.js @code{.scala} files separately, only to combine them later. This is used e.g. for distributing Scala.js libraries as Maven Jars, which are compiled separately by library authors to be combined into a final executable later.
 
   @sect{Fast Optimization}
+    @hl.javascript
+      ScalaJS.c.LExample$.prototype.main__V = (function() {
+        var x = 0;
+        while ((x < 999)) {
+          x = ((x + new ScalaJS.c.sci_StringOps().init___T(
+            ScalaJS.m.s_Predef().augmentString__T__T("2")
+          ).toInt__I()) | 0)
+        };
+        ScalaJS.m.s_Predef().println__O__V(x)
+      });
+
     @p
-      This phase is a whole-program optimization of the @code{.sjsir} files, and lives in the @lnk("tools/", "https://github.com/scala-js/scala-js/tree/master/tools") folder of the Scala.js repository. The rough operations that get performed are:
+      This phase is a whole-program optimization of the @code{.sjsir} files, and lives in the @lnk("tools/", "https://github.com/scala-js/scala-js/tree/master/tools") folder of the Scala.js repository. The end result is a rough translation of Scala into the equivalent Javascript (e.g. above):
+
+    @ul
+      @li
+        Scala-style method @hl.scala{def}s become Javascript-style prototype-function-assignment
+      @li
+        Scala @hl.scala{var}s become Javascript @hl.scala{var}s
+      @li
+        Scala @hl.scala{while}s become Javascript @hl.scala{while}s
+      @li
+        Implicits are materialized, hence all the @hl.scala{StringOps} and @hl.scala{augmentString} extensions are present in the output
+      @li
+        Classes and methods are fully-qualified, e.g. @hl.scala{println} becomes @hl.scala{Predef().println}
+      @li
+        Method names are qualified by their types, e.g. @hl.scala{__O__V} means that @hl.scala{println} takes @hl.scala{Object} and returns @hl.scala{void}
+
+    @p
+      This is an incomplete description of the translation, but it should give a good sense of how the translation from Scala to Javascript looks like. In general, the output is verbose but straightforward.
+
+    @p
+      In addition to this superficial translation, the optimizer does a number of things which are more subtle and vary from case to case. The rough operations that get performed are:
 
     @ul
       @li
@@ -151,10 +191,24 @@
       While the input for this phase is the aggregate @code{.sjsir} files from your project and all your dependencies, the output is executable Javascript. This phase usually runs in less than a second, outputs a Javascript blob in the 700kb-1mb range, and is suitable for repeated use during development. This corresponds to the @code{fastOptJS} command in SBT.
 
   @sect{Full Optimization}
+    @hl.javascript
+      be.prototype.main=function(){
+          for(var a=0;999>a;)
+              a=a+(new de).g(S(L(),"2")).ne()|0;
+          ee(); L();
+          var b=F(fe); ge();
+          a=(new he).g(w(a)); b=bc(0,J(q(b,[a])));
+          ie(bc(L(),J(q(F(fe),[je(ke(ge().Vg),b)]))))
+      }
+
     @p
       The @lnk("Google Closure Compiler", "https://developers.google.com/closure/compiler/") (GCC) is a set of tools that work with Javascript. It has multiple @lnk("levels of optimization", "https://developers.google.com/closure/compiler/docs/compilation_levels"), doing everything from basic whitespace-removal to heavy optimization. It is a old, relatively mature project that is relied on both inside and outside google to optimize the delivery of Javascript to the browser.
+
     @p
-      Scala.js uses GCC in its most aggressive mode: @lnk("Advanced Optimization", "https://developers.google.com/closure/compiler/docs/api-tutorial3"). As described in the linked documentation, this performs optimizations such as:
+      Scala.js uses GCC in its most aggressive mode: @lnk("Advanced Optimization", "https://developers.google.com/closure/compiler/docs/api-tutorial3"). GCC spits out a compressed, minified version of the Javascript (above) that @sect.ref{Fast Optimization} spits out: e.g. in the example above, all identifiers have been renamed to short strings, the @hl.javascript{while}-loop has been replaced by a @hl.javascript{for}-loop, and the @hl.scala{println} function has been inlined.
+
+    @p
+      As described in the linked documentation, GCC performs optimizations such as:
 
     @ul
       @li

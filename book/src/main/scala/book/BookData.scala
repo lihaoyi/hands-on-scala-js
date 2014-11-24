@@ -1,7 +1,8 @@
 package book
 
 import acyclic.file
-
+import scalatags.Text.TypedTag
+import scalatags.Text.all._
 object BookData {
   lazy val javaAPIs = {
     import java.io.File
@@ -28,5 +29,17 @@ object BookData {
       filename -> docpath
     }
   }
+  var counter = 0
+  def example(t: TypedTag[String], main: String) = {
+    val tagId = "example"+counter
+    counter += 1
+    Seq(
+      t(id:=tagId, display.block),
+      script(s"$main(document.getElementById('$tagId'))")
+    )
+  }
+  def split = div(cls:="pure-g")
+  def more = div(cls:="pure-u-1 pure-u-md-13-24")
+  def less = div(cls:="pure-u-1 pure-u-md-11-24")
+  def half = div(cls:="pure-u-1 pure-u-md-1-2")
 }
-

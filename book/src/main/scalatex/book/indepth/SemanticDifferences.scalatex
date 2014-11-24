@@ -1,3 +1,4 @@
+@import BookData._
 @p
   Although Scala.js tries very hard to maintain compatibility with Scala-JVM, there are some parts where the two platforms differs. This can be roughly grouped into two things: differences in the libraries available,and differences in the language itself. This chapter will cover both of these facets.
 
@@ -10,18 +11,39 @@
     @p
       Float literals are truncated to their (binary) precision. However, output does not truncate to that precision. This can lead to the following behavior (this works as expected when using doubles):
 
-  @hl.scala
-    println(13.345f)
-    // Scala:    13.345
-    // Scala.js: 13.345000267028809
+  @split
+    @half
+      @hl.scala
+        // Scala-JVM
+        > println(13.345f)
+        13.345
 
+    @half
+      @hl.scala
+        // Scala.js
+        > println(13.345f)
+        13.345000267028809
 
-  @sect{Integer division by 0 is undefined}
+  @sect{Int division by 0 is undefined}
     @p
       Unlike the JVM where dividing an integer type by 0 throws an exception, in Scala.js integer division by 0 is undefined. This allows for efficient implementation of division. Dividing a Double or Float by 0 yields positive or negative infinity as expected.
 
+    @split
+      @half
+        @hl.scala
+          // Scala-JVM
+          > 10 / 0
+          java.lang.ArithmeticException: / by zero
+      @half
+        @hl.scala
+          // Scala.js
+          > 10 / 0
+          0
 
-  @sect{isInstanceOf tests are based on value}
+    @p
+      This is a consequence of the eternal trade-off between performance and correctness, as described in the section @sect.ref{Why does error behavior differ?}
+
+  @sect{Primitive isInstanceOf tests are based on value}
     @p
       Instance tests (and consequently pattern matching) on any of @hl.scala{Byte}, @hl.scala{Short}, @hl.scala{Int}, @hl.scala{Float}, @hl.scala{Double} are based on the value and not the type they were created with. The following are examples:
 
@@ -51,24 +73,24 @@
       // Scala:    1.0
       // Scala.js: 1
     @p
-      This is due to how numeric values are represented at runtime in Scala.js. Use a formatting interpolator if you always want to show decimals:
+      This is due to how numeric values are represented at runtime in Scala.js: @hl.scala{Float}s and @hl.scala{Double}s are raw Javascript @hl.scala{Number}s, and their @hl.scala{toString} behavior follows from that.
+
+    @p
+      Use a formatting interpolator if you always want to show decimals:
 
     @hl.scala
       val x = 1.0
       println(f"$x%.1f")
-      // Scala:    1.0
+      // Scala-JVM:    1.0
       // Scala.js: 1.0
+
   @sect{Unit}
     @p
       scala.Unit is represented using JavaScript's undefined. Therefore, calling @hl.scala{toString()} on @hl.scala{Unit} will return @hl.scala{"undefined"} rather than @hl.scala{"()""}.
 
-  @sect{Strings}
-    @p
-      JavaScript uses UCS-2 for encoding strings and does not support conversion to or from other character sets. As a result, String constructors taking Byte arrays are not supported by Scala.js.
-
   @sect{Reflection}
     @p
-      Java reflection and, a fortiori, Scala reflection, are not supported. There is limited support for @lnk("java.lang.Class", "https://docs.oracle.com/javase/7/docs/api/java/lang/Class.html"), e.g., obj.getClass.getName will work for any Scala.js object (not for objects that come from JavaScript interop).
+      Java reflection and Scala reflection, are not supported. There is limited support for @lnk("java.lang.Class", "https://docs.oracle.com/javase/7/docs/api/java/lang/Class.html"), e.g., obj.getClass.getName will work for any Scala.js object (not for objects that come from JavaScript interop). Reflection makes it difficult to perform the optimizations that Scala.js heavily relies on. For a more detailed discussion on this topic, take a look at the section @sect.ref{Why No Reflection?}.
 
   @sect{Exceptions}
     @p
@@ -89,10 +111,11 @@
       This sometimes has an impact on functions in the Scala library that use regular expressions themselves. A list of known functions that are affected is given here:
     @ul
       @li
-        StringLike.split(x: Array[Char]) (see issue #105)
+        @hl.scala{StringLike.split(x: Array[Char])} (see issue #105)
+
   @sect{Symbols}
     @p
-      scala.Symbol is supported, but is a potential source of memory leaks in applications that make heavy use of symbols. The main reason is that JavaScript does not support weak references, causing all symbols created by Scala.js tow remain in memory throughout the lifetime of the application.
+      @hl.scala{scala.Symbol} is supported, but is a potential source of memory leaks in applications that make heavy use of symbols. The main reason is that JavaScript does not support weak references, causing all symbols created by Scala.js tow remain in memory throughout the lifetime of the application.
 
   @sect{Enumerations}
     @p
@@ -139,6 +162,7 @@
     ("JavaScript libraries: chipmunk.js, hand.js, react.js, jquery", "Java ecosystem: guice, junit, apache-commons, log4j"),
     ("IntelliJ, Eclipse, SBT, Chrome console, firebug", "Scala REPL, Yourkit, VisualVM, JProfiler")
   )
+
   @p
     Scala.js differs from Scala-JVM not just in the corner-cases of the language, but also in the libraries available. Scala-JVM has access to JVM APIs and the wealth of the Java libraries, while Scala.js has access to Javascript APIs and Javascript libraries. It's also possible to write pure-Scala libraries that run on both Scala.js and Scala-JVM, as detailed @a("here").
   @p

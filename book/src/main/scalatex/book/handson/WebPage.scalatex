@@ -1,4 +1,4 @@
-
+@import BookData._
 
 @p
   Most web applications aren't neat little games which live on a single canvas: they are large, structured HTML pages, which involve displaying data (whether from the user or from the web) in multiple ways, while allowing the user to make changes to the data that can be saved back to whatever remote web-service/database it came from.
@@ -11,13 +11,12 @@
   @p
     The most basic way of building interactive web pages using Scala.js is to use the Javascript APIs to blat HTML strings directly into some container div, often @code{document.body}. This approach works, as the following code snippet demonstrates:
 
-  @div(cls:="pure-g")
-    @div(cls:="pure-u-1 pure-u-md-13-24")
+  @split
+    @more
       @hl.ref("examples/demos/src/main/scala/webpage/HelloWorld0.scala")
 
-    @div(cls:="pure-u-1 pure-u-md-11-24")
-      @div(id:="div1")
-      @script("HelloWorld0().main(document.getElementById('div1'))")
+    @less
+      @BookData.example(div, "HelloWorld0().main")
 
   @p
     This approach works, as the above example shows, but has a couple of disadvantages:
@@ -40,13 +39,12 @@
   @p
     With that, the above snippet of code re-written using Scalatags looks as follows:
 
-  @div(cls:="pure-g")
-    @div(cls:="pure-u-1 pure-u-md-13-24")
+  @split
+    @more
       @hl.ref("examples/demos/src/main/scala/webpage/HelloWorld1.scala")
 
-    @div(cls:="pure-u-1 pure-u-md-11-24")
-      @div(id:="div2")
-      @script("HelloWorld1().main(document.getElementById('div2'))")
+    @less
+      @BookData.example(div, "HelloWorld1().main")
 
   @p
     Scalatags has some nice advantages over plain HTML: it's type-safe, so typos like @hl.scala{dvi} get caught at compile-time. It's also secure, such that you don't need to worry about script-tags in strings or similar. The @lnk("Scalatags Readme", "https://github.com/lihaoyi/scalatags#scalatags") elaborates on these points and other advantages. As you can see, it takes just 1 import at the top of the file to bring it in scope, and then you can use all of Scalatags' functionality.
@@ -55,13 +53,12 @@
     The Scalatags github page has @lnk("comprehensive documentation", "https://github.com/lihaoyi/scalatags#hello-world") on how to express all manner of HTML fragments using Scalatags, so anyone who's familiar with how HTML works can quickly get up to speed. Instead of a detailed listing, we'll walk through some interactive examples to show Scalatags in action!
 
   @sect{User Input}
-    @div(cls:="pure-g")
-      @div(cls:="pure-u-1 pure-u-md-13-24")
+    @split
+      @more
         @hl.ref("examples/demos/src/main/scala/webpage/Inputs.scala", "val box")
 
-      @div(cls:="pure-u-1 pure-u-md-11-24")
-        @div(id:="div3")
-        @script("Inputs().main(document.getElementById('div3'))")
+      @less
+        @BookData.example(div, "Inputs().main")
 
     @p
       In Scalatags, you build up fragments of type @hl.scala{Frag} using functions like @hl.scala{div}, @hl.scala{h1}, etc., and call @hl.scala{.render} on it to turn it into a real @lnk.dom.Element. Different fragments render to different things: e.g. @hl.scala{input.render} gives you a @lnk.dom.HTMLInputElement, @hl.scala{span.render} gives you a @lnk.dom.HTMLSpanElement. You can then access the properties of these elements: adding callbacks, checking their value, anything you want.
@@ -89,24 +86,22 @@
     @p
       Lastly, we just need to define the input box and output-container (as we did earlier), set the @lnk.dom.onkeyup event handler, and place it in a larger fragment, and then into our target:
 
-    @div(cls:="pure-g")
-      @div(cls:="pure-u-1 pure-u-md-13-24")
+    @split
+      @more
         @hl.ref("examples/demos/src/main/scala/webpage/Search0.scala", "val output")
 
-      @div(cls:="pure-u-1 pure-u-md-11-24")
-        @div(id:="div4")
-        @script("Search0().main(document.getElementById('div4'))")
+      @less
+        @BookData.example(div, "Search0().main")
 
     @p
       And there you have it! A working search box. This is a relatively self-contained example: all the items its searching are available locally, no Ajax calls, and there's no fancy handling of the searched items. If we want to, for example, highlght the matched section of each fruit's name, we can modify the @hl.scala{def renderListings} call to do so:
 
-    @div(cls:="pure-g")
-      @div(cls:="pure-u-1 pure-u-md-13-24")
+    @split
+      @more
         @hl.ref("examples/demos/src/main/scala/webpage/Search1.scala", "def renderListings", "lazy val")
 
-      @div(cls:="pure-u-1 pure-u-md-11-24")
-        @div(id:="div5")
-        @script("Search1().main(document.getElementById('div5'))")
+      @less
+        @BookData.example(div, "Search1().main")
 
     @p
       Here, instead of sticking the name of the matched fruits directly into the @hl.scala{li}, we instead first split off the part which matches the query, and then highlght the first section yellow. Easy!
@@ -133,27 +128,24 @@
     One half of the web application faces forwards towards the user, managing and rendering HTML or Canvas for the user to view and interact with. Another half faces backwards, talking to various web-services or databases which turn the application from a standalone-widget into part of a greater whole. We've already seen how to make the front half, let's now talk about working with the back half.
 
   @sect{Raw Javascript}
-    @div(cls:="pure-g")
-      @div(cls:="pure-u-1 pure-u-md-13-24")
+    @split
+      @more
         @hl.ref("examples/demos/src/main/scala/webpage/Weather0.scala", "val xhr")
 
-      @div(cls:="pure-u-1 pure-u-md-11-24")
-        @div(id:="div6")
-        @script("Weather0().main(document.getElementById('div6'))")
+      @less
+        @BookData.example(div, "Weather0().main")
     @p
       The above snippet of code uses the raw Javascript Ajax API in order to make a request to @lnk("openweathermap.org", "http://openweathermap.org/"), to get the weather data for the city of Singapore as a JSON blob. The part of the API that we'll be using is documented @lnk("here", "http://openweathermap.org/current"). For now, we're unceremoniously dumping it in a @hl.scala{pre} so you can see the raw response data.
 
     @p
       As you can see, using the raw Javascript API to make the Ajax call looks almost identical to actually doing this in Javascript, shown below:
 
-    @div(cls:="pure-g")
-      @div(cls:="pure-u-1 pure-u-md-13-24")
+    @split
+      @more
         @hl.ref("examples/demos/src/main/resources/webpage/weather.js", "var xhr")
 
-      @div(cls:="pure-u-1 pure-u-md-11-24")
-        @div(id:="div7")
-        @script("WeatherJs(document.getElementById('div7'))")
-        @script("WeatherJs(document.getElementById('div7'))")
+      @less
+        @BookData.example(div, "WeatherJs")
 
     @p
       The primary syntactic differences are:
@@ -184,13 +176,12 @@
     @p
       Then we need the code itself:
 
-    @div(cls:="pure-g")
-      @div(cls:="pure-u-1 pure-u-md-13-24")
+    @split
+      @more
         @hl.ref("examples/demos/src/main/scala/webpage/Weather1.scala", "val url")
 
-      @div(cls:="pure-u-1 pure-u-md-11-24")
-        @div(id:="div8")
-        @script("Weather1().main(document.getElementById('div8'))")
+      @less
+        @BookData.example(div, "Weather1().main")
 
     @p
       A single call to @hl.scala{Ajax.get(...)}, with the URL, and we receive a @hl.scala{scala.concurrent.Future} that we can use to get access to the result when ready. Here we're just using it's @hl.scala{onSuccess}, but we could use it in a for-comprehension, with @lnk("Scala Async", "https://github.com/scala/async"), or however else we can use normal @hl.scala{Future}s
@@ -202,13 +193,12 @@
     @p
       First, let's make the call prettyprint the document, so at least we can see what it contains:
 
-    @div(cls:="pure-g")
-      @div(cls:="pure-u-1 pure-u-md-13-24")
+    @split
+      @more
         @hl.ref("examples/demos/src/main/scala/webpage/Weather2.scala", "Ajax.get")
 
-      @div(cls:="pure-u-1 pure-u-md-11-24")
-        @div(id:="div9")
-        @script("Weather2().main(document.getElementById('div9'))")
+      @less
+        @BookData.example(div, "Weather1().main")
 
     @p
       We do this by taking @hl.scala{xhr.responseText} and putting it through both @hl.scala{JSON.parse} and @hl.scala{JSON.stringify}, passing in a @hl.scala{space} argument to tell @hl.scala{JSON.stringify} to spread it out nicely.
@@ -216,13 +206,12 @@
     @p
       Now that we've pretty-printed it, we can immediately see what data it contains and which part of the data we want. Let's change the previous example's @hl.scala{onSuccess} call to extract the @hl.scala{weather}, @hl.scala{temp} and @hl.scala{humidity} and put them in a nice, human-friendly format for us to enjoy:
 
-    @div(cls:="pure-g")
-      @div(cls:="pure-u-1 pure-u-md-13-24")
+    @split
+      @more
         @hl.ref("examples/demos/src/main/scala/webpage/Weather3.scala", "Ajax.get")
 
-      @div(cls:="pure-u-1 pure-u-md-11-24")
-        @div(id:="div10")
-        @script("Weather3().main(document.getElementById('div10'))")
+      @less
+        @BookData.example(div, "Weather3().main")
 
     @p
       First we parse the incoming response, extract a bunch of values from it, and then stick it in a Scalatags fragment for us to see. Note how we can use the names of the attributes e.g. @hl.scala{json.name} even though @hl.scala{name} is a dynamic property which you can't be sure exists: this is because @hl.scala{json} is of type @hl.scala{js.Dynamic}, which allows us to refer to arbitrary parameters and methods on the underlying object without type-checking.
@@ -252,8 +241,7 @@
   @p
     Here is the meat and potatoes of this program: every time it gets called with an array of weather-data, we iterate over the cities in that array. It then does a similar sort of data-extraction that we did earlier, putting the results into the @hl.scala{output} div we defined above, including highlighting.
 
-  @div(id:="div11")
-  @script("WeatherSearch().main(document.getElementById('div11'))")
+  @BookData.example(div, "WeatherSearch().main")
 
   @p
     And that's the working example! Try searching for cities like "Singapore" or "New York" or "San Francisco" and watch as the search narrows as you enter more characters into the text box. Note that the OpenWeatherMap API limits ambiguous searches to about a dozen results, so if a city doesn't turn up in a partial-search, try entering more characters to narrow it down.

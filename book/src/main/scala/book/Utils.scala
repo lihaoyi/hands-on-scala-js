@@ -171,14 +171,27 @@ object hl{
     val whitespace = indent(lines(startLine))
     val endLine = lines.indexWhere(
       line => line.contains(end) || (indent(line) < whitespace && line.trim != ""),
-      startLine
+      startLine + 1
     )
     val sliced =
       if (endLine == -1) lines.drop(startLine)
       else lines.slice(startLine, endLine)
+
     val blob = sliced.map(_.drop(whitespace)).mkString("\n")
 
 
-    pre(code(cls:=lang + " highlight-me", blob))
+    pre(
+      code(cls:=lang + " highlight-me", blob),
+      a(
+        cls:="header-link",
+        i(cls:="fa fa-link "),
+        position.absolute,
+        right:="0.5em",
+        bottom:="0.5em",
+        display.block,
+        fontSize:="24px",
+        href:="#"
+      )
+    )
   }
 }

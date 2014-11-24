@@ -1,3 +1,4 @@
+@import BookData._
 @p
   @sect.ref{Getting Started} walks you through how to set up some basic Scala.js applications, but that only scratches the surface of the things you can do with Scala.js. Apart from being able to use the same techniques you're used to in Scala-JVM in the browser, Scala.js opens up a whole range of possibilities and novel techniques that are not found in typical Scala-JVM applications.
 
@@ -77,13 +78,12 @@
     @p
       Now that the set-up is out of the way, let's consider a simple HTML widhet that lets you enter text in a @hl.html{<textarea>}, and keeps track of the number of words, characters, and counts how long each word is.
 
-    @div(cls:="pure-g")
-      @div(cls:="pure-u-1 pure-u-md-13-24")
+    @split
+      @more
         @hl.ref("examples/demos/src/main/scala/advanced/BasicRx.scala", "val txt =")
 
-      @div(cls:="pure-u-1 pure-u-md-11-24")
-        @div(id:="div19", display:="block")
-        @script("BasicRx().main(document.getElementById('div19'))")
+      @less
+        @example(div, "BasicRx().main")
 
     @p
       This snippet sets up a basic data-flow graph. We have our @hl.scala{txt} @hl.scala{Var}, and a bunch of @hl.scala{Rx}s (@hl.scala{numChars}, @hl.scala{numWords}, @hl.scala{avgWordLength}) that are computed based on @hl.scala{txt}.
@@ -102,13 +102,12 @@
       That was a pretty simple example to get you started with a simple Scala.Rx application. Let's look at a more meaty example to see how we can use Scala.Rx to help structure our interactive web application:
 
 
-    @div(cls:="pure-g")
-      @div(cls:="pure-u-1 pure-u-md-13-24")
+    @split
+      @more
         @hl.ref("examples/demos/src/main/scala/advanced/BasicRx.scala", "val fruits =")
 
-      @div(cls:="pure-u-1 pure-u-md-11-24")
-        @div(id:="div20", display:="block")
-        @script("BasicRx().main2(document.getElementById('div20'))")
+      @less
+        @example(div, "BasicRx().main2")
 
     @p
       This is a basic re-implementation of the autocomplete widget we created in the chapter @sect.ref{Interactive Web Pages}, except done using Scala.Rx. Note that unlike the original implementation, we don't need to manage the clearing of the output area via @hl.scala{innerHTML = ""} and the re-rendering via @hl.scala{appendChild(...)}. All this is handled by the same @hl.scala{rxFrag} code we wrote earlier. 
@@ -132,7 +131,7 @@
     On Scala.js, things are different: multi-threaded concurrency is a non-starter, since Javascript engines are all single-threaded. As a result, there are virtually no blocking APIs in Javascript: all operations need to be asynchronous if you don't want them to freeze the user interface of the browser while the operation is happening. Scala.js uses standard Javascript APIs and is no different.
 
   @p
-    However, Scala.js has much more powerful tools to work with than your typical Javascript libraries. The Scala standard library comes wiith a rich API for Futures and Promises, which are thankfully 100% asynchronous. Though this design was chosen for performance on the JVM, it perfectly fits our 100% asynchronous Javascript APIs. We have tools like Scala-Async, which works perfectly with Scala.js, and lets you create asynchronous computations in a much less confusing manner.
+    However, Scala.js has much more powerful tools to work with than your typical Javascript libraries. The Scala standard library comes with a rich API for @sect.ref{Futures & Promises}, which are thankfully 100% asynchronous. Though this design was chosen for performance on the JVM, it perfectly fits our 100% asynchronous Javascript APIs. We have tools like @sect.ref{Scala-Async}, which works perfectly with Scala.js, and lets you create asynchronous computations in a much less confusing manner.
 
   @sect{Futures & Promises}
     @p
@@ -178,15 +177,13 @@
     @p
       Overall, these helper functions do nothing special, btu we're defining them first to avoid having to copy-&-paste code throughout the subsequent examples. Now that we've defined all the relevant scaffolding, let's walk through a few ways that we can implement the all-important @hl.scala{handle} method.
 
+    @def scrollDiv = div(
+      height:="200px",
+      overflow:="scroll"
+    )
 
     @sect{Direct Use of XMLHttpRequest}
-      @div(
-        id:="div123",
-        display:="block",
-        height:="200px",
-        overflow:="scroll"
-      )
-      @script("Futures().main0(document.getElementById('div123'))")
+      @example(scrollDiv, "Futures().main0")
       @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def handle0", "main")
 
       @p
@@ -198,13 +195,7 @@
         This solution is basically equivalent to the initial code given in the @sect.ref{Raw Javascript} section of @sect.ref{Interactive Web Pages}, with the additional code necessary for aggregation. As described in @sect.ref{dom.extensions}, we can make use of the @hl.scala{Ajax} object to make it slightly tidier.
 
     @sect{Using dom.extensions.Ajax}
-      @div(
-        id:="div124",
-        display:="block",
-        height:="200px",
-        overflow:="scroll"
-      )
-      @script("Futures().main1(document.getElementById('div124'))")
+      @example(scrollDiv, "Futures().main1")
       @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def handle1", "main")
 
       @p
@@ -213,13 +204,7 @@
         However, we still have the messiness inherent in the result aggregation: we don't actually want to perform our action (writing to the @hl.scala{output} div) when one @hl.scala{Future} is complete, but only when @i{all} the @hl.scala{Future}s are complete. Thus we still need to do some amount of manual book-keeping in the @hl.scala{results} buffer.
 
     @sect{Future Combinators}
-      @div(
-        id:="div125",
-        display:="block",
-        height:="200px",
-        overflow:="scroll"
-      )
-      @script("Futures().main2(document.getElementById('div125'))")
+      @example(scrollDiv, "Futures().main2")
       @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def handle2", "main")
 
       @p
@@ -261,19 +246,18 @@
       @p
         Let's look at a traditional implementation, using Scala.js but no special features. We'll just use the Javascript @hl.scala{canvas.onmouveXXX} operations directly. 
 
-      @div(cls:="pure-g")
-        @div(cls:="pure-u-1 pure-u-md-13-24")
+      @split
+        @more
           @hl.ref("examples/demos/src/main/scala/advanced/Async.scala", "// traditional")
 
-        @div(cls:="pure-u-1 pure-u-md-11-24")
-          @canvas(id:="canvas211", display:="block")
-          @script("Async().main0(document.getElementById('canvas211'))")
+        @less
+          @example(canvas, "Async().main0")
       @p
-        This is a working implementation, and you can play with it on the right. We basically set the three listeners: 
+        This is a working implementation, and you can play with it on the right. We basically set the three listeners:
 
       @ul
         @li 
-          @hl.scala{canvas.onmousemove}
+          @hl.scala{canvas.onmousemove} 
         @li 
           @hl.scala{canvas.onmousedown}
         @li   
@@ -295,14 +279,12 @@
       @p
         Now we've seen what a "traditional" approach looks like, let's look at how we would do this using Scala-Async. 
 
-      @div(cls:="pure-g")
-        @div(cls:="pure-u-1 pure-u-md-13-24")
+      @split
+        @more
           @hl.ref("examples/demos/src/main/scala/advanced/Async.scala", "// async")
 
-        @div(cls:="pure-u-1 pure-u-md-11-24")
-          @canvas(id:="canvas222", display:="block")
-          @script("Async().main(document.getElementById('canvas222'))")
-    
+        @less
+          @example(canvas, "Async().main")
 
       @p
         We have an @hl.scala{async} block, which contains a while loop. Each round around the loop, we wait for the @hl.scala{mousedown} channel to start the path, waiting for either @hl.scala{mousedown} or @hl.scala{mousedown} (which continues the path or ends it respectively), fill the shape, and then wait for another @hl.scala{mousedown} before clearing the canvas and going again.

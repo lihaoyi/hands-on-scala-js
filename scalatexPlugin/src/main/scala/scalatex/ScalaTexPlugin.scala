@@ -48,7 +48,6 @@ class ScalaTexPlugin(val global: Global) extends Plugin {
 
           val shim = s"""
             $pkgName
-            import BookData._
             import scalatags.Text.all._
             object $objectName{
               def apply() = scalatex.twf("${file.getPath}")

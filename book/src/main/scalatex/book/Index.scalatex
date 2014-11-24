@@ -1,12 +1,11 @@
-
+@import BookData._
 @sect("Hands-on Scala.js", "Writing client-side web applications in Scala")
-  @div(cls:="pure-g")
-    @div(cls:="pure-u-1 pure-u-md-13-24")
+  @split
+    @more
       @hl.ref("examples/demos/src/main/scala/Splash.scala", "var x")
 
-    @div(cls:="pure-u-1 pure-u-md-11-24")
-      @canvas(id:="canvas1", display:="block")
-      @script("Splash().main(document.getElementById('canvas1'))")
+    @less
+      @BookData.example(canvas, "Splash().main")
 
   @p
     @lnk("Scala.js", "http://www.scala-js.org/") is a compiler that compiles Scala source code to equivalent Javascript code. That lets you write Scala code that you can run in a web browser, or other environments (Chrome plugins, Node.js, etc.) where Javascript is supported.
@@ -15,7 +14,11 @@
     This book contains something for all levels of experience with Scala.js: absolute beginners can get started with the @sect.ref{Intro to Scala.js} and @sect.ref{Hands On} tutorial, people who have used it before can skip ahead to the later parts of the tutorial: @sect.ref{Making a Canvas App} or @sect.ref{Interactive Web Pages}. Intermediate users will find interest in the chapters on @sect.ref{Cross Publishing Libraries} with Scala.js or @sect.ref{Integrating Client-Server}, and even experienced users will find the @sect.ref{In Depth} documention useful.
 
   @p
+    Many of the code samples are taken from examples available on the book's @lnk("Github Page", "https://github.com/lihaoyi/scala-js-book"); for those code samples (e.g. the animation above), there is a link in the bottom-right corner of the snippet that you can click on to go to the original code. These come in handy if you find you need additional context around the snippet, and find yourself asking questions like "what imports do I need for this to work" or "I need the working example in its entirety to see what I'm doing wrong".
+
+  @p
     This book does not spend time on pontifying a philosophy or ideology behind Scala.js or Scala. It instead spends its words on hands-on tutorials and in-depth dives into parts of the Scala.js platform, to try and get you acquainted with Scala.js as soon as possible, so you can make your own decisions about its merits or qualities.
+
 
 @sect("Intro to Scala.js")
   @Intro()

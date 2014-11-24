@@ -1,4 +1,4 @@
-
+@import BookData._
 @p
   By this point, you've already cloned and got your hands dirty fiddling around with the toy @lnk("workbench-example-app", "https://github.com/lihaoyi/workbench-example-app"). You have your editor set up, SBT installed, and have published the example application in a way you can host online for other people to see. Maybe you've even made some changes to the application to see what happens. Hopefully you're curious, and want to learn more.
 
@@ -29,13 +29,12 @@
   @p
     Next, let's set some event handlers on the canvas:
 
-  @div(cls:="pure-g")
-    @div(cls:="pure-u-1 pure-u-md-13-24")
+  @split
+    @more
       @hl.ref("examples/demos/src/main/scala/canvasapp/ScratchPad.scala", "/*code*/")
 
-    @div(cls:="pure-u-1 pure-u-md-11-24")
-      @canvas(id:="canvas2", display:="block")
-      @script("ScratchPad().main(document.getElementById('canvas2'))")
+    @less
+      @BookData.example(canvas, "ScratchPad().main")
 
   @p
     This code sets up the @lnk.dom.mousedown and @lnk.dom.mouseup events to keep track of whether or not the mouse has currently been clicked. It then draws black squares any time you move the mouse while the button is down. This lets you basically click-and-drag to draw pictures on the canvas. Try it out!
@@ -64,13 +63,12 @@
   @p
     Once that's done, it's only a few lines of code to set up a nice, live clock:
 
-  @div(cls:="pure-g")
-    @div(cls:="pure-u-1 pure-u-md-13-24")
+  @split
+    @more
       @hl.ref("examples/demos/src/main/scala/canvasapp/Clock.scala", "/*code*/")
 
-    @div(cls:="pure-u-1 pure-u-md-11-24")
-      @canvas(id:="canvas3", display:="block")
-      @script("Clock().main(document.getElementById('canvas3'))")
+    @less
+      @BookData.example(canvas, "Clock().main")
 
   @p
     As you can see, we're using more @lnk("Canvas APIs", "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D"), in this case dealing with rendering text on the canvas. Another thing we're using is the Javascript @lnk("Date", "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date") class, in Scala.js under the full name @hl.scala{scala.scalajs.js.Date}, here imported as @hl.scala{js.Date}.
@@ -152,8 +150,7 @@
       At almost 100 lines of code, this is quite a meaty example! Nonetheless, when all is said and done, you will find that the example actually works! Try it out!
 
     @div
-      @canvas(id:="canvas4", display:="block")
-    @script("FlappyLine().main(document.getElementById('canvas4'))")
+      @BookData.example(canvas, "FlappyLine().main")
 
 @sect{Canvas Recap}
   @p

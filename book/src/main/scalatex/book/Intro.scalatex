@@ -1,8 +1,9 @@
+@import BookData._
 @p
   Scala.js compiles Scala code to equivalent, executable Javascript. Here's the compilation of a trivial hello-world example:
 
-@div(cls:="pure-g")
-  @div(cls:="pure-u-1 pure-u-md-1-2")
+@split
+  @half
     @hl.scala
       object Example extends js.JSApp{
         def main() = {
@@ -12,7 +13,7 @@
         }
       }
 
-  @div(cls:="pure-u-1 pure-u-md-1-2")
+  @half
     @hl.javascript
       ScalaJS.c.LExample$.prototype.main__V = (function() {
         var x = 0;

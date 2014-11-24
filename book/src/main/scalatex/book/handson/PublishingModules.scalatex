@@ -1,3 +1,4 @@
+@import BookData._
 @p
   We've spent several chapters exploring the experience of making web apps using Scala.js, but any large app (web or not!) likely relies on a host of libraries in order to implement large chunks of its functionality. Ideally these libraries would be re-usable, and can be shared among different projects, teams or even companies.
 
@@ -54,11 +55,11 @@
     @p
       However, when it comes to actually formatting the date, we have a problem: Javascript and Java provide different utilities for formatting dates! They both let you format them, but they provide different APIs. Thus, to do the formatting of each individual date, we call out to the @hl.scala{Platform.format} function, which is implemented twice: once in @code{js/} and once in @code{jvm/}:
 
-    @div(cls:="pure-g")
-      @div(cls:="pure-u-1 pure-u-md-1-2")
+    @split
+      @half
         @hl.ref("examples/crossBuilds/simple/js/src/main/scala/simple/Platform.scala")
 
-      @div(cls:="pure-u-1 pure-u-md-1-2")
+      @half
         @hl.ref("examples/crossBuilds/simple/jvm/src/main/scala/simple/Platform.scala")
 
     @p

@@ -2,7 +2,7 @@
     Scala.js is a relatively large project, and is the result of both an enormous amount of hard work as well as a number of decisions that craft what it's like to program in Scala.js today. Many of these decisions result in marked differences from the behavior of the same code running on the JVM. This chapter explores the reasoning and rationale behind these decisions.
 
 
-@sect("Why No Reflection?")
+@sect{Why No Reflection?}
   @p
     Scala.js prohibits reflection as it makes dead-code elimination difficult, and the compiler relies heavily on dead-code elimination to generate reasonably-sized executables. The chapter on @sect.ref("The Compilation Pipeline") goes into more detail of why, but a rough estimate of the effect of various optimizations on a small application is:
 
