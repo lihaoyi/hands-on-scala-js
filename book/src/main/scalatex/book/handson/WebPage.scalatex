@@ -159,7 +159,7 @@
       @li
         @hl.scala("=>") v.s. @hl.javascript{function} to define the callback.
       @li
-        Scalatags' @hl.scala{pre} v.s. @hl.javascript{document.createElement}
+        Scalatags' @hl.scala{pre} v.s. @hl.javascript{document.createElement("pre")}
 
     @p
       Overall, they're pretty close, which is a common theme in Scala.js: using Javascript APIs in Scala.js is often as seamless and easy as using them in Javascript itself, and it often looks almost identical.

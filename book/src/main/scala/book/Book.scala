@@ -8,7 +8,7 @@ import scalatags.Text.all._
  * Created by haoyi on 10/26/14.
  */
 object Book {
-  val autoResources = Seq(
+  val autoResources = Set(
     "META-INF/resources/webjars/highlightjs/8.2-1/highlight.min.js",
     "META-INF/resources/webjars/highlightjs/8.2-1/styles/idea.min.css",
     "META-INF/resources/webjars/highlightjs/8.2-1/languages/scala.min.js",
@@ -18,38 +18,32 @@ object Book {
     "META-INF/resources/webjars/highlightjs/8.2-1/languages/xml.min.js",
     "META-INF/resources/webjars/pure/0.5.0/pure-min.css",
     "META-INF/resources/webjars/pure/0.5.0/grids-responsive-min.css",
-    "META-INF/resources/webjars/font-awesome/4.2.0/css/font-awesome.min.css",
     "META-INF/resources/webjars/font-awesome/4.2.0/fonts/FontAwesome.otf",
     "META-INF/resources/webjars/font-awesome/4.2.0/fonts/fontawesome-webfont.eot",
     "META-INF/resources/webjars/font-awesome/4.2.0/fonts/fontawesome-webfont.svg",
     "META-INF/resources/webjars/font-awesome/4.2.0/fonts/fontawesome-webfont.ttf",
     "META-INF/resources/webjars/font-awesome/4.2.0/fonts/fontawesome-webfont.woff",
-    "META-INF/resources/webjars/react/0.11.1/react.min.js",
     "css/side-menu.css",
-    "example-fastopt.js",
+    "example-opt.js",
     "webpage/weather.js",
     "favicon.svg",
     "favicon.png"
   )
 
-  val manualResources = Seq(
+  val fontAwesomeCss =
+    "META-INF/resources/webjars/font-awesome/4.2.0/css/font-awesome.min.css"
+
+  val manualResources = Set(
     "images/javascript-the-good-parts-the-definitive-guide.jpg",
     "images/Hello World.png",
     "images/Hello World White.png",
     "images/Hello World Console.png",
     "images/IntelliJ Hello.png",
     "images/Dropdown.png",
-    "images/Scalatags Downloads.png"
+    "images/Scalatags Downloads.png",
+    fontAwesomeCss
   )
 
-  val includes = for(res <- autoResources) yield {
-    if (res.endsWith(".js"))
-      script(src:=res)
-    else if (res.endsWith(".css"))
-      link(rel:="stylesheet", href:=res)
-    else
-      raw("")
-  }
 
   val txt = Index()
   val data = upickle.write(sect.structure)
@@ -61,8 +55,10 @@ object Book {
         meta(charset:="utf-8"),
         meta(name:="viewport", content:="width=device-width, initial-scale=1.0"),
         link(rel:="shortcut icon", `type`:="image/png", href:="favicon.png"),
+        link(rel:="stylesheet", href:=fontAwesomeCss),
+        link(rel:="stylesheet", href:="styles.css"),
         tags2.title("Hands-on Scala.js"),
-        includes
+        script(src:="scripts.js")
       ),
       body(
         onload:=s"Controller().main($data)",

@@ -26,7 +26,7 @@
     @li
       @b{Continuous}: Handling of first-class signals, like in @link("Elm", "http://elm-lang.org/learn/What-is-FRP.elm")
 
-  @sect{Why FPR}
+  @sect{Why FRP}
     @p
       The value proposition of FRP is that in a "traditional" program, when an event occurs, events and changes propagate throughout the program in an ad-hoc manner. An event-listener may trigger additional events, call some callbacks, or set some mutable variables that subsequent code will read and react to.
 

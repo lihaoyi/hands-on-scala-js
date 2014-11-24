@@ -77,7 +77,7 @@ class ScrollSpy(structure: Tree[String],
     }
     def walkTree(tree: Tree[MenuNode]): Boolean = {
       val Tree(MenuNode(menuItem, itemId, start, end), children) = tree
-      val before = headers(start) < threshold
+      val before = headers(start) <= threshold
       val after = (end >= headers.length) || headers(end) > threshold
 
       val win = before && after
@@ -96,7 +96,8 @@ class ScrollSpy(structure: Tree[String],
           // This means it's the leaf element, because it won but there
           // aren't any children which won, so it must be the actual leaf
           tree.children.foreach(_.value.frag.classList.remove("selected"))
-          dom.location.hash = itemId
+          if (dom.location.hash != itemId)
+            dom.location.hash = itemId
           scroll(menuItem.children(0))
 
         }

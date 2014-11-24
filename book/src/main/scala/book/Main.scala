@@ -22,8 +22,20 @@ object Main {
 
     write(Book.site, "output/index.html")
 
-    for(res <- Book.autoResources ++ Book.manualResources) {
+    val jsFiles = Book.autoResources.filter(_.endsWith(".js")).toSet
+    val cssFiles = Book.autoResources.filter(_.endsWith(".css")).toSet
+    val miscFiles = Book.autoResources -- cssFiles -- jsFiles
+
+    for(res <- Book.manualResources ++ miscFiles) {
       copy(getClass.getResourceAsStream("/" + res), "output/" + res)
+    }
+
+    for((resources, dest) <- Seq(jsFiles -> "scripts.js", cssFiles -> "styles.css")) {
+      val blobs = for(res <- resources.iterator) yield {
+        io.Source.fromInputStream(getClass.getResourceAsStream("/"+res)).mkString
+      }
+
+      write(blobs.mkString("\n"), "output/"+dest)
     }
 
     val allNames = {

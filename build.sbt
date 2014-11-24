@@ -44,8 +44,8 @@ lazy val book = Project(
     "com.lihaoyi" %%% "upickle" % "0.2.5"
   ),
   (resources in Compile) += {
-    (fastOptJS in (demos, Compile)).value
-    (artifactPath in (demos, Compile, fastOptJS)).value
+    (fullOptJS in (demos, Compile)).value
+    (artifactPath in (demos, Compile, fullOptJS)).value
   },
   (unmanagedResourceDirectories in Compile) ++=
     (unmanagedResourceDirectories in (demos, Compile)).value,
