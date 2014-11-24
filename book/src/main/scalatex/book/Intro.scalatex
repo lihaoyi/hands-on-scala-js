@@ -9,7 +9,8 @@
         def main() = {
           var x = 0
           while(x < 10) x += 3
-          println(x) // 12
+          println(x)
+          // 12
         }
       }
 
@@ -20,7 +21,8 @@
         while ((x < 10)) {
           x = ((x + 3) | 0)
         };
-        ScalaJS.m.s_Predef().println__O__V(x) // 12
+        ScalaJS.m.s_Predef().println__O__V(x)
+        // 12
       });
 
 @p
@@ -60,7 +62,7 @@
       In a large code-base, finding out what methods or properties a variable has is often a long chase through dozens of files to see how it ended up being passed to the current function. Refactorings, which are OK when you can just test the code see if it works, become dangerous when your code base is large enough that "just test all the code" would take hours. Language-warts which are slightly annoying in small programs become a minefield in large ones: it's only a matter of time before you hit one, often in code you did-not/cannot test, resulting in breakages in production.
 
     @p
-      Apart from the inherent danger of the language, Javascript has another major problem: the language has left so many things unspecified, yet at the same time provides the ability to emulate these things in a variety of ways. This means that rather than having a single way of e.g. defining a class and instantiating an object, there is a decade-long debate between a dozen different and equally-bad, hand-crafted alternatives. Large code-bases use third-party libraries, and most are guaranteed (purely due to how stastistics work) to do these basic things differently from your own code, making understanding these disparate code-bases (e.g. when something goes wrong) very difficult.
+      Apart from the inherent danger of the language, Javascript has another major problem: the language has left many things unspecified, yet at the same time provides the ability to emulate these things in a variety of ways. This means that rather than having a single way of e.g. defining a class and instantiating an object, there is a decade-long debate between a dozen different and equally-bad, hand-crafted alternatives. Large code-bases use third-party libraries, and most are guaranteed (purely due to how stastistics work) to do these basic things differently from your own code, making understanding these disparate code-bases (e.g. when something goes wrong) very difficult.
 
     @p
       To work in Javascript, you need the discipline to limit yourself to the sane subset of the language, avoiding all the pitfalls along the way:
@@ -118,7 +120,7 @@
 
 
     @p
-      Not only do you have an expressive language with static types, you also have great tooling with IDEs like IntelliJ and Eclipse, a rich library of standard collections, and many other modern conveniences that we take for granted but are curiously missing when working in the wild west of web development: the browser! You get all of the upside of developing for the web platform,
+      Not only do you have an expressive language with static types, you also have great tooling with IDEs like IntelliJ and Eclipse, a rich library of standard collections, and many other modern conveniences that we take for granted but are curiously missing when working in the wild west of web development: the browser! You get all of the upside of developing for the web platform.
 
     @p
       While not useful for small applications, where most of the logic is gluing together external APIs, this comes in very useful in large applications where a lot of the complexity and room-for-error is entirely internal. With larger apps, you can no longer blame browser vendors for confusing APIs that make your code terrible: these confusing APIs only lurk in the peripherals around a larger, complex application. One thing you learn working in large-ish web client-side code-bases is that the bulk of the confusion and complexity is no-one's fault but your own, as a team.

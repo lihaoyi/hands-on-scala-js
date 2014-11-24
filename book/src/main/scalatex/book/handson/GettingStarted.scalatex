@@ -111,10 +111,10 @@
   @hl.ref("output/workbench-example-app/src/main/scala/example/ScalaJSExample.scala", "@JSExport", "val ctx")
 
   @p
-    This @hl.scala("@JSExport") annotation is used to tell Scala.js that you want this method to be visible and callable from Javascript. By default, Scala.js does dead code elimination and removes any methods or classes which are not used. This is done to keep the compiled executables a reasonable size, since most projects use only a small fraction of e.g. the standard library. @hl.scala("@JSExport") is used to tell Scala.js that the @hl.scala{ScalaJSExample} object and its @hl.scala{def main} method are entry points to the program. Even if they aren't called anywhere internally, they are called externally by Javascript that the Scala.js compiler is not aware of, and should not be removed.
+    This @hl.scala("@JSExport") annotation is used to tell Scala.js that you want this method to be visible and callable from Javascript. By default, Scala.js does @sect.ref("Fast Optimization", "dead code elimination") and removes any methods or classes which are not used. This is done to keep the compiled executables a reasonable size, since most projects use only a small fraction of e.g. the standard library. @hl.scala("@JSExport") is used to tell Scala.js that the @hl.scala{ScalaJSExample} object and its @hl.scala{def main} method are entry points to the program. Even if they aren't called anywhere internally, they are called externally by Javascript that the Scala.js compiler is not aware of, and should not be removed. In this case, we are going to call this method from Javascript to start the Scala.js program.
 
   @p
-    Apart from this annotation, @hl.scala{ScalaJSExample} is just a normal Scala @hl.scala{object}, and behaves like one in every way. Note that the main-method in this case takes a @lnk.dom.HTMLCanvasElement: your exported methods can have any signature, with arbitrary arity or types for parameters or the return value. This is in contrast to the main method on the JVM which always takes an @hl.scala{Array[String]} and returns @hl.scala{Unit}. In fact, there's nothing special about this method at all! It's like any other exported method, we just happen to attribute it the "main" entry point.
+    Apart from this annotation, @hl.scala{ScalaJSExample} is just a normal Scala @hl.scala{object}, and behaves like one in every way. Note that the main-method in this case takes a @lnk.dom.HTMLCanvasElement: your exported methods can have any signature, with arbitrary arity or types for parameters or the return value. This is in contrast to the main method on the JVM which always takes an @hl.scala{Array[String]} and returns @hl.scala{Unit}. In fact, there's nothing special about this method at all! It's like any other exported method, we just happen to attribute it the "main" entry point. It is entirely possible to define multiple exported classes and methods, and build a "library" using Scala.js of methods that are intended for external Javascript to use.
 
   @hl.ref("output/workbench-example-app/src/main/scala/example/ScalaJSExample.scala", "val ctx", "var count")
 
@@ -181,7 +181,7 @@
     @hl.ref("output/workbench-example-app/src/main/resources/index-dev.html")
 
     @p
-      This is the HTML page which our toy app lives in, and the same page that we have so far been using to view the app in the browser. To anyone who has used HTML, most of it is probably familiar. Things of note are the Script tags: @hl.scala{"../example-fastopt.js"} Is the executable blob spat out by the compiler, which we need to include in the HTML page for anything to happen. This is where the results of your compiled Scala code appear. @hl.scala{"workbench.js"} is the client for the Workbench plugin that connects to SBT, reloads the browser and forwards logspam to the browser console.
+      This is the HTML page which our toy app lives in, and the same page that we have so far been using to view the app in the browser. To anyone who has used HTML, most of it is probably familiar. Things of note are the @hl.html{<script>} tags: @hl.scala{"../example-fastopt.js"} Is the executable blob spat out by the compiler, which we need to include in the HTML page for anything to happen. This is where the results of your compiled Scala code appear. @hl.scala{"workbench.js"} is the client for the Workbench plugin that connects to SBT, reloads the browser and forwards logspam to the browser console.
 
     @p
       The @hl.scala{ScalaJSExample().main()} call is what kicks off the Scala.js application and starts its execution. Scala.js follows Scala semantics in that @hl.scala{object}s are evaluated lazily, with no top-level code allowed. This is in contrast to Javascript, where you can include top-level statements and object-literals in your code which execute immediately. In Scala.js, nothing happens when @code{../example-fastopt.js} is imported! We have to call the main-method first. In this case, we're passing the canvas object (attained using @hl.javascript{getElementById}) to it so it knows where to do its thing.
@@ -241,11 +241,11 @@
     var g = ((((255 - ScalaJS.m.Lexample_ScalaJSExample().p$1.x$1) | 0) * height) | 0);
 
   @p
-    As you can see, this code is still very verbose, with lots of unnecessarily long identifiers such as @hl.javascript{Lexample_ScalaJSExample} in it. This is because we've only performed the @i{fast optimization} on this file, to try and keep the time taken to edit -> compile while developing reasonably short.
+    As you can see, this code is still very verbose, with lots of unnecessarily long identifiers such as @hl.javascript{Lexample_ScalaJSExample} in it. This is because we've only performed the @sect.ref{Fast Optimization} on this file, to try and keep the time taken to edit -> compile while developing reasonably short.
 
   @sect{Optimization}
     @p
-      If we're planning on publishing the app for real, we can run the @i{full optimization}. This takes several seconds longer than the @i{fast optimization}, but results in a significantly smaller and leaner output file @code{example-opt.js}.
+      If we're planning on publishing the app for real, we can run the @sect.ref{Full Optimization}. This takes several seconds longer than the @sect.ref{Fast Optimization}, but results in a significantly smaller and leaner output file @code{example-opt.js}.
 
     @hl.bash
       haoyi-mbp:temp haoyi$ du -h target/scala-2.11/example-opt.js

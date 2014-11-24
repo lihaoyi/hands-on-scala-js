@@ -187,14 +187,53 @@
     @p
       This is a common pattern in situations where there's a tradeoff between debuggability and speed. In Scala.js' case, it allows us to get good debuggability in development, as well as good performance in production. There's some loss in debuggability in development, sacrificed in exchange for greater performance.
 
+@sect{Small Executables}
+  Why do we care so much about how big our executables are in Scala.js? Why don't we care about how big they are on Scala-JVM? This is mostly due to three reasons:
 
-@sect("Why Jars instead of RequireJS/CommonJS")
-  @p
-    In JVM-land, the standard method for distributing these libraries is as @lnk("Maven Artifacts", "http://stackoverflow.com/questions/2487485/what-is-maven-artifact"). These are typically published in a public location such as @lnk("Maven Central", "http://search.maven.org/"), where others can find and download them for use. Typically downloads are done automatically by the build-tool: in Scala-JVM typically this is SBT.
-  @p
-    In Javascript-land, there are multiple ways of acquiring dependencies: @lnk("CommonJS", "http://en.wikipedia.org/wiki/CommonJS") and @lnk("RequireJS/AMD", "http://requirejs.org/") are two competing standards with a host of implementations. Historically, a third approach has been most common: the developer would simply download the modules himself, check it into source-control and manually add a @hl.html{<script>} tag to the HTML page that will make the functionality available through some global variable.
-  @p
-    In Scala.js, we side with the JVM standard of distributing libraries as maven jars. This lets us take advantage of all the existing tooling around Scala to handle these jars (SBT, Ivy, Maven Central, etc.) which is far more mature and cohesive than the story in Javascript-land. For example, the Scalatags library we used in the earlier is @lnk("published on maven central", "http://search.maven.org/#search%7Cga%7C1%7Cscalatags"), and adding one line to SBT is enough to pull it down and include it in our project.
+  @ul
+    @li
+      When cross-compiling Scala to Javascript, the end-result tends to be much more verbose than when cross-compiled to Java Bytecode.
+    @li
+      Scala.js typically is run in web browsers, which typically do not work well with large executables compared to e.g. the JVM
+    @li
+      Scala.js often is delivered to many users over the network, and long download times force users to wait, degrading the user experience
 
   @p
-    One interesting wrinkle in Scala.js's case is that since Scala can compile to both Scala.js and Scala-JVM, it is entirely possible to publish a library that can run on both client and server! This chapter will explore the process of building, testing, and publishing such a library.
+    These factors combined means that Scala.js has to put in extra effort to optimize the code to reduce it's size at compile-time.
+
+  @sect{Raw Verbosity}
+    @p
+      Scala.js compiles to Javascript source code, while Scala-JVM compiles to Java bytecode. Java bytecode is a binary format and thus somewhat optimized for size, while Javascript is textual and is designed to be easy to read and write by hand.
+    @p
+      What does these mean, concretely? This means that a symbol marking something, e.g. the start of a function, is often a single byte in Java bytecode. Even more, it may not have any delimiter at all, instead the meaning of the binary data being inferred from its position in the file! On the other hand, in Javascript, declaring a function takes a long-and-verbose @hl.javascript{function} keyword, which together with peripheral punctuation (@code{.}, @code{ = }, etc.) often adds up to tens of bytes to express a single idea.
+    @p
+      What does this mean concretely? This means that expressing the same meaning in Javascript usually takes more "raw code" than expressing the same meaning in Java bytecode. Even though Java bytecode is relatively verbose for a binary format, it still is significantly more concise the Javascript, and it shows: the Scala standard library weighs in at a cool 6mb on Scala-JVM, while it weighs 20mb on Scala.js.
+    @p
+      All things being equal, this would mean that Scala.js would have to work harder to keep down code-size than Scala-JVM would have to. Alas, not all other things are equal.
+
+  @sect{Browsers Performance}
+    @p
+      Without any optimization, a naive compilation to Scala.js results in an executable (Including the standard library) weighing around 20mb. On the surface, this isn't a problem: runtimes like the JVM have no issue with loading 20mb of Java bytecode to execute; many large desktop applications weigh in the 100s of megabytes while still loading and executing fine.
+    @p
+      However, the web browser isn't a native execution environment; loading 20mb of Javascript is sufficient to heavily tax even the most modern web browsers such as Chrome and Firefox. Even though most of the code comprises class and method definitions that never have their contents executed, loading such a heavy load into e.g. Chrome makes it freeze for 5-10 seconds initially. Even after that, even after the code has all been parsed and isn't been actively executed, having all this Javascript makes the browser sluggish for up to a minute before the JIT compiler can speed things up.
+    @p
+      Overall, this means that you probably do not want to work with un-optimized Scala.js executables. Even for development, the slow load times and initial sluggishness make testing the results of your hard-work in the browser a frustrating experience. But that's not all...
+
+  @sect{Deployment Size}
+    @p
+      Scala.js applications often run in the browser. Not just any browser, but the browsers of your users, who had come to your website or web-app to try and accomplish some task. This is in stark contrast the Scala-JVM applications, which most often run on servers: servers that you own and control, and can deploy code to at your leisure.
+
+    @p
+      When running code on your own servers in some data center, you often do not care how big the compiled code is: the Scala standard library is several (6-7) megabytes, which added to your own code and any third-party libraries you're using, may add up to tens of megabytes, maybe a hundred or two if it's a relatively large application. Even that pales in comparison to the size of the JVM, which weighs in the 100s of megabytes.
+    @p
+      Even so, you are deploying your code on an machine (virtual or real) which has several gigabytes of memory and 100s of gigabytes of disk space. Even if the size of the code makes deployment slower, you only deploy fresh code a handful of times a day at most, and the size of your executable typically does not worry you.
+    @p
+      Scala.js is different: it runs in the browsers of your users. Before it can run in their browser, it first has to be downloaded, probably over a connection that is much slower than the one used to deploy your code to your servers or data-center. It probably is downloaded thousands of times per day, and every user which downloads it must pay the cost of waiting for it to finish downloading before they can take any actions on your website.
+
+    @p
+      A typical website loads ~100kb-1mb of Javascript, and 1mb is on the heavy side. Most Javascript libraries weigh in on the order of 50-100kb. For Scala.js to be useful in the browser, it has to be able to compare favorably with these numbers.
+
+  @hr
+
+  @p
+    Thus, while on Scala-JVM you typically have executables that (including dependencies) end up weighing 10s to 100s of megabytes, Scala.js has a much tighter budget. A hello world Scala.js application weighs in at around 100kb, and as you write more code and use more libraries (and parts of the standard library) this number rises to the 100s of kb. This isn't tiny, especially compared to the many small Javascript libraries out there, but it definitely is much smaller than what you'd be used to on the JVM.

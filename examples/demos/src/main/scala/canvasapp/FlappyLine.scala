@@ -91,7 +91,7 @@ object FlappyLine extends{
       obstacles.clear()
       dead -= 1
       renderer.fillStyle = "darkred"
-      renderer.fillText("You Died", canvas.width / 2, canvas.height / 2)
+      renderer.fillText("Game Over", canvas.width / 2, canvas.height / 2)
     }
 
     def run() = {

@@ -40,7 +40,7 @@
   @p
     We have two projects: @code{client} and @code{server}, one of which is a Scala.js project (indicated by the presence of @hl.scala{scalaJSSettings}). Both projects share a number of settings: the presence of the @code{shared/} folder, which shared code can live in (similar to what we saw in @sect.ref{Cross Publishing Libraries}) and the settings to add @lnk.github.Scalatags and @lnk.github.uPickle to the build. Note that those two dependencies use the triple @code{%%%} instead of the double @code{%%} to declare: this means that for each dependency, we will pull in the Scala-JVM or Scala.js version depending on whether it's being used in a Scala.js project.
   @p
-    The @code{client} subproject is uneventful, with a dependency on the by-now-familiar @code{scalajs-dom} library. The @code{server} project, on the other hand, is interesting: it contains the dependencies required for us to set up out Spray server, and one additioanl thing: we add the output of @code{fastOptJS} from the client to the @code{resources} on the server. This will allow the @code{server} to serve the compiled-javascript from our @code{client} project from its resources.
+    The @code{client} subproject is uneventful, with a dependency on the by-now-familiar @code{scalajs-dom} library. The @code{server} project, on the other hand, is interesting: it contains the dependencies required for us to set up out Spray server, and one additional thing: we add the output of @code{fastOptJS} from the client to the @code{resources} on the server. This will allow the @code{server} to serve the compiled-javascript from our @code{client} project from its resources.
 
   @p
     Next, let's kick off the Spray server in our Scala-JVM main method:
@@ -110,15 +110,15 @@
   @hl.ref("examples/crossBuilds/clientserver/client/src/main/scala/simple/Client.scala", "ajax/list", "")
 
   @p
-    Three times on the server and once on the client! What's worse, two of the appearances of @i{list} are in string literals, which are not checked by the compiler to match up with themselves or the name of the method @hl.scala{list}. Apart from this, there is one other piece of duplication that is unchecked: the type being returned from @hl.scala{list} (@hl.scala{Seq[FileData]} is being repeated on the client in @hl.scala{upickle.read[Seq[FileData]]} in order to de-serialize the serialized data. This leaves three wide-open opportunities for error:
+    Three times on the server and once on the client! What's worse, two of the appearances of @hl.scala{"list"} are in string literals, which are not checked by the compiler to match up with themselves or the name of the method @hl.scala{list}. Apart from this, there is one other piece of duplication that is unchecked: the type being returned from @hl.scala{list} (@hl.scala{Seq[FileData]}) is being repeated on the client in @hl.scala{upickle.read[Seq[FileData]]} in order to de-serialize the serialized data. This leaves three opportunities for error wide-open:
 
   @ul
     @li
-      You could change the string literals "list" and forget to change the method-name @hl.scala{list}, thus confusing future maintainers of the code.
+      You could change the string literals @hl.scala{"list"} and forget to change the method-name @hl.scala{list}, thus confusing future maintainers of the code.
     @li
-      You could change one of literal "list"s but forget to change the other, thus causing an error at run-time (e.g. a 404 NOT FOUND response)
+      You could change one of literal @hl.scala{"list"}s but forget to change the other, thus causing an error at run-time (e.g. a 404 NOT FOUND response)
     @li
-      You could update the return type of @hl.scala{list} and forget to update the deserialization call on the client, resulting in a deserialization failure at runtime.
+      You could update the return type of the @hl.scala{list} method and forget to update the @hl.scala{upickle.read} deserialization call on the client, resulting in a deserialization failure at runtime.
 
   @p
 
@@ -130,11 +130,10 @@
   @p
     @lnk("Autowire", "https://github.com/lihaoyi/autowire") is a library that turns your request routing layer from a fragile, hand-crafted mess into a solid, type-checked, boilerplate-free experience. Autowire basically turns what was previously a stringly-typed, hand-crafted Ajax call and route:
 
-  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala", """path("ajax" / "list")""", "")
   @hl.ref("examples/crossBuilds/clientserver/client/src/main/scala/simple/Client.scala", "ajax/list", "")
 
   @p
-    Into a single, type-checked function call:
+    Into a safe, type-checked function call:
 
   @hl.ref("examples/crossBuilds/clientserver2/client/src/main/scala/simple/Client.scala", ".call()", "")
 

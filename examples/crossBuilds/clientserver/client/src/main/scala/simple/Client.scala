@@ -1,4 +1,3 @@
-//js/src/main/scala/simple/Platform.scala
 package simple
 
 import scalatags.JsDom.all._

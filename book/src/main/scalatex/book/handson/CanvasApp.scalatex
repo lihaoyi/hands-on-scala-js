@@ -45,7 +45,7 @@
   @img(src:="images/Dropdown.png", maxWidth:="100%")
 
   @p
-    Apart from mouse events, keyboard events, scroll events, input events, etc. are all usable from Scala.js as you'd expect
+    Apart from mouse events, keyboard events, scroll events, input events, etc. are all usable from Scala.js as you'd expect. If you have problems getting this to work, feel free to click on the link @i(cls:="fa fa-link ") icon below the code snippet to see what the full code for the example looks like
 
 @sect{Making a Clock using setInterval}
 
@@ -71,7 +71,7 @@
       @BookData.example(canvas, "Clock().main")
 
   @p
-    As you can see, we're using more @lnk("Canvas APIs", "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D"), in this case dealing with rendering text on the canvas. Another thing we're using is the Javascript @lnk("Date", "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date") class, in Scala.js under the full name @hl.scala{scala.scalajs.js.Date}, here imported as @hl.scala{js.Date}.
+    As you can see, we're using more @lnk("Canvas APIs", "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D"), in this case dealing with rendering text on the canvas. Another thing we're using is the Javascript @lnk("Date", "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date") class, in Scala.js under the full name @hl.scala{scala.scalajs.js.Date}, here imported as @hl.scala{js.Date}. Again, click on the link @i(cls:="fa fa-link ") icon to view the full-code if you're having trouble here.
 
 @sect{Tying it together: Flappy Box}
 
@@ -103,7 +103,7 @@
       This section of the code is peripherally necessary, but not core to the implementation or logic of Flappy Box. We see the same @hl.scala{canvas}/@hl.scala{renderer} logic we've seen in all our examples, along with some logic to make the canvas a reasonable size, and some configuration of how we will render text to the canvas.
 
     @p
-      In general, code like this will usually end up being necessary in a Scala.js program: the Javascript APIs that the browser provides to do things often ends up being somewhat roundabout and verbose. It's somewhat annoying to have to do for a small program such as this one, but in a larger application, the cost is both spread out over thousands of lines of code and also typically hidden away in some helpers, so you don't have to mess with this stuff unless you really want to.
+      In general, code like this will usually end up being necessary in a Scala.js program: the Javascript APIs that the browser provides to do things often ends up being somewhat roundabout and verbose. It's somewhat annoying to have to do for a small program such as this one, but in a larger application, the cost is both spread out over thousands of lines of code and also typically hidden away in helper functions, so the verbosity and non-idiomatic-scala-ness doesn't bother you much.
 
   @sect{Defining our State}
     @hl.ref("examples/demos/src/main/scala/canvasapp/FlappyLine.scala", "/*variables*/", end="def runLive")

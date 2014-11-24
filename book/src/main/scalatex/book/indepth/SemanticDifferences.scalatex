@@ -68,10 +68,17 @@
     @p
       Calling toString on a Float or a Double that holds an integral value, will not append ".0" to that value:
 
-    @hl.scala
-      println(1.0)
-      // Scala:    1.0
-      // Scala.js: 1
+    @split
+      @half
+        @hl.scala
+          // Scala-JVM:
+          > println(1.0)
+          1.0
+      @half
+        @hl.scala
+          // Scala.js:
+          > println(1.0)
+          1
     @p
       This is due to how numeric values are represented at runtime in Scala.js: @hl.scala{Float}s and @hl.scala{Double}s are raw Javascript @hl.scala{Number}s, and their @hl.scala{toString} behavior follows from that.
 
@@ -86,11 +93,11 @@
 
   @sect{Unit}
     @p
-      scala.Unit is represented using JavaScript's undefined. Therefore, calling @hl.scala{toString()} on @hl.scala{Unit} will return @hl.scala{"undefined"} rather than @hl.scala{"()""}.
+      @hl.scala{scala.Unit} is represented using JavaScript's undefined. Therefore, calling @hl.scala{toString()} on @hl.scala{Unit} will return @hl.scala{"undefined"} rather than @hl.scala{"()"}. In practice, this shouldn't matter for most use cases.
 
   @sect{Reflection}
     @p
-      Java reflection and Scala reflection, are not supported. There is limited support for @lnk("java.lang.Class", "https://docs.oracle.com/javase/7/docs/api/java/lang/Class.html"), e.g., obj.getClass.getName will work for any Scala.js object (not for objects that come from JavaScript interop). Reflection makes it difficult to perform the optimizations that Scala.js heavily relies on. For a more detailed discussion on this topic, take a look at the section @sect.ref{Why No Reflection?}.
+      Java reflection and Scala reflection, are not supported. There is limited support for @lnk("java.lang.Class", "https://docs.oracle.com/javase/7/docs/api/java/lang/Class.html"), e.g., @hl.scala{obj.getClass.getName} will work for any Scala.js object but not for objects that come from JavaScript interop (i.e. anything which @hl.scala{extends js.Object}). Reflection makes it difficult to perform the optimizations that Scala.js heavily relies on. For a more detailed discussion on this topic, take a look at the section @sect.ref{Why No Reflection?}.
 
   @sect{Exceptions}
     @p
@@ -98,11 +105,11 @@
 
     @ul
       @li
-        @hl.scala{ArrayIndexOutOfBoundsException} is never thrown.
+        @hl.scala{ArrayIndexOutOfBoundsException} is never thrown. Instead, the value becomes @hl.javascript{undefined}, which will probably propagate through your program and blow up somewhat later.
       @li
         @hl.scala{NullPointerException} is reported as JavaScript @hl.scala{TypeError} instead.
       @li
-        @hl.scala{StackOverflowError} is unsupported since the underlying JavaScript exception type varies based on the browser.
+        @hl.scala{StackOverflowError} is unsupported since the underlying JavaScript exception type varies based on the browser. e.g. in Chrome the browser just hangs and kills the process/tab without any chance for the developer to catch the error.
 
   @sect{Regular expressions}
     @p
@@ -111,7 +118,7 @@
       This sometimes has an impact on functions in the Scala library that use regular expressions themselves. A list of known functions that are affected is given here:
     @ul
       @li
-        @hl.scala{StringLike.split(x: Array[Char])} (see issue #105)
+        @hl.scala{StringLike.split(x: Array[Char])}
 
   @sect{Symbols}
     @p
@@ -139,7 +146,7 @@
     @p
       Calls to either of these two methods which could not be rewritten, or calls to constructors of the protected Val class without an explicit name as parameter, will issue a warning.
     @p
-      Note that the name rewriting honors the nextName iterator. Therefore, the full rewrite is:
+      Note that the name rewriting honors the @hl.scala{nextName} iterator. Therefore, the full rewrite is:
     @hl.scala
       val <ident> = Value(
         if (nextName != null && nextName.hasNext)
@@ -152,15 +159,15 @@
 
 @sect{Library Differences}
   @val myTable = Seq(
-    ("Most of java.lang.*", "j.l.Thread, j.l.Runtime, ..."),
-    ("Almost all of scala.*", "s.c.parallel, s.tools.nsc"),
+    ("Most of java.lang.*", "java.lang.Thread, java.lang.Runtime, ..."),
+    ("Almost all of scala.*", "scala.collection.parallel, scala.tools.nsc"),
     ("Some of java.util.*", "org.omg.CORBA, sun.misc.*"),
-    ("Scala Macros: upickle, scala-async, scalaxy, etc", "Reflection: scala-pickling, scala-reflect"),
-    ("Pure-Scala ecosystem: shapeless, scalaz, scalatags, utest", "Java-dependent: Scalatest, Scalate"),
-    ("JS stuff: XmlHttpRequest, Websockets. Localstorage", " JVM stuff: Netty, akka, spray, file IO, JNI"),
+    ("Macros: uPickle, Scala-Async, Scalaxy, etc", "Reflection: Scala-Pickling, Scala-Reflect"),
+    ("Shapeless, Scalaz, Scalatags, uTest", "Scalatest, Scalate"),
+    ("XMLHttpRequest, Websockets. Localstorage", "Netty, Akka, Spray, File IO, JNI"),
     ("HTML DOM, Canvas, WebGL", "AWT, Swing, SWT, OpenGL"),
-    ("JavaScript libraries: chipmunk.js, hand.js, react.js, jquery", "Java ecosystem: guice, junit, apache-commons, log4j"),
-    ("IntelliJ, Eclipse, SBT, Chrome console, firebug", "Scala REPL, Yourkit, VisualVM, JProfiler")
+    ("Chipmunk.js, Hand.js, React.js, jQuery", "Guice, JUnit, Apache-Commons, log4j"),
+    ("IntelliJ, Eclipse, SBT, Chrome console, Firebug", "Scala REPL, Yourkit, VisualVM, JProfiler")
   )
 
   @p
@@ -189,7 +196,7 @@
     @p
       There isn't a full list of standard library library APIs which are available from Scala.js, but it should be enough to give you a rough idea of what is supported. The full list of classes that have been ported to Scala.js is available under @sect.ref{Available Java APIs}
 
-  @sect{Reflection v.s. Macros}
+  @sect{Macros v.s. Reflection}
     @tableHead
       @for(tuple <- myTable.slice(3, 4))
         @tr
@@ -199,7 +206,7 @@
       As described @sect.ref("Why No Reflection?", "here"), Reflection is not supported in Scala.js, due to the way it inhibits optimization. This doesn't just mean you can't use reflection yourself: many third-party libraries also use reflection, and you won't be able to use them either.
 
     @p
-      On the other hand, Scala.js does support Macros, and macros can in many ways substitute many of the use cases that people have traditionally used reflection for (see @sect.ref("Macros", "here"). For example, instead of using a reflection-based serialization library like @lnk.github.scalaPickling, you can use a macro-based library such as @lnk.github.uPickle.
+      On the other hand, Scala.js does support Macros, and macros can in many ways substitute many of the use cases that people have traditionally used reflection for (see @sect.ref("Macros", "here")). For example, instead of using a reflection-based serialization library like @lnk.github.scalaPickling, you can use a macro-based library such as @lnk.github.uPickle.
 
   @sect{Pure-Scala v.s. Java Libraries}
     @tableHead
@@ -225,7 +232,7 @@
       Naturally, none of these are an exact replacement, as the browser environment is fundamentally different from that of a desktop application running on the JVM. Nonetheless, there are many analogues, and if so desired you can write code to abstract away these differences and run on both Scala.js and Scala-JVM
 
 
-  @sect{Java tooling v.s. Scala/Browser tooling}
+  @sect{Scala/Browser tooling v.s. Java tooling}
     @tableHead
       @for(tuple <- myTable.slice(7, 8))
         @tr

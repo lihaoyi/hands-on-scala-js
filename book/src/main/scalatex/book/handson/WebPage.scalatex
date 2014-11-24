@@ -9,7 +9,7 @@
 @sect{Hello World: HTML}
 
   @p
-    The most basic way of building interactive web pages using Scala.js is to use the Javascript APIs to blat HTML strings directly into some container div, often @code{document.body}. This approach works, as the following code snippet demonstrates:
+    The most basic way of building interactive web pages using Scala.js is to use the Javascript APIs to blat HTML strings directly into some container @hl.html{<div>} or @hl.html{<body>}. This approach works, as the following code snippet demonstrates:
 
   @split
     @more
@@ -17,6 +17,9 @@
 
     @less
       @BookData.example(div, "HelloWorld0().main")
+
+  @p
+    Remember that we're now requiring a @hl.scala{dom.HTMLDivElement} instead of a @hl.scala{dom.HTMLCanvsElement} to be passed in when the Javascript calls @hl.javascript{HelloWorld0().main(...)}. If you're coming to this point from the previous chapter, you'll need to update the on-page Javascript's @hl.javascript{document.getElementById} to pick a @hl.html{<div>} rather than the @hl.html{<canvas>} we were using in the previous chapter.
 
   @p
     This approach works, as the above example shows, but has a couple of disadvantages:
@@ -34,7 +37,7 @@
   @p
     @lnk("Scalatags", "https://github.com/lihaoyi/scalatags") is a cross-platform Scala.js/Scala-JVM library that is designed to generate HTML. To use Scalatags, you need to add it as a dependency to your Scala.js SBT project, in the @code{build.sbt} file:
 
-  @hl.ref("examples/demos/build.sbt", "com.scalatags")
+  @hl.ref("examples/demos/build.sbt", "com.scalatags", "")
 
   @p
     With that, the above snippet of code re-written using Scalatags looks as follows:
@@ -58,7 +61,7 @@
         @hl.ref("examples/demos/src/main/scala/webpage/Inputs.scala", "val box")
 
       @less
-        @BookData.example(div, "Inputs().main")
+        @BookData.example(div(height:="150px"), "Inputs().main")
 
     @p
       In Scalatags, you build up fragments of type @hl.scala{Frag} using functions like @hl.scala{div}, @hl.scala{h1}, etc., and call @hl.scala{.render} on it to turn it into a real @lnk.dom.Element. Different fragments render to different things: e.g. @hl.scala{input.render} gives you a @lnk.dom.HTMLInputElement, @hl.scala{span.render} gives you a @lnk.dom.HTMLSpanElement. You can then access the properties of these elements: adding callbacks, checking their value, anything you want.
@@ -113,11 +116,11 @@
 
   @ul
     @li
-      It's safe! If you make a trivial syntactic mistake, the compiler will catch it, because Scalatags is plain Scala
+      It's safe! If you make a trivial syntactic mistake, the compiler will catch it, because Scalatags is plain Scala. Try it!
     @li
       It's composable! You can easily define fragments and assign them to variables, to be used later. You can break apart large Scalatags fragments the same way you break apart normal code, avoiding the huge monolithic HTML templates that are common in other templating systems.
     @li
-      It's Scala! You have the full power of the Scala language to write your fragments. No need to learn special syntax/cases for conditionals or repetitions: you can use plain-old-scala if-elses, for-loops, etc.
+      It's Scala! You have the full power of the Scala language to write your fragments. No need to learn special syntax/cases for conditionals or repetitions: you can use plain-old-Scala @hl.scala{if}-@hl.scala{else}s, @hl.scala{for}-loops, etc.
 
   @p
     Now that you've gotten a quick overview of the kinds of things you can do with Scalatags, let's move on to the next section of our hands-on tutorial...
@@ -135,7 +138,7 @@
       @less
         @BookData.example(div, "Weather0().main")
     @p
-      The above snippet of code uses the raw Javascript Ajax API in order to make a request to @lnk("openweathermap.org", "http://openweathermap.org/"), to get the weather data for the city of Singapore as a JSON blob. The part of the API that we'll be using is documented @lnk("here", "http://openweathermap.org/current"). For now, we're unceremoniously dumping it in a @hl.scala{pre} so you can see the raw response data.
+      The above snippet of code uses the raw Javascript Ajax API in order to make a request to @lnk("openweathermap.org", "http://openweathermap.org/"), to get the weather data for the city of Singapore as a JSON blob. The part of the API that we'll be using is documented @lnk("here", "http://openweathermap.org/current"), and if you're interested you can read all about the various options that they provide. For now, we're unceremoniously dumping it in a @hl.scala{pre} so you can see the raw response data.
 
     @p
       As you can see, using the raw Javascript API to make the Ajax call looks almost identical to actually doing this in Javascript, shown below:
@@ -181,7 +184,7 @@
         @hl.ref("examples/demos/src/main/scala/webpage/Weather1.scala", "val url")
 
       @less
-        @BookData.example(div, "Weather1().main")
+        @BookData.example(div(height:="100%", overflow:="scroll"), "Weather1().main")
 
     @p
       A single call to @hl.scala{Ajax.get(...)}, with the URL, and we receive a @hl.scala{scala.concurrent.Future} that we can use to get access to the result when ready. Here we're just using it's @hl.scala{onSuccess}, but we could use it in a for-comprehension, with @lnk("Scala Async", "https://github.com/scala/async"), or however else we can use normal @hl.scala{Future}s
@@ -198,7 +201,7 @@
         @hl.ref("examples/demos/src/main/scala/webpage/Weather2.scala", "Ajax.get")
 
       @less
-        @BookData.example(div, "Weather1().main")
+        @BookData.example(div(height:="100%", overflow:="scroll"), "Weather1().main")
 
     @p
       We do this by taking @hl.scala{xhr.responseText} and putting it through both @hl.scala{JSON.parse} and @hl.scala{JSON.stringify}, passing in a @hl.scala{space} argument to tell @hl.scala{JSON.stringify} to spread it out nicely.
@@ -211,7 +214,7 @@
         @hl.ref("examples/demos/src/main/scala/webpage/Weather3.scala", "Ajax.get")
 
       @less
-        @BookData.example(div, "Weather3().main")
+        @BookData.example(div(height:="100%", overflow:="scroll"), "Weather3().main")
 
     @p
       First we parse the incoming response, extract a bunch of values from it, and then stick it in a Scalatags fragment for us to see. Note how we can use the names of the attributes e.g. @hl.scala{json.name} even though @hl.scala{name} is a dynamic property which you can't be sure exists: this is because @hl.scala{json} is of type @hl.scala{js.Dynamic}, which allows us to refer to arbitrary parameters and methods on the underlying object without type-checking.

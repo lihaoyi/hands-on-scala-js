@@ -109,7 +109,7 @@ object lnk{
     val IntelliJ = lnk("IntelliJ", "http://blog.jetbrains.com/scala/")
     val Eclipse = lnk("Eclipse", "http://scala-ide.org/")
     val Rhino = lnk("Rhino", "https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino")
-    val Nodejs = lnk("Nodejs", "http://nodejs.org/")
+    val Nodejs = lnk("Node.js", "http://nodejs.org/")
     val PhantomJS = lnk("PhantomJS", "http://phantomjs.org/")
     val Play = lnk("Play", "https://www.playframework.com/")
     val Scalatra = lnk("Scalatra", "http://www.scalatra.org/")
@@ -118,7 +118,7 @@ object lnk{
   }
   object github{
     val Scalatags = lnk("Scalatags", "https://github.com/lihaoyi/scalatags")
-    val uPickle= lnk("Scalatags", "https://github.com/lihaoyi/upickle")
+    val uPickle= lnk("uPickle", "https://github.com/lihaoyi/upickle")
     val scalaPickling = lnk("scala-pickling", "https://github.com/scala/pickling")
   }
 }
@@ -137,7 +137,7 @@ object hl{
         .dropWhile(_ == "")
         .mkString("\n")
 
-      pre(code(cls:=lang + " highlight-me", stripped))
+      pre(code(cls:=lang + " highlight-me hljs", stripped))
     }
   }
 
@@ -181,7 +181,7 @@ object hl{
 
 
     pre(
-      code(cls:=lang + " highlight-me", blob),
+      code(cls:=lang + " highlight-me hljs", blob),
       a(
         cls:="header-link",
         i(cls:="fa fa-link "),

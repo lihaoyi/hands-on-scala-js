@@ -302,4 +302,4 @@
     @hr
 
     @p
-      Scala-Async is a Macro; that means that it is both more flexible and more limited than normal Scala, e.g. you cannot put the @hl.scala{await} call inside a lambda or higher-order-function like @hl.scala{.map}. Like Futures, it doesn't provide any fundamental capabilities, but is a tool that can be used to simplify otherwise messy asynchronous workflows. 
+      Scala-Async is a Macro; that means that it is both more flexible and more limited than normal Scala, e.g. you cannot put the @hl.scala{await} call inside a lambda or higher-order-function like @hl.scala{.map}. Like Futures, it doesn't provide any fundamentally new capabilities, but is a tool that can be used to simplify otherwise messy asynchronous workflows.
