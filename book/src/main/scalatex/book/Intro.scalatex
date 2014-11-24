@@ -101,7 +101,7 @@
   @p
     Despite the problems with Javascript (and other tools like HTML an CSS, which have their own problems) the Web platform got a lot of things right, and the Desktop and Mobile platforms have a lot of catching up to do. If only we could improve upon the parts that aren't so great. This is where Scala.js comes in.
 
-@sect{The Promise}
+@sect{About Scala.js}
 
   @p
     With Scala.js, you can cross compile your Scala code to a Javascript executable that can run on all major web browsers. You get all the benefits of the web platform in terms of deployability, security, and hyperlinking, with none of the problems of writing your software in Javascript. Scala.js provides a @sect.ref("The Language", "better language") to do your work in, but also provides some other goodies that have in-so-far never been seen in mainstream web development: @sect.ref("Sharing Code", "shared-code") and @sect.ref("Client-Server Integration", "client-server integration").

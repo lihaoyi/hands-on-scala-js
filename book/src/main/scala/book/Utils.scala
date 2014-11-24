@@ -147,6 +147,11 @@ object hl{
   def diff(code: String*) = highlight(code, "diff")
   def html(code: String*) = highlight(code, "xml")
 
+  val mappings = Seq(
+    "output/scala-js" -> "https://github.com/scala-js/scala-js",
+    "output/workbench-example-app" -> "https://github.com/lihaoyi/workbench-example-app",
+    "" -> "https://github.com/lihaoyi/hands-on-scala-js"
+  )
   def ref(filepath: String, start: String = "", end: String = "\n") = {
 
     val lang = filepath.split('.').last match {
@@ -179,7 +184,17 @@ object hl{
 
     val blob = sliced.map(_.drop(whitespace)).mkString("\n")
 
+    val (prefix, url) =
+      mappings.iterator
+              .find{case (prefix, path) => filepath.startsWith(prefix)}
+              .get
 
+    val hash =
+      if (endLine == -1) ""
+      else s"#L$startLine-L$endLine"
+
+    val linkUrl =
+      s"$url/tree/master/${filepath.drop(prefix.length)}$hash"
     pre(
       code(cls:=lang + " highlight-me hljs", blob),
       a(
@@ -190,7 +205,8 @@ object hl{
         bottom:="0.5em",
         display.block,
         fontSize:="24px",
-        href:="#"
+        href:=linkUrl,
+        target:="_blank"
       )
     )
   }

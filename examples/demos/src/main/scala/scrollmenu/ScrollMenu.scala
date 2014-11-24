@@ -61,13 +61,13 @@ class ScrollSpy(structure: Tree[String],
   }
 
 
-  private[this] var scrolling = false
-  def apply(threshold: => Double) = if (!scrolling){
-    scrolling = true
-    dom.setTimeout(() => start(threshold), 200)
+  private[this] var scrolling = -1
+  def apply() = {
+    dom.clearTimeout(scrolling)
+    scrolling = dom.setTimeout(() => start(), 200)
   }
-  private[this] def start(threshold: Double) = {
-    scrolling = false
+  private[this] def start() = {
+//    scrolling = false
     def scroll(el: dom.Element) = {
       val rect = el.getBoundingClientRect()
       if (rect.top <= 0)
@@ -77,8 +77,8 @@ class ScrollSpy(structure: Tree[String],
     }
     def walkTree(tree: Tree[MenuNode]): Boolean = {
       val Tree(MenuNode(menuItem, itemId, start, end), children) = tree
-      val before = headers(start) <= threshold
-      val after = (end >= headers.length) || headers(end) > threshold
+      val before = headers(start) <= main.scrollTop
+      val after = (end >= headers.length) || headers(end) > main.scrollTop
 
       val win = before && after
 
@@ -97,7 +97,7 @@ class ScrollSpy(structure: Tree[String],
           // aren't any children which won, so it must be the actual leaf
           tree.children.foreach(_.value.frag.classList.remove("selected"))
           if (dom.location.hash != itemId)
-            dom.location.hash = itemId
+            dom.history.pushState(null, null, "#"+itemId)
           scroll(menuItem.children(0))
 
         }

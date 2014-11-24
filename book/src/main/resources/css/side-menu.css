@@ -333,6 +333,6 @@ code{
 }
 
 /*Workaround for bug in highlight.js IDEA theme*/
-.hljs-tag, .hljs-symbol{
+span.hljs-tag, span.hljs-symbol{
     background: none;
 }

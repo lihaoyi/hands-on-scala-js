@@ -34,7 +34,7 @@ object Controller{
         scrollSpy.domTrees.map(_.value.frag)
       ).render
 
-      def updateScroll() = scrollSpy(main.scrollTop)
+      def updateScroll() = scrollSpy()
       val expandIcon = i(cls := "fa fa-caret-down").render
       val expandLink =
         a(
