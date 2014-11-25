@@ -4,7 +4,7 @@
 
 @ul
   @li
-    @lnk("sbt", "http://www.scala-sbt.org/"): SBT is the most common build-tool in the Scala community, and is what we will use for building our Scala.js application. Their home page has a link to download and install it.
+    @lnk("sbt", "http://www.scala-sbt.org/"): SBT is the most common build-tool in the Scala community, and is what we will use for building our Scala.js application. Their home page has a link to download and install it. (If you are already using Typesafe Activator, that is effectively sbt.)
   @li
     An editor for Scala: @lnk("IntelliJ Scala", "http://blog.jetbrains.com/scala/") and @lnk("Eclipse ScalaIDE", "http://scala-ide.org/") are the most popular choices and work on all platforms, though there are others.
   @li
