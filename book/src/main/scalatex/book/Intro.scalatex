@@ -35,7 +35,7 @@
   @li
     Typo-safety due to its compiler which catches many silly errors before the code is run
   @li
-    In-editor support for autocomplete, error-highlghting, refactors, and intelligent navigation
+    In-editor support for autocomplete, error-highlighting, refactors, and intelligent navigation
   @li
     Moderate sized compiled executables, in the 100-400kb range
   @li
