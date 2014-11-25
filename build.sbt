@@ -13,7 +13,8 @@ lazy val scalaParser = project.in(file("scalaParser")).settings(
   testFrameworks += new TestFramework("utest.runner.JvmFramework")
 )
 lazy val scalatexApi = project.in(file("scalatexApi"))
-                       .settings(
+                              .dependsOn(scalaParser)
+                              .settings(
   scalaVersion := "2.11.4",
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "utest" % "0.2.4",
