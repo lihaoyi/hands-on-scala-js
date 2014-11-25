@@ -59,7 +59,7 @@
       However, Javascript is not an easy language to work in at scale: when your code-base extends to thousands, tens or hundreds of thousands of lines of code. The un-typed nature of the language, which is fine for small applications, becomes an issue when you are mainly working with code that you did not write.
 
     @p
-      In a large code-base, finding out what methods or properties a variable has is often a long chase through dozens of files to see how it ended up being passed to the current function. Refactorings, which are OK when you can just test the code see if it works, become dangerous when your code base is large enough that "just test all the code" would take hours. Language-warts which are slightly annoying in small programs become a minefield in large ones: it's only a matter of time before you hit one, often in code you did-not/cannot test, resulting in breakages in production.
+      In a large code-base, finding out what methods or properties a variable has is often a long chase through dozens of files to see how it ended up being passed to the current function. Refactorings, which are OK when you can just test the code to see if it works, become dangerous when your code base is large enough that "just test all the code" would take hours. Language-warts which are slightly annoying in small programs become a minefield in large ones: it's only a matter of time before you hit one, often in code you did-not/cannot test, resulting in breakages in production.
 
     @p
       Apart from the inherent danger of the language, Javascript has another major problem: the language has left many things unspecified, yet at the same time provides the ability to emulate these things in a variety of ways. This means that rather than having a single way of e.g. defining a class and instantiating an object, there is a decade-long debate between a dozen different and equally-bad, hand-crafted alternatives. Large code-bases use third-party libraries, and most are guaranteed (purely due to how stastistics work) to do these basic things differently from your own code, making understanding these disparate code-bases (e.g. when something goes wrong) very difficult.
@@ -95,7 +95,7 @@
         Desktop application security is non-existent. Install one rogue application and it can take over your computer, steal your credit card number, use your email for sending spam, and all sorts of other nasty things. Removing these for-good sometimes involves re-installing your entire operating system. Hence people are much more wary about only installing desktop software from people they "trust".
 
     @p
-      In many ways, mobile App platforms like Android and iOS have closed the gap between "native" and "web" applications. Installing a new App may take 30 seconds, you can often deep-link to certain pages within an App, and Apps a much tighter security model than desktop software does. Nevertheless, 30 seconds is still much longer than the 0.5 seconds it takes to open a web page, deep-linking in apps is not very prevalent, and the security model still often leaves space for rogue Apps to misbehave and steal data.
+      In many ways, mobile App platforms like Android and iOS have closed the gap between "native" and "web" applications. Installing a new App may take 30 seconds, you can often deep-link to certain pages within an App, and Apps have a much tighter security model than desktop software does. Nevertheless, 30 seconds is still much longer than the 0.5 seconds it takes to open a web page, deep-linking in apps is not very prevalent, and the security model still often leaves space for rogue Apps to misbehave and steal data.
 
   @hr
   @p
@@ -151,7 +151,7 @@
         Not having to resort to awkward Ajax-calls or pre-computation to avoid duplicating logic between the client and server
 
     @p
-      Shared code doesn't just mean sharing pre-made libraries between the client and server. You can easily @sect.ref("Cross Publishing Libraries", "publish your own libraries") that can be used on both Scala-JVM and Scala.js. This means that as a library author, you can at once target two completely different platforms, and (with some work) take advantage of the intricacies of each platform to optimize your library for each one. Take Scalatags as an example: as the first client-server Scala.js-ScalaJVM shared libraries, it enjoys a roughly event split of downloads from people using it on both platforms:
+      Shared code doesn't just mean sharing pre-made libraries between the client and server. You can easily @sect.ref("Cross Publishing Libraries", "publish your own libraries") that can be used on both Scala-JVM and Scala.js. This means that as a library author, you can at once target two completely different platforms, and (with some work) take advantage of the intricacies of each platform to optimize your library for each one. Take Scalatags as an example: as the first client-server Scala.js-ScalaJVM shared libraries, it enjoys a roughly even split of downloads from people using it on both platforms:
 
     @img(src:="images/Scalatags Downloads.png", width:="100%")
 
@@ -180,6 +180,3 @@
 
   @p
     Scala.js provides all these things, and much more. If you're interested enough to want to make use of Scala.js, read on!
-
-
-
