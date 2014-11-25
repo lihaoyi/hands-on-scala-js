@@ -1,4 +1,3 @@
-
-trait Basic {
-  s ~ !Basic.OperatorChar
+class Parser {
+  {() => }
 }

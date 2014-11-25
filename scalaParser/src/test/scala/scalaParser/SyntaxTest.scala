@@ -14,7 +14,7 @@ object SyntaxTest extends TestSuite{
       case Failure(f: ParseError) =>
         println(f.position)
         println(f.formatExpectedAsString)
-//        println(f.formatTraces)
+        println(f.formatTraces)
         throw new Exception(f.position + "\t" + f.formatTraces)
       case Success(parsed) =>
         assert(parsed == input)
@@ -378,6 +378,14 @@ object SyntaxTest extends TestSuite{
         """trait Basic {
           |  !a.b
           |}
+        """.stripMargin
+      )
+      * - check(
+        """
+          |class Parser {
+          |  {() => }
+          |}
+          |
         """.stripMargin
       )
     }

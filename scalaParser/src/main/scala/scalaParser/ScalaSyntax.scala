@@ -136,7 +136,10 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def ParamType = rule { K.O("=>") ~ Type | Type ~ "*" | Type }
 
-  def Expr: R0 = rule { (Bindings | optional(K.W("implicit")) ~ Id | "_") ~ K.O("=>") ~ Expr | Expr1 }
+  def Expr: R0 = rule {
+    (Bindings | optional(K.W("implicit")) ~ Id | "_") ~ K.O("=>") ~ Expr |
+    Expr1
+  }
   def Expr1: R0 = rule {
     IfCFlow |
     WhileCFlow |
@@ -201,15 +204,15 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
 
   def BlockExpr: R0 = rule { '{' ~ (CaseClauses | Block) ~ "}" }
+  def BlockEnd: R0 = rule{ optional(Semis) ~ &("}" | "case") }
   def Block: R0 = rule {
      optional(Semis) ~
      (
-       BlockStats ~ Semis ~ ResultExpr |
-       BlockStats |
-       ResultExpr |
-       MATCH
-     ) ~
-     optional(Semis)
+       ResultExpr ~ BlockEnd |
+       BlockStats ~ Semis ~ ResultExpr ~ BlockEnd |
+       BlockStats ~ BlockEnd |
+       MATCH ~ BlockEnd
+     )
   }
   def BlockStats: R0 = rule{
     oneOrMore(BlockStat).separatedBy(Semis)
@@ -219,7 +222,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     zeroOrMore(Annotation) ~ (optional(K.W("implicit") | K.W("lazy")) ~ Def | zeroOrMore(LocalModifier) ~ TmplDef) |
     Expr1
   }
-  def ResultExpr: R0 = rule { (Bindings | optional(K.W("implicit")) ~ Id | "_") ~ K.W("=>") ~ Block | Expr1 }
+  def ResultExpr: R0 = rule {
+    (Bindings | optional(K.W("implicit")) ~ Id | "_") ~ K.W("=>") ~ Block | Expr1
+  }
   def Enumerators: R0 = rule { Generator ~ zeroOrMore(Semi ~ Enumerator) ~ WL }
   def Enumerator: R0 = rule { Generator | Guard | Pattern1 ~ K.O("=") ~ Expr }
   def Generator: R0 = rule { Pattern1 ~ K.O("<-") ~ Expr ~ optional(WL ~ Guard)  }
@@ -274,7 +279,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def ClassParams: R0 = rule { oneOrMore(ClassParam).separatedBy(',') }
   def ClassParam: R0 = rule { zeroOrMore(Annotation) ~ optional(zeroOrMore(Modifier) ~ (K.W("val") | K.W("var"))) ~ Id ~ K.O(":") ~ ParamType ~ optional(K.O("=") ~ Expr) }
 
-  def Bindings: R0 = rule { '(' ~ oneOrMore(Binding).separatedBy(',') ~ ')' }
+  def Bindings: R0 = rule { '(' ~ zeroOrMore(Binding).separatedBy(',') ~ ')' }
   def Binding: R0 = rule { (Id | K.W("_")) ~ optional(K.O(":") ~ Type) }
 
   def Modifier: R0 = rule { LocalModifier | AccessModifier | K.W("override") }
@@ -340,8 +345,8 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def TmplDef: R0 = rule {
     K.W("trait") ~ TraitDef |
-      optional(K.W("case")) ~ (K.W("class") ~ ClassDef |
-        K.W("object") ~ ObjectDef)
+    optional(K.W("case")) ~ (K.W("class") ~ ClassDef |
+    K.W("object") ~ ObjectDef)
   }
   def ClassDef: R0 = rule {
     Id ~
