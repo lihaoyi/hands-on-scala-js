@@ -9,6 +9,7 @@ import scala.util.{Failure, Success}
 
 object SyntaxTest extends TestSuite{
   def check[T](input: String) = {
+    println("Checking...")
     new ScalaSyntax(input).CompilationUnit.run() match{
       case Failure(f: ParseError) =>
         println(f.position)
@@ -27,14 +28,16 @@ object SyntaxTest extends TestSuite{
 
       )
       * - check(
-        """
-          |package torimatomeru
+        """package torimatomeru
           |
-          |import org.parboiled2.ParseError
-          |import utest._
-          |import utest.framework.Test
+          |package lols
         """.stripMargin
-
+      )
+      * - check(
+        """package torimatomeru
+          |import a
+          |import b
+        """.stripMargin
       )
       * - check(
         """
@@ -70,16 +73,9 @@ object SyntaxTest extends TestSuite{
       * - check(
         """
           |object SyntaxTest extends TestSuite{
-          |  def check[T](input: String) = {
-          |    new ScalaSyntax(input).CompilationUnit.run() match{
-          |      case Failure(f: ParseError) =>
-          |        println(f.position)
-          |        println(f.formatExpectedAsString)
-          |        println(f.formatTraces)
-          |        throw new Exception(f.position + "\t" + f.formatTraces)
-          |      case Success(parsed) =>
-          |        assert(parsed == input)
-          |    }
+          |  {
+          |        println
+          |        throw 1
           |  }
           |}
         """.stripMargin
@@ -219,6 +215,15 @@ object SyntaxTest extends TestSuite{
           |}
         """.stripMargin
       )
+      * - check(
+        """
+          |object L{
+          |  a b c
+          |  d = 1
+          |}
+        """.stripMargin
+      )
+
       * - check(
         """/*                     __                                               *\
           |**     ________ ___   / /  ___      __ ____  Scala.js CLI               **
@@ -360,11 +365,26 @@ object SyntaxTest extends TestSuite{
           |}
         """.stripMargin
       )
+      * - check(
+        """
+          |trait Basic {
+          |  b match {
+          |    case C => true; case _ => false
+          |  }
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """trait Basic {
+          |  !a.b
+          |}
+        """.stripMargin
+      )
     }
     def checkFile(path: String) = check(io.Source.fromFile(path).mkString)
     'file{
 
-
+      * - checkFile("test.txt")
       * - checkFile("scalaParser/src/main/scala/scalaParser/syntax/Basic.scala")
       * - checkFile("scalaParser/src/main/scala/scalaParser/syntax/Identifiers.scala")
       * - checkFile("scalaParser/src/main/scala/scalaParser/syntax/Literals.scala")

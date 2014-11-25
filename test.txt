@@ -1,0 +1,4 @@
+
+trait Basic {
+  s ~ !Basic.OperatorChar
+}
