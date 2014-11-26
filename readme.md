@@ -8,3 +8,9 @@ To build,
 ```
 sbt book/run
 ```
+
+And look in
+
+```
+book/target/output/index.html
+```

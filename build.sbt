@@ -4,28 +4,30 @@ import ScalaJSKeys._
 
 val cloneRepos = taskKey[Unit]("Clone stuff from github")
 
-lazy val scalaParser = project.in(file("scalaParser")).settings(
+val sharedSettings = Seq(
   scalaVersion := "2.11.4",
+  libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
+  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
+  autoCompilerPlugins := true
+)
+
+lazy val scalaParser = project.settings(sharedSettings:_*)
+                              .settings(
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "utest" % "0.2.4",
-    "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
     "org.parboiled" %% "parboiled" % "2.0.1"
   ),
-  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
   testFrameworks += new TestFramework("utest.runner.JvmFramework")
 )
-lazy val scalatexApi = project.in(file("scalatexApi"))
+lazy val scalatexApi = project.settings(sharedSettings:_*)
                               .dependsOn(scalaParser)
                               .settings(
-  scalaVersion := "2.11.4",
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "utest" % "0.2.4",
     "com.scalatags" %% "scalatags" % "0.4.2",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-    "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
     "org.parboiled" %% "parboiled" % "2.0.1"
   ),
-  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
   testFrameworks += new TestFramework("utest.runner.JvmFramework")
 )
 
@@ -33,8 +35,7 @@ lazy val scalatexPlugin = Project(
   id   = "scalatexPlugin",
   base = file("scalatexPlugin"),
   dependencies = Seq(scalatexApi)
-) settings (
-  scalaVersion := "2.11.4",
+).settings(sharedSettings:_*).settings(
   libraryDependencies += "org.scala-lang" % "scala-compiler" % scalaVersion.value,
   publishArtifact in Compile := false
 )
@@ -43,16 +44,11 @@ lazy val book = Project(
   id = "book",
   base = file("book"),
   dependencies = Seq(scalatexApi)
-).settings(
-  scalaVersion := "2.11.4",
+).settings(sharedSettings:_*).settings(
   libraryDependencies ++= Seq(
     "org.webjars" % "highlightjs" % "8.2-1",
     "org.webjars" % "pure" % "0.5.0",
     "org.webjars" % "font-awesome" % "4.2.0",
-    "org.webjars" % "react" % "0.11.1",
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-    "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-    "org.eclipse.jgit" % "org.eclipse.jgit" % "3.5.1.201410131835-r",
     "com.lihaoyi" %%% "upickle" % "0.2.5"
   ),
   (resources in Compile) += {
@@ -73,14 +69,8 @@ lazy val book = Project(
   watchSources ++= {
     ((sourceDirectory in Compile).value / "scalatex" ** "*.scalatex").get
   },
-  (watchSources in Test) ++= {
-    ((sourceDirectory in Test).value / "scalatex" ** "*.scalatex").get
-  },
-  libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
-  autoCompilerPlugins := true,
-  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
   cloneRepos := {
-    val localPath = crossTarget.value / "clones"
+    val localPath = target.value / "clones"
     if (!localPath.isDirectory){
       val paths = Seq(
         "scala-js" -> "scala-js",
@@ -101,7 +91,8 @@ lazy val book = Project(
   },
   (run in Compile) <<= (run in Compile).dependsOn(cloneRepos),
   initialize := {
-    System.setProperty("clone.root", crossTarget.value.getAbsolutePath + "/clones")
+    System.setProperty("clone.root", target.value.getAbsolutePath + "/clones")
+    System.setProperty("output.root", target.value.getAbsolutePath + "/output")
   }
 )
 

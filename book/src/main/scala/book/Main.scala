@@ -19,15 +19,15 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     println("Writing Book")
-
-    write(Book.site, "output/index.html")
+    val outputRoot = System.getProperty("output.root") + "/"
+    write(Book.site, s"$outputRoot/index.html")
 
     val jsFiles = Book.autoResources.filter(_.endsWith(".js")).toSet
     val cssFiles = Book.autoResources.filter(_.endsWith(".css")).toSet
     val miscFiles = Book.autoResources -- cssFiles -- jsFiles
 
     for(res <- Book.manualResources ++ miscFiles) {
-      copy(getClass.getResourceAsStream("/" + res), "output/" + res)
+      copy(getClass.getResourceAsStream("/" + res), outputRoot + res)
     }
 
     for((resources, dest) <- Seq(jsFiles -> "scripts.js", cssFiles -> "styles.css")) {
@@ -35,7 +35,7 @@ object Main {
         io.Source.fromInputStream(getClass.getResourceAsStream("/"+res)).mkString
       }
 
-      write(blobs.mkString("\n"), "output/"+dest)
+      write(blobs.mkString("\n"), outputRoot + dest)
     }
 
     val allNames = {
