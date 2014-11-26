@@ -68,6 +68,7 @@ class ScrollSpy(structure: Tree[String],
       dom.requestAnimationFrame((d: Double) => start())
     }
   }
+  private[this] var previousId = ""
   private[this] def start() = {
     scrolling = false
     def scroll(el: dom.Element) = {
@@ -95,15 +96,15 @@ class ScrollSpy(structure: Tree[String],
           winFound = winFound | newWinFound
         }
         if (!winFound) {
-          // This means it's the leaf element, because it won but there
-          // aren't any children which won, so it must be the actual leaf
-          tree.children.foreach(_.value.frag.classList.remove("selected"))
+          if (previousId != itemId){
+            previousId = itemId
+            // This means it's the leaf element, because it won but there
+            // aren't any children which won, so it must be the actual leaf
+            tree.children.foreach(_.value.frag.classList.remove("selected"))
+            scroll(menuItem.children(0))
 
-          val top = main.scrollTop
-          dom.location.hash = itemId
-          main.scrollTop = top
-
-          scroll(menuItem.children(0))
+            dom.history.replaceState(null, null, "#" + itemId)
+          }
         }
         menuItem.children(0).classList.add("pure-menu-selected")
       }else{
