@@ -1,3 +1,4 @@
+@import BookData._
 
 @p
   Historically, sharing code across client & server has been a holy-grail for web development. There are many things which have made it hard in the past:

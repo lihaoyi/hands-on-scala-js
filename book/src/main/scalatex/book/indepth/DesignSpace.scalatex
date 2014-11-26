@@ -1,3 +1,5 @@
+@import BookData._
+
 @p
     Scala.js is a relatively large project, and is the result of both an enormous amount of hard work as well as a number of decisions that craft what it's like to program in Scala.js today. Many of these decisions result in marked differences from the behavior of the same code running on the JVM. This chapter explores the reasoning and rationale behind these decisions.
 

@@ -2,6 +2,8 @@
 import scala.scalajs.sbtplugin.ScalaJSPlugin._
 import ScalaJSKeys._
 
+val cloneRepos = taskKey[Unit]("Clone stuff from github")
+
 lazy val scalaParser = project.in(file("scalaParser")).settings(
   scalaVersion := "2.11.4",
   libraryDependencies ++= Seq(
@@ -76,7 +78,31 @@ lazy val book = Project(
   },
   libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
   autoCompilerPlugins := true,
-  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2")
+  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
+  cloneRepos := {
+    val localPath = crossTarget.value / "clones"
+    if (!localPath.isDirectory){
+      val paths = Seq(
+        "scala-js" -> "scala-js",
+        "lihaoyi" -> "workbench-example-app"
+      )
+      localPath.delete()
+      for ((user, repo) <- paths){
+        println(s"Cloning $repo...")
+        org.eclipse.jgit.api.Git.cloneRepository()
+           .setURI(s"https://github.com/$user/$repo")
+           .setDirectory(localPath / repo)
+           .call()
+      }
+      println("Done Cloning")
+    }else{
+      println("Already Cloned")
+    }
+  },
+  (run in Compile) <<= (run in Compile).dependsOn(cloneRepos),
+  initialize := {
+    System.setProperty("clone.root", crossTarget.value.getAbsolutePath + "/clones")
+  }
 )
 
 lazy val demos = project.in(file("examples/demos"))

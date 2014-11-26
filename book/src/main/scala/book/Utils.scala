@@ -123,7 +123,7 @@ object lnk{
   }
 }
 
-object hl{
+class Highlighter(mappings: Seq[(String, String)]){
   def highlight(snippet: Seq[String], lang: String) = {
     val string = snippet.mkString
     val lines = string.split("\n", -1)
@@ -147,11 +147,6 @@ object hl{
   def diff(code: String*) = highlight(code, "diff")
   def html(code: String*) = highlight(code, "xml")
 
-  val mappings = Seq(
-    "examples/scala-js" -> "https://github.com/scala-js/scala-js",
-    "examples/workbench-example-app" -> "https://github.com/lihaoyi/workbench-example-app",
-    "" -> "https://github.com/lihaoyi/hands-on-scala-js"
-  )
   def ref(filepath: String, start: String = "", end: String = "\n") = {
 
     val lang = filepath.split('.').last match {

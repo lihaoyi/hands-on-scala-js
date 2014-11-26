@@ -1,9 +1,14 @@
 package book
 
+import java.io.File
+
 import acyclic.file
 import scalatags.Text.TypedTag
 import scalatags.Text.all._
 object BookData {
+  val cloneRoot = System.getProperty("clone.root") + "/"
+
+
   lazy val javaAPIs = {
     import java.io.File
     def recursiveListFiles(f: File): Array[File] = {
@@ -12,12 +17,12 @@ object BookData {
     }
 
     val roots = Seq(
-      "examples/scala-js/javalanglib/src/main/scala",
-      "examples/scala-js/javalib/src/main/scala"
+      "scala-js/javalanglib/src/main/scala",
+      "scala-js/javalib/src/main/scala"
     )
     for{
       root <- roots
-      file <- recursiveListFiles(new File(root))
+      file <- recursiveListFiles(new File(cloneRoot + root))
       if file != null
       if file.isFile
     } yield{
@@ -42,4 +47,13 @@ object BookData {
   def more = div(cls:="pure-u-1 pure-u-md-13-24")
   def less = div(cls:="pure-u-1 pure-u-md-11-24")
   def half = div(cls:="pure-u-1 pure-u-md-1-2")
+
+
+  val hl = new Highlighter(
+    Seq(
+      s"$cloneRoot/scala-js" -> "https://github.com/scala-js/scala-js",
+      s"$cloneRoot/workbench-example-app" -> "https://github.com/lihaoyi/workbench-example-app",
+      "" -> "https://github.com/lihaoyi/hands-on-scala-js"
+    )
+  )
 }
