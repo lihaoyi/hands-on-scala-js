@@ -23,10 +23,10 @@
     │   └── src/main/scala/simple/Platform.scala
     └── project/ build.sbt
   @p
-    In this case the two @code{shared/} folders are symlinked together to keep them in sync. This can be done by first creating @code{js/shared}, and then running
+    In this case the two @code{shared/} folders are symlinked together to keep them in sync. This can be done by first creating @code{js/shared}, and from @code{jvm} then running
 
   @hl.bash
-    $ ln -s ../js/shared jvm/shared
+    $ ln -s ../js/shared/ shared
 
   @sect{Build Configuration}
     @p
