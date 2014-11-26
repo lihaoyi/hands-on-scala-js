@@ -81,7 +81,7 @@
     + ctx.fillStyle = "white"
 
   @p
-    Because we started ran @code{sbt ~fastOptJS} with the @code{~} prefix earlier, it should pick up the change and automatically recompile. The example project is set up to automatically refresh the page when recompilation is complete.
+    Because we started @code{sbt ~fastOptJS} with the @code{~} prefix earlier, it should pick up the change and automatically recompile. The example project is set up to automatically refresh the page when recompilation is complete.
 
   @img(src:="images/Hello World White.png", maxWidth:="100%")
 
