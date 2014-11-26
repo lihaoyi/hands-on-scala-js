@@ -106,7 +106,7 @@
       object RunMe extends scala.scalajs.js.JSApp{
         def main(): Unit = {
           println("Hello World!")
-          println("In Scala.js, 1/0 is ${1/0}!")
+          println("In Scala.js, (1.0).toString is ${(1.0).toString}!")
         }
       }
 
@@ -115,7 +115,7 @@
 
     @hl.bash
       Hello World!
-      In Scala.js, 1/0 is 0!
+      In Scala.js, (1.0).toString is 0!
 
     @p
       This exhibits the weirdness of integer divide-by-zero in Scala.js, which is one of the few ways in which @sect.ref("Deviations from Scala-JVM", "Scala.js deviates from Scala-JVM"). This also shows us we're really running on Scala.js: on Scala-JVM, integer divide-by-zero throws an exception rather than returning zero!
@@ -129,7 +129,7 @@
       @li
         @b{Node.js} using @code{sbt fastOptStage::run} or @code{sbt fullOptStage::run}, having installed Node.js separately
       @li
-        @b{PhantomJS} using @code{sbt fastOptStage::run} or @code{sbt fullOptStage::run}, having installed PhantomJS separately, and turned on @hl.scala{requiresDOM := true} in SBT
+        @b{PhantomJS} using @code{sbt fastOptStage::run} or @code{sbt fullOptStage::run}, having installed PhantomJS separately, and turned on @hl.scala{jsDependencies += RuntimeDOM} in SBT
 
     @p
       Typically, the best way to get started is using Rhino and @code{sbt run}, since it's setup-free, and setting up Node.js or PhantomJS later as necessary. The next two sections elaborate on the differences between these ways of running your code. Check out the later sections on @sect.ref{Headless Runtimes} and @sect.ref{Run Configurations} to learn more about the other settings and why you would want to use them.
@@ -152,7 +152,7 @@
     @li
       @lnk.misc.Nodejs, a relatively new Javascript runtime based on Google's V8 Javascript engine, Node.js lets you run your Scala.js application from the command line much faster than in Rhino, with performance that matches that of modern browsers. However, you need to separately @lnk("install Node.js", "http://nodejs.org/download/") in order to use it. Like Rhino, it comes with a bare-minimal runtime environment, with no DOM or browser-related functionality. You need to run @code{sbt fastOptStage::run} to run using Node.js.
     @li
-      @lnk.misc.PhantomJS is a headless Webkit browser. This means that unlike Node.js or Rhino, PhantomJS provides you with a full DOM and all its APIs to use in your tests, if you wish to e.g. test interactions with the HTML of the web page. On the other hand, it is somewhat slower than Node.js, though still much faster than Rhino. Like Node.js, it needs to be installed separately. You need to run You need to run @code{sbt fastOptStage::run}, as well as setting the @hl.scala{requiresDOM := true} flag in your SBT configuration, to use PhantomJS.
+      @lnk.misc.PhantomJS is a headless Webkit browser. This means that unlike Node.js or Rhino, PhantomJS provides you with a full DOM and all its APIs to use in your tests, if you wish to e.g. test interactions with the HTML of the web page. On the other hand, it is somewhat slower than Node.js, though still much faster than Rhino. Like Node.js, it needs to be installed separately. You need to run You need to run @code{sbt fastOptStage::run}, as well as setting the @hl.scala{jsDependencies += RuntimeDOM} flag in your SBT configuration, to use PhantomJS.
   @p
     These are your three options to run your Scala.js code via the command-line. Generally, it's easiest to get started with Rhino since it's the default and requires no setup, though you may find it worthwhile to setup Node or Phantom if you need additional speed or DOM-integration in your runs.
 

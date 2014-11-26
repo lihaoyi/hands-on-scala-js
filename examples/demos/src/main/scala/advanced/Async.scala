@@ -29,11 +29,11 @@ object Async {
 
     type ME = dom.MouseEvent
     val mousemove =
-      Channel[ME](canvas.onmousemove = _)
+      new Channel[ME](canvas.onmousemove = _)
     val mouseup =
-      Channel[ME](canvas.onmouseup = _)
+      new Channel[ME](canvas.onmouseup = _)
     val mousedown =
-      Channel[ME](canvas.onmousedown = _)
+      new Channel[ME](canvas.onmousedown = _)
 
     async{
       while(true){
@@ -99,7 +99,7 @@ object Async {
   }
 }
 
-case class Channel[T](init: (T => Unit) => Unit){
+class Channel[T](init: (T => Unit) => Unit){
   init(update)
   private[this] var value: Promise[T] = null
   def apply(): Future[T] = {

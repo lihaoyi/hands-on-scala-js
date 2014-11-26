@@ -109,7 +109,7 @@
       Publish it! Both @code{sbt publishLocal} and @code{sbt publishSigned} work on this module, for publishing either locally, Maven Central via Sonatype, or Bintray. Running the command bare should be sufficient to publish both the @code{js} or @code{jvm} projects, or you can also specify which one e.g. @code{jvm/publishLocal} to publish only one subproject.
 
   @p
-    This @code{jvm} project works identically to any other Scala-JVM project, and the @code{js} project works identically to the Command Line API described earlier. Thus you can do things like @code{fastOptStage::run} to run the code on Node.js, setting @hl.scala{requiresDOM := true}, run @code{fullOptStage::run} to run the code with full, aggressive optimizations. And of course, things that work in both Scala.js and Scala-JVM can be run on both, basic commands such as @code{run} or @code{test}.
+    This @code{jvm} project works identically to any other Scala-JVM project, and the @code{js} project works identically to the Command Line API described earlier. Thus you can do things like @code{fastOptStage::run} to run the code on Node.js, setting @hl.scala{jsDependencies += RuntimeDOM}, run @code{fullOptStage::run} to run the code with full, aggressive optimizations. And of course, things that work in both Scala.js and Scala-JVM can be run on both, basic commands such as @code{run} or @code{test}.
 
   @p
     You can also run tests using this code, if you have a testing library set up. The next section will go into detail as to how to set that up.

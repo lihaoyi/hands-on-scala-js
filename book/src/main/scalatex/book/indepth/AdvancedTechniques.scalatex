@@ -294,7 +294,7 @@
       @p
         You may be wondering what these @hl.scala{Channel} things are, and where they are coming from. Although these are not provided by Scala, they are pretty straightforward to define ourselves:
 
-      @hl.ref("examples/demos/src/main/scala/advanced/Async.scala", "case class Channel")
+      @hl.ref("examples/demos/src/main/scala/advanced/Async.scala", "class Channel")
 
       @p
         The point of @hl.scala{Channel} is to allow us to turn event-callbacks (like those provided by the DOM's @hl.scala{onmouseXXX} properties) into some kind of event-stream, that we can listen to asynchronously (via @hl.scala{apply} that returns a @hl.scala{Future}) or merge via @hl.scala{|}. This is a minimal implementation for what we need now, but it would be easy to provide more functionality (filter, map, etc.) as necessary.

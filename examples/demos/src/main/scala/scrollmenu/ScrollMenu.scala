@@ -61,13 +61,15 @@ class ScrollSpy(structure: Tree[String],
   }
 
 
-  private[this] var scrolling = -1
+  private[this] var scrolling = false
   def apply() = {
-    dom.clearTimeout(scrolling)
-    scrolling = dom.setTimeout(() => start(), 200)
+    if (!scrolling) {
+      scrolling = true
+      dom.requestAnimationFrame((d: Double) => start())
+    }
   }
   private[this] def start() = {
-//    scrolling = false
+    scrolling = false
     def scroll(el: dom.Element) = {
       val rect = el.getBoundingClientRect()
       if (rect.top <= 0)
@@ -96,10 +98,12 @@ class ScrollSpy(structure: Tree[String],
           // This means it's the leaf element, because it won but there
           // aren't any children which won, so it must be the actual leaf
           tree.children.foreach(_.value.frag.classList.remove("selected"))
-          if (dom.location.hash != itemId)
-            dom.history.pushState(null, null, "#"+itemId)
-          scroll(menuItem.children(0))
 
+          val top = main.scrollTop
+          dom.location.hash = itemId
+          main.scrollTop = top
+
+          scroll(menuItem.children(0))
         }
         menuItem.children(0).classList.add("pure-menu-selected")
       }else{

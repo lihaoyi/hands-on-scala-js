@@ -1,8 +1,14 @@
 
+import org.eclipse.jgit.api.CreateBranchCommand.SetupUpstreamMode
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.merge.MergeStrategy
+import org.eclipse.jgit.transport.{UsernamePasswordCredentialsProvider, RefSpec}
+
 import scala.scalajs.sbtplugin.ScalaJSPlugin._
 import ScalaJSKeys._
 
 val cloneRepos = taskKey[Unit]("Clone stuff from github")
+val pushGithub = taskKey[Unit]("Push stuff to github")
 
 val sharedSettings = Seq(
   scalaVersion := "2.11.4",
@@ -79,7 +85,7 @@ lazy val book = Project(
       localPath.delete()
       for ((user, repo) <- paths){
         println(s"Cloning $repo...")
-        org.eclipse.jgit.api.Git.cloneRepository()
+        Git.cloneRepository()
            .setURI(s"https://github.com/$user/$repo")
            .setDirectory(localPath / repo)
            .call()
@@ -93,6 +99,36 @@ lazy val book = Project(
   initialize := {
     System.setProperty("clone.root", target.value.getAbsolutePath + "/clones")
     System.setProperty("output.root", target.value.getAbsolutePath + "/output")
+  },
+  pushGithub := {
+    val outputRoot = target.value.getAbsolutePath + "/output"
+    val repo = Git.init().setDirectory(new File(outputRoot)).call()
+    val remoteUrl = "https://github.com/lihaoyi/hands-on-scala-js"
+
+    val creds = new UsernamePasswordCredentialsProvider(
+      System.console.readLine("username>"),
+      System.console.readPassword("password>")
+    )
+    repo.add()
+        .addFilepattern(".")
+        .call()
+
+    repo.commit()
+        .setAll(true)
+        .setMessage(".")
+        .call()
+
+    repo.rebase().setUpstream("gh-pages").call()
+    repo.fetch()
+        .setRemote(remoteUrl)
+        .setRefSpecs(new RefSpec("refs/heads/gh-pages:refs/heads/gh-pages"))
+        .call()
+    repo.push()
+        .setRemote(remoteUrl)
+        .setCredentialsProvider(creds)
+        .setRefSpecs(new RefSpec("refs/heads/master:refs/heads/gh-pages"))
+        .call()
+    streams.value.log("Pushing to Github Pages complete!")
   }
 )
 
