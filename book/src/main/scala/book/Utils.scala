@@ -148,8 +148,8 @@ object hl{
   def html(code: String*) = highlight(code, "xml")
 
   val mappings = Seq(
-    "output/scala-js" -> "https://github.com/scala-js/scala-js",
-    "output/workbench-example-app" -> "https://github.com/lihaoyi/workbench-example-app",
+    "examples/scala-js" -> "https://github.com/scala-js/scala-js",
+    "examples/workbench-example-app" -> "https://github.com/lihaoyi/workbench-example-app",
     "" -> "https://github.com/lihaoyi/hands-on-scala-js"
   )
   def ref(filepath: String, start: String = "", end: String = "\n") = {

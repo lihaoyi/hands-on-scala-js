@@ -12,8 +12,8 @@ object BookData {
     }
 
     val roots = Seq(
-      "output/scala-js/javalanglib/src/main/scala",
-      "output/scala-js/javalib/src/main/scala"
+      "examples/scala-js/javalanglib/src/main/scala",
+      "examples/scala-js/javalib/src/main/scala"
     )
     for{
       root <- roots
