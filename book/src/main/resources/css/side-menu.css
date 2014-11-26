@@ -302,13 +302,16 @@ code{
 .header-link{
     opacity: 0.05;
 }
-.collapsed.menu-item-list li.hide > ul{
-    opacity: 1;
-    overflow: hidden;
-    height: 0px;
+#menu .menu-item-list .hide ul li > a{
+    padding-top: 0px;
+    padding-bottom: 0px;
 }
-.collapsed.menu-item-list .hide li > a{
+#menu .collapsed.menu-item-list li.hide > ul{
+    overflow: hidden;
+}
+#menu .expanded.menu-item-list .hide li > a{
     background: none;
+    color: #777;
 }
 
 #menu .menu-item-list li.selected{
@@ -316,6 +319,15 @@ code{
 }
 #menu .menu-item-list .hide li.selected{
     border-left: none;
+}
+
+.menu-item-list ul, .menu-item-list a{
+    -webkit-transition: all 0.2s ease-out;
+    -moz-transition: all 0.2s ease-out;
+    -ms-transition: all 0.2s ease-out;
+    -o-transition: all 0.2s ease-out;
+    transition: all 0.2s ease-out;
+    overflow: hidden
 }
 
 /*Override stuff from pure =/ it's not doing what I want*/

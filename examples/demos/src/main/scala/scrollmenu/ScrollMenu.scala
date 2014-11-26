@@ -23,6 +23,7 @@ class ScrollSpy(structure: Tree[String],
         li(
           a(
             t.value,
+            display := (if (i == -1) "none" else "block"),
             href:="#"+Controller.munge(t.value),
             cls:="menu-item"
           )
@@ -90,21 +91,23 @@ class ScrollSpy(structure: Tree[String],
       val childIndexes = children.map(walkIndex)
       val childWin = childIndexes.indexWhere(_ != null)
       if (childWin != -1) t :: childIndexes(childWin)
-      else if (win) Nil
+      else if (win) List(t)
       else null
     }
 
     val winPath = walkIndex(domTrees)
     val winItem = winPath.last.value
     def walkTree(tree: Tree[MenuNode], indices: List[Tree[MenuNode]]): Unit = {
-      for(item <- indices){
-        item.value.frag.classList.remove("hide")
-        item.value.frag.classList.remove("selected")
-        item.value.frag.children(0).classList.add("pure-menu-selected")
-        for(child <- item.children){
+      for(Tree(MenuNode(frag, _, start, end), children) <- indices){
+        frag.classList.remove("hide")
+        frag.classList.remove("selected")
+        frag.children(1).asInstanceOf[dom.HTMLElement].style.maxHeight = (end - start + 1) * 44 + "px"
+        frag.children(0).classList.add("pure-menu-selected")
+        for(child <- children if child.value.frag != indices(1).value.frag){
           val childFrag = child.value.frag
           childFrag.children(0).classList.remove("pure-menu-selected")
           childFrag.classList.add("hide")
+          childFrag.children(1).asInstanceOf[dom.HTMLElement].style.maxHeight = "0px"
           if (child.value.start < winItem.start) childFrag.classList.add("selected")
           else childFrag.classList.remove("selected")
         }
