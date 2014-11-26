@@ -48,7 +48,6 @@ object Compiler{
           incPos(q"$curr(..${compileBlock(parts, offset1)})", offset1)
         case (curr, Ast.Header(header, block, offset1)) =>
           incPos(q"$curr(${compileHeader(header, block, offset1)})", offset1)
-
       }
 
       out

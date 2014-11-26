@@ -388,6 +388,25 @@ object SyntaxTest extends TestSuite{
           |
         """.stripMargin
       )
+      * - check(
+        """
+          |
+          |
+          |
+          |package omg
+          |;
+          |
+          |;
+          |
+          |;
+          |class Parser
+          |;
+          |
+          |;
+          |
+          |;
+        """.stripMargin
+      )
     }
     def checkFile(path: String) = check(io.Source.fromFile(path).mkString)
     'file{

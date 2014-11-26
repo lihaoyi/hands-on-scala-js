@@ -189,7 +189,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def SimpleExpr1 = rule{
     K.W("new") ~ (ClassTemplate | TemplateBody) |
       BlockExpr |
-      Literal ~ drop[String] |
+      Literal |
       Path |
       K.W("_") |
       '(' ~ optional(Exprs) ~ ")"
@@ -208,9 +208,8 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Block: R0 = rule {
      optional(Semis) ~
      (
+       BlockStats ~ optional(Semis ~ ResultExpr) ~ BlockEnd |
        ResultExpr ~ BlockEnd |
-       BlockStats ~ Semis ~ ResultExpr ~ BlockEnd |
-       BlockStats ~ BlockEnd |
        MATCH ~ BlockEnd
      )
   }
@@ -245,17 +244,17 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
   def SimplePattern: R0 = rule {
     K.W("_") |
-      Literal ~ drop[String] |
-      '(' ~ optional(Patterns) ~ ')' |
-      (
-        StableId ~
-          optional(
-            '(' ~
-              (optional(Patterns ~ ',') ~ optional(VarId ~ '@') ~ K.W("_") ~ '*' | optional(Patterns)) ~
-              ')'
-          )
-        ) |
-      VarId
+    Literal |
+    '(' ~ optional(Patterns) ~ ')' |
+    (
+      StableId ~
+      optional(
+        '(' ~
+          (optional(Patterns ~ ',') ~ optional(VarId ~ '@') ~ K.W("_") ~ '*' | optional(Patterns)) ~
+          ')'
+      )
+    ) |
+    VarId
   }
   def Patterns: R0 = rule { K.W("_") ~ '*' | oneOrMore(Pattern).separatedBy(',') }
 
@@ -408,8 +407,10 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
       pr("CompulationUnit 0") ~
       optional(Semis) ~
       pr("CompulationUnit 1") ~
-      (TopPackageSeq ~ Semis ~ TopStatSeq | TopPackageSeq | TopStatSeq) ~
+      (TopPackageSeq ~ optional(Semis ~ TopStatSeq) | TopStatSeq) ~
+      optional(Semis) ~
       WL
+
     )
   }
 }
