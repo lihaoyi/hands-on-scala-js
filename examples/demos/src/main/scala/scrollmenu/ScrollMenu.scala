@@ -17,7 +17,7 @@ class ScrollSpy(structure: Tree[String],
                 main: dom.HTMLElement,
                 var clean: Boolean = false){
   val (headers, domTrees) = {
-    var i = 0
+    var i = -1
     def recurse(t: Tree[String], depth: Int): Tree[MenuNode] = {
       val curr =
         li(
@@ -32,7 +32,7 @@ class ScrollSpy(structure: Tree[String],
       val children = t.children.map(recurse(_, depth + 1))
       Tree(
         MenuNode(
-          curr(ul(paddingLeft := "15px",children.map(_.value.frag))).render,
+          curr(ul(marginLeft := "15px",children.map(_.value.frag))).render,
           Controller.munge(t.value),
           originalI,
           if (children.length > 0) children.map(_.value.end).max else originalI + 1
@@ -56,7 +56,7 @@ class ScrollSpy(structure: Tree[String],
         .map(offset(_, main))
         .toVector
     }
-    val domTrees = structure.children.map(recurse(_, 0))
+    val domTrees = recurse(structure, 0)
     (headers, domTrees)
   }
 
@@ -68,7 +68,7 @@ class ScrollSpy(structure: Tree[String],
       dom.requestAnimationFrame((d: Double) => start())
     }
   }
-  private[this] var previousId = ""
+  private[this] var previousWin: MenuNode = null
   private[this] def start() = {
     scrolling = false
     def scroll(el: dom.Element) = {
@@ -78,44 +78,47 @@ class ScrollSpy(structure: Tree[String],
       else if (rect.top > dom.innerHeight)
         el.scrollIntoView(false)
     }
-    def walkTree(tree: Tree[MenuNode]): Boolean = {
-      val Tree(MenuNode(menuItem, itemId, start, end), children) = tree
-      val before = headers(start) <= main.scrollTop
-      val after = (end >= headers.length) || headers(end) > main.scrollTop
-
-      val win = before && after
-
-      if (win){
-        menuItem.classList.remove("hide")
-        var winFound = false
-
-        for(c <- tree.children){
-          val newWinFound = walkTree(c)
-          if (!winFound) c.value.frag.classList.add("selected")
-          else c.value.frag.classList.remove("selected")
-          winFound = winFound | newWinFound
-        }
-        if (!winFound) {
-          if (previousId != itemId){
-            previousId = itemId
-            // This means it's the leaf element, because it won but there
-            // aren't any children which won, so it must be the actual leaf
-            tree.children.foreach(_.value.frag.classList.remove("selected"))
-            scroll(menuItem.children(0))
-
-            dom.history.replaceState(null, null, "#" + itemId)
-          }
-        }
-        menuItem.children(0).classList.add("pure-menu-selected")
-      }else{
-        if(clean) tree.children.map(walkTree)
-        menuItem.children(0).classList.remove("pure-menu-selected")
-        menuItem.classList.add("hide")
-        menuItem.classList.remove("selected")
+    val scrollTop = main.scrollTop
+    def walkIndex(tree: Tree[MenuNode]): List[Tree[MenuNode]] = {
+      val t @ Tree(m, children) = tree
+      val win = if(m.start == -1) true
+      else {
+        val before = headers(m.start) <= scrollTop
+        val after = (m.end >= headers.length) || headers(m.end) > scrollTop
+        before && after
       }
-      win
+      val childIndexes = children.map(walkIndex)
+      val childWin = childIndexes.indexWhere(_ != null)
+      if (childWin != -1) t :: childIndexes(childWin)
+      else if (win) Nil
+      else null
     }
-    domTrees.map(walkTree)
+
+    val winPath = walkIndex(domTrees)
+    val winItem = winPath.last.value
+    def walkTree(tree: Tree[MenuNode], indices: List[Tree[MenuNode]]): Unit = {
+      for(item <- indices){
+        item.value.frag.classList.remove("hide")
+        item.value.frag.classList.remove("selected")
+        item.value.frag.children(0).classList.add("pure-menu-selected")
+        for(child <- item.children){
+          val childFrag = child.value.frag
+          childFrag.children(0).classList.remove("pure-menu-selected")
+          childFrag.classList.add("hide")
+          if (child.value.start < winItem.start) childFrag.classList.add("selected")
+          else childFrag.classList.remove("selected")
+        }
+      }
+
+    }
+
+    if (winItem != previousWin){
+      scroll(winItem.frag.children(0))
+      dom.history.replaceState(null, null, "#" + winItem.id)
+      previousWin = winItem
+      walkTree(domTrees, winPath)
+    }
+
   }
 
 

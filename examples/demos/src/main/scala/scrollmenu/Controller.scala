@@ -31,7 +31,7 @@ object Controller{
 
     val scrollSpy = new ScrollSpy(structure, main)
     val list = ul(cls := "menu-item-list collapsed")(
-      scrollSpy.domTrees.map(_.value.frag)
+      scrollSpy.domTrees.value.frag
     ).render
 
     def updateScroll() = scrollSpy()
@@ -51,6 +51,7 @@ object Controller{
           expandIcon.classList.toggle("fa-caret-down")
           expandIcon.classList.toggle("fa-caret-up")
           list.classList.toggle("collapsed")
+          list.classList.toggle("expanded")
           scrollSpy.clean = !scrollSpy.clean
           updateScroll()
         }
