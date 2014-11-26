@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE ci [
+  <!ELEMENT ci (task*,matrix*)>
+  <!ELEMENT task (#PCDATA)>
+  <!ATTLIST task id ID #REQUIRED>
+  <!ELEMENT matrix (run*)>
+  <!ATTLIST matrix id ID #REQUIRED>
+  <!ELEMENT run (v*)>
+  <!ATTLIST run matrix IDREF #IMPLIED>
+  <!ATTLIST run task IDREF #IMPLIED>
+  <!ELEMENT v (#PCDATA)>
+  <!ATTLIST v n CDATA #REQUIRED>
+]>
+<ci>
+
+  <task id="main"><![CDATA[
+    export JAVA_HOME=$HOME/apps/java-$java
+    sbt ++$scala package packageDoc &&
+    sbt ++$scala helloworld/run \
+        'set scalaJSStage in Global := FastOptStage' \
+        ++$scala helloworld/run \
+        'set scalaJSStage in Global := FullOptStage' \
+        ++$scala helloworld/run \
+        helloworld/clean &&
+    sbt 'set scalaJSOptimizerOptions in ScalaJSBuild.helloworld ~= (_.withDisableOptimizer(true))' \
+        'set scalaJSStage in Global := FastOptStage' \
+        ++$scala helloworld/run \
+        helloworld/clean &&
+    sbt 'set inScope(ThisScope in ScalaJSBuild.helloworld)(postLinkJSEnv := PhantomJSEnv().value)' \
+        'set scalaJSStage in Global := FastOptStage' \
+        ++$scala helloworld/run \
+        'set scalaJSStage in Global := FullOptStage' \
+        ++$scala helloworld/run &&
+    sbt ++$scala testingExample/test \
+        'set scalaJSStage in Global := FastOptStage' \
+        ++$scala testingExample/test \
+        'set scalaJSStage in Global := FullOptStage' \
+        ++$scala testingExample/test \
+        testingExample/clean &&
+    sbt 'set scalaJSOptimizerOptions in ScalaJSBuild.testingExample ~= (_.withDisableOptimizer(true))' \
+        'set scalaJSStage in Global := FastOptStage' \
+        ++$scala testingExample/test &&
+    sbt ++$scala "testSuite/testOnly -- -- -trhino -tsource-maps" \
+                 "noIrCheckTest/testOnly -- -- -trhino -tsource-maps" \
+        'set scalaJSStage in Global := FastOptStage' \
+        ++$scala "testSuite/testOnly -- -- -ttypedarray -tnodejs -tsource-maps" \
+                 "noIrCheckTest/testOnly -- -- -ttypedarray -tnodejs -tsource-maps" \
+        'set scalaJSStage in Global := FullOptStage' \
+        ++$scala "testSuite/testOnly -- -- -ttypedarray -tnodejs -tsource-maps" \
+                 "noIrCheckTest/testOnly -- -- -ttypedarray -tnodejs -tsource-maps" \
+        testSuite/clean &&
+    sbt 'set scalaJSOptimizerOptions in ScalaJSBuild.testSuite ~= (_.withDisableOptimizer(true))' \
+        'set scalaJSStage in Global := FastOptStage' \
+        ++$scala "testSuite/testOnly -- -- -ttypedarray -tnodejs -tsource-maps" \
+        testSuite/clean &&
+    sbt 'set scalaJSSemantics in ScalaJSBuild.testSuite ~= { _.withAsInstanceOfs(scala.scalajs.tools.sem.CheckedBehavior.Compliant).withStrictFloats(true) }' \
+        ++$scala "testSuite/testOnly -- -- -trhino -tsource-maps -tcompliant-asinstanceofs -tstrict-floats" \
+        'set scalaJSStage in Global := FastOptStage' \
+        ++$scala "testSuite/testOnly -- -- -ttypedarray -tnodejs -tsource-maps -tcompliant-asinstanceofs -tstrict-floats" \
+        'set scalaJSStage in Global := FullOptStage' \
+        ++$scala "testSuite/testOnly -- -- -ttypedarray -tnodejs -tsource-maps -tcompliant-asinstanceofs -tstrict-floats" \
+        testSuite/clean &&
+    sbt 'set scalaJSSemantics in ScalaJSBuild.testSuite ~= { _.withAsInstanceOfs(scala.scalajs.tools.sem.CheckedBehavior.Compliant).withStrictFloats(true) }' \
+        'set scalaJSOptimizerOptions in ScalaJSBuild.testSuite ~= (_.withDisableOptimizer(true))' \
+        'set scalaJSStage in Global := FastOptStage' \
+        ++$scala "testSuite/testOnly -- -- -ttypedarray -tnodejs -tsource-maps -tcompliant-asinstanceofs -tstrict-floats" \
+        testSuite/clean &&
+    sbt 'set inScope(ThisScope in ScalaJSBuild.helloworld)(postLinkJSEnv := PhantomJSEnv().value)' \
+        'set scalaJSStage in Global := FastOptStage' \
+        ++$scala "testSuite/testOnly -- -- -tphantomjs" \
+        'set scalaJSStage in Global := FullOptStage' \
+        ++$scala "testSuite/testOnly -- -- -tphantomjs" \
+        testSuite/clean &&
+    sbt 'set scalacOptions in ScalaJSBuild.testSuite += "-Xexperimental"' \
+        ++$scala "testSuite/testOnly -- -- -trhino -tsource-maps" \
+        'set scalaJSStage in Global := FastOptStage' \
+        ++$scala "testSuite/testOnly -- -- -ttypedarray -tnodejs -tsource-maps" \
+        'set scalaJSStage in Global := FullOptStage' \
+        ++$scala "testSuite/testOnly -- -- -ttypedarray -tnodejs -tsource-maps" &&
+    sbt 'set scalaJSStage in Global := FastOptStage' \
+        ++$scala "javalibExTestSuite/testOnly -- -- -ttypedarray -tnodejs -tsource-maps" \
+        'set scalaJSStage in Global := FullOptStage' \
+        ++$scala "javalibExTestSuite/testOnly -- -- -ttypedarray -tnodejs -tsource-maps" &&
+    sbt ++$scala compiler/test reversi/fastOptJS reversi/fullOptJS &&
+    sbt ++$scala partest/fetchScalaSource &&
+    sh ci/checksizes.sh $scala &&
+    sh ci/check-partest-coverage.sh $scala
+  ]]></task>
+
+  <task id="bootstrap"><![CDATA[
+    export JAVA_HOME=$HOME/apps/java-$java
+    sbt 'set scalaJSStage in Global := FastOptStage' \
+        ++$scala toolsJS/test \
+        'set scalaJSStage in Global := FullOptStage' \
+        ++$scala toolsJS/test
+  ]]></task>
+
+  <task id="tools-cli-stubs"><![CDATA[
+    export JAVA_HOME=$HOME/apps/java-$java
+    sbt ++$scala tools/package tools/test cli/assembly stubs/package
+  ]]></task>
+
+  <task id="tools-cli-stubs-sbtplugin"><![CDATA[
+    export JAVA_HOME=$HOME/apps/java-$java
+    sbt ++$scala tools/package tools/test cli/assembly stubs/package \
+        sbtPlugin/package sbtPlugin/test
+  ]]></task>
+
+  <task id="partestc"><![CDATA[
+    export JAVA_HOME=$HOME/apps/java-$java
+    sbt ++$scala partest/compile
+  ]]></task>
+
+  <task id="sbtplugin-test"><![CDATA[
+    # Publish Scala.js artifacts locally
+    sbt ++2.11.2 publishLocal ++2.10.4 tools/publishLocal sbtPlugin/publishLocal
+    # Go into standalone project and test
+    cd sbt-plugin-test
+    sbt noDOM/run withDOM/run test \
+        'set scalaJSStage in Global := FastOptStage' \
+        jetty9/run test
+  ]]></task>
+
+  <task id="partest-noopt"><![CDATA[
+    export JAVA_HOME=$HOME/apps/java-$java
+    sbt ++$scala package "partestSuite/testOnly -- --showDiff"
+  ]]></task>
+
+  <task id="partest-fastopt"><![CDATA[
+    export JAVA_HOME=$HOME/apps/java-$java
+    sbt ++$scala package "partestSuite/testOnly -- --fastOpt --showDiff"
+  ]]></task>
+
+  <task id="partest-fullopt"><![CDATA[
+    export JAVA_HOME=$HOME/apps/java-$java
+    sbt ++$scala package "partestSuite/testOnly -- --fullOpt --showDiff"
+  ]]></task>
+
+  <matrix id="pr">
+    <!-- Main test tasks -->
+    <run task="main">
+      <v n="scala">2.10.2</v>
+      <v n="java">1.6</v>
+    </run>
+    <run task="main">
+      <v n="scala">2.10.2</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="main">
+      <v n="scala">2.10.2</v>
+      <v n="java">1.8</v>
+    </run>
+    <run task="main">
+      <v n="scala">2.11.2</v>
+      <v n="java">1.6</v>
+    </run>
+    <run task="main">
+      <v n="scala">2.11.2</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="main">
+      <v n="scala">2.11.2</v>
+      <v n="java">1.8</v>
+    </run>
+    <run task="main">
+      <v n="scala">2.11.4</v>
+      <v n="java">1.7</v>
+    </run>
+
+    <!-- Bootstrap test tasks -->
+    <run task="bootstrap">
+      <v n="scala">2.10.2</v>
+      <v n="java">1.6</v>
+    </run>
+    <run task="bootstrap">
+      <v n="scala">2.10.2</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="bootstrap">
+      <v n="scala">2.10.2</v>
+      <v n="java">1.8</v>
+    </run>
+    <!-- Tools do not compile on JDK6, Scala 2.11.x (see #1235) -->
+    <run task="bootstrap">
+      <v n="scala">2.11.2</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="bootstrap">
+      <v n="scala">2.11.2</v>
+      <v n="java">1.8</v>
+    </run>
+    <!-- Tools do not compile on Scala 2.11.4 (see #1215). -->
+
+    <!-- Tools / CLI / Stubs / sbtPlugin test tasks -->
+    <run task="tools-cli-stubs-sbtplugin">
+      <v n="scala">2.10.4</v>
+      <v n="java">1.6</v>
+    </run>
+    <run task="tools-cli-stubs-sbtplugin">
+      <v n="scala">2.10.4</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="tools-cli-stubs-sbtplugin">
+      <v n="scala">2.10.4</v>
+      <v n="java">1.8</v>
+    </run>
+    <!-- Tools do not compile on JDK6, Scala 2.11.x (see #1235) -->
+    <run task="tools-cli-stubs">
+      <v n="scala">2.11.2</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="tools-cli-stubs">
+      <v n="scala">2.11.2</v>
+      <v n="java">1.8</v>
+    </run>
+    <!-- Tools do not compile on Scala 2.11.4 (see #1215). -->
+
+    <!-- Partest compilation test tasks -->
+    <run task="partestc">
+      <v n="scala">2.11.0</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="partestc">
+      <v n="scala">2.11.1</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="partestc">
+      <v n="scala">2.11.2</v>
+      <v n="java">1.7</v>
+    </run>
+    <!-- Partest does not compile on Scala 2.11.4 (see #1215). -->
+
+    <run task="sbtplugin-test" />
+  </matrix>
+
+  <matrix id="nightly">
+    <run matrix="pr" />
+
+    <!-- Main test tasks (all remaining Scala versions) -->
+    <run task="main">
+      <v n="scala">2.10.3</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="main">
+      <v n="scala">2.10.4</v>
+      <v n="java">1.6</v>
+    </run>
+    <run task="main">
+      <v n="scala">2.10.4</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="main">
+      <v n="scala">2.10.4</v>
+      <v n="java">1.8</v>
+    </run>
+    <run task="main">
+      <v n="scala">2.11.0</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="main">
+      <v n="scala">2.11.1</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="main">
+      <v n="scala">2.11.4</v>
+      <v n="java">1.6</v>
+    </run>
+    <run task="main">
+      <v n="scala">2.11.4</v>
+      <v n="java">1.8</v>
+    </run>
+
+    <!-- Bootstrap test tasks (all remaining Scala versions) -->
+    <run task="bootstrap">
+      <v n="scala">2.10.3</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="bootstrap">
+      <v n="scala">2.10.4</v>
+      <v n="java">1.6</v>
+    </run>
+    <run task="bootstrap">
+      <v n="scala">2.10.4</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="bootstrap">
+      <v n="scala">2.10.4</v>
+      <v n="java">1.8</v>
+    </run>
+    <run task="bootstrap">
+      <v n="scala">2.11.0</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="bootstrap">
+      <v n="scala">2.11.1</v>
+      <v n="java">1.7</v>
+    </run>
+
+    <run task="partest-noopt">
+      <v n="scala">2.11.2</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="partest-fastopt">
+      <v n="scala">2.11.2</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="partest-fullopt">
+      <v n="scala">2.11.2</v>
+      <v n="java">1.7</v>
+    </run>
+  </matrix>
+
+  <matrix id="weekly">
+    <!-- weekly does not have to run nightly, since they will run at the same time -->
+
+    <run task="partest-noopt">
+      <v n="scala">2.11.0</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="partest-fastopt">
+      <v n="scala">2.11.0</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="partest-fullopt">
+      <v n="scala">2.11.0</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="partest-noopt">
+      <v n="scala">2.11.1</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="partest-fastopt">
+      <v n="scala">2.11.1</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="partest-fullopt">
+      <v n="scala">2.11.1</v>
+      <v n="java">1.7</v>
+    </run>
+    <run task="partest-noopt">
+      <v n="scala">2.11.2</v>
+      <v n="java">1.8</v>
+    </run>
+    <run task="partest-fastopt">
+      <v n="scala">2.11.2</v>
+      <v n="java">1.8</v>
+    </run>
+    <run task="partest-fullopt">
+      <v n="scala">2.11.2</v>
+      <v n="java">1.8</v>
+    </run>
+    <!--
+        Partest does sometimes not compile on JDK6 (see #1227) we
+        therefore do not run any JDK6 partests.
+
+        Partest does not compile on Scala 2.11.4 (see #1215).
+      -->
+  </matrix>
+
+</ci>
