@@ -27,7 +27,7 @@ object BookData {
       if file.isFile
     } yield{
       val path = file.getPath
-        .drop(root.length + 1)
+        .drop(cloneRoot.length + root.length + 1)
         .dropRight(".scala".length)
       val filename = path.replace('/', '.')
       val docpath = s"https://docs.oracle.com/javase/7/docs/api/$path.html"

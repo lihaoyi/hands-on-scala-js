@@ -8,7 +8,6 @@ import scala.scalajs.sbtplugin.ScalaJSPlugin._
 import ScalaJSKeys._
 
 val cloneRepos = taskKey[Unit]("Clone stuff from github")
-val pushGithub = taskKey[Unit]("Push stuff to github")
 
 val sharedSettings = Seq(
   scalaVersion := "2.11.4",
@@ -100,7 +99,7 @@ lazy val book = Project(
     System.setProperty("clone.root", target.value.getAbsolutePath + "/clones")
     System.setProperty("output.root", target.value.getAbsolutePath + "/output")
   },
-  pushGithub := {
+  publish := {
     val outputRoot = target.value.getAbsolutePath + "/output"
     val repo = Git.init().setDirectory(new File(outputRoot)).call()
     val remoteUrl = "https://github.com/lihaoyi/hands-on-scala-js"
