@@ -115,10 +115,10 @@
 
     @hl.bash
       Hello World!
-      In Scala.js, (1.0).toString is 0!
+      In Scala.js, (1.0).toString is 1!
 
     @p
-      This exhibits the weirdness of integer divide-by-zero in Scala.js, which is one of the few ways in which @sect.ref("Deviations from Scala-JVM", "Scala.js deviates from Scala-JVM"). This also shows us we're really running on Scala.js: on Scala-JVM, integer divide-by-zero throws an exception rather than returning zero!
+      This exhibits the weirdness of @hl.scala{Double.toString} in Scala.js, which is one of the few ways in which @sect.ref("Deviations from Scala-JVM", "Scala.js deviates from Scala-JVM"). This also shows us we're really running on Scala.js: on Scala-JVM, @hl.scala{(1.0).toString} returns @hl.scala{"1.0"} rather than @hl.scala{"1"}!
 
     @p
       One thing you may be wondering is: when you run a Scala.js program in the terminal, how does it execute the output Javascript? What about the DOM? and Ajax calls? Can it access the filesystem? The answer to all these questions is "it depends": it turns out there are multiple ways you can run Scala.js from the command-line:
