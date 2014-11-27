@@ -10,7 +10,7 @@ object Page{
         script(src:="/client-fastopt.js"),
         link(
           rel:="stylesheet",
-          href:="http://yui.yahooapis.com/pure/0.5.0/pure-min.css"
+          href:="https://cdnjs.cloudflare.com/ajax/libs/pure/0.5.0/pure-min.css"
         )
       ),
       body(

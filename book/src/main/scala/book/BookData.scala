@@ -43,6 +43,7 @@ object BookData {
       script(s"$main(document.getElementById('$tagId'))")
     )
   }
+
   def split = div(cls:="pure-g")
   def more = div(cls:="pure-u-1 pure-u-md-13-24")
   def less = div(cls:="pure-u-1 pure-u-md-11-24")

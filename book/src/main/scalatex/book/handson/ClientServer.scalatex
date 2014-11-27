@@ -74,6 +74,8 @@
   @p
     Now, if we go to the browser at @code{localhost:8080}, we should see our web-page!
 
+  @iframe(src:="https://hands-on-scala-js.herokuapp.com/", width:="100%", height:="300px", "frameBorder".attr:="0")
+
 @sect{Client-Server Reflections}
   @p
     By now you've already set up your first client-server application. However, it might not be immediately clear what we've done and why it's interesting! Here are some points to consider.

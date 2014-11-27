@@ -1,3 +1,4 @@
+import NativePackagerKeys._
 import utest.jsrunner.JsCrossBuild
 import scala.scalajs.sbtplugin.ScalaJSPlugin._
 import ScalaJSKeys._
@@ -22,6 +23,7 @@ lazy val client = project.in(file("client"))
 
 lazy val server = project.in(file("server"))
                          .settings(sharedSettings:_*)
+                         .settings(packageArchetype.java_application:_*)
                          .settings(
   libraryDependencies ++= Seq(
     "io.spray" %% "spray-can" % "1.3.2",

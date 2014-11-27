@@ -4,10 +4,13 @@ import akka.actor.ActorSystem
 import spray.http.{HttpEntity, MediaTypes}
 import spray.routing.SimpleRoutingApp
 
+import scala.util.Properties
+
 object Server extends SimpleRoutingApp{
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem()
-    startServer("localhost", port = 8080){
+    val port = Properties.envOrElse("PORT", "8080").toInt
+    startServer("0.0.0.0", port = port){
       get{
         pathSingleSlash{
           complete{
