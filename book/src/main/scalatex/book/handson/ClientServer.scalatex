@@ -39,7 +39,8 @@
   @hl.ref("examples/crossBuilds/clientserver/build.sbt")
 
   @p
-    We have two projects: @code{client} and @code{server}, one of which is a Scala.js project (indicated by the presence of @hl.scala{scalaJSSettings}). Both projects share a number of settings: the presence of the @code{shared/} folder, which shared code can live in (similar to what we saw in @sect.ref{Cross Publishing Libraries}) and the settings to add @lnk.github.Scalatags and @lnk.github.uPickle to the build. Note that those two dependencies use the triple @code{%%%} instead of the double @code{%%} to declare: this means that for each dependency, we will pull in the Scala-JVM or Scala.js version depending on whether it's being used in a Scala.js project.
+    We have two projects: @code{client} and @code{server}, one of which is a Scala.js project (indicated by the presence of @hl.scala{scalaJSSettings}). Both projects share a number of settings: the presence of the @code{shared/} folder, which shared code can live in (similar to what we saw in @sect.ref{Cross Publishing Libraries}) and the settings to add @lnk.github.Scalatags and @lnk.github.uPickle to the build. Note that those two dependencies use the triple @code{%%%} instead of the double @code{%%} to declare: this means that for each dependency, we will pull in the Scala-JVM or Scala.js version depending on whether it's being used in a Scala.js project. Note also the @hl.scala{packageArchetype.java_application} setting, which isn't strictly necessary depending on what you want to do with the application, but this example needs it as part of the deployment to Heroku.
+
   @p
     The @code{client} subproject is uneventful, with a dependency on the by-now-familiar @code{scalajs-dom} library. The @code{server} project, on the other hand, is interesting: it contains the dependencies required for us to set up out Spray server, and one additional thing: we add the output of @code{fastOptJS} from the client to the @code{resources} on the server. This will allow the @code{server} to serve the compiled-javascript from our @code{client} project from its resources.
 
@@ -75,6 +76,9 @@
     Now, if we go to the browser at @code{localhost:8080}, we should see our web-page!
 
   @iframe(src:="https://hands-on-scala-js.herokuapp.com/", width:="100%", height:="300px", "frameBorder".attr:="0")
+
+  @p
+    This is a real, live example running on a @lnk("Heroku server", "https://hands-on-scala-js.herokuapp.com/"). Feel free to poke around and explore the filesystem on the server, just to convince yourself that this actually works and is not just a mock up.
 
 @sect{Client-Server Reflections}
   @p
