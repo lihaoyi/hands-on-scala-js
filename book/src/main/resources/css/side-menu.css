@@ -309,9 +309,9 @@ code{
 #menu .collapsed.menu-item-list li.hide > ul{
     overflow: hidden;
 }
-#menu .expanded.menu-item-list .hide li > a{
+#menu .expanded.menu-item-list .hide li > a:not(:hover){
     background: none;
-    color: #777;
+    color: #999;
 }
 
 #menu .menu-item-list li.selected{
