@@ -100,6 +100,11 @@ lazy val book = Project(
     System.setProperty("output.root", target.value.getAbsolutePath + "/output")
   },
   publish := {
+    // If you want to publish the heroku app, push the contents of
+    // examples/crossBuilds/clientserver to https://git.heroku.com/hands-on-scala-js.git
+    // May aswell do it manually because it's a slow process and the
+    // code doesn't change much
+
     val outputRoot = target.value.getAbsolutePath + "/output"
     val repo = Git.init().setDirectory(new File(outputRoot)).call()
     val remoteUrl = "https://github.com/lihaoyi/hands-on-scala-js"
