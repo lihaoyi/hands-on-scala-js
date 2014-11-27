@@ -52,8 +52,8 @@ object Controller{
           expandIcon.classList.toggle("fa-caret-up")
           list.classList.toggle("collapsed")
           list.classList.toggle("expanded")
-          scrollSpy.clean = !scrollSpy.clean
-          updateScroll()
+          scrollSpy.toggleOpen()
+//          updateScroll()
         }
       ).render
 

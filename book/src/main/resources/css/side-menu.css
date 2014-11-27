@@ -302,7 +302,7 @@ code{
 .header-link{
     opacity: 0.05;
 }
-#menu .menu-item-list .hide ul li > a{
+#menu .collapsed .menu-item-list .hide ul li > a{
     padding-top: 0px;
     padding-bottom: 0px;
 }

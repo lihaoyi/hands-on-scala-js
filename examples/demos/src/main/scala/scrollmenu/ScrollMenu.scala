@@ -14,8 +14,7 @@ case class MenuNode(frag: dom.HTMLElement, id: String, start: Int, end: Int)
  * Lots of sketchy imperative code in order to maximize performance.
  */
 class ScrollSpy(structure: Tree[String],
-                main: dom.HTMLElement,
-                var clean: Boolean = false){
+                main: dom.HTMLElement){
   val (headers, domTrees) = {
     var i = -1
     def recurse(t: Tree[String], depth: Int): Tree[MenuNode] = {
@@ -52,25 +51,48 @@ class ScrollSpy(structure: Tree[String],
         }
         rec(structure).tail
       }
-      menuItems.map(Controller.munge)
-        .map(dom.document.getElementById)
-        .map(offset(_, main))
-        .toVector
+
+      js.Array(
+        menuItems.map(Controller.munge)
+          .map(dom.document.getElementById)
+          .map(offset(_, main)):_*
+      )
     }
     val domTrees = recurse(structure, 0)
     (headers, domTrees)
   }
 
+  var open = false
+  def toggleOpen() = {
+    open = !open
+    if (open){
+      def rec(tree: Tree[MenuNode])(f: MenuNode => Unit): Unit = {
+        f(tree.value)
+        tree.children.foreach(rec(_)(f))
+      }
+      rec(domTrees)(setFullHeight)
+    }else{
+      start(force = true)
+    }
+  }
 
+  def setFullHeight(mn: MenuNode) = {
+    mn.frag
+      .children(1)
+      .asInstanceOf[dom.HTMLElement]
+      .style
+      .maxHeight = (mn.end - mn.start + 1) * 44 + "px"
+  }
   private[this] var scrolling = false
   def apply() = {
     if (!scrolling) {
+      println("Scroll...")
       scrolling = true
-      dom.requestAnimationFrame((d: Double) => start())
+      dom.setTimeout(() => start(), 200)
     }
   }
   private[this] var previousWin: MenuNode = null
-  private[this] def start() = {
+  private[this] def start(force: Boolean = false) = {
     scrolling = false
     def scroll(el: dom.Element) = {
       val rect = el.getBoundingClientRect()
@@ -98,16 +120,20 @@ class ScrollSpy(structure: Tree[String],
     val winPath = walkIndex(domTrees)
     val winItem = winPath.last.value
     def walkTree(tree: Tree[MenuNode], indices: List[Tree[MenuNode]]): Unit = {
-      for(Tree(MenuNode(frag, _, start, end), children) <- indices){
-        frag.classList.remove("hide")
-        frag.classList.remove("selected")
-        frag.children(1).asInstanceOf[dom.HTMLElement].style.maxHeight = (end - start + 1) * 44 + "px"
-        frag.children(0).classList.add("pure-menu-selected")
+      println("WalkTree")
+      for(Tree(mn, children) <- indices){
+        mn.frag.classList.remove("hide")
+        mn.frag.classList.remove("selected")
+        setFullHeight(mn)
+        mn.frag.children(0).classList.add("pure-menu-selected")
         for(child <- children if child.value.frag != indices(1).value.frag){
           val childFrag = child.value.frag
+
           childFrag.children(0).classList.remove("pure-menu-selected")
           childFrag.classList.add("hide")
-          childFrag.children(1).asInstanceOf[dom.HTMLElement].style.maxHeight = "0px"
+          if(!open)
+            childFrag.children(1).asInstanceOf[dom.HTMLElement].style.maxHeight = "0px"
+
           if (child.value.start < winItem.start) childFrag.classList.add("selected")
           else childFrag.classList.remove("selected")
         }
@@ -115,7 +141,7 @@ class ScrollSpy(structure: Tree[String],
 
     }
 
-    if (winItem != previousWin){
+    if (winItem != previousWin || force){
       scroll(winItem.frag.children(0))
       dom.history.replaceState(null, null, "#" + winItem.id)
       previousWin = winItem
