@@ -75,7 +75,7 @@
   @p
     Now, if we go to the browser at @code{localhost:8080}, we should see our web-page!
 
-  @iframe(src:="https://hands-on-scala-js.herokuapp.com/", width:="100%", height:="300px", "frameBorder".attr:="0")
+  @iframe(src:="https://hands-on-scala-js.herokuapp.com/", width:="100%", height:="350px", "frameBorder".attr:="0")
 
   @p
     This is a real, live example running on a @lnk("Heroku server", "https://hands-on-scala-js.herokuapp.com/"). Feel free to poke around and explore the filesystem on the server, just to convince yourself that this actually works and is not just a mock up.
@@ -213,7 +213,12 @@
         While @hl.scala{Ajax.post} returned a @hl.scala{Future[dom.XMLHttpRequest]} and left us to call @hl.scala{upickle.read} and deserialize the data ourselves, @hl.scala{Ajaxer[Api].list(...).call()} now returns a @hl.scala{Future[Seq[FileData]]}! Thus we don't need to worry about making a mistake in the deserialization logic when we write it by hand.
 
     @p
-      Other than that, nothing much has changed. If you've done this correctly, the web application will look and behave exactly as it did earlier! So why did we do this in the first place?
+      Other than that, nothing much has changed. If you've done this correctly, the web application will look and behave exactly as it did earlier!
+
+    @iframe(src:="https://hands-on-scala-js.herokuapp.com/", width:="100%", height:="350px", "frameBorder".attr:="0")
+
+    @p
+      So why did we do this in the first place?
 
   @sect{Why Autowire?}
     @p
