@@ -111,17 +111,17 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     oneOrMore(AnnotType).separatedBy(WL ~ K.W("with")) ~ optional(Refinement)
   }
   def AnnotType = rule {
-    SimpleType ~ zeroOrMore(WL ~ Annotation)
+     SimpleType ~  zeroOrMore(WL ~ Annotation) 
   }
   def SimpleType: R0 = rule {
     BasicType ~
-      optional(WL ~ '#' ~ Id) ~
-      optional(WL ~ TypeArgs)
+    optional(WL ~ '#' ~ Id) ~
+    optional(WL ~ TypeArgs)
   }
   def BasicType: R0 = rule {
-    '(' ~ Types ~ ')' |
-      Path ~ '.' ~ K.W("type") |
-      StableId
+    '(' ~ Types ~ ')'  |
+    Path ~ '.' ~ K.W("type")   |
+    StableId 
   }
   def TypeArgs = rule { '[' ~ Types ~ "]" }
   def Types = rule { oneOrMore(Type).separatedBy(',') }
@@ -131,14 +131,21 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def RefineStat = rule { "type" ~ TypeDef | Dcl | MATCH }
   def TypePat = rule { CompoundType }
   def Ascription = rule {
-    ":" ~ ("_" ~ "*" | InfixType | oneOrMore(Annotation))
+     ":" ~ ("_" ~ "*" |  InfixType  | oneOrMore(Annotation)) 
   }
 
   def ParamType = rule { K.O("=>") ~ Type | Type ~ "*" | Type }
 
+  def LambdaHead: R0 = rule{
+    (
+      Bindings |
+      optional(K.W("implicit")) ~ Id ~ optional(Ascription) |
+      "_" ~ optional(Ascription)
+    ) ~
+    K.O("=>")
+  }
   def Expr: R0 = rule {
-    (Bindings | optional(K.W("implicit")) ~ Id | "_") ~ K.O("=>") ~ Expr |
-    Expr1
+    zeroOrMore(LambdaHead) ~ Expr1
   }
   def Expr1: R0 = rule {
     IfCFlow |
@@ -206,12 +213,13 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def BlockExpr: R0 = rule { '{' ~ (CaseClauses | Block) ~ "}" }
   def BlockEnd: R0 = rule{ optional(Semis) ~ &("}" | "case") }
   def Block: R0 = rule {
-     optional(Semis) ~
-     (
-       BlockStats ~ optional(Semis ~ ResultExpr) ~ BlockEnd |
-       ResultExpr ~ BlockEnd |
-       MATCH ~ BlockEnd
-     )
+    zeroOrMore(LambdaHead) ~
+    optional(Semis) ~
+    (
+      ResultExpr ~ BlockEnd |
+      BlockStats ~ optional(Semis ~ ResultExpr) ~ BlockEnd |
+      MATCH ~ BlockEnd
+    )
   }
   def BlockStats: R0 = rule{
     oneOrMore(BlockStat).separatedBy(Semis)
@@ -221,9 +229,8 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     zeroOrMore(Annotation) ~ (optional(K.W("implicit") | K.W("lazy")) ~ Def | zeroOrMore(LocalModifier) ~ TmplDef) |
     Expr1
   }
-  def ResultExpr: R0 = rule {
-    (Bindings | optional(K.W("implicit")) ~ Id | "_") ~ K.W("=>") ~ Block | Expr1
-  }
+
+  def ResultExpr: R0 = Expr
   def Enumerators: R0 = rule { Generator ~ zeroOrMore(Semi ~ Enumerator) ~ WL }
   def Enumerator: R0 = rule { Generator | Guard | Pattern1 ~ K.O("=") ~ Expr }
   def Generator: R0 = rule { Pattern1 ~ K.O("<-") ~ Expr ~ optional(WL ~ Guard)  }
@@ -286,7 +293,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def AccessModifier: R0 = rule { (K.W("private") | K.W("protected")) ~ optional(AccessQualifier) }
   def AccessQualifier: R0 = rule { '[' ~ (K.W("this") | Id) ~ ']' }
 
-  def Annotation: R0 = rule { '@' ~ SimpleType ~ zeroOrMore(WL ~ ArgumentExprs) }
+  def Annotation: R0 = rule {  '@' ~  SimpleType ~  zeroOrMore(WL ~ ArgumentExprs)  }
   def ConstrAnnotation: R0 = rule { '@' ~ SimpleType ~ ArgumentExprs }
 
   def TemplateBody: R0 = rule {
@@ -404,9 +411,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
   def CompilationUnit: Rule1[String] = rule {
     capture(
-      pr("CompulationUnit 0") ~
+      
       optional(Semis) ~
-      pr("CompulationUnit 1") ~
+      
       (TopPackageSeq ~ optional(Semis ~ TopStatSeq) | TopStatSeq) ~
       optional(Semis) ~
       WL

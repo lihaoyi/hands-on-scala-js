@@ -17,7 +17,11 @@ object SyntaxTest extends TestSuite{
         println(f.formatTraces)
         throw new Exception(f.position + "\t" + f.formatTraces)
       case Success(parsed) =>
-        assert(parsed == input)
+        if(parsed != input)
+
+          throw new Exception(
+            "Parsing Failed at " + parsed.length + "\n" + input.drop(parsed.length).take(50)
+          )
     }
   }
   println("running")
@@ -407,11 +411,35 @@ object SyntaxTest extends TestSuite{
           |;
         """.stripMargin
       )
+      * - check(
+        """
+          |
+          |object GenJSCode {
+          |  code: @switch
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """object B {
+          |  { a: L => }
+          |}
+        """.stripMargin
+      )
+      * - check(
+        """object O{
+          |  {
+          |    val index = 0
+          |    i: Int => 10
+          |    0
+          |  }
+          |}
+        """.stripMargin
+      )
     }
     def checkFile(path: String) = check(io.Source.fromFile(path).mkString)
     'file{
 
-      * - checkFile("test.txt")
+      * - checkFile("scalaParser/src/test/resources/test.scala")
       * - checkFile("scalaParser/src/main/scala/scalaParser/syntax/Basic.scala")
       * - checkFile("scalaParser/src/main/scala/scalaParser/syntax/Identifiers.scala")
       * - checkFile("scalaParser/src/main/scala/scalaParser/syntax/Literals.scala")
@@ -433,16 +461,16 @@ object SyntaxTest extends TestSuite{
       * - checkFile("scalatexPlugin/src/main/scala/scalatex/ScalaTexPlugin.scala")
     }
 
-//    'omg{
-//      val root = new java.io.File("../scala-js/")
-//      def listFiles(s: java.io.File): Iterator[String] = {
-//        val (dirs, files) = s.listFiles().toIterator.partition(_.isDirectory)
-//        files.map(_.getPath) ++ dirs.flatMap(listFiles)
-//      }
-//      for(f <- listFiles(root).filter(_.endsWith(".scala"))){
-//        println("CHECKING " + f)
-//        checkFile(f)
-//      }
-//    }
+    'omg{
+      val root = new java.io.File("book/target/clones/scala-js/")
+      def listFiles(s: java.io.File): Iterator[String] = {
+        val (dirs, files) = s.listFiles().toIterator.partition(_.isDirectory)
+        files.map(_.getPath) ++ dirs.flatMap(listFiles)
+      }
+      for(f <- listFiles(root).filter(_.endsWith(".scala"))){
+        println("CHECKING " + f)
+        checkFile(f)
+      }
+    }
   }
 }

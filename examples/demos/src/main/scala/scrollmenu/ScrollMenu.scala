@@ -88,7 +88,7 @@ class ScrollSpy(structure: Tree[String],
     if (!scrolling) {
       println("Scroll...")
       scrolling = true
-      dom.setTimeout(() => start(), 200)
+      dom.requestAnimationFrame((d: Double) => start())
     }
   }
   private[this] var previousWin: MenuNode = null

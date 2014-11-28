@@ -9,9 +9,13 @@ trait Identifiers { self: Parser with Basic =>
     def Operator = rule(oneOrMore(OperatorChar))
 
     def VarId = rule {
-      !(Keywords ~ (WhitespaceChar | Newline | "//" | "/*")) ~ Lower ~ IdRest
+      !(Keywords | WhitespaceChar | Newline | "//" | "/*") ~ Lower ~ IdRest
     }
-    def PlainId = rule { Upper ~ IdRest | VarId | !(Keywords ~ (WhitespaceChar | Newline | "//" | "/*")) ~ Operator }
+    def PlainId = rule {
+      Upper ~ IdRest |
+      VarId |
+      !(Keywords | WhitespaceChar | Newline | "//" | "/*") ~ !Keywords ~ Operator
+    }
     def Id = rule { PlainId | ("`" ~ oneOrMore(noneOf("`")) ~ "`") }
     def IdRest = rule {
       zeroOrMore(zeroOrMore("_") ~ oneOrMore(!"_" ~ Letter | Digit)) ~
