@@ -1,5 +1,3 @@
-object EmitHtml {
-  args match{
-    case Array(file, _*) => 1
-  }
+trait T{
+  s match { case S(_, r @ _*) => 1 }
 }
