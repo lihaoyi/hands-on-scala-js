@@ -108,7 +108,8 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
       OneNewlineMax ~ '{' ~ oneOrMore(RefineStat).separatedBy(Semi) ~ "}"
     }
     rule {
-      oneOrMore(AnnotType).separatedBy(K.W("with")) ~ optional(Refinement)
+      oneOrMore(AnnotType).separatedBy(K.W("with")) ~ optional(Refinement) |
+      Refinement
     }
   }
   def AnnotType = rule {
@@ -304,7 +305,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
 
   def TypeParamClause: R0 = {
-    def VariantTypeParam: R0 = rule { zeroOrMore(Annotation) ~ optional(anyOf("+-")) ~ TypeParam }
+    def VariantTypeParam: R0 = rule { zeroOrMore(Annotation) ~ optional(WL ~ anyOf("+-")) ~ TypeParam }
     rule { '[' ~ oneOrMore(VariantTypeParam).separatedBy(',') ~ ']' }
   }
   def FunTypeParamClause: R0 = rule {
@@ -356,7 +357,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def TemplateStat: R0 = rule {
     Import |
     zeroOrMore(Annotation ~ OneNewlineMax) ~ zeroOrMore(Modifier) ~ (Def | Dcl) |
-    Expr
+    Expr0(true)
   }
 
   def SelfType: R0 = rule { K.W("this") ~ K.O(":") ~ Type ~ K.O("=>") | Id ~ optional(K.O(":") ~ Type) ~ K.O("=>") }

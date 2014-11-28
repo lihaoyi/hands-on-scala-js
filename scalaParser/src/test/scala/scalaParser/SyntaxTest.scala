@@ -568,6 +568,33 @@ object SyntaxTest extends TestSuite{
             |}
           """.stripMargin
         )
+        * - check(
+          """trait Function12[-T1, +R]
+          """.stripMargin
+        )
+        * - check(
+          """@a // Don't do this at home!
+            |trait B
+          """.stripMargin
+        )
+        * - check(
+          """object T{
+            |  type B = { def F: S }
+            |}
+            |
+          """.stripMargin
+        )
+        * - check(
+          """
+            |object ScalaJSBuild{
+            |      (
+            |        1 / 2
+            |          / 3
+            |      )
+            |}
+            |
+          """.stripMargin
+        )
       }
       'neg{
         * - checkNeg(

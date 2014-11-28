@@ -1,10 +1,5 @@
-object K{
 
-  def newBuilder =
-    new B
-
-  @inline def a = 1
-
-
+object L{
+  a.b = c
+  a().b = c
 }
-
