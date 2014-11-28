@@ -6,20 +6,6 @@ import org.parboiled2._
 
 /**
  * Parser for Scala syntax.
- *
- * The `G` parameter that gets passed in to each rule stands for
- * "Greedy", and determines whether or not that rule is to consume
- * newlines after the last terminal in that rule. We need to pass it
- * everywhere so it can go all the way to the last terminal deep
- * inside the parse tree, which can then decide whether or not to
- * consume whitespace.
- *
- * The vast majority of terminals will consume newlines; only rules
- * which occur in {} blocks won't have their terminals consume newlines,
- * and only the *last* terminal in the rule will be affected.
- * That's why the parser does terminals-consume-newlines-by-default,
- * and leaves it up to the dev to thread the `G` variable where-ever
- * we want the opposite behavior.
  */
 class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identifiers with Literals {
   // Aliases for common things. These things are used in almost every parser
@@ -41,7 +27,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   /**
    * By default, all strings and characters greedily
-   * capture all whitespace immediately after the token.
+   * capture all whitespace immediately before the token.
    */
   implicit private[this] def wspStr(s: String): R0 = rule { WL ~ str(s)  }
   implicit private[this] def wspChar(s: Char): R0 = rule { WL ~ ch(s) }
@@ -54,7 +40,6 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
    */
   object K {
     def W(s: String) = rule{ WL ~ Key.W(s) }
-
     def O(s: String) = rule{ WL ~ Key.O(s) }
   }
 
@@ -146,14 +131,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
   def SimpleType: R0 = {
     def BasicType: R0 = rule {
-      '(' ~ Types ~ ')'  |
-        StableId ~ '.' ~ `type` |
-        StableId
+      '(' ~ Types ~ ')'  | StableId ~ '.' ~ `type` | StableId
     }
-    rule {
-      BasicType ~
-      zeroOrMore(TypeArgs | '#' ~ Id)
-    }
+    rule{ BasicType ~ zeroOrMore(TypeArgs | '#' ~ Id) }
   }
 
   def TypeArgs = rule { '[' ~ Types ~ "]" }
@@ -185,7 +165,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     }
   }
   def Enumerators(G: Boolean = false): R0 = {
-    def Generator: R0 = rule { Pattern1 ~ (K.O("<-") | K.O("←"))~ Expr0(G) ~ optional(Guard(G))  }
+    def Generator: R0 = rule {
+      Pattern1 ~ (K.O("<-") | K.O("←"))~ Expr0(G) ~ optional(Guard(G))
+    }
     def Enumerator: R0 = rule { Generator | Guard(G) | Pattern1 ~ `=` ~ Expr0(G) }
     rule { Generator ~ zeroOrMore(Semis ~ Enumerator) ~ WL }
   }
@@ -202,7 +184,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
       optional(K.W("finally") ~ Expr0(G))
     }
 
-    def DoWhileCFlow = rule { K.W("do") ~ Expr0(G) ~ optional(Semi) ~ "while" ~ '(' ~ Expr ~ ")" }
+    def DoWhileCFlow = rule {
+      K.W("do") ~ Expr0(G) ~ optional(Semi) ~ "while" ~ '(' ~ Expr ~ ")"
+    }
     def ForCFlow = {
 
       rule {
@@ -274,10 +258,13 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def BlockExpr: R0 = rule { '{' ~ (CaseClauses | Block) ~ optional(Semis) ~  "}" }
 
   def BlockStats: R0 = {
-
+    def Template: R0 = rule{
+      zeroOrMore(Annotation) ~
+      (optional(`implicit` | K.W("lazy")) ~ Def | zeroOrMore(LocalModifier) ~ TmplDef)
+    }
     def BlockStat: R0 = rule {
       Import |
-      zeroOrMore(Annotation) ~ (optional(`implicit` | K.W("lazy")) ~ Def | zeroOrMore(LocalModifier) ~ TmplDef) |
+      Template |
       Expr0(true)
     }
     rule{ oneOrMore(BlockStat).separatedBy(Semis) }
@@ -306,11 +293,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Pattern: R0 = rule {
     oneOrMore(Pattern1).separatedBy('|')
   }
-  def Pattern1: R0 = rule {
-    `_` ~ `:` ~ TypePat |
-    VarId ~ `:` ~ TypePat |
-    Pattern2
-  }
+  def Pattern1: R0 = rule { `_` ~ `:` ~ TypePat | VarId ~ `:` ~ TypePat | Pattern2 }
   def Pattern2: R0 = {
     def Pattern3: R0 = rule {
       `_` ~ '*' | SimplePattern ~ zeroOrMore(Id ~ SimplePattern)
@@ -320,15 +303,8 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def SimplePattern: R0 = {
 
-    def ExtractorArgs = rule{
-      zeroOrMore(Pattern).separatedBy(',')
-    }
-    def Extractor: R0 = rule{
-      StableId ~
-      optional(
-        '(' ~ ExtractorArgs ~ ')'
-      )
-    }
+    def ExtractorArgs = rule{ zeroOrMore(Pattern).separatedBy(',') }
+    def Extractor: R0 = rule{ StableId ~ optional('(' ~ ExtractorArgs ~ ')') }
     rule {
       `_` ~ optional(`:` ~ TypePat) ~ !("*") |
       Literal |
@@ -344,11 +320,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     rule { '[' ~ oneOrMore(VariantTypeParam).separatedBy(',') ~ ']' }
   }
   def FunTypeParamClause: R0 = rule {
-    '[' ~ oneOrMore(zeroOrMore(Annotation) ~ TypeParam).separatedBy(',') ~ ']' }
-  def TypeBounds: R0 = rule{
-    optional(K.O(">:") ~ Type) ~
-    optional(K.O("<:") ~ Type)
+    '[' ~ oneOrMore(zeroOrMore(Annotation) ~ TypeParam).separatedBy(',') ~ ']'
   }
+  def TypeBounds: R0 = rule{ optional(K.O(">:") ~ Type) ~ optional(K.O("<:") ~ Type) }
   def TypeParam: R0 = rule {
     (Id | `_`) ~
     optional(TypeParamClause) ~
@@ -361,8 +335,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
   def ParamClause: R0 = rule { OneNewlineMax ~ '(' ~ optional(Params) ~ ')' }
   def Params: R0 = {
-
-    def Param: R0 = rule { zeroOrMore(Annotation) ~ Id ~ optional(`:` ~ ParamType) ~ optional(`=` ~ Expr) }
+    def Param: R0 = rule {
+      zeroOrMore(Annotation) ~ Id ~ optional(`:` ~ ParamType) ~ optional(`=` ~ Expr)
+    }
     rule { zeroOrMore(Param).separatedBy(',') }
   }
 
@@ -398,38 +373,28 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
 
   def SelfType: R0 = rule {
-    `this` ~ `:` ~ InfixType ~ `=>` |
-    (Id | `_`) ~ optional(`:` ~ InfixType) ~ `=>`
+    `this` ~ `:` ~ InfixType ~ `=>` | (Id | `_`) ~ optional(`:` ~ InfixType) ~ `=>`
   }
 
   def Import: R0 = {
     def ImportExpr: R0 = rule {
       StableId ~ optional('.' ~ (`_` | ImportSelectors))
     }
-    def ImportSelectors: R0 = rule { '{' ~ zeroOrMore(ImportSelector ~ ',') ~ (ImportSelector | `_`) ~ "}" }
+    def ImportSelectors: R0 = rule {
+      '{' ~ zeroOrMore(ImportSelector ~ ',') ~ (ImportSelector | `_`) ~ "}"
+    }
     def ImportSelector: R0 = rule { Id ~ optional(`=>` ~ (Id | `_`)) }
     rule { K.W("import") ~ oneOrMore(ImportExpr).separatedBy(',') }
   }
 
   def Dcl: R0 = {
-
     def VarDcl: R0 = rule { Ids ~ `:` ~ Type }
     def FunDcl: R0 = rule { FunSig ~ optional(`:` ~ Type) }
-
-    rule {
-      `val` ~ ValDcl |
-      `var` ~ VarDcl |
-      `def` ~ FunDcl |
-      `type` ~ TypeDcl
-    }
+    rule{ `val` ~ ValDcl | `var` ~ VarDcl | `def` ~ FunDcl | `type` ~ TypeDcl }
   }
   def FunSig: R0 = rule { Id ~ optional(FunTypeParamClause) ~ ParamClauses }
   def ValDcl: R0 = rule { Ids ~ `:` ~ Type }
-  def TypeDcl: R0 = rule {
-    Id ~
-    optional(TypeParamClause) ~
-    TypeBounds
-  }
+  def TypeDcl: R0 = rule { Id ~ optional(TypeParamClause) ~ TypeBounds }
 
   def PatVarDef: R0 = {
     def PatDef: R0 = rule { oneOrMore(Pattern2).separatedBy(',') ~ optional(`:` ~ Type) ~ `=` ~ Expr0(true) }
@@ -442,7 +407,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
       `this` ~ ParamClause ~ ParamClauses ~ (`=` ~ ConstrExpr | OneNewlineMax ~ ConstrBlock) |
       FunSig ~ (
         optional(`:` ~ Type) ~ `=` ~ optional(K.W("macro")) ~ Expr0(true) |
-          OneNewlineMax ~ '{' ~ Block ~ "}"
+        OneNewlineMax ~ '{' ~ Block ~ "}"
       )
     }
     rule { `def` ~ FunDef | `type` ~ TypeDef | PatVarDef | TmplDef }
@@ -452,9 +417,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def TmplDef: R0 = {
     def TraitTemplate: R0 = {
-      def TraitParents: R0 = rule {
-        AnnotType ~ zeroOrMore(`with` ~ AnnotType)
-      }
+      def TraitParents: R0 = rule { AnnotType ~ zeroOrMore(`with` ~ AnnotType) }
       rule{ optional(EarlyDefs) ~ TraitParents ~ optional(TemplateBody) }
     }
     def ClassParamClauses: R0 = {
@@ -496,18 +459,14 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     def TraitDef: R0 = rule { Id ~ optional(TypeParamClause) ~ TraitTemplateOpt }
     rule {
       `trait` ~ TraitDef |
-      optional(`case`) ~ (
-        `class` ~ ClassDef |
-        `object` ~ ObjectDef
-      )
+      optional(`case`) ~ (`class` ~ ClassDef | `object` ~ ObjectDef)
     }
   }
 
 
   def ObjectDef: R0 = rule { Id ~ ClassTemplateOpt }
   def ClassTemplateOpt: R0 = rule {
-    `extends` ~ ClassTemplate |
-      optional(optional(`extends`) ~ TemplateBody)
+    `extends` ~ ClassTemplate | optional(optional(`extends`) ~ TemplateBody)
   }
 
   def ClassTemplate: R0 = {
