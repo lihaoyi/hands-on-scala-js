@@ -491,7 +491,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
         optional(Semis) ~
         (TopPackageSeq ~ optional(Semis ~ TopStatSeq) | TopStatSeq) ~
         optional(Semis) ~
-        WL
+        WL ~ EOI
       )
     }
   }
