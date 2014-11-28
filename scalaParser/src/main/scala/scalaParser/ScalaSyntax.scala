@@ -82,11 +82,13 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
       Id ~ zeroOrMore('.' ~ Id)
     }
   }
-
+  def ExistentialDcl = rule { K.W("type") ~ TypeDcl | K.W("val") ~ ValDcl }
+  def ExistentialClause = rule {
+    "forSome" ~ '{' ~ oneOrMore(ExistentialDcl).separatedBy(Semi) ~ '}'
+  }
   def Type: R0 = {
     def WildcardType: R0 = rule{ K.W("_") }
-    def ExistentialDcl = rule { K.W("type") ~ TypeDcl | K.W("val") ~ ValDcl }
-    def ExistentialClause = rule { "forSome" ~ '{' ~ oneOrMore(ExistentialDcl).separatedBy(Semi) }
+
     def FunctionArgTypes = rule {
       InfixType | '(' ~ optional(oneOrMore(ParamType) separatedBy ',') ~ ')'
     }
@@ -110,7 +112,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     }
   }
   def AnnotType = rule {
-     SimpleType ~  zeroOrMore(Annotation)
+    SimpleType ~ zeroOrMore(Annotation)
   }
   def SimpleType: R0 = {
     def BasicType: R0 = rule {
@@ -131,7 +133,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def TypePat = rule { CompoundType }
   def Ascription = rule {
-     ":" ~ ("_" ~ "*" |  InfixType  | oneOrMore(Annotation)) 
+     ":" ~ ("_" ~ "*" | InfixType | oneOrMore(Annotation))
   }
 
   def ParamType = rule { K.O("=>") ~ Type | Type ~ "*" | Type }
@@ -145,7 +147,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
       (
         Bindings |
         optional(K.W("implicit")) ~ Id ~ optional(Ascription) |
-        "_" ~ optional(Ascription)
+        K.W("_") ~ optional(Ascription)
       ) ~
       K.O("=>")
     }
@@ -216,13 +218,13 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
       BlockExpr |
       Literal |
       Path |
-      K.W("_") |
+      NotNewline ~ K.W("_") |
       '(' ~ optional(Exprs) ~ ")"
     }
     rule {
       SimpleExpr1 ~
       zeroOrMore('.' ~ Id | TypeArgs | ArgumentExprs) ~
-      optional( "_")
+      optional(K.W("_"))
     }
   }
 
@@ -302,7 +304,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     def VariantTypeParam: R0 = rule { zeroOrMore(Annotation) ~ optional(anyOf("+-")) ~ TypeParam }
     rule { '[' ~ oneOrMore(VariantTypeParam).separatedBy(',') ~ ']' }
   }
-  def FunTypeParamClause: R0 = rule { '[' ~ oneOrMore(TypeParam).separatedBy(',') ~ ']' }
+  def FunTypeParamClause: R0 = rule { '[' ~ oneOrMore(zeroOrMore(Annotation) ~ TypeParam).separatedBy(',') ~ ']' }
   def TypeBounds: R0 = rule{
     optional(K.O(">:") ~ Type) ~
     optional(K.O("<:") ~ Type)

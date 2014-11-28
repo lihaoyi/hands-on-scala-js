@@ -1,4 +1,3 @@
-
-object System {
-  def a[@b T] = 1
+class A {
+  null: T forSome { type T <: V }
 }

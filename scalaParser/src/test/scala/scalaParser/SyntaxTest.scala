@@ -538,6 +538,27 @@ object SyntaxTest extends TestSuite{
           """class Runtime private
           """.stripMargin
         )
+        * - check(
+          """
+            |object System {
+            |  def a[@b T[@b V]] = 1
+            |}
+            |
+          """.stripMargin
+        )
+        * - check(
+          """class A {
+            |  null: T forSome { type T <: V }
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """object U{
+            |  private val _fragment = fld(Fragment)
+            |  _fld = null
+            |}
+          """.stripMargin
+        )
       }
       'neg{
         * - checkNeg(
@@ -571,6 +592,14 @@ object SyntaxTest extends TestSuite{
             |    2
             |  } yield x
             |}
+          """.stripMargin
+        )
+        * - checkNeg(
+          """
+            |object System {
+            |  def a[@b T[V @b]] = 1
+            |}
+            |
           """.stripMargin
         )
       }
