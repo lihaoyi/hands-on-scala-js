@@ -1,3 +1,10 @@
-class A {
-  null: T forSome { type T <: V }
+object K{
+
+  def newBuilder =
+    new B
+
+  @inline def a = 1
+
+
 }
+

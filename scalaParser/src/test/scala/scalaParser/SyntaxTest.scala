@@ -547,15 +547,24 @@ object SyntaxTest extends TestSuite{
           """.stripMargin
         )
         * - check(
-          """class A {
-            |  null: T forSome { type T <: V }
+          """object U{
+            |  private val _fragment = fld(Fragment)
+            |  _fld = null
             |}
           """.stripMargin
         )
         * - check(
-          """object U{
-            |  private val _fragment = fld(Fragment)
-            |  _fld = null
+          """class Array{
+            |  def length_= = 1
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """object K{
+            |  def newBuilder =
+            |    new B
+            |
+            |  @inline def a = 1
             |}
           """.stripMargin
         )

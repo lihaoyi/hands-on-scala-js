@@ -112,7 +112,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     }
   }
   def AnnotType = rule {
-    SimpleType ~ zeroOrMore(Annotation)
+    SimpleType ~ optional(NotNewline ~ oneOrMore(Annotation))
   }
   def SimpleType: R0 = {
     def BasicType: R0 = rule {
@@ -132,8 +132,11 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
 
   def TypePat = rule { CompoundType }
+  def FunctionArgTypes = rule {
+    InfixType | '(' ~ optional(oneOrMore(ParamType) separatedBy ',') ~ ')'
+  }
   def Ascription = rule {
-     ":" ~ ("_" ~ "*" |  InfixType  | oneOrMore(Annotation))
+     ":" ~ ("_" ~ "*" |  InfixType | oneOrMore(Annotation))
   }
 
   def ParamType = rule { K.O("=>") ~ Type | Type ~ "*" | Type }
@@ -147,7 +150,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
       (
         Bindings |
         optional(K.W("implicit")) ~ Id ~ optional(Ascription) |
-        "_" ~ optional(Ascription)
+        K.W("_") ~ optional(Ascription)
       ) ~
       K.O("=>")
     }
@@ -224,7 +227,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     rule {
       SimpleExpr1 ~
       zeroOrMore('.' ~ Id | TypeArgs | ArgumentExprs) ~
-      optional( "_")
+      optional(K.W("_"))
     }
   }
 
@@ -360,7 +363,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def Import: R0 = {
     def ImportExpr: R0 = rule {
-      StableId ~ optional('.' ~ ("_" | ImportSelectors))
+      StableId ~ optional('.' ~ (K.W("_") | ImportSelectors))
     }
     def ImportSelectors: R0 = rule { '{' ~ zeroOrMore(ImportSelector ~ ',') ~ (ImportSelector | K.W("_")) ~ "}" }
     def ImportSelector: R0 = rule { Id ~ optional(K.O("=>") ~ (Id | K.W("_"))) }

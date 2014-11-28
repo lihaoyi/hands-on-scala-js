@@ -13,7 +13,7 @@ trait Identifiers { self: Parser with Basic =>
     def Id = rule { !Keywords ~ PlainId | ("`" ~ oneOrMore(noneOf("`")) ~ "`") }
     def IdRest = rule {
       zeroOrMore(zeroOrMore("_") ~ oneOrMore(!"_" ~ Letter | Digit)) ~
-      optional(oneOrMore("_") ~ optional(Operator))
+      optional(oneOrMore("_") ~ zeroOrMore(OperatorChar))
     }
 
 
