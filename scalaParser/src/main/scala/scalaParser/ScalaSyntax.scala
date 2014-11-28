@@ -227,7 +227,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def BlockStat: R0 = rule {
     Import |
     zeroOrMore(Annotation) ~ (optional(K.W("implicit") | K.W("lazy")) ~ Def | zeroOrMore(LocalModifier) ~ TmplDef) |
-    Expr1
+    Expr
   }
 
   def ResultExpr: R0 = Expr
