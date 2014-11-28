@@ -320,18 +320,20 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def SimplePattern: R0 = {
     def Patterns: R0 = rule { `_` ~ '*' | oneOrMore(Pattern).separatedBy(',') }
+    def ExtractorArgs = rule{
+      optional(Patterns ~ ',') ~ optional(VarId ~ '@') ~ `_` ~ '*'
+    }
+    def Extractor: R0 = rule{
+      StableId ~
+      optional(
+        '(' ~ (ExtractorArgs | optional(Patterns)) ~ ')'
+      )
+    }
     rule {
       `_` ~ optional(`:` ~ TypePat) |
       Literal |
       '(' ~ optional(Patterns) ~ ')' |
-      (
-        StableId ~
-        optional(
-          '(' ~
-          (optional(Patterns ~ ',') ~ optional(VarId ~ '@') ~ `_` ~ '*' | optional(Patterns)) ~
-          ')'
-        )
-      ) |
+      Extractor |
       VarId
     }
   }

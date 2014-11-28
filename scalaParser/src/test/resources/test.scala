@@ -1,2 +1,5 @@
-
-import java.util.concurrent.TimeUnit.{ NANOSECONDS => NANOS, MILLISECONDS ⇒ MILLIS }
+object EmitHtml {
+  args match{
+    case Array(file, _*) => 1
+  }
+}
