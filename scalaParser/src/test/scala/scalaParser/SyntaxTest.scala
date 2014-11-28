@@ -682,6 +682,22 @@ object SyntaxTest extends TestSuite{
             }
           """.stripMargin
         )
+        * - check(
+          """trait Growable {
+            |    +=
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """package immutable {
+            |  object O
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """import java.util.concurrent.TimeUnit.{ NANOSECONDS => NANOS, MILLISECONDS ⇒ MILLIS }
+          """.stripMargin
+        )
 
       }
       'neg{
