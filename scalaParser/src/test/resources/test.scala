@@ -1,6 +1,6 @@
 
-object OptimizerCore {
-  tpe match {
-    case NothingType | _:RecordType=> 1
-  }
+trait Growable {
+    xs match {
+      case xs => xs foreach +=
+    }
 }

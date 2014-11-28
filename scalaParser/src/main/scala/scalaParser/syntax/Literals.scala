@@ -4,7 +4,8 @@ import acyclic.file
 import org.parboiled2._
 
 trait Literals { self: Parser with Basic with Identifiers =>
-  def Expr: Rule0
+  def Block: Rule0
+  def WL: Rule0
   object Literals{
     import Basic._
     def FloatingPointLiteral = rule {
@@ -36,7 +37,6 @@ trait Literals { self: Parser with Basic with Identifiers =>
       (Key.W("null") ~ !(Basic.Letter | Basic.Digit))
     }
 
-
     def EscapedChars = rule { '\\' ~ anyOf("btnfr'\\\"") }
 
     // Note that symbols can take on the same values as keywords!
@@ -51,7 +51,7 @@ trait Literals { self: Parser with Basic with Identifiers =>
     }
     def pr(s: String) = rule { run(println(s"LOGGING $cursor: $s")) }
     def Interpolation = rule{
-      "$" ~ Identifiers.Id | "${" ~ Expr ~ "}" | "$$"
+      "$" ~ Identifiers.Id | "${" ~ Block ~ WL ~ "}" | "$$"
     }
     def StringLiteral = rule {
       (Identifiers.Id ~ "\"\"\"" ~ MultiLineChars ~ ("\"\"\"" ~ zeroOrMore('"'))) |

@@ -608,6 +608,81 @@ object SyntaxTest extends TestSuite{
             |}
           """.stripMargin
         )
+        * - check(
+          """object OptimizerCore {
+            |  tpe match {
+            |    case NothingType | _:RecordType=> 1
+            |  }
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """class A{
+            |  1
+            |  () => 1
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """trait ReactorCanReply {
+            |  _: InternalReplyReactor =>
+            |}
+          """.stripMargin
+        )
+
+        * - check(
+          """object G{
+            |  def isBefore(pd: SubComponent) = settings.stopBefore
+            |  phaseDescriptors sliding 2 collectFirst ()
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """class SymbolLoaders {
+            |  type T = ClassPath[AbstractFile]#ClassRep
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """trait ContextErrors {
+            |    def isUnaffiliatedExpr = expanded.isInstanceOf[scala.reflect.api.Exprs#Expr[_]]
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """trait Typers{
+            |  s"nested ${ if (1) "trait" else "class" }"
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """trait ReflectSetup { this: Global =>
+            |  phase = 1
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """trait Predef {
+            |  @x
+            |  // a
+            |  type T
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """
+            object StringContext {
+
+              s"${
+                require(index >= 0 && index < str.length)
+                val ok = "[\b, \t, \n, \f, \r, \\, \", \']"
+                if (index == str.length - 1) "at terminal" else s"'\\${str(index + 1)}' not one of $ok at"
+              }"
+
+            }
+          """.stripMargin
+        )
+
       }
       'neg{
         * - checkNeg(
@@ -679,12 +754,21 @@ object SyntaxTest extends TestSuite{
     }
 
     'omg{
-      val root = new java.io.File("book/target/clones/scala-js/")
+//      val root = new java.io.File("book/target/clones/scala-js/")
+      val root = new java.io.File("../scala")
       def listFiles(s: java.io.File): Iterator[String] = {
         val (dirs, files) = s.listFiles().toIterator.partition(_.isDirectory)
         files.map(_.getPath) ++ dirs.flatMap(listFiles)
       }
-      for(f <- listFiles(root).filter(_.endsWith(".scala"))){
+      val blacklist = Seq(
+        "dbuild-meta-json-gen.scala",
+        "genprod.scala"
+      )
+      for{
+        f <- listFiles(root)
+        if f.endsWith(".scala")
+        if !blacklist.exists(f.endsWith)
+      }{
         println("CHECKING " + f)
         checkFile(f)
       }

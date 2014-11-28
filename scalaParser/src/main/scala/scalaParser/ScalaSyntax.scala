@@ -74,7 +74,17 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Ids = rule { oneOrMore(Id) separatedBy ',' }
 
   def NotNewline: R0 = rule{ &( WS ~ noneOf("\n") )}
-  def OneNewlineMax: R0 = rule{ WS ~ optional(Basic.Newline) ~ NotNewline}
+  def OneNewlineMax: R0 = rule{
+    WS ~
+    optional(Basic.Newline) ~
+    zeroOrMore(
+      zeroOrMore(Basic.WhitespaceChar) ~
+      Literals.Comment ~
+      zeroOrMore(Basic.WhitespaceChar) ~
+      Basic.Newline
+    ) ~
+    NotNewline
+  }
   def StableId: R0 = {
     def ClassQualifier = rule { '[' ~ Id ~ ']' }
     rule {
@@ -123,8 +133,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     }
     rule {
       BasicType ~
-        optional('#' ~ Id) ~
-        optional(TypeArgs)
+      zeroOrMore(TypeArgs | '#' ~ Id)
     }
   }
 
@@ -164,12 +173,14 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Expr = Expr0()
   def ExprSensitive = Expr0(true)
   def Expr0(G: Boolean = false): R0 = {
-    def IfCFlow = rule { "if" ~ '(' ~ Expr ~ ')' ~ Expr0(G) ~ optional(optional(Semi) ~ K.W("else") ~ Expr0(G)) }
+    def IfCFlow = rule {
+      "if" ~ '(' ~ Expr ~ ')' ~ Expr0(G) ~ optional(optional(Semi) ~ K.W("else") ~ Expr0(G))
+    }
     def WhileCFlow = rule { "while" ~ '(' ~ Expr ~ ')' ~ Expr0(G) }
     def TryCFlow = rule {
       K.W("try") ~ Expr0(G) ~
-        optional(K.W("catch") ~ Expr0(G)) ~
-        optional(K.W("finally") ~ Expr0(G))
+      optional(K.W("catch") ~ Expr0(G)) ~
+      optional(K.W("finally") ~ Expr0(G))
     }
 
     def DoWhileCFlow = rule { K.W("do") ~ Expr0(G) ~ optional(Semi) ~ "while" ~ '(' ~ Expr ~ ")" }
@@ -228,7 +239,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     }
     rule {
       SimpleExpr1 ~
-      zeroOrMore('.' ~ Id | TypeArgs | ArgumentExprs) ~
+      zeroOrMore('.' ~ Id | TypeArgs | NotNewline ~ ArgumentExprs) ~
       optional(K.W("_"))
     }
   }
@@ -363,7 +374,10 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     Expr0(true)
   }
 
-  def SelfType: R0 = rule { K.W("this") ~ K.O(":") ~ Type ~ K.O("=>") | Id ~ optional(K.O(":") ~ Type) ~ K.O("=>") }
+  def SelfType: R0 = rule {
+    K.W("this") ~ K.O(":") ~ InfixType ~ K.O("=>") |
+    (Id | K.W("_")) ~ optional(K.O(":") ~ InfixType) ~ K.O("=>")
+  }
 
   def Import: R0 = {
     def ImportExpr: R0 = rule {
@@ -403,11 +417,10 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     def ConstrExpr: R0 = rule { ConstrBlock | SelfInvocation }
     def FunDef: R0 = rule {
       K.W("this") ~ ParamClause ~ ParamClauses ~ (K.O("=") ~ ConstrExpr | OneNewlineMax ~ ConstrBlock) |
-        FunSig ~
-          (
-            optional(K.O(":") ~ Type) ~ K.O("=") ~ optional(K.W("macro")) ~ Expr |
-              OneNewlineMax ~ '{' ~ Block ~ "}"
-            )
+      FunSig ~ (
+        optional(K.O(":") ~ Type) ~ K.O("=") ~ optional(K.W("macro")) ~ Expr0(true) |
+          OneNewlineMax ~ '{' ~ Block ~ "}"
+      )
     }
     rule { K.W("def") ~ FunDef | K.W("type") ~ TypeDef | PatVarDef | TmplDef }
   }
