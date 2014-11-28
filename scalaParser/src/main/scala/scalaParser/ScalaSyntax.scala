@@ -74,7 +74,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Ids = rule { oneOrMore(Id) separatedBy ',' }
 
   def NotNewline: R0 = rule{ &( WS ~ noneOf("\n") )}
-  def OneNewlineMax: R0 = rule{ optional(Basic.Newline) ~ NotNewline}
+  def OneNewlineMax: R0 = rule{ WS ~ optional(Basic.Newline) ~ NotNewline}
   def StableId: R0 = {
     def ClassQualifier = rule { '[' ~ Id ~ ']' }
     rule {
@@ -200,10 +200,11 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def PostfixExpr(G: Boolean = false): R0 = {
     def PrefixExpr = rule { optional(WL ~ anyOf("-+~!")) ~ SimpleExpr }
     def Check = if (G) OneNewlineMax else MATCH
+    def Check0 = if (G) NotNewline else MATCH
     def InfixExpr: R0 = rule {
       PrefixExpr ~
       zeroOrMore(
-        NotNewline ~
+        Check0 ~
         Id ~
         Check ~
         PrefixExpr
@@ -392,7 +393,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
 
   def PatVarDef: R0 = {
-    def PatDef: R0 = rule { oneOrMore(Pattern2).separatedBy(',') ~ optional(K.O(":") ~ Type) ~ K.O("=") ~ Expr }
+    def PatDef: R0 = rule { oneOrMore(Pattern2).separatedBy(',') ~ optional(K.O(":") ~ Type) ~ K.O("=") ~ Expr0(true) }
     def VarDef: R0 = rule { Ids ~ K.O(":") ~ Type ~ K.O("=") ~ K.W("_") | PatDef }
     rule { K.W("val") ~ PatDef | K.W("var") ~ VarDef }
   }

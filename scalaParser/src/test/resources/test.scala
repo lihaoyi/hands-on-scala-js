@@ -1,5 +1,3 @@
 
-object L{
-  a.b = c
-  a().b = c
-}
+@RawJSType // Don't do this at home!
+sealed trait UndefOr[A]
