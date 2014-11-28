@@ -326,11 +326,11 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     def Extractor: R0 = rule{
       StableId ~
       optional(
-        '(' ~ (ExtractorArgs | optional(Patterns)) ~ ')'
+        '(' ~ (ExtractorArgs | Patterns | MATCH) ~ ')'
       )
     }
     rule {
-      `_` ~ optional(`:` ~ TypePat) |
+      `_` ~ optional(`:` ~ TypePat) ~ !("*") |
       Literal |
       '(' ~ optional(Patterns) ~ ')' |
       Extractor |
