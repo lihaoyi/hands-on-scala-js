@@ -142,7 +142,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     }
   }
   def AnnotType = rule {
-    SimpleType ~ optional(NotNewline ~ oneOrMore(Annotation))
+    SimpleType ~ optional(NotNewline ~ oneOrMore(NotNewline ~ Annotation))
   }
   def SimpleType: R0 = {
     def BasicType: R0 = rule {
@@ -185,7 +185,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     }
   }
   def Enumerators(G: Boolean = false): R0 = {
-    def Generator: R0 = rule { Pattern1 ~ K.O("<-") ~ Expr0(G) ~ optional(Guard(G))  }
+    def Generator: R0 = rule { Pattern1 ~ (K.O("<-") | K.O("←"))~ Expr0(G) ~ optional(Guard(G))  }
     def Enumerator: R0 = rule { Generator | Guard(G) | Pattern1 ~ `=` ~ Expr0(G) }
     rule { Generator ~ zeroOrMore(Semis ~ Enumerator) ~ WL }
   }
@@ -271,7 +271,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
       OneNewlineMax ~ BlockExpr
   }
 
-  def BlockExpr: R0 = rule { '{' ~ (CaseClauses | Block) ~ "}" }
+  def BlockExpr: R0 = rule { '{' ~ (CaseClauses | Block) ~ optional(Semis) ~  "}" }
 
   def BlockStats: R0 = {
 
@@ -313,26 +313,26 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
   def Pattern2: R0 = {
     def Pattern3: R0 = rule {
-      SimplePattern ~ zeroOrMore(Id ~ SimplePattern)
+      `_` ~ '*' | SimplePattern ~ zeroOrMore(Id ~ SimplePattern)
     }
     rule{ VarId ~ "@" ~ Pattern3 | Pattern3 | VarId }
   }
 
   def SimplePattern: R0 = {
-    def Patterns: R0 = rule { `_` ~ '*' | oneOrMore(Pattern).separatedBy(',') }
+
     def ExtractorArgs = rule{
-      optional(Patterns ~ ',') ~ optional(VarId ~ '@') ~ `_` ~ '*'
+      zeroOrMore(Pattern).separatedBy(',')
     }
     def Extractor: R0 = rule{
       StableId ~
       optional(
-        '(' ~ (ExtractorArgs | Patterns | MATCH) ~ ')'
+        '(' ~ ExtractorArgs ~ ')'
       )
     }
     rule {
       `_` ~ optional(`:` ~ TypePat) ~ !("*") |
       Literal |
-      '(' ~ optional(Patterns) ~ ')' |
+      '(' ~ optional(ExtractorArgs) ~ ')' |
       Extractor |
       VarId
     }
@@ -361,6 +361,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
   def ParamClause: R0 = rule { OneNewlineMax ~ '(' ~ optional(Params) ~ ')' }
   def Params: R0 = {
+
     def Param: R0 = rule { zeroOrMore(Annotation) ~ Id ~ optional(`:` ~ ParamType) ~ optional(`=` ~ Expr) }
     rule { zeroOrMore(Param).separatedBy(',') }
   }
@@ -387,6 +388,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     '{' ~
     optional(SelfType) ~
     zeroOrMore(TemplateStat).separatedBy(Semis) ~
+    optional(Semis) ~
     '}'
   }
   def TemplateStat: R0 = rule {
@@ -460,7 +462,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
         OneNewlineMax ~
         '(' ~
         `implicit` ~
-        ClassParam ~
+        oneOrMore(ClassParam).separatedBy(",") ~
         ")"
       }
 
@@ -545,7 +547,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     rule {
       capture(
         optional(Semis) ~
-        (TopPackageSeq ~ optional(Semis ~ TopStatSeq) | TopStatSeq) ~
+        (TopPackageSeq ~ optional(Semis ~ TopStatSeq) | TopStatSeq | MATCH) ~
         optional(Semis) ~
         WL
       )

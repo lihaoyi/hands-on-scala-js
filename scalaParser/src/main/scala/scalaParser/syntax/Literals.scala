@@ -51,7 +51,7 @@ trait Literals { self: Parser with Basic with Identifiers =>
     }
     def pr(s: String) = rule { run(println(s"LOGGING $cursor: $s")) }
     def Interpolation = rule{
-      "$" ~ Identifiers.Id | "${" ~ Block ~ WL ~ "}" | "$$"
+      "$" ~ Identifiers.PlainIdNoDollar | "${" ~ Block ~ WL ~ "}" | "$$"
     }
     def StringLiteral = rule {
       (Identifiers.Id ~ "\"\"\"" ~ MultiLineChars ~ ("\"\"\"" ~ zeroOrMore('"'))) |

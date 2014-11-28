@@ -698,6 +698,32 @@ object SyntaxTest extends TestSuite{
           """import java.util.concurrent.TimeUnit.{ NANOSECONDS => NANOS, MILLISECONDS ⇒ MILLIS }
           """.stripMargin
         )
+        * - check(
+          """class FunFinder{
+            |  val targetName = s"$name${ if (isModule) "$" else "" }"
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """class AkkaException{
+            |  for (i ← 0 until trace.length)
+            |    ()
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """class FiniteDuration{
+            |  1000.
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """object Test4 {
+            |    type T = F @field
+            |    @BeanProperty val x = 1
+            |}
+          """.stripMargin
+        )
 
       }
       'neg{
@@ -776,14 +802,20 @@ object SyntaxTest extends TestSuite{
         val (dirs, files) = s.listFiles().toIterator.partition(_.isDirectory)
         files.map(_.getPath) ++ dirs.flatMap(listFiles)
       }
+      // Things that we won't bother parsing, mainly because they use XML literals
       val blacklist = Seq(
         "dbuild-meta-json-gen.scala",
-        "genprod.scala"
+        "genprod.scala",
+        "doc/html/HtmlPage.scala",
+        "scala/src/scaladoc/scala/tools/nsc/doc/html",
+        "jvm/interpreter.scala",
+        "disabled", // don't bother parsing disabled tests
+        "neg" // or neg tests
       )
       for{
         f <- listFiles(root)
         if f.endsWith(".scala")
-        if !blacklist.exists(f.endsWith)
+        if !blacklist.exists(f.contains)
       }{
         println("CHECKING " + f)
         checkFile(f)

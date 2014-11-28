@@ -8,14 +8,20 @@ trait Identifiers { self: Parser with Basic =>
     import Basic._
     def Operator = rule{!Keywords ~ oneOrMore(OperatorChar)}
 
-    def VarId = rule { !Keywords ~ Lower ~ IdRest }
-    def PlainId = rule { !Keywords ~ Upper ~ IdRest | VarId | Operator }
+    def VarId = VarId0(true)
+    def VarId0(dollar: Boolean) = rule { !Keywords ~ Lower ~ IdRest(dollar) }
+    def PlainId = rule { !Keywords ~ Upper ~ IdRest(true) | VarId | Operator }
+    def PlainIdNoDollar = rule { !Keywords ~ Upper ~ IdRest(false) | VarId0(false) | Operator }
     def Id = rule { !Keywords ~ PlainId | ("`" ~ oneOrMore(noneOf("`")) ~ "`") }
-    def IdRest = rule {
-      zeroOrMore(zeroOrMore("_") ~ oneOrMore(!"_" ~ Letter | Digit)) ~
-      optional(oneOrMore("_") ~ zeroOrMore(OperatorChar))
+    def IdRest(dollar: Boolean) = {
+      if (!dollar) rule {
+        zeroOrMore(zeroOrMore("_") ~ oneOrMore(!anyOf("_$") ~ Letter | Digit)) ~
+        optional(oneOrMore("_") ~ zeroOrMore(OperatorChar))
+      } else rule{
+        zeroOrMore(zeroOrMore("_") ~ oneOrMore(!"_" ~ Letter | Digit)) ~
+        optional(oneOrMore("_") ~ zeroOrMore(OperatorChar))
+      }
     }
-
 
     def AlphabetKeywords = rule {
       (
@@ -33,5 +39,6 @@ trait Identifiers { self: Parser with Basic =>
       AlphabetKeywords | SymbolicKeywords
 
     }
+
   }
 }
