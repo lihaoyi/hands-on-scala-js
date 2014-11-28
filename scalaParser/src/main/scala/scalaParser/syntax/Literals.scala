@@ -16,7 +16,7 @@ trait Literals { self: Parser with Basic with Identifiers =>
       )
     }
 
-    def IntegerLiteral = rule { (DecimalNumeral | HexNumeral) ~ optional(anyOf("Ll")) }
+    def IntegerLiteral = rule { (HexNumeral | DecimalNumeral) ~ optional(anyOf("Ll")) }
 
     def BooleanLiteral = rule { Key.W("true") | Key.W("false")  }
 
@@ -36,7 +36,7 @@ trait Literals { self: Parser with Basic with Identifiers =>
     }
 
 
-    def EscapedChars = rule { '\\' ~ anyOf("rnt\\\"") }
+      def EscapedChars = rule { '\\' ~ anyOf("rnt\\\"") }
 
     // Note that symbols can take on the same values as keywords!
     def SymbolLiteral = rule { ''' ~ (Identifiers.PlainId | Identifiers.Keywords) }
@@ -44,9 +44,10 @@ trait Literals { self: Parser with Basic with Identifiers =>
     def CharacterLiteral = rule { ''' ~ (UnicodeExcape | EscapedChars | !'\\' ~ CharPredicate.from(isPrintableChar)) ~ ''' }
 
     def MultiLineChars = rule { zeroOrMore(optional('"') ~ optional('"') ~ noneOf("\"")) }
+    def pr(s: String) = rule { run(println(s"LOGGING $cursor: $s")) }
     def StringLiteral = rule {
       (optional(Identifiers.Id) ~ "\"\"\"" ~ MultiLineChars ~ ("\"\"\"" ~ zeroOrMore('"'))) |
-      (optional(Identifiers.Id) ~ '"' ~ zeroOrMore("\\\"" | noneOf("\n\"")) ~ '"')
+      (optional(Identifiers.Id) ~ '"' ~ zeroOrMore("\\\"" | "\\\\" | noneOf("\n\"")) ~ '"')
     }
 
     def isPrintableChar(c: Char): Boolean = {
