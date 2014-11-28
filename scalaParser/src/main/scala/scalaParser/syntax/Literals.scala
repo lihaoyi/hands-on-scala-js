@@ -4,6 +4,7 @@ import acyclic.file
 import org.parboiled2._
 
 trait Literals { self: Parser with Basic with Identifiers =>
+  def Expr: Rule0
   object Literals{
     import Basic._
     def FloatingPointLiteral = rule {
@@ -23,7 +24,7 @@ trait Literals { self: Parser with Basic with Identifiers =>
     def MultilineComment: Rule0 = rule { "/*" ~ zeroOrMore(MultilineComment | !"*/" ~ ANY) ~ "*/" }
     def Comment: Rule0 = rule {
       MultilineComment |
-        "//" ~ zeroOrMore(!Basic.Newline ~ ANY) ~ &(Basic.Newline | EOI)
+      "//" ~ zeroOrMore(!Basic.Newline ~ ANY) ~ &(Basic.Newline | EOI)
     }
 
     def Literal = rule {
@@ -36,18 +37,27 @@ trait Literals { self: Parser with Basic with Identifiers =>
     }
 
 
-      def EscapedChars = rule { '\\' ~ anyOf("rnt\\\"") }
+    def EscapedChars = rule { '\\' ~ anyOf("btnfr'\\\"") }
 
     // Note that symbols can take on the same values as keywords!
     def SymbolLiteral = rule { ''' ~ (Identifiers.PlainId | Identifiers.Keywords) }
 
-    def CharacterLiteral = rule { ''' ~ (UnicodeExcape | EscapedChars | !'\\' ~ CharPredicate.from(isPrintableChar)) ~ ''' }
+    def CharacterLiteral = rule {
+      ''' ~ (UnicodeExcape | EscapedChars | !'\\' ~ CharPredicate.from(isPrintableChar)) ~ '''
+    }
 
-    def MultiLineChars = rule { zeroOrMore(optional('"') ~ optional('"') ~ noneOf("\"")) }
+    def MultiLineChars = rule {
+      zeroOrMore(Interpolation | optional('"') ~ optional('"') ~ noneOf("\""))
+    }
     def pr(s: String) = rule { run(println(s"LOGGING $cursor: $s")) }
+    def Interpolation = rule{
+      "$" ~ Identifiers.Id | "${" ~ Expr ~ "}" | "$$"
+    }
     def StringLiteral = rule {
-      (optional(Identifiers.Id) ~ "\"\"\"" ~ MultiLineChars ~ ("\"\"\"" ~ zeroOrMore('"'))) |
-      (optional(Identifiers.Id) ~ '"' ~ zeroOrMore("\\\"" | "\\\\" | noneOf("\n\"")) ~ '"')
+      (Identifiers.Id ~ "\"\"\"" ~ MultiLineChars ~ ("\"\"\"" ~ zeroOrMore('"'))) |
+      (Identifiers.Id ~ '"' ~ zeroOrMore(Interpolation | "\\\"" | "\\\\" | noneOf("\n\"")) ~ '"') |
+      ("\"\"\"" ~ MultiLineChars ~ ("\"\"\"" ~ zeroOrMore('"'))) |
+      ('"' ~ zeroOrMore("\\\"" | "\\\\" | noneOf("\n\"")) ~ '"')
     }
 
     def isPrintableChar(c: Char): Boolean = {

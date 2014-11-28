@@ -595,6 +595,19 @@ object SyntaxTest extends TestSuite{
             |
           """.stripMargin
         )
+        * - check(
+          """trait Writer{
+            | '\f'
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """object CyclicDependencyException {
+            |    def str(info: ResolutionInfo) =
+            |      s"${info.resourceName} from: ${info.origins.mkString(", ")}"
+            |}
+          """.stripMargin
+        )
       }
       'neg{
         * - checkNeg(

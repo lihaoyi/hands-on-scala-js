@@ -1,3 +1,6 @@
 
-@RawJSType // Don't do this at home!
-sealed trait UndefOr[A]
+object OptimizerCore {
+  tpe match {
+    case NothingType | _:RecordType=> 1
+  }
+}

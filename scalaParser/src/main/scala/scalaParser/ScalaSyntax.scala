@@ -277,7 +277,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     oneOrMore(Pattern1).separatedBy('|')
   }
   def Pattern1: R0 = rule {
-    K.W("_") ~ K.O(":") ~ TypePat | VarId ~ K.O(":") ~ TypePat | Pattern2
+    K.W("_") ~ K.O(":") ~ TypePat |
+    VarId ~ K.O(":") ~ TypePat |
+    Pattern2
   }
   def Pattern2: R0 = {
     def Pattern3: R0 = rule {
@@ -289,18 +291,18 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def SimplePattern: R0 = {
     def Patterns: R0 = rule { K.W("_") ~ '*' | oneOrMore(Pattern).separatedBy(',') }
     rule {
-      K.W("_") |
-        Literal |
-        '(' ~ optional(Patterns) ~ ')' |
-        (
-          StableId ~
-          optional(
-            '(' ~
-            (optional(Patterns ~ ',') ~ optional(VarId ~ '@') ~ K.W("_") ~ '*' | optional(Patterns)) ~
-            ')'
-          )
-        ) |
-        VarId
+      K.W("_") ~ optional(K.O(":") ~ TypePat) |
+      Literal |
+      '(' ~ optional(Patterns) ~ ')' |
+      (
+        StableId ~
+        optional(
+          '(' ~
+          (optional(Patterns ~ ',') ~ optional(VarId ~ '@') ~ K.W("_") ~ '*' | optional(Patterns)) ~
+          ')'
+        )
+      ) |
+      VarId
     }
   }
 
