@@ -260,8 +260,6 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     }
   }
 
-
-
   def ResultExpr: R0 = Expr
 
   def CaseClauses: R0 = {
@@ -325,9 +323,6 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     rule { zeroOrMore(Param).separatedBy(',') }
   }
 
-
-
-
   def ClassParam: R0 = rule {
     zeroOrMore(Annotation) ~
     optional(zeroOrMore(Modifier) ~ (K.W("val") | K.W("var"))) ~
@@ -337,16 +332,12 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     optional(K.O("=") ~ Expr)
   }
 
-
-
-
   def Modifier: R0 = rule { LocalModifier | AccessModifier | K.W("override") }
   def LocalModifier: R0 = rule { K.W("abstract") | K.W("final") | K.W("sealed") | K.W("implicit") | K.W("lazy") }
   def AccessModifier: R0 = {
     def AccessQualifier: R0 = rule { '[' ~ (K.W("this") | Id) ~ ']' }
     rule { (K.W("private") | K.W("protected")) ~ optional(AccessQualifier) }
   }
-
 
   def Annotation: R0 = rule {  '@' ~  SimpleType ~  zeroOrMore(WL ~ ArgumentExprs)  }
 
@@ -373,10 +364,6 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     rule { K.W("import") ~ oneOrMore(ImportExpr).separatedBy(',') }
   }
 
-
-
-
-
   def Dcl: R0 = {
 
     def VarDcl: R0 = rule { Ids ~ K.O(":") ~ Type }
@@ -384,9 +371,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
     rule {
       K.W("val") ~ ValDcl |
-        K.W("var") ~ VarDcl |
-        K.W("def") ~ FunDcl |
-        K.W("type") ~ zeroOrMore(Newline) ~ TypeDcl
+      K.W("var") ~ VarDcl |
+      K.W("def") ~ FunDcl |
+      K.W("type") ~ zeroOrMore(Newline) ~ TypeDcl
     }
   }
   def FunSig: R0 = rule { Id ~ optional(FunTypeParamClause) ~ ParamClauses }
@@ -415,8 +402,6 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     }
     rule { K.W("def") ~ FunDef | K.W("type") ~ zeroOrMore(Newline) ~ TypeDef | PatVarDef | TmplDef }
   }
-
-
 
   def TypeDef: R0 = rule { Id ~ optional(TypeParamClause) ~ K.O("=") ~ Type }
 
@@ -491,7 +476,6 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     rule{ '{' ~ optional(oneOrMore(EarlyDef).separatedBy(Semis)) ~ '}' ~ K.W("with") }
   }
 
-
   def ConstrBlock: R0 = rule { '{' ~ SelfInvocation ~ optional(Semis ~ BlockStats) ~ '}' }
   def SelfInvocation: R0 = rule { K.W("this") ~ oneOrMore(ArgumentExprs) }
 
@@ -500,9 +484,9 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     def Packaging: R0 = rule { K.W("package") ~ QualId ~ '{' ~ TopStatSeq ~ '}' }
     def TopStat: R0 = rule {
       Packaging |
-        PackageObject |
-        Import |
-        zeroOrMore(Annotation ~ optional(Newline)) ~ zeroOrMore(Modifier) ~ TmplDef
+      PackageObject |
+      Import |
+      zeroOrMore(Annotation ~ optional(Newline)) ~ zeroOrMore(Modifier) ~ TmplDef
     }
     rule { oneOrMore(TopStat).separatedBy(Semis) }
   }

@@ -1,4 +1,6 @@
 object K{
-  class RTTypeTest
-  private object O
+  omg("lol",
+    1,
+    2
+  )
 }
