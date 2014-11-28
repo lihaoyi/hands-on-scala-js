@@ -24,8 +24,6 @@ import org.parboiled2._
 class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identifiers with Literals {
   // Aliases for common things. These things are used in almost every parser
   // in the file, so it makes sense to keep them short.
-  type B = Boolean
-  val t = true
   type R0 = Rule0
   /**
    * Parses all whitespace, excluding newlines. This is only
@@ -83,52 +81,59 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def QualId = rule { WL ~ oneOrMore(Id).separatedBy('.') }
   def Ids = rule { oneOrMore(Id) separatedBy ',' }
 
-  def Path: R0 = rule {
-    zeroOrMore(Id ~ '.') ~ K.W("this") ~ zeroOrMore(Id).separatedBy('.') |
-      StableId
-  }
-  def StableId: R0 = rule {
-    zeroOrMore(Id ~ '.') ~ (K.W("this") | K.W("super") ~ optional(ClassQualifier)) ~ '.' ~ oneOrMore(Id).separatedBy('.') |
+  def NotNewline: R0 = rule{ &( WS ~ noneOf("\n") )}
+
+  def StableId: R0 = {
+    def ClassQualifier = rule { '[' ~ Id ~ ']' }
+    rule {
+      zeroOrMore(Id ~ '.') ~ (K.W("this") | K.W("super") ~ optional(ClassQualifier)) ~ '.' ~ oneOrMore(Id).separatedBy('.') |
       Id ~ zeroOrMore(WL ~ '.' ~ WL ~ Id)
+    }
   }
 
-  def ClassQualifier = rule { '[' ~ Id ~ ']' }
-
-  def Type: R0 = rule {
-    FunctionArgTypes ~ K.O("=>") ~ Type | InfixType ~ optional(WL ~ ExistentialClause)
+  def Type: R0 = {
+    def ExistentialDcl = rule { K.W("type") ~ TypeDcl | K.W("val") ~ ValDcl }
+    def ExistentialClause = rule { "forSome" ~ '{' ~ oneOrMore(ExistentialDcl).separatedBy(Semi) }
+    def FunctionArgTypes = rule {
+      InfixType | '(' ~ optional(oneOrMore(ParamType) separatedBy ',') ~ ')'
+    }
+    rule {
+      FunctionArgTypes ~ K.O("=>") ~ Type | InfixType ~ optional(WL ~ ExistentialClause)
+    }
   }
-  def FunctionArgTypes = rule {
-    InfixType | '(' ~ optional(oneOrMore(ParamType) separatedBy ',') ~ ')'
-  }
-
-  def ExistentialClause = rule { "forSome" ~ '{' ~ oneOrMore(ExistentialDcl).separatedBy(Semi) }
-  def ExistentialDcl = rule { K.W("type") ~ TypeDcl | K.W("val") ~ ValDcl }
 
   def InfixType = rule {
     CompoundType ~ zeroOrMore(WL ~ Id ~ optional(Newline) ~ CompoundType)
   }
-  def CompoundType = rule {
-    oneOrMore(AnnotType).separatedBy(WL ~ K.W("with")) ~ optional(Refinement)
+  def CompoundType = {
+    def RefineStat = rule { "type" ~ TypeDef | Dcl | MATCH }
+    def Refinement = rule {
+      optional(Newline) ~ '{' ~ oneOrMore(RefineStat).separatedBy(Semi) ~ "}"
+    }
+    rule {
+      oneOrMore(AnnotType).separatedBy(WL ~ K.W("with")) ~ optional(Refinement)
+    }
   }
   def AnnotType = rule {
      SimpleType ~  zeroOrMore(WL ~ Annotation) 
   }
-  def SimpleType: R0 = rule {
-    BasicType ~
-    optional(WL ~ '#' ~ Id) ~
-    optional(WL ~ TypeArgs)
+  def SimpleType: R0 = {
+    def BasicType: R0 = rule {
+      '(' ~ Types ~ ')'  |
+        StableId ~ '.' ~ K.W("type") |
+        StableId
+    }
+    rule {
+      BasicType ~
+        optional(WL ~ '#' ~ Id) ~
+        optional(WL ~ TypeArgs)
+    }
   }
-  def BasicType: R0 = rule {
-    '(' ~ Types ~ ')'  |
-    Path ~ '.' ~ K.W("type")   |
-    StableId 
-  }
+
   def TypeArgs = rule { '[' ~ Types ~ "]" }
   def Types = rule { oneOrMore(Type).separatedBy(',') }
-  def Refinement = rule {
-    optional(Newline) ~ '{' ~ oneOrMore(RefineStat).separatedBy(Semi) ~ "}"
-  }
-  def RefineStat = rule { "type" ~ TypeDef | Dcl | MATCH }
+
+
   def TypePat = rule { CompoundType }
   def Ascription = rule {
      ":" ~ ("_" ~ "*" |  InfixType  | oneOrMore(Annotation)) 
@@ -136,73 +141,93 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def ParamType = rule { K.O("=>") ~ Type | Type ~ "*" | Type }
 
-  def LambdaHead: R0 = rule{
-    (
-      Bindings |
-      optional(K.W("implicit")) ~ Id ~ optional(Ascription) |
-      "_" ~ optional(Ascription)
-    ) ~
-    K.O("=>")
+  def LambdaHead: R0 = {
+    def Bindings: R0 = {
+      def Binding: R0 = rule { (Id | K.W("_")) ~ optional(K.O(":") ~ Type) }
+      rule { '(' ~ zeroOrMore(Binding).separatedBy(',') ~ ')' }
+    }
+    rule{
+      (
+        Bindings |
+        optional(K.W("implicit")) ~ Id ~ optional(Ascription) |
+        "_" ~ optional(Ascription)
+      ) ~
+      K.O("=>")
+    }
   }
-  def Expr: R0 = rule {
-    zeroOrMore(LambdaHead) ~ Expr1
+  def Enumerators: R0 = {
+    def Generator: R0 = rule { Pattern1 ~ K.O("<-") ~ Expr ~ optional(WL ~ Guard)  }
+    def Enumerator: R0 = rule { Generator | Guard | Pattern1 ~ K.O("=") ~ Expr }
+    rule { Generator ~ zeroOrMore(Semi ~ Enumerator) ~ WL }
   }
-  def Expr1: R0 = rule {
-    IfCFlow |
-    WhileCFlow |
-    TryCFlow |
-    DoWhileCFlow |
-    ForCFlow |
-    K.W("throw") ~ Expr |
-    K.W("return") ~ optional(Expr) |
-    SimpleExpr ~ K.O("=") ~ Expr |
-    PostfixExpr ~ optional("match" ~ '{' ~ CaseClauses ~ "}" | Ascription)
+  def Expr: R0 = {
+    def IfCFlow = rule { "if" ~ '(' ~ Expr ~ ')' ~ zeroOrMore(Newline) ~ Expr ~ optional(optional(Semi) ~ K.W("else") ~ Expr) }
+    def WhileCFlow = rule { "while" ~ '(' ~ Expr ~ ')' ~ zeroOrMore(Newline) ~ Expr }
+    def TryCFlow = rule {
+      K.W("try") ~ Expr ~
+        optional(WL ~ K.W("catch") ~ Expr) ~
+        optional(WL ~ K.W("finally") ~ Expr)
+    }
 
-  }
-  def IfCFlow = rule { "if" ~ '(' ~ Expr ~ ')' ~ zeroOrMore(Newline) ~ Expr ~ optional(optional(Semi) ~ K.W("else") ~ Expr) }
-  def WhileCFlow = rule { "while" ~ '(' ~ Expr ~ ')' ~ zeroOrMore(Newline) ~ Expr }
-  def TryCFlow = rule {
-    K.W("try") ~ Expr ~
-      optional(WL ~ K.W("catch") ~ Expr) ~
-      optional(WL ~ K.W("finally") ~ Expr)
+    def DoWhileCFlow = rule { K.W("do") ~ Expr ~ optional(Semi) ~ "while" ~ '(' ~ Expr ~ ")" }
+    def ForCFlow = {
+
+      rule {
+        "for" ~
+        ('(' ~ Enumerators ~ ')' | '{' ~ Enumerators ~ '}') ~
+        zeroOrMore(Newline) ~
+        optional(K.W("yield")) ~
+        Expr
+      }
+    }
+    rule {
+      zeroOrMore(LambdaHead) ~ (
+        IfCFlow |
+          WhileCFlow |
+          TryCFlow |
+          DoWhileCFlow |
+          ForCFlow |
+          K.W("throw") ~ Expr |
+          K.W("return") ~ optional(Expr) |
+          SimpleExpr ~ K.O("=") ~ Expr |
+          PostfixExpr ~ optional("match" ~ '{' ~ CaseClauses ~ "}" | Ascription)
+        )
+    }
   }
 
-  def DoWhileCFlow = rule { K.W("do") ~ Expr ~ optional(Semi) ~ "while" ~ '(' ~ Expr ~ ")" }
-  def ForCFlow = rule {
-    "for" ~
-      ('(' ~ Enumerators ~ ')' | '{' ~ Enumerators ~ '}') ~
-      zeroOrMore(Newline) ~
-      optional(K.W("yield")) ~
-      Expr }
-  def NotNewline: R0 = rule{ &( WS ~ noneOf("\n") )}
-  def PostfixExpr: R0 = rule { InfixExpr ~ optional(NotNewline ~ Id ~ optional(Newline)) }
-  def InfixExpr: R0 = rule {
-    PrefixExpr ~
-    zeroOrMore(
-      NotNewline ~
-      Id ~
-      optional(Newline) ~
-      PrefixExpr
-    )
+  def PostfixExpr: R0 = {
+    def PrefixExpr = rule { optional(WL ~ anyOf("-+~!")) ~ SimpleExpr }
+    def InfixExpr: R0 = rule {
+      PrefixExpr ~
+      zeroOrMore(
+        NotNewline ~
+        Id ~
+        optional(Newline) ~
+        PrefixExpr
+      )
+    }
+    rule { InfixExpr ~ optional(NotNewline ~ Id ~ optional(Newline)) }
   }
-  def PrefixExpr = rule { optional(WL ~ anyOf("-+~!")) ~ SimpleExpr }
 
-  def SimpleExpr: R0 = rule {
-    SimpleExpr1 ~
+  def SimpleExpr: R0 = {
+    def Path: R0 = rule {
+      zeroOrMore(Id ~ '.') ~ K.W("this") ~ zeroOrMore(Id).separatedBy('.') |
+        StableId
+    }
+    def SimpleExpr1 = rule{
+      K.W("new") ~ (ClassTemplate | TemplateBody) |
+        BlockExpr |
+        Literal |
+        Path |
+        K.W("_") |
+        '(' ~ optional(Exprs) ~ ")"
+    }
+    rule {
+      SimpleExpr1 ~
       zeroOrMore(WL ~ ('.' ~ Id | TypeArgs | ArgumentExprs)) ~
       optional(WL ~ "_")
+    }
   }
-
-  def SimpleExpr1 = rule{
-    K.W("new") ~ (ClassTemplate | TemplateBody) |
-      BlockExpr |
-      Literal |
-      Path |
-      K.W("_") |
-      '(' ~ optional(Exprs) ~ ")"
-  }
-
-
 
   def Exprs: R0 = rule { oneOrMore(Expr).separatedBy(',') }
   def ArgumentExprs: R0 = rule {
@@ -211,31 +236,39 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
 
   def BlockExpr: R0 = rule { '{' ~ (CaseClauses | Block) ~ "}" }
-  def BlockEnd: R0 = rule{ optional(Semis) ~ &("}" | "case") }
-  def Block: R0 = rule {
-    zeroOrMore(LambdaHead) ~
-    optional(Semis) ~
-    (
-      ResultExpr ~ BlockEnd |
-      BlockStats ~ optional(Semis ~ ResultExpr) ~ BlockEnd |
-      MATCH ~ BlockEnd
-    )
-  }
-  def BlockStats: R0 = rule{
-    oneOrMore(BlockStat).separatedBy(Semis)
-  }
-  def BlockStat: R0 = rule {
-    Import |
-    zeroOrMore(Annotation) ~ (optional(K.W("implicit") | K.W("lazy")) ~ Def | zeroOrMore(LocalModifier) ~ TmplDef) |
-    Expr
+
+  def BlockStats: R0 = {
+
+    def BlockStat: R0 = rule {
+      Import |
+        zeroOrMore(Annotation) ~ (optional(K.W("implicit") | K.W("lazy")) ~ Def | zeroOrMore(LocalModifier) ~ TmplDef) |
+        Expr
+    }
+    rule{ oneOrMore(BlockStat).separatedBy(Semis) }
   }
 
+  def Block: R0 = {
+    def BlockEnd: R0 = rule{ optional(Semis) ~ &("}" | "case") }
+    rule {
+      zeroOrMore(LambdaHead) ~
+      optional(Semis) ~
+      (
+        ResultExpr ~ BlockEnd |
+        BlockStats ~ optional(Semis ~ ResultExpr) ~ BlockEnd |
+        MATCH ~ BlockEnd
+      )
+    }
+  }
+
+
+
   def ResultExpr: R0 = Expr
-  def Enumerators: R0 = rule { Generator ~ zeroOrMore(Semi ~ Enumerator) ~ WL }
-  def Enumerator: R0 = rule { Generator | Guard | Pattern1 ~ K.O("=") ~ Expr }
-  def Generator: R0 = rule { Pattern1 ~ K.O("<-") ~ Expr ~ optional(WL ~ Guard)  }
-  def CaseClauses: R0 = rule { oneOrMore(CaseClause) }
-  def CaseClause: R0 = rule { K.W("case") ~ Pattern ~ optional(Guard) ~ K.O("=>") ~ Block }
+
+  def CaseClauses: R0 = {
+    def CaseClause: R0 = rule { K.W("case") ~ Pattern ~ optional(Guard) ~ K.O("=>") ~ Block }
+    rule { oneOrMore(CaseClause) }
+  }
+
   def Guard: R0 = rule { K.W("if") ~ PostfixExpr }
   def Pattern: R0 = rule {
     oneOrMore(Pattern1).separatedBy('|')
@@ -243,31 +276,38 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Pattern1: R0 = rule {
     K.W("_") ~ K.O(":") ~ TypePat | VarId ~ K.O(":") ~ TypePat | Pattern2
   }
-  def Pattern2: R0 = rule {
-    VarId ~ "@" ~ Pattern3 | Pattern3 | VarId
+  def Pattern2: R0 = {
+    def Pattern3: R0 = rule {
+      SimplePattern ~ zeroOrMore(Id ~ SimplePattern)
+    }
+    rule{ VarId ~ "@" ~ Pattern3 | Pattern3 | VarId }
   }
-  def Pattern3: R0 = rule {
-    SimplePattern ~ zeroOrMore(Id ~ SimplePattern)
-  }
-  def SimplePattern: R0 = rule {
-    K.W("_") |
-    Literal |
-    '(' ~ optional(Patterns) ~ ')' |
-    (
-      StableId ~
-      optional(
-        '(' ~
-          (optional(Patterns ~ ',') ~ optional(VarId ~ '@') ~ K.W("_") ~ '*' | optional(Patterns)) ~
-          ')'
-      )
-    ) |
-    VarId
-  }
-  def Patterns: R0 = rule { K.W("_") ~ '*' | oneOrMore(Pattern).separatedBy(',') }
 
-  def TypeParamClause: R0 = rule { '[' ~ oneOrMore(VariantTypeParam).separatedBy(',') ~ ']' }
+  def SimplePattern: R0 = {
+    def Patterns: R0 = rule { K.W("_") ~ '*' | oneOrMore(Pattern).separatedBy(',') }
+    rule {
+      K.W("_") |
+        Literal |
+        '(' ~ optional(Patterns) ~ ')' |
+        (
+          StableId ~
+          optional(
+            '(' ~
+            (optional(Patterns ~ ',') ~ optional(VarId ~ '@') ~ K.W("_") ~ '*' | optional(Patterns)) ~
+            ')'
+          )
+        ) |
+        VarId
+    }
+  }
+
+
+  def TypeParamClause: R0 = {
+    def VariantTypeParam: R0 = rule { zeroOrMore(Annotation) ~ optional(anyOf("+-")) ~ TypeParam }
+    rule { '[' ~ oneOrMore(VariantTypeParam).separatedBy(',') ~ ']' }
+  }
   def FunTypeParamClause: R0 = rule { '[' ~ oneOrMore(TypeParam).separatedBy(',') ~ ']' }
-  def VariantTypeParam: R0 = rule { zeroOrMore(Annotation) ~ optional(anyOf("+-")) ~ TypeParam }
+
   def TypeParam: R0 = rule {
     (Id | K.W("_")) ~
       optional(TypeParamClause) ~
@@ -276,25 +316,39 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
       zeroOrMore(K.O("<%") ~ Type) ~
       zeroOrMore(K.O(":") ~ Type)
   }
-  def ParamClauses: R0 = rule { zeroOrMore(ParamClause) ~ optional(optional(Newline) ~ '(' ~ K.W("implicit") ~ Params ~ ')') }
+  def ParamClauses: R0 = rule {
+    zeroOrMore(ParamClause) ~ optional(optional(Newline) ~ '(' ~ K.W("implicit") ~ Params ~ ')')
+  }
   def ParamClause: R0 = rule { optional(Newline) ~ '(' ~ optional(Params) ~ ')' }
-  def Params: R0 = rule { zeroOrMore(Param).separatedBy(',') }
-  def Param: R0 = rule { zeroOrMore(Annotation) ~ Id ~ optional(K.O(":") ~ ParamType) ~ optional(K.O("=") ~ Expr) }
-  def ClassParamClauses: R0 = rule { zeroOrMore(ClassParamClause) ~ optional(optional(Newline) ~ '(' ~ K.W("implicit") ~ ClassParam ~ ")") }
-  def ClassParamClause: R0 = rule { optional(Newline) ~ '(' ~ optional(ClassParams) ~ ")" }
-  def ClassParams: R0 = rule { oneOrMore(ClassParam).separatedBy(',') }
-  def ClassParam: R0 = rule { zeroOrMore(Annotation) ~ optional(zeroOrMore(Modifier) ~ (K.W("val") | K.W("var"))) ~ Id ~ K.O(":") ~ ParamType ~ optional(K.O("=") ~ Expr) }
+  def Params: R0 = {
+    def Param: R0 = rule { zeroOrMore(Annotation) ~ Id ~ optional(K.O(":") ~ ParamType) ~ optional(K.O("=") ~ Expr) }
+    rule { zeroOrMore(Param).separatedBy(',') }
+  }
 
-  def Bindings: R0 = rule { '(' ~ zeroOrMore(Binding).separatedBy(',') ~ ')' }
-  def Binding: R0 = rule { (Id | K.W("_")) ~ optional(K.O(":") ~ Type) }
+
+
+
+  def ClassParam: R0 = rule {
+    zeroOrMore(Annotation) ~
+    optional(zeroOrMore(Modifier) ~ (K.W("val") | K.W("var"))) ~
+    Id ~
+    K.O(":") ~
+    ParamType ~
+    optional(K.O("=") ~ Expr)
+  }
+
+
+
 
   def Modifier: R0 = rule { LocalModifier | AccessModifier | K.W("override") }
   def LocalModifier: R0 = rule { K.W("abstract") | K.W("final") | K.W("sealed") | K.W("implicit") | K.W("lazy") }
-  def AccessModifier: R0 = rule { (K.W("private") | K.W("protected")) ~ optional(AccessQualifier) }
-  def AccessQualifier: R0 = rule { '[' ~ (K.W("this") | Id) ~ ']' }
+  def AccessModifier: R0 = {
+    def AccessQualifier: R0 = rule { '[' ~ (K.W("this") | Id) ~ ']' }
+    rule { (K.W("private") | K.W("protected")) ~ optional(AccessQualifier) }
+  }
+
 
   def Annotation: R0 = rule {  '@' ~  SimpleType ~  zeroOrMore(WL ~ ArgumentExprs)  }
-  def ConstrAnnotation: R0 = rule { '@' ~ SimpleType ~ ArgumentExprs }
 
   def TemplateBody: R0 = rule {
     '{' ~
@@ -310,24 +364,33 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def SelfType: R0 = rule { K.W("this") ~ K.O(":") ~ Type ~ K.O("=>") | Id ~ optional(K.O(":") ~ Type) ~ K.O("=>") }
 
-  def Import: R0 = rule { K.W("import") ~ oneOrMore(ImportExpr).separatedBy(',') }
-
-  def ImportExpr: R0 = rule {
-    StableId ~ optional('.' ~ ("_" | ImportSelectors))
+  def Import: R0 = {
+    def ImportExpr: R0 = rule {
+      StableId ~ optional('.' ~ ("_" | ImportSelectors))
+    }
+    def ImportSelectors: R0 = rule { '{' ~ zeroOrMore(ImportSelector ~ ',') ~ (ImportSelector | K.W("_")) ~ "}" }
+    def ImportSelector: R0 = rule { Id ~ optional(K.O("=>") ~ (Id | K.W("_"))) }
+    rule { K.W("import") ~ oneOrMore(ImportExpr).separatedBy(',') }
   }
-  def ImportSelectors: R0 = rule { '{' ~ zeroOrMore(ImportSelector ~ ',') ~ (ImportSelector | K.W("_")) ~ "}" }
-  def ImportSelector: R0 = rule { Id ~ optional(K.O("=>") ~ (Id | K.W("_"))) }
 
-  def Dcl: R0 = rule {
-    K.W("val") ~ ValDcl |
-      K.W("var") ~ VarDcl |
-      K.W("def") ~ FunDcl |
-      K.W("type") ~ zeroOrMore(Newline) ~ TypeDcl
+
+
+
+
+  def Dcl: R0 = {
+
+    def VarDcl: R0 = rule { Ids ~ K.O(":") ~ Type }
+    def FunDcl: R0 = rule { FunSig ~ optional(WL ~ K.O(":") ~ Type) }
+
+    rule {
+      K.W("val") ~ ValDcl |
+        K.W("var") ~ VarDcl |
+        K.W("def") ~ FunDcl |
+        K.W("type") ~ zeroOrMore(Newline) ~ TypeDcl
+    }
   }
-  def ValDcl: R0 = rule { Ids ~ K.O(":") ~ Type }
-  def VarDcl: R0 = rule { Ids ~ K.O(":") ~ Type }
-  def FunDcl: R0 = rule { FunSig ~ optional(WL ~ K.O(":") ~ Type) }
   def FunSig: R0 = rule { Id ~ optional(FunTypeParamClause) ~ ParamClauses }
+  def ValDcl: R0 = rule { Ids ~ K.O(":") ~ Type }
   def TypeDcl: R0 = rule {
     Id ~
       optional(WL ~ TypeParamClause) ~
@@ -335,89 +398,126 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
       optional(WL ~ K.O("<:") ~ Type)
   }
 
-  def PatVarDef: R0 = rule { K.W("val") ~ PatDef | K.W("var") ~ VarDef }
-  def Def: R0 = rule { K.W("def") ~ FunDef | K.W("type") ~ zeroOrMore(Newline) ~ TypeDef | PatVarDef | TmplDef }
-  def PatDef: R0 = rule { oneOrMore(Pattern2).separatedBy(',') ~ optional(K.O(":") ~ Type) ~ K.O("=") ~ Expr }
-  def VarDef: R0 = rule { Ids ~ K.O(":") ~ Type ~ K.O("=") ~ K.W("_") | PatDef }
-  def FunDef: R0 = rule {
-    K.W("this") ~ ParamClause ~ ParamClauses ~ (K.O("=") ~ ConstrExpr | optional(Newline) ~ ConstrBlock) |
-      FunSig ~
-        (
-          optional(K.O(":") ~ Type) ~ K.O("=") ~ optional(K.W("macro")) ~ Expr |
-            optional(Newline) ~ '{' ~ Block ~ "}"
-          )
+  def PatVarDef: R0 = {
+    def PatDef: R0 = rule { oneOrMore(Pattern2).separatedBy(',') ~ optional(K.O(":") ~ Type) ~ K.O("=") ~ Expr }
+    def VarDef: R0 = rule { Ids ~ K.O(":") ~ Type ~ K.O("=") ~ K.W("_") | PatDef }
+    rule { K.W("val") ~ PatDef | K.W("var") ~ VarDef }
   }
+  def Def: R0 = {
+    def ConstrExpr: R0 = rule { ConstrBlock | SelfInvocation }
+    def FunDef: R0 = rule {
+      K.W("this") ~ ParamClause ~ ParamClauses ~ (K.O("=") ~ ConstrExpr | optional(Newline) ~ ConstrBlock) |
+        FunSig ~
+          (
+            optional(K.O(":") ~ Type) ~ K.O("=") ~ optional(K.W("macro")) ~ Expr |
+              optional(Newline) ~ '{' ~ Block ~ "}"
+            )
+    }
+    rule { K.W("def") ~ FunDef | K.W("type") ~ zeroOrMore(Newline) ~ TypeDef | PatVarDef | TmplDef }
+  }
+
+
+
   def TypeDef: R0 = rule { Id ~ optional(TypeParamClause) ~ K.O("=") ~ Type }
 
-  def TmplDef: R0 = rule {
-    K.W("trait") ~ TraitDef |
-    optional(K.W("case")) ~ (K.W("class") ~ ClassDef |
-    K.W("object") ~ ObjectDef)
-  }
-  def ClassDef: R0 = rule {
-    Id ~
+  def TmplDef: R0 = {
+    def TraitTemplate: R0 = {
+      def TraitParents: R0 = rule {
+        AnnotType ~ zeroOrMore(WL ~ K.W("with") ~ AnnotType)
+      }
+      rule{ optional(EarlyDefs) ~ TraitParents ~ optional(TemplateBody) }
+    }
+    def ClassParamClauses: R0 = {
+      def Implicit: R0 = rule{
+        optional(Newline) ~
+          '(' ~
+          K.W("implicit") ~
+          ClassParam ~
+          ")"
+      }
+      def ConstrPrelude: R0 = {
+        def Annot: R0 = rule { '@' ~ SimpleType ~ ArgumentExprs }
+        rule{ zeroOrMore(Annot) ~ optional(AccessModifier) }
+      }
+      def ClassParamClause: R0 = {
+        def ClassParams: R0 = rule { oneOrMore(ClassParam).separatedBy(',') }
+        rule { optional(Newline) ~ '(' ~ optional(ClassParams) ~ ")" }
+      }
+      rule {
+          ConstrPrelude ~ (
+          oneOrMore(ClassParamClause) ~ optional(Implicit) |
+            Implicit
+          )
+      }
+    }
+    def ClassDef: R0 = rule {
+      Id ~
       optional(TypeParamClause) ~
-      zeroOrMore(ConstrAnnotation) ~
-      optional(AccessModifier) ~
-      ClassParamClauses ~
+      optional(ClassParamClauses) ~
       ClassTemplateOpt
+    }
+    def TraitTemplateOpt: R0 = rule {
+      K.W("extends") ~ TraitTemplate | optional(optional(K.W("extends")) ~ TemplateBody)
+    }
+    def TraitDef: R0 = rule { Id ~ optional(TypeParamClause) ~ TraitTemplateOpt }
+    rule {
+      K.W("trait") ~ TraitDef |
+      optional(K.W("case")) ~ (
+        K.W("class") ~ ClassDef |
+        K.W("object") ~ ObjectDef
+      )
+    }
   }
-  def TraitDef: R0 = rule { Id ~ optional(TypeParamClause) ~ TraitTemplateOpt }
+
+
   def ObjectDef: R0 = rule { Id ~ ClassTemplateOpt }
   def ClassTemplateOpt: R0 = rule {
     WL ~ K.W("extends") ~ ClassTemplate |
       optional(WL ~ optional(K.W("extends")) ~ TemplateBody)
   }
-  def TraitTemplateOpt: R0 = rule { K.W("extends") ~ TraitTemplate | optional(optional(K.W("extends")) ~ TemplateBody) }
-  def ClassTemplate: R0 = rule {
-    optional(EarlyDefs) ~
-      ClassParents ~
-      optional(WL ~ TemplateBody)
+
+  def ClassTemplate: R0 = {
+    def ClassParents: R0 = {
+      def Constr: R0 = rule{ AnnotType ~ zeroOrMore(WL ~ ArgumentExprs) }
+      rule{ Constr ~ zeroOrMore(WL ~ K.W("with") ~ AnnotType) }
+    }
+    rule{ optional(EarlyDefs) ~ ClassParents ~ optional(WL ~ TemplateBody) }
   }
 
-  def TraitTemplate: R0 = rule {
-    optional(EarlyDefs) ~ TraitParents ~ optional(TemplateBody)
+  def EarlyDefs: R0 = {
+    def EarlyDef: R0 = rule {
+      zeroOrMore(Annotation ~ optional(Newline)) ~ zeroOrMore(Modifier) ~ PatVarDef
+    }
+    rule{ '{' ~ optional(oneOrMore(EarlyDef).separatedBy(Semis)) ~ '}' ~ K.W("with") }
   }
-  def ClassParents: R0 = rule {
-    Constr ~ zeroOrMore(WL ~ K.W("with") ~ AnnotType)
-  }
-  def TraitParents: R0 = rule {
-    AnnotType ~ zeroOrMore(WL ~ K.W("with") ~ AnnotType)
-  }
-  def Constr: R0 = rule {
-    AnnotType ~ zeroOrMore(WL ~ ArgumentExprs)
-  }
-  def EarlyDefs: R0 = rule {
-    '{' ~ optional(oneOrMore(EarlyDef).separatedBy(Semis)) ~ '}' ~ K.W("with")
-  }
-  def EarlyDef: R0 = rule {
-    zeroOrMore(Annotation ~ optional(Newline)) ~ zeroOrMore(Modifier) ~ PatVarDef
-  }
-  def ConstrExpr: R0 = rule { ConstrBlock | SelfInvocation }
-  def ConstrBlock: R0 = rule { '{' ~ SelfInvocation ~ zeroOrMore(Semis ~ BlockStat) ~ '}' }
+
+
+  def ConstrBlock: R0 = rule { '{' ~ SelfInvocation ~ optional(Semis ~ BlockStats) ~ '}' }
   def SelfInvocation: R0 = rule { K.W("this") ~ oneOrMore(ArgumentExprs) }
 
-  def TopStatSeq: R0 = rule { oneOrMore(TopStat).separatedBy(Semis) }
-  def TopStat: R0 = rule {
-    Packaging |
-      PackageObject |
-      Import |
-      zeroOrMore(Annotation ~ optional(Newline)) ~ zeroOrMore(Modifier) ~ TmplDef
+  def TopStatSeq: R0 = {
+    def PackageObject: R0 = rule { K.W("package") ~ K.W("object") ~ ObjectDef }
+    def Packaging: R0 = rule { K.W("package") ~ QualId ~ '{' ~ TopStatSeq ~ '}' }
+    def TopStat: R0 = rule {
+      Packaging |
+        PackageObject |
+        Import |
+        zeroOrMore(Annotation ~ optional(Newline)) ~ zeroOrMore(Modifier) ~ TmplDef
+    }
+    rule { oneOrMore(TopStat).separatedBy(Semis) }
   }
-  def Packaging: R0 = rule { K.W("package") ~ QualId ~ '{' ~ TopStatSeq ~ '}' }
-  def PackageObject: R0 = rule { K.W("package") ~ K.W("object") ~ ObjectDef }
-  def TopPackageSeq: R0 = rule{
-    oneOrMore(K.W("package") ~ QualId).separatedBy(Semis)
-  }
-  def CompilationUnit: Rule1[String] = rule {
-    capture(
-      
-      optional(Semis) ~
-      
-      (TopPackageSeq ~ optional(Semis ~ TopStatSeq) | TopStatSeq) ~
-      optional(Semis) ~
-      WL
 
-    )
+  def CompilationUnit: Rule1[String] = {
+    def TopPackageSeq: R0 = rule{
+      oneOrMore(K.W("package") ~ QualId).separatedBy(Semis)
+    }
+    rule {
+      capture(
+        optional(Semis) ~
+        (TopPackageSeq ~ optional(Semis ~ TopStatSeq) | TopStatSeq) ~
+        optional(Semis) ~
+        WL
+      )
+    }
   }
 }

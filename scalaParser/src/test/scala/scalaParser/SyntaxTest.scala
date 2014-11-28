@@ -435,6 +435,21 @@ object SyntaxTest extends TestSuite{
           |}
         """.stripMargin
       )
+      * - check(
+        """object GenJSCode{
+          |  val g: G.this.g.type
+          |}
+          |
+        """.stripMargin
+      )
+      * - check(
+        """object K{
+          |  class RTTypeTest
+          |  private object O
+          |}
+        """.stripMargin
+      )
+
     }
     def checkFile(path: String) = check(io.Source.fromFile(path).mkString)
     'file{
