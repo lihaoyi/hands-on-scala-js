@@ -851,7 +851,7 @@ object SyntaxTest extends TestSuite{
 
     'omg{
 //      val root = new java.io.File("book/target/clones/scala-js/")
-      val root = new java.io.File("../scala")
+      val root = new java.io.File("../scala/test/files/pos")
       def listFiles(s: java.io.File): Iterator[String] = {
         val (dirs, files) = s.listFiles().toIterator.partition(_.isDirectory)
         files.map(_.getPath) ++ dirs.flatMap(listFiles)

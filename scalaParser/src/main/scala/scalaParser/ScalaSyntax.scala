@@ -142,7 +142,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     InfixType | '(' ~ optional(oneOrMore(ParamType) separatedBy ',') ~ ')'
   }
   def Ascription = rule {
-     ":" ~ ("_" ~ "*" |  InfixType | oneOrMore(Annotation))
+     ":" ~ ("_" ~ "*" |  Type | oneOrMore(Annotation))
   }
 
   def ParamType = rule { `=>` ~ Type | Type ~ "*" | Type }
@@ -155,7 +155,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     rule{
       (
         Bindings |
-        optional(`implicit`) ~ Id ~ optional(Ascription) |
+        optional(`implicit`) ~ Id ~ optional(":" ~ CompoundType) |
         `_` ~ optional(Ascription)
       ) ~
       `=>`

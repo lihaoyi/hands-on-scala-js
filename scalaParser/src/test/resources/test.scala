@@ -1,4 +1,4 @@
-object A {
+object Sessions {
+  In{z: @serialized => System.out.println(z)}
 
-  A.m(1: Any => Any)
 }
