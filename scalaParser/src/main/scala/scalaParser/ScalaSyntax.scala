@@ -365,6 +365,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def TemplateBody: R0 = rule {
     '{' ~
     optional(SelfType) ~
+    optional(Semis) ~
     zeroOrMore(TemplateStat).separatedBy(Semis) ~
     optional(Semis) ~
     '}'

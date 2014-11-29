@@ -784,6 +784,10 @@ object SyntaxTest extends TestSuite{
             |}
           """.stripMargin
         )
+        * - check(
+          """abstract class Mix___eFoo___wBar_I_ extends Foo___ with Bar_I_    { ; ; f; }
+          """.stripMargin
+        )
       }
       'neg{
         * - checkNeg(
@@ -857,7 +861,7 @@ object SyntaxTest extends TestSuite{
 
     'omg{
 //      val root = new java.io.File("book/target/clones/scala-js/")
-      val root = new java.io.File("../scala/test/files/pos")
+      val root = new java.io.File("../scala")
       def listFiles(s: java.io.File): Iterator[String] = {
         val (dirs, files) = s.listFiles().toIterator.partition(_.isDirectory)
         files.map(_.getPath) ++ dirs.flatMap(listFiles)
@@ -870,7 +874,12 @@ object SyntaxTest extends TestSuite{
         "scala/src/scaladoc/scala/tools/nsc/doc/html",
         "jvm/interpreter.scala",
         "disabled", // don't bother parsing disabled tests
-        "neg" // or neg tests
+        "neg", // or neg tests
+        "deprecate-early-type-defs.scala", // or deprecated tests
+        // Lots of guys in these folders seem
+        // to be borked, skip all of them
+        "test/files/positions",
+        "test/files/presentation"
       )
       for{
         f <- listFiles(root)
