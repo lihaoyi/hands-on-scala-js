@@ -103,9 +103,6 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def Type: R0 = {
     def WildcardType: R0 = rule{ `_` }
 
-    def FunctionArgTypes = rule {
-      InfixType | '(' ~ optional(oneOrMore(ParamType) separatedBy ',') ~ ')'
-    }
     rule {
       (WildcardType |
       FunctionArgTypes ~ `=>` ~ Type |
@@ -114,7 +111,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   }
 
   def InfixType = rule {
-    CompoundType ~ zeroOrMore(Id ~ OneNewlineMax ~ CompoundType)
+    CompoundType ~ zeroOrMore(NotNewline ~ Id ~ OneNewlineMax ~ CompoundType)
   }
   def CompoundType = {
     def RefineStat = rule { `type` ~ TypeDef | Dcl | MATCH }
@@ -191,7 +188,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
       rule {
         "for" ~
-        ('(' ~ Enumerators() ~ ')' | '{' ~ Enumerators(G = true) ~ '}') ~
+        ('(' ~ Enumerators() ~ ')' | '{' ~ Enumerators(true) ~ '}') ~
         optional(K.W("yield")) ~
         Expr0(G)
       }
@@ -205,7 +202,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
         ForCFlow |
         K.W("throw") ~ Expr0(G) |
         K.W("return") ~ optional(Expr0(G)) |
-        SimpleExpr ~ `=` ~ Expr0(G) |
+        SimpleExpr() ~ `=` ~ Expr0(G) |
         PostfixExpr(G) ~ optional("match" ~ '{' ~ CaseClauses ~ "}" | Ascription)
       )
     }
@@ -213,7 +210,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def PostfixExpr(G: Boolean = false): R0 = {
     def PrefixExpr = rule {
-      optional(WL ~ anyOf("-+~!") ~ WS ~ !(Basic.OperatorChar)) ~  SimpleExpr
+      optional(WL ~ anyOf("-+~!") ~ WS ~ !(Basic.OperatorChar)) ~  SimpleExpr(G)
     }
     def Check = if (G) OneNewlineMax else MATCH
     def Check0 = if (G) NotNewline else MATCH
@@ -230,11 +227,12 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     rule { InfixExpr ~ optional(NotNewline ~ Id ~ optional(Newline)) }
   }
 
-  def SimpleExpr: R0 = {
+  def SimpleExpr(G: Boolean = false): R0 = {
     def Path: R0 = rule {
       zeroOrMore(Id ~ '.') ~ `this` ~ zeroOrMore('.' ~ Id) |
       StableId
     }
+    def Check0 = if (G) NotNewline else MATCH
     def SimpleExpr1 = rule{
       K.W("new") ~ (ClassTemplate | TemplateBody) |
       BlockExpr |
@@ -246,7 +244,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     rule {
       SimpleExpr1 ~
       zeroOrMore('.' ~ Id | TypeArgs | NotNewline ~ ArgumentExprs) ~
-      optional(`_`)
+      optional(Check0  ~ `_`)
     }
   }
 

@@ -768,6 +768,16 @@ object SyntaxTest extends TestSuite{
             |}
           """.stripMargin
         )
+        * - check(
+          """object test {
+            |  for {
+            |    n <- A
+            |    a <- B
+            |    _ <- C
+            |  } yield n
+            |}
+          """.stripMargin
+        )
       }
       'neg{
         * - checkNeg(

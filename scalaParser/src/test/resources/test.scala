@@ -1,5 +1,4 @@
-class Test {
+object A {
 
-    f: A
-    g(og): B
+  A.m(1: Any => Any)
 }
