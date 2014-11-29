@@ -101,12 +101,18 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     "forSome" ~ '{' ~ oneOrMore(ExistentialDcl).separatedBy(Semi) ~ '}'
   }
   def Type: R0 = {
-    def WildcardType: R0 = rule{ `_` }
-
+    def FunctionArgTypes = rule {
+      '(' ~ optional(oneOrMore(ParamType) separatedBy ',') ~ ')'
+    }
     rule {
-      (WildcardType |
-      FunctionArgTypes ~ `=>` ~ Type |
-      InfixType ~ optional(ExistentialClause)) ~ TypeBounds
+      (
+        `_` |
+        FunctionArgTypes ~ `=>` ~ Type |
+        InfixType ~ (
+          `=>` ~ Type |
+          optional(ExistentialClause)
+        )
+      ) ~ TypeBounds
     }
   }
 
@@ -138,9 +144,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
 
   def TypePat = rule { CompoundType }
-  def FunctionArgTypes = rule {
-    InfixType | '(' ~ optional(oneOrMore(ParamType) separatedBy ',') ~ ')'
-  }
+
   def Ascription = rule {
      ":" ~ ("_" ~ "*" |  Type | oneOrMore(Annotation))
   }
