@@ -222,6 +222,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
       zeroOrMore(
         Check0 ~
         Id ~
+        optional(TypeArgs) ~
         Check ~
         PrefixExpr
       )
@@ -260,7 +261,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
   def BlockStats: R0 = {
     def Template: R0 = rule{
       zeroOrMore(Annotation) ~
-      (optional(`implicit` | K.W("lazy")) ~ Def | zeroOrMore(LocalModifier) ~ TmplDef)
+      (optional(`implicit`) ~ optional(K.W("lazy")) ~ Def | zeroOrMore(LocalModifier) ~ TmplDef)
     }
     def BlockStat: R0 = rule {
       Import |
@@ -405,8 +406,8 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     def ConstrExpr: R0 = rule { ConstrBlock | SelfInvocation }
     def FunDef: R0 = rule {
       `this` ~ ParamClause ~ ParamClauses ~ (`=` ~ ConstrExpr | OneNewlineMax ~ ConstrBlock) |
-      FunSig ~ (
-        optional(`:` ~ Type) ~ `=` ~ optional(K.W("macro")) ~ Expr0(true) |
+      FunSig ~ optional(`:` ~ Type) ~ (
+        `=` ~ optional(K.W("macro")) ~ Expr0(true) |
         OneNewlineMax ~ '{' ~ Block ~ "}"
       )
     }
@@ -471,7 +472,7 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
 
   def ClassTemplate: R0 = {
     def ClassParents: R0 = {
-      def Constr: R0 = rule{ AnnotType ~ zeroOrMore(ArgumentExprs) }
+      def Constr: R0 = rule{ AnnotType ~ zeroOrMore(NotNewline ~ ArgumentExprs) }
       rule{ Constr ~ zeroOrMore(`with` ~ AnnotType) }
     }
     rule{ optional(EarlyDefs) ~ ClassParents ~ optional(TemplateBody) }
@@ -484,12 +485,14 @@ class ScalaSyntax(val input: ParserInput) extends Parser with Basic with Identif
     rule{ '{' ~ optional(oneOrMore(EarlyDef).separatedBy(Semis)) ~ '}' ~ `with` }
   }
 
-  def ConstrBlock: R0 = rule { '{' ~ SelfInvocation ~ optional(Semis ~ BlockStats) ~ '}' }
+  def ConstrBlock: R0 = rule { '{' ~ SelfInvocation ~ optional(Semis ~ BlockStats) ~ optional(Semis) ~ '}' }
   def SelfInvocation: R0 = rule { `this` ~ oneOrMore(ArgumentExprs) }
 
   def TopStatSeq: R0 = {
     def PackageObject: R0 = rule { `package` ~ `object` ~ ObjectDef }
-    def Packaging: R0 = rule { `package` ~ QualId ~ '{' ~ TopStatSeq ~ WL ~ '}' }
+    def Packaging: R0 = rule {
+      `package` ~ QualId ~ '{' ~ optional(TopStatSeq) ~ WL ~ '}'
+    }
     def TopStat: R0 = rule {
       Packaging |
       PackageObject |

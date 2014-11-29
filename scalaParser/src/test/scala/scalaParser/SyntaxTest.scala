@@ -724,7 +724,50 @@ object SyntaxTest extends TestSuite{
             |}
           """.stripMargin
         )
-
+        * - check(
+          """package `dmacro` {
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """class A {
+            |  def fn1 = List apply 1
+            |  def fn2 = List apply[Int] 2
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """class C {
+            |  def this(x: Int) = {
+            |    this();
+            |    class D;
+            |  }
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """trait B[T] {
+            |  def f1(a: T): Unit { }
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """object test {
+            |  case object Int16 extends SampleFormat1
+            |  (1) match {
+            |    case _   => 1
+            |  }
+            |}
+          """.stripMargin
+        )
+        * - check(
+          """object A {
+            |  def x {
+            |    implicit lazy val e: Int = 0
+            |  }
+            |}
+          """.stripMargin
+        )
       }
       'neg{
         * - checkNeg(
@@ -768,6 +811,7 @@ object SyntaxTest extends TestSuite{
             |
           """.stripMargin
         )
+
       }
     }
     def checkFile(path: String) = check(io.Source.fromFile(path).mkString)
