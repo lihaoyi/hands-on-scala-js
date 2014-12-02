@@ -125,16 +125,13 @@ lazy val book = Project(
         .setMessage(".")
         .call()
 
-    repo.rebase().setUpstream("gh-pages").call()
-    repo.fetch()
-        .setRemote(remoteUrl)
-        .setRefSpecs(new RefSpec("refs/heads/gh-pages:refs/heads/gh-pages"))
-        .call()
     repo.push()
         .setRemote(remoteUrl)
         .setCredentialsProvider(creds)
-        .setRefSpecs(new RefSpec("refs/heads/master:refs/heads/gh-pages"))
+        .setRefSpecs(new RefSpec("master:gh-pages"))
+        .setForce(true)
         .call()
+
     streams.value.log("Pushing to Github Pages complete!")
   }
 )

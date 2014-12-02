@@ -140,7 +140,8 @@ class ScrollSpy(structure: Tree[String],
         } walkHide(child)
 
         val size = walkTree(rest) + children.length
-        mn.frag.children(1).asInstanceOf[dom.HTMLElement].style.maxHeight = size * 44 + "px"
+        mn.frag.children(1).asInstanceOf[dom.HTMLElement].style.maxHeight =
+          if (!open) size * 44 + "px" else "none"
         size
     }
 
@@ -149,7 +150,10 @@ class ScrollSpy(structure: Tree[String],
 
       frag.children(0).classList.remove("pure-menu-selected")
       frag.classList.add("hide")
-      frag.children(1).asInstanceOf[dom.HTMLElement].style.maxHeight = "0px"
+
+      frag.children(1).asInstanceOf[dom.HTMLElement].style.maxHeight =
+        if (!open) "0px" else "none"
+
       if (tree.value.start < winItem.start) frag.classList.add("selected")
       else frag.classList.remove("selected")
       tree.children.foreach(walkHide)
