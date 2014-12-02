@@ -4,8 +4,6 @@ import acyclic.file
 import org.parboiled2._
 
 trait Literals { self: Parser with Basic with Identifiers =>
-  def Block: Rule0
-  def WL: Rule0
   object Literals{
     import Basic._
     def FloatingPointLiteral = rule {
@@ -18,14 +16,14 @@ trait Literals { self: Parser with Basic with Identifiers =>
       )
     }
 
-    def IntegerLiteral = rule { (HexNumeral | DecimalNumeral) ~ optional(anyOf("Ll")) }
+    def IntegerLiteral = rule { (DecimalNumeral | HexNumeral) ~ optional(anyOf("Ll")) }
 
     def BooleanLiteral = rule { Key.W("true") | Key.W("false")  }
 
     def MultilineComment: Rule0 = rule { "/*" ~ zeroOrMore(MultilineComment | !"*/" ~ ANY) ~ "*/" }
     def Comment: Rule0 = rule {
       MultilineComment |
-      "//" ~ zeroOrMore(!Basic.Newline ~ ANY) ~ &(Basic.Newline | EOI)
+        "//" ~ zeroOrMore(!Basic.Newline ~ ANY) ~ &(Basic.Newline | EOI)
     }
 
     def Literal = rule {
@@ -37,27 +35,18 @@ trait Literals { self: Parser with Basic with Identifiers =>
       (Key.W("null") ~ !(Basic.Letter | Basic.Digit))
     }
 
-    def EscapedChars = rule { '\\' ~ anyOf("btnfr'\\\"") }
+
+    def EscapedChars = rule { '\\' ~ anyOf("rnt\\\"") }
 
     // Note that symbols can take on the same values as keywords!
     def SymbolLiteral = rule { ''' ~ (Identifiers.PlainId | Identifiers.Keywords) }
 
-    def CharacterLiteral = rule {
-      ''' ~ (UnicodeExcape | EscapedChars | !'\\' ~ CharPredicate.from(isPrintableChar)) ~ '''
-    }
+    def CharacterLiteral = rule { ''' ~ (UnicodeExcape | EscapedChars | !'\\' ~ CharPredicate.from(isPrintableChar)) ~ ''' }
 
-    def MultiLineChars = rule {
-      zeroOrMore(Interpolation | optional('"') ~ optional('"') ~ noneOf("\""))
-    }
-    def pr(s: String) = rule { run(println(s"LOGGING $cursor: $s")) }
-    def Interpolation = rule{
-      "$" ~ Identifiers.PlainIdNoDollar | "${" ~ Block ~ WL ~ "}" | "$$"
-    }
+    def MultiLineChars = rule { zeroOrMore(optional('"') ~ optional('"') ~ noneOf("\"")) }
     def StringLiteral = rule {
-      (Identifiers.Id ~ "\"\"\"" ~ MultiLineChars ~ ("\"\"\"" ~ zeroOrMore('"'))) |
-      (Identifiers.Id ~ '"' ~ zeroOrMore(Interpolation | "\\\"" | "\\\\" | noneOf("\n\"")) ~ '"') |
-      ("\"\"\"" ~ MultiLineChars ~ ("\"\"\"" ~ zeroOrMore('"'))) |
-      ('"' ~ zeroOrMore("\\\"" | "\\\\" | noneOf("\n\"")) ~ '"')
+      (optional(Identifiers.Id) ~ "\"\"\"" ~ MultiLineChars ~ ("\"\"\"" ~ zeroOrMore('"'))) |
+      (optional(Identifiers.Id) ~ '"' ~ zeroOrMore("\\\"" | noneOf("\n\"")) ~ '"')
     }
 
     def isPrintableChar(c: Char): Boolean = {

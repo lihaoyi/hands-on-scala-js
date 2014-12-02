@@ -25,6 +25,7 @@ object Book {
     "META-INF/resources/webjars/font-awesome/4.2.0/fonts/fontawesome-webfont.woff",
     "css/side-menu.css",
     "example-opt.js",
+    "example-opt.js.map",
     "webpage/weather.js",
     "favicon.svg",
     "favicon.png"
@@ -71,7 +72,6 @@ object Book {
         script(raw(googleAnalytics))
       ),
       body(
-        onload:=s"Controller().main($data)",
         div(id:="layout")(
           a(href:="#menu", id:="menuLink", cls:="menu-link")(
             span
@@ -83,7 +83,8 @@ object Book {
           div(id:="main-box")(
             txt
           )
-        )
+        ),
+        script(raw(s"Controller().main($data)"))
       )
     )
   ).render

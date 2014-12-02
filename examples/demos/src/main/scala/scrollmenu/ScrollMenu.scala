@@ -1,7 +1,7 @@
 package scrollmenu
 
 import org.scalajs.dom
-
+import org.scalajs.dom.extensions._
 import scala.scalajs.js
 import scalatags.JsDom.all._
 
@@ -32,7 +32,7 @@ class ScrollSpy(structure: Tree[String],
       val children = t.children.map(recurse(_, depth + 1))
       Tree(
         MenuNode(
-          curr(ul(marginLeft := "15px",children.map(_.value.frag))).render,
+          curr(ul(paddingLeft := "15px",children.map(_.value.frag))).render,
           Controller.munge(t.value),
           originalI,
           if (children.length > 0) children.map(_.value.end).max else originalI + 1
@@ -84,16 +84,23 @@ class ScrollSpy(structure: Tree[String],
       .maxHeight = (mn.end - mn.start + 1) * 44 + "px"
   }
   private[this] var scrolling = false
-  def apply() = {
+  private[this] var scrollTop = -1
+  def apply(): Unit = {
     if (!scrolling) {
-      println("Scroll...")
       scrolling = true
-      dom.requestAnimationFrame((d: Double) => start())
+      scrollTop = main.scrollTop
+      dom.setTimeout({() =>
+          scrolling = false
+          if (scrollTop == main.scrollTop) start()
+          else apply()
+        },
+        75
+      )
     }
   }
   private[this] var previousWin: MenuNode = null
   private[this] def start(force: Boolean = false) = {
-    scrolling = false
+
     def scroll(el: dom.Element) = {
       val rect = el.getBoundingClientRect()
       if (rect.top <= 0)
@@ -119,36 +126,40 @@ class ScrollSpy(structure: Tree[String],
 
     val winPath = walkIndex(domTrees)
     val winItem = winPath.last.value
-    def walkTree(tree: Tree[MenuNode], indices: List[Tree[MenuNode]]): Unit = {
-      println("WalkTree")
-      for(Tree(mn, children) <- indices){
+    def walkTree(indices: List[Tree[MenuNode]]): Int = indices match {
+      case Nil => 0
+      case (Tree(mn, children) :: rest) =>
+
         mn.frag.classList.remove("hide")
         mn.frag.classList.remove("selected")
-        setFullHeight(mn)
+
         mn.frag.children(0).classList.add("pure-menu-selected")
-        for(child <- children if child.value.frag != indices(1).value.frag){
-          val childFrag = child.value.frag
+        for {
+          child <- children
+          if !indices.headOption.exists(_.value.frag == child.value.frag)
+        } walkHide(child)
 
-          childFrag.children(0).classList.remove("pure-menu-selected")
-          childFrag.classList.add("hide")
-          if(!open)
-            childFrag.children(1).asInstanceOf[dom.HTMLElement].style.maxHeight = "0px"
+        val size = walkTree(rest) + children.length
+        mn.frag.children(1).asInstanceOf[dom.HTMLElement].style.maxHeight = size * 44 + "px"
+        size
+    }
 
-          if (child.value.start < winItem.start) childFrag.classList.add("selected")
-          else childFrag.classList.remove("selected")
-        }
-      }
+    def walkHide(tree: Tree[MenuNode]): Unit = {
+      val frag = tree.value.frag
 
+      frag.children(0).classList.remove("pure-menu-selected")
+      frag.classList.add("hide")
+      frag.children(1).asInstanceOf[dom.HTMLElement].style.maxHeight = "0px"
+      if (tree.value.start < winItem.start) frag.classList.add("selected")
+      else frag.classList.remove("selected")
+      tree.children.foreach(walkHide)
     }
 
     if (winItem != previousWin || force){
       scroll(winItem.frag.children(0))
       dom.history.replaceState(null, null, "#" + winItem.id)
       previousWin = winItem
-      walkTree(domTrees, winPath)
+      walkTree(winPath)
     }
-
   }
-
-
 }

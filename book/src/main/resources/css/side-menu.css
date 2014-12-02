@@ -322,11 +322,11 @@ code{
 }
 
 .menu-item-list ul, .menu-item-list a{
-    -webkit-transition: all 0.2s ease-in-out;
-    -moz-transition: all 0.2s ease-in-out;
-    -ms-transition: all 0.2s ease-in-out;
-    -o-transition: all 0.2s ease-in-out;
-    transition: all 0.2s ease-in-out;
+    -webkit-transition: max-height 0.2s ease;
+    -moz-transition: max-height 0.2s ease;
+    -ms-transition: max-height 0.2s ease;
+    -o-transition: max-height 0.2s ease;
+    transition: max-height 0.2s ease;
     overflow: hidden
 }
 

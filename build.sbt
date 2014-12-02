@@ -56,9 +56,12 @@ lazy val book = Project(
     "org.webjars" % "font-awesome" % "4.2.0",
     "com.lihaoyi" %%% "upickle" % "0.2.5"
   ),
-  (resources in Compile) += {
+  (resources in Compile) ++= {
     (fullOptJS in (demos, Compile)).value
-    (artifactPath in (demos, Compile, fullOptJS)).value
+    Seq(
+      (artifactPath in (demos, Compile, fullOptJS)).value,
+      new java.io.File((artifactPath in (demos, Compile, fullOptJS)).value.getPath + ".map")
+    )
   },
   (unmanagedResourceDirectories in Compile) ++=
     (unmanagedResourceDirectories in (demos, Compile)).value,
