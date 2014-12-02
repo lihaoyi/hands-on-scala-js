@@ -177,13 +177,10 @@
     @p
       Overall, these helper functions do nothing special, btu we're defining them first to avoid having to copy-&-paste code throughout the subsequent examples. Now that we've defined all the relevant scaffolding, let's walk through a few ways that we can implement the all-important @hl.scala{handle} method.
 
-    @def scrollDiv = div(
-      height:="200px",
-      overflow:="scroll"
-    )
+    @def exampleDiv = div(height:="200px")
 
     @sect{Direct Use of XMLHttpRequest}
-      @example(scrollDiv, "Futures().main0")
+      @example(exampleDiv, "Futures().main0")
       @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def handle0", "main")
 
       @p
@@ -195,7 +192,7 @@
         This solution is basically equivalent to the initial code given in the @sect.ref{Raw Javascript} section of @sect.ref{Interactive Web Pages}, with the additional code necessary for aggregation. As described in @sect.ref{dom.extensions}, we can make use of the @hl.scala{Ajax} object to make it slightly tidier.
 
     @sect{Using dom.extensions.Ajax}
-      @example(scrollDiv, "Futures().main1")
+      @example(exampleDiv, "Futures().main1")
       @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def handle1", "main")
 
       @p
@@ -204,7 +201,7 @@
         However, we still have the messiness inherent in the result aggregation: we don't actually want to perform our action (writing to the @hl.scala{output} div) when one @hl.scala{Future} is complete, but only when @i{all} the @hl.scala{Future}s are complete. Thus we still need to do some amount of manual book-keeping in the @hl.scala{results} buffer.
 
     @sect{Future Combinators}
-      @example(scrollDiv, "Futures().main2")
+      @example(exampleDiv, "Futures().main2")
       @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def handle2", "main")
 
       @p

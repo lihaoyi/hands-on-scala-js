@@ -39,7 +39,7 @@ object BookData {
     val tagId = "example"+counter
     counter += 1
     Seq(
-      t(id:=tagId, display.block),
+      t(id:=tagId, display.block, overflow.scroll),
       script(s"$main(document.getElementById('$tagId'))")
     )
   }

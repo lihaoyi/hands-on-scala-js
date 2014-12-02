@@ -163,6 +163,7 @@ class ScrollSpy(structure: Tree[String],
       scroll(winItem.frag.children(0))
       dom.history.replaceState(null, null, "#" + winItem.id)
       previousWin = winItem
+//      println(winPath.map(_.value.id))
       walkTree(winPath)
     }
   }
