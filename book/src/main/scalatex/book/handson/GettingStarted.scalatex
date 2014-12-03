@@ -19,7 +19,7 @@
   If you've worked with Scala before, you probably already have most of these installed. Otherwise, take a moment to download them before we get to work.
 
 @p
-  The quickest way to get started with Scala.js is to @code{git clone} @lnk("workbench-example-app", "https://github.com/lihaoyi/workbench-example-app"), go into the repository root, and run @code{~fastOptJS}
+  The quickest way to get started with Scala.js is to @code{git clone} @lnk("workbench-example-app", "https://github.com/lihaoyi/workbench-example-app"), go into the repository root, and run @code{sbt ~fastOptJS}
 
 @hl.bash
   git clone https://github.com/lihaoyi/workbench-example-app
