@@ -16,67 +16,26 @@ val sharedSettings = Seq(
   autoCompilerPlugins := true
 )
 
-lazy val scalaParser = project.settings(sharedSettings:_*)
-                              .settings(
-  libraryDependencies ++= Seq(
-    "com.lihaoyi" %% "utest" % "0.2.4",
-    "org.parboiled" %% "parboiled" % "2.0.1"
-  ),
-  testFrameworks += new TestFramework("utest.runner.JvmFramework")
-)
-lazy val scalatexApi = project.settings(sharedSettings:_*)
-                              .dependsOn(scalaParser)
-                              .settings(
-  libraryDependencies ++= Seq(
-    "com.lihaoyi" %% "utest" % "0.2.4",
-    "com.scalatags" %% "scalatags" % "0.4.2",
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-    "org.parboiled" %% "parboiled" % "2.0.1"
-  ),
-  testFrameworks += new TestFramework("utest.runner.JvmFramework")
-)
-
-lazy val scalatexPlugin = Project(
-  id   = "scalatexPlugin",
-  base = file("scalatexPlugin"),
-  dependencies = Seq(scalatexApi)
-).settings(sharedSettings:_*).settings(
-  libraryDependencies += "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-  publishArtifact in Compile := false
-)
 
 lazy val book = Project(
   id = "book",
-  base = file("book"),
-  dependencies = Seq(scalatexApi)
-).settings(sharedSettings:_*).settings(
+  base = file("book")
+).settings(sharedSettings ++ inConfig(Compile)(scalatex.SbtPlugin.settings):_*).settings(
   libraryDependencies ++= Seq(
     "org.webjars" % "highlightjs" % "8.2-1",
     "org.webjars" % "pure" % "0.5.0",
     "org.webjars" % "font-awesome" % "4.2.0",
+    "com.scalatags" %% "scalatags" % "0.4.2",
     "com.lihaoyi" %%% "upickle" % "0.2.5"
   ),
-  (resources in Compile) ++= {
+  (resources in Compile) += {
     (fullOptJS in (demos, Compile)).value
-    Seq(
-      (artifactPath in (demos, Compile, fullOptJS)).value,
-      new java.io.File((artifactPath in (demos, Compile, fullOptJS)).value.getPath + ".map")
-    )
+    (artifactPath in (demos, Compile, fullOptJS)).value
   },
+
   (unmanagedResourceDirectories in Compile) ++=
     (unmanagedResourceDirectories in (demos, Compile)).value,
-  scalacOptions in Compile ++= {
-    val jar = (Keys.`package` in (scalatexPlugin, Compile)).value
-    val addPlugin = "-Xplugin:" + jar.getAbsolutePath
-    // add plugin timestamp to compiler options to trigger recompile of
-    // main after editing the plugin. (Otherwise a 'clean' is needed.)
-    val dummy = "-Jdummy=" + jar.lastModified
-    val options = "-P:scalatex-options:" + sourceDirectory.value / "scalatex"
-    Seq(addPlugin, dummy)
-  },
-  watchSources ++= {
-    ((sourceDirectory in Compile).value / "scalatex" ** "*.scalatex").get
-  },
+
   cloneRepos := {
     val localPath = target.value / "clones"
     if (!localPath.isDirectory){

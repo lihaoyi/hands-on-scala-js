@@ -15,7 +15,7 @@ case class MenuNode(frag: dom.HTMLElement, id: String, start: Int, end: Int)
  */
 class ScrollSpy(structure: Tree[String],
                 main: dom.HTMLElement){
-  val (headers, domTrees) = {
+  lazy val domTrees = {
     var i = -1
     def recurse(t: Tree[String], depth: Int): Tree[MenuNode] = {
       val curr =
@@ -40,26 +40,26 @@ class ScrollSpy(structure: Tree[String],
         children
       )
     }
-    def offset(el: dom.HTMLElement, parent: dom.HTMLElement): Double = {
-      if (el == parent) 0
-      else el.offsetTop + offset(el.offsetParent.asInstanceOf[dom.HTMLElement], parent)
-    }
-    val headers = {
-      val menuItems = {
-        def rec(current: Tree[String]): Seq[String] = {
-          current.value +: current.children.flatMap(rec)
-        }
-        rec(structure).tail
-      }
 
-      js.Array(
-        menuItems.map(Controller.munge)
-          .map(dom.document.getElementById)
-          .map(offset(_, main)):_*
-      )
-    }
     val domTrees = recurse(structure, 0)
-    (headers, domTrees)
+    domTrees
+  }
+  def offset(el: dom.HTMLElement, parent: dom.HTMLElement): Double = {
+    if (el == parent) 0
+    else el.offsetTop + offset(el.offsetParent.asInstanceOf[dom.HTMLElement], parent)
+  }
+  lazy val headers = {
+    val menuItems = {
+      def rec(current: Tree[String]): Seq[String] = {
+        current.value +: current.children.flatMap(rec)
+      }
+      rec(structure).tail
+    }
+
+    js.Array(
+      menuItems.map(name => dom.document.getElementById(Controller.munge(name)))
+               .map((el) => () => offset(el, main)):_*
+    )
   }
 
   var open = false
@@ -113,8 +113,8 @@ class ScrollSpy(structure: Tree[String],
       val t @ Tree(m, children) = tree
       val win = if(m.start == -1) true
       else {
-        val before = headers(m.start) <= scrollTop
-        val after = (m.end >= headers.length) || headers(m.end) > scrollTop
+        val before = headers(m.start)() <= scrollTop
+        val after = (m.end >= headers.length) || headers(m.end)() > scrollTop
         before && after
       }
       val childIndexes = children.map(walkIndex)

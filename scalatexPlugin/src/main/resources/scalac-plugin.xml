@@ -1,4 +1,0 @@
-<plugin>
-  <name>demo-plugin</name>
-  <classname>scalatex.ScalaTexPlugin</classname>
-</plugin>
