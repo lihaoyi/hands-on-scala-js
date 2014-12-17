@@ -318,7 +318,7 @@
     @li
       The @lnk.dom.CanvasRenderingContext2D has a bunch of methods on it that can be used to draw things. Here we only draw 1x1 rectangles to put points on the canvas; try modifying the code to make it draw something else.
     @li
-      We've look at the @code{master} branch of @code{workbench-example-app}, but this project also has several other branches showing off different facets of Scala.js: @lnk("dodge-the-dots", "https://github.com/lihaoyi/workbench-example-app/tree/dodge-the-dots") and @lnk("space-invaders", "https://github.com/lihaoyi/workbench-example-app/tree/space-invaders") are both interesting branches worth playing with as a beginner. Check them out!
+      We've looked at the @code{master} branch of @code{workbench-example-app}, but this project also has several other branches showing off different facets of Scala.js: @lnk("dodge-the-dots", "https://github.com/lihaoyi/workbench-example-app/tree/dodge-the-dots") and @lnk("space-invaders", "https://github.com/lihaoyi/workbench-example-app/tree/space-invaders") are both interesting branches worth playing with as a beginner. Check them out!
     @li
       Try publishing the output code somewhere. You only need @code{example-opt.js} and @code{index-opt.html}; try putting them somewhere online where the world can see it.
 
