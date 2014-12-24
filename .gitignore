@@ -5,3 +5,8 @@ output/
 *.iml
 .idea
 .history
+/*/examples/crossBuilds/clientserver2/server/shared/
+examples/crossBuilds/clientserver2/server/shared/
+/*/examples/crossBuilds/clientserver/server/shared/
+examples/crossBuilds/clientserver/server/shared/
+
