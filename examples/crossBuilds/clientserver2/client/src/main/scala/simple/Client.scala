@@ -8,7 +8,7 @@ import autowire._
 object Ajaxer extends autowire.Client[String, upickle.Reader, upickle.Writer]{
   override def doCall(req: Request) = {
     dom.extensions.Ajax.post(
-      url = "/atmosphere/ajax/" + req.path.mkString("/"),
+      url = "/atmosphere/" + req.path.mkString("/"),
       data = upickle.write(req.args)
     ).map(_.responseText)
   }
