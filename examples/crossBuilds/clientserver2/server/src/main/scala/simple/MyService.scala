@@ -40,36 +40,19 @@ trait MyService extends HttpService with Api {
       } ~
       getFromResourceDirectory("")
     } ~
-   post{
-    path(Segments){ s =>
-      extract(_.request.entity.asString) { e =>
-        complete {
-          Router.route[Api](self)(
-            autowire.Core.Request(s, upickle.read[Map[String, String]](e))
-          )
-        }
-      }
-    }
-  }
-
-  /*
     post {
-      //"atmosphere" is needed at the front otherwise connection is refused:
-      //POST http://localhost:8080/atmosphere/ajax/simple/Api/list net::ERR_CONNECTION_REFUSED
-      //This our problem now:
-      // POST http://localhost:8080/atmosphere/ajax/simple/Api/list 404 (Not Found)
-      path("atmosphere" / Segments) {
+      path(Segments){ s =>
         extract(_.request.entity.asString) { e =>
           complete {
-            upickle.write(list(e))
+            Router.route[Api](self)(
+              autowire.Core.Request(s, upickle.read[Map[String, String]](e))
+            )
           }
         }
       }
     }
-    */
 
   def list(path: String): Seq[FileData] = {
-    println("In list with: " + path)
     val (dir, last) = path.splitAt(path.lastIndexOf("/") + 1)
     val files =
       Option(new java.io.File("./" + dir).listFiles())
@@ -79,12 +62,5 @@ trait MyService extends HttpService with Api {
       if f.getName.startsWith(last)
     }
     yield FileData(f.getName, f.length())
-    /*
-    var res = Seq[FileData]()
-    res :+ FileData("one",3)
-    res :+ FileData("two",3)
-    println(s"To return: $res")
-    res
-    */
   }
 }

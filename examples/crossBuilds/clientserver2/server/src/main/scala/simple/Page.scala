@@ -7,7 +7,7 @@ object Page{
   val skeleton =
     html(
       head(
-        script(src:="/atmosphere/client-fastopt.js"),
+        script(src:="/browser/client-fastopt.js"),
         link(
           rel:="stylesheet",
           href:="http://yui.yahooapis.com/pure/0.5.0/pure-min.css"
