@@ -1,4 +1,3 @@
-import utest.jsrunner.JsCrossBuild
 import scala.scalajs.sbtplugin.ScalaJSPlugin._
 import ScalaJSKeys._
 val sharedSettings = Seq(
@@ -24,11 +23,18 @@ lazy val client = project.in(file("client"))
 lazy val server = project.in(file("server"))
                          .settings(sharedSettings:_*)
                          .settings(
-  libraryDependencies ++= Seq(
-    "io.spray" %% "spray-can" % "1.3.2",
-    "io.spray" %% "spray-routing" % "1.3.2",
-    "com.typesafe.akka" %% "akka-actor" % "2.3.6"
-  ),
+  libraryDependencies ++= {
+    val akkaV = "2.3.5"
+    val sprayV = "1.3.2"
+    Seq(
+      "io.spray"            %%  "spray-servlet" % sprayV,
+      "io.spray"            %%  "spray-routing" % sprayV,
+      "io.spray"            %%  "spray-testkit" % sprayV % "test",
+      "com.typesafe.akka"   %%  "akka-actor"    % akkaV,
+      "com.typesafe.akka"   %%  "akka-testkit"  % akkaV   % "test",
+      "org.specs2"          %%  "specs2-core"   % "2.3.11" % "test"
+    )
+  },
   (resources in Compile) += {
     (fastOptJS in (client, Compile)).value
     (artifactPath in (client, Compile, fastOptJS)).value
