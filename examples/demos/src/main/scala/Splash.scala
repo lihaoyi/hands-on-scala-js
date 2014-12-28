@@ -15,7 +15,7 @@ object Splash extends{
     }
     clear()
 
-    val renderer =
+    val brush =
       canvas.getContext("2d")
             .asInstanceOf[dom.CanvasRenderingContext2D]
 
@@ -26,18 +26,17 @@ object Splash extends{
     type Graph = (String, Double => Double)
     val graphs = Seq[Graph](
       ("red", sin),
-      ("green", x => 1 - abs(x % 4 - 2)),
-      ("blue", x => pow(sin(x/12), 2) * sin(x))
+      ("green", x => abs(x % 4 - 2) - 1),
+      ("blue", x => sin(x/12) * sin(x))
     ).zipWithIndex
     dom.setInterval(() => {
       x = (x + 1) % w; if (x == 0) clear()
       for (((color, f), i) <- graphs) {
         val offset = h / 3 * (i + 0.5)
         val y = f(x / w * 75) * h / 30
-        renderer.fillStyle = color
-        renderer.fillRect(x, y + offset, 3, 3)
+        brush.fillStyle = color
+        brush.fillRect(x, y + offset, 3, 3)
       }
     }, 20)
-
   }
 }

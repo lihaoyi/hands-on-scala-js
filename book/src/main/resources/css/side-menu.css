@@ -1,12 +1,4 @@
-body {
-    color: #777;
-}
-*{
-    position: relative;
-}
-p{
-    text-align: justify;
-}
+
 #main{
     position: fixed;
     max-width: 100%;
@@ -15,10 +7,38 @@ p{
     height: 100%;
     overflow-y: scroll
 }
+
 .pure-img-responsive {
     max-width: 100%;
     height: auto;
 }
+
+
+.header {
+    margin: 0;
+    color: #333;
+    text-align: center;
+    padding: 2.5em 2em 0;
+    border-bottom: 1px solid #eee;
+}
+.header h1 {
+    margin: 0.2em 0;
+    font-size: 3em;
+    font-weight: 300;
+}
+.header h2 {
+    font-weight: 300;
+    color: #ccc;
+    padding: 0;
+    margin-top: 0;
+}
+
+.content-subhead {
+    margin: 50px 0 20px 0;
+    font-weight: 300;
+    color: #888;
+}
+
 
 /*
 Add transition to containers so they can push in and out.
@@ -32,62 +52,6 @@ Add transition to containers so they can push in and out.
     -o-transition: all 0.2s ease-out;
     transition: all 0.2s ease-out;
 }
-
-/*
-This is the parent `<div>` that contains the menu and the content area.
-*/
-#layout {
-    position: relative;
-    padding-left: 0;
-}
-    #layout.active {
-        position: relative;
-        left: 250px;
-    }
-        #layout.active #menu {
-            left: 250px;
-            width: 250px;
-        }
-
-        #layout.active .menu-link {
-            left: 250px;
-        }
-/*
-The content `<div>` is where all your content goes.
-*/
-.content {
-    margin: 0 auto;
-    padding: 0 2em;
-    max-width: 800px;
-    margin-bottom: 50px;
-    line-height: 1.6em;
-}
-
-.header {
-     margin: 0;
-     color: #333;
-     text-align: center;
-     padding: 2.5em 2em 0;
-     border-bottom: 1px solid #eee;
- }
-    .header h1 {
-        margin: 0.2em 0;
-        font-size: 3em;
-        font-weight: 300;
-    }
-     .header h2 {
-        font-weight: 300;
-        color: #ccc;
-        padding: 0;
-        margin-top: 0;
-    }
-
-.content-subhead {
-    margin: 50px 0 20px 0;
-    font-weight: 300;
-    color: #888;
-}
-
 
 
 /*
@@ -108,61 +72,61 @@ appears on the left side of the page.
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
 }
-    /*
-    All anchors inside the menu should be styled like this.
-    */
-    #menu a {
-        color: #999;
-        border: none;
-        padding: 0.6em 0 0.6em 0.6em;
-    }
+/*
+All anchors inside the menu should be styled like this.
+*/
+#menu a {
+    color: #999;
+    border: none;
+    padding: 0.6em 0 0.6em 0.6em;
+}
 
-    /*
-    Remove all background/borders, since we are applying them to #menu.
-    */
-     #menu .pure-menu,
-     #menu .pure-menu ul {
-        border: none;
-        background: transparent;
-    }
+/*
+Remove all background/borders, since we are applying them to #menu.
+*/
+#menu .pure-menu,
+#menu .pure-menu ul {
+    border: none;
+    background: transparent;
+}
 
-    /*
-    Add that light border to separate items into groups.
-    */
-    #menu .pure-menu ul,
-    #menu .pure-menu .menu-item-divided {
-        border-top: 1px solid #333;
-    }
-        /*
-        Change color of the anchor links on hover/focus.
-        */
-        #menu .pure-menu li a:hover,
-        #menu .pure-menu li a:focus {
-            background: #333;
-        }
+/*
+Add that light border to separate items into groups.
+*/
+#menu .pure-menu ul,
+#menu .pure-menu .menu-item-divided {
+    border-top: 1px solid #333;
+}
+/*
+Change color of the anchor links on hover/focus.
+*/
+#menu .pure-menu li a:hover,
+#menu .pure-menu li a:focus {
+    background: #333;
+}
 
-    /*
-    This styles the selected menu item `<li>`.
-    */
-    #menu .pure-menu-selected,
-    #menu .pure-menu-heading {
-        background: #1f8dd6;
-    }
-        /*
-        This styles a link within a selected menu item `<li>`.
-        */
-        #menu .pure-menu-selected {
-            color: #fff;
-        }
+/*
+This styles the selected menu item `<li>`.
+*/
+#menu .pure-menu-selected,
+#menu .pure-menu-heading {
+    background: #1f8dd6;
+}
+/*
+This styles a link within a selected menu item `<li>`.
+*/
+#menu .pure-menu-selected {
+    color: #fff;
+}
 
-    /*
-    This styles the menu heading.
-    */
-    #menu .pure-menu-heading {
-        font-size: 110%;
-        color: #fff;
-        margin: 0;
-    }
+/*
+This styles the menu heading.
+*/
+#menu .pure-menu-heading {
+    font-size: 110%;
+    color: #fff;
+    margin: 0;
+}
 
 /* -- Dynamic Button For Responsive Menu -------------------------------------*/
 
@@ -189,34 +153,34 @@ small screens.
     padding: 2.1em 1.6em;
 }
 
-    .menu-link:hover,
-    .menu-link:focus {
-        background: #000;
-    }
+.menu-link:hover,
+.menu-link:focus {
+    background: #000;
+}
 
-    .menu-link span {
-        position: relative;
-        display: block;
-    }
+.menu-link span {
+    position: relative;
+    display: block;
+}
 
-    .menu-link span,
-    .menu-link span:before,
-    .menu-link span:after {
-        background-color: #fff;
-        width: 100%;
-        height: 0.2em;
-    }
+.menu-link span,
+.menu-link span:before,
+.menu-link span:after {
+    background-color: #fff;
+    width: 100%;
+    height: 0.2em;
+}
 
-        .menu-link span:before,
-        .menu-link span:after {
-            position: absolute;
-            margin-top: -0.6em;
-            content: " ";
-        }
+.menu-link span:before,
+.menu-link span:after {
+    position: absolute;
+    margin-top: -0.6em;
+    content: " ";
+}
 
-        .menu-link span:after {
-            margin-top: 0.6em;
-        }
+.menu-link span:after {
+    margin-top: 0.6em;
+}
 
 
 /* -- Responsive Styles (Media Queries) ------------------------------------- */
@@ -253,55 +217,7 @@ Hides the menu at `48em`, but modify this based on your app's needs.
         left: 250px;
     }
 }
-/* Custom Stuff */
-a:link    {
-    color: #479;
-    text-decoration: none;
-}
-a:visited {
-    color: #858;
-    text-decoration: none;
-}
-a:hover   {
-    text-decoration: underline;
-}
-a:active  {
-    color: #000;
-    text-decoration: underline;
-}
-code{
-    color: #000;
-}
-.half-table{
-    width: 100%;
-}
-.half-table td{
-    width: 50%;
-}
-.half-table th{
-    width: 50%;
-}
-.header-link{
-    position: absolute;
-    right: 0px;
-}
-*:hover > .header-link:hover{
-    opacity: 1.0;
-}
-*:hover > .header-link:active{
-    opacity: 0.75;
-}
-*:hover > .header-link{
-    text-align: right;
-    text-decoration: none;
-    opacity: 0.5;
-}
-.header-link > i{
-    color: #777;
-}
-.header-link{
-    opacity: 0.05;
-}
+
 #menu .collapsed .menu-item-list .hide ul li > a{
     padding-top: 0px;
     padding-bottom: 0px;
@@ -338,7 +254,34 @@ code{
     top: 0px;
 }
 
-/*Workaround for bug in highlight.js IDEA theme*/
-span.hljs-tag, span.hljs-symbol{
-    background: none;
+
+.half-table{
+    width: 100%;
+}
+.half-table td{
+    width: 50%;
+}
+.half-table th{
+    width: 50%;
+}
+
+
+/*
+This is the parent `<div>` that contains the menu and the content area.
+*/
+#layout {
+    position: relative;
+    padding-left: 0;
+}
+#layout.active {
+    position: relative;
+    left: 250px;
+}
+#layout.active #menu {
+    left: 250px;
+    width: 250px;
+}
+
+#layout.active .menu-link {
+    left: 250px;
 }

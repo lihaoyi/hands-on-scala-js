@@ -60,8 +60,13 @@ object Main {
           div(id:="menu")
 
         ),
-        div(id:="main",
-          div(id:="main-box")(
+        div(
+          id:="main",
+          div(
+            id:="main-box",
+            cls:="scalatex-content",
+            maxWidth:="800px",
+            lineHeight:="1.6em",
             frag
           )
         ),

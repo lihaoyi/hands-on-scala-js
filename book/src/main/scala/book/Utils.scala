@@ -16,10 +16,13 @@ case class pureTable(header: Frag*){
 object sect extends scalatex.site.Section{
   var indent = 0
 
-
   override val headers: Seq[Header] = Seq(
-    Header((h, s, l) => div(cls:="header")(h1(h, l), h2(s)), f => div(cls:="content", f)),
-    Header((h, s, l) => div(cls:="header")(h1(id:=munge(h), h, l), br)),
+    Header(
+      (l, h, s) => div(cls:="header")(h1(h, l), br, h2(s)),
+      f => div(cls:="content", f)
+    ),
+    Header(
+      (l, h, s) => div(cls:="header")(h1(id:=munge(h), h, l), br)),
     h1, h2, h3, h4, h5, h6
   )
 }
