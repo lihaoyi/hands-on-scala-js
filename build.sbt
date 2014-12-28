@@ -4,7 +4,7 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.merge.MergeStrategy
 import org.eclipse.jgit.transport.{UsernamePasswordCredentialsProvider, RefSpec}
 
-import scala.scalajs.sbtplugin.ScalaJSPlugin._
+import scalajs.sbtplugin.ScalaJSPlugin._
 import ScalaJSKeys._
 
 val cloneRepos = taskKey[Unit]("Clone stuff from github")

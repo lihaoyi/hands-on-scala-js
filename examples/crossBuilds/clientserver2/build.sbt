@@ -1,5 +1,5 @@
 import utest.jsrunner.JsCrossBuild
-import scala.scalajs.sbtplugin.ScalaJSPlugin._
+import scalajs.sbtplugin.ScalaJSPlugin._
 import ScalaJSKeys._
 val sharedSettings = Seq(
   unmanagedSourceDirectories in Compile +=

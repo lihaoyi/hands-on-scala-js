@@ -1,11 +1,11 @@
 @import BookData._
 
-@val firstHalfDescription = """
-is a set of tutorials that walks you through getting started with Scala.js. You'll build a range of small projects, from Making a Canvas App to Interactive Web Pages to Integrating Client-Server, and in the process will get a good overview of both Scala.js's use cases as well as the development experience
-"""
-@val secondHalfDescription = """
+@val firstHalfDescription = Seq[Frag]("""
+is a set of tutorials that walks you through getting started with Scala.js. You'll build a range of small projects, from """, sect.ref("Making a Canvas App"), " to ", sect.ref("Interactive Web Pages"), " to ", sect.ref("Integrating Client-Server"), """, and in the process will get a good overview of both Scala.js's use cases as well as the development experience
+""")
+@val secondHalfDescription = Seq("""
 is a set of detailed expositions on various parts of the Scala.js platform. Nothing in here is necessary for you to make your first demos, but as you dig deeper into the platform, you will likely need or want to care about these things so you can properly understand what's going on "under the hood"
-"""
+""")
 @sect("Hands-on Scala.js", "Writing client-side web applications in Scala")
   @split
     @more

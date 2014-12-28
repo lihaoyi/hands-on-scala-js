@@ -5,7 +5,7 @@
 @split
   @half
     @hl.scala
-      object Example extends js.JSApp{
+      object Main extends js.JSApp{
         def main() = {
           var x = 0
           while(x < 10) x += 3
@@ -16,12 +16,13 @@
 
   @half
     @hl.javascript
-      ScalaJS.c.LExample$.prototype.main__V = (function() {
+      ScalaJS.c.LMain$.prototype.main__V = (function() {
         var x = 0;
         while ((x < 10)) {
           x = ((x + 3) | 0)
         };
-        ScalaJS.m.s_Predef().println__O__V(x)
+        ScalaJS.m.s_Predef()
+                 .println__O__V(x)
         // 12
       });
 
@@ -67,7 +68,7 @@
     @p
       To work in Javascript, you need the discipline to limit yourself to the sane subset of the language, avoiding all the pitfalls along the way:
 
-    @img(src:="images/javascript-the-good-parts-the-definitive-guide.jpg")
+    @img(src:="images/javascript-the-good-parts-the-definitive-guide.jpg", margin.auto, display.block)
 
     @p
       Even if you manage to do so, what constitutes a pitfall and what constitutes a clever-language-feature changes yearly, making it difficult to maintain cohesiveness over time. This is compounded by the fact that refactoring is difficult, and so removing "unwanted" patterns from a large code-base a difficult (often multi-year) process.

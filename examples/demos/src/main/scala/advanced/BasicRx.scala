@@ -1,8 +1,8 @@
 package advanced
 
 import org.scalajs.dom
-import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExport
+import scalajs.js
+import scalajs.js.annotation.JSExport
 import rx._
 import scalatags.JsDom.all._
 

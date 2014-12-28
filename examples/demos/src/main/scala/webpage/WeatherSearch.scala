@@ -2,9 +2,9 @@ package webpage
 
 import org.scalajs.dom
 import dom.extensions._
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
-import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExport
+import scalajs.concurrent.JSExecutionContext.Implicits.runNow
+import scalajs.js
+import scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
 
 @JSExport

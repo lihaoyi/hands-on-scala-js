@@ -3,7 +3,7 @@ package canvasapp
 
 import org.scalajs.dom
 
-import scala.scalajs.js.annotation.JSExport
+import scalajs.js.annotation.JSExport
 import scala.util.Random
 
 @JSExport

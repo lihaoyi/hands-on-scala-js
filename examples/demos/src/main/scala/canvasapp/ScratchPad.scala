@@ -3,7 +3,7 @@ package canvasapp
 
 import org.scalajs.dom
 
-import scala.scalajs.js.annotation.JSExport
+import scalajs.js.annotation.JSExport
 
 @JSExport
 object ScratchPad extends{
@@ -22,19 +22,21 @@ object ScratchPad extends{
     /*code*/
     renderer.fillStyle = "black"
     var down = false
-    canvas.onmousedown = (e: dom.MouseEvent)=>{
-      down = true
-    }
-    canvas.onmouseup = (e: dom.MouseEvent)=>{
-      down = false
-    }
-    canvas.onmousemove = (e: dom.MouseEvent)=>{
-      val rect = canvas.getBoundingClientRect()
-      if (down) renderer.fillRect(
-        e.clientX - rect.left,
-        e.clientY - rect.top,
-        10, 10
-      )
+    canvas.onmousedown =
+      (e: dom.MouseEvent) => down = true
+
+    canvas.onmouseup =
+      (e: dom.MouseEvent) => down = false
+
+    canvas.onmousemove = {
+      (e: dom.MouseEvent) =>
+        val rect =
+          canvas.getBoundingClientRect()
+        if (down) renderer.fillRect(
+          e.clientX - rect.left,
+          e.clientY - rect.top,
+          10, 10
+        )
     }
   }
 }

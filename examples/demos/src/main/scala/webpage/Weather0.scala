@@ -2,8 +2,8 @@ package webpage
 
 import org.scalajs.dom
 import org.scalajs.dom.{Node, Element}
-import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExport
+import scalajs.js
+import scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
 
 @JSExport

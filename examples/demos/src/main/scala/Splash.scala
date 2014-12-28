@@ -2,7 +2,7 @@ import java.lang.Math._
 
 import org.scalajs.dom
 
-import scala.scalajs.js.annotation.JSExport
+import scalajs.js.annotation.JSExport
 
 @JSExport
 object Splash extends{

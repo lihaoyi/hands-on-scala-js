@@ -2,7 +2,7 @@ package scrollmenu
 
 import org.scalajs.dom
 import org.scalajs.dom.extensions._
-import scala.scalajs.js
+import scalajs.js
 import scalatags.JsDom.all._
 
 case class Tree[T](value: T, children: Vector[Tree[T]])

@@ -3,7 +3,7 @@ package advanced
 import org.scalajs.dom
 import concurrent._
 import async.Async._
-import scala.scalajs.js.annotation.JSExport
+import scalajs.js.annotation.JSExport
 import scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 @JSExport

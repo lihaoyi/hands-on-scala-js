@@ -1,4 +1,4 @@
-import scala.scalajs.sbtplugin.ScalaJSPlugin.ScalaJSKeys._
+import scalajs.sbtplugin.ScalaJSPlugin.ScalaJSKeys._
 
 (emitSourceMaps in fullOptJS) := false
 

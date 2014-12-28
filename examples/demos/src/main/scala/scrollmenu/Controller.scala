@@ -3,8 +3,8 @@ package scrollmenu
 import org.scalajs.dom
 import org.scalajs.dom.extensions._
 
-import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExport
+import scalajs.js
+import scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
 
 

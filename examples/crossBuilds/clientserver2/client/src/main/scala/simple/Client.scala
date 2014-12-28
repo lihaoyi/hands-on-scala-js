@@ -1,7 +1,7 @@
 package simple
 import scalatags.JsDom.all._
 import org.scalajs.dom
-import scala.scalajs.js.annotation.JSExport
+import scalajs.js.annotation.JSExport
 import scalajs.concurrent.JSExecutionContext.Implicits.runNow
 import autowire._
 

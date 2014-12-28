@@ -5,10 +5,10 @@ import org.scalajs.dom.XMLHttpRequest
 import org.scalajs.dom.extensions.{Ajax, KeyCode}
 import scala.collection.mutable
 import scala.concurrent.Future
-import scala.scalajs.js
+import scalajs.js
 import scalatags.JsDom.all._
-import scala.scalajs.js.annotation.JSExport
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
+import scalajs.js.annotation.JSExport
+import scalajs.concurrent.JSExecutionContext.Implicits.runNow
 @JSExport
 object Futures {
   def main(container: dom.HTMLDivElement,

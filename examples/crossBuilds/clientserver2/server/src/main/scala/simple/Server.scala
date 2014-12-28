@@ -30,7 +30,10 @@ object Server extends SimpleRoutingApp with Api{
           extract(_.request.entity.asString) { e =>
             complete {
               Router.route[Api](Server)(
-                autowire.Core.Request(s, upickle.read[Map[String, String]](e))
+                autowire.Core.Request(
+                  s,
+                  upickle.read[Map[String, String]](e)
+                )
               )
             }
           }

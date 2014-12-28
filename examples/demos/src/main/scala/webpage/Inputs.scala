@@ -1,7 +1,7 @@
 package webpage
 
 import org.scalajs.dom
-import scala.scalajs.js.annotation.JSExport
+import scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
 
 @JSExport
