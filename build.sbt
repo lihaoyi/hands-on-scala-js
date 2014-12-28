@@ -20,13 +20,11 @@ val sharedSettings = Seq(
 lazy val book = Project(
   id = "book",
   base = file("book")
-).settings(sharedSettings ++ inConfig(Compile)(scalatex.SbtPlugin.settings):_*).settings(
+).settings(sharedSettings ++ scalatex.SbtPlugin.projectSettings:_*).settings(
   libraryDependencies ++= Seq(
-    "org.webjars" % "highlightjs" % "8.2-1",
-    "org.webjars" % "pure" % "0.5.0",
-    "org.webjars" % "font-awesome" % "4.2.0",
     "com.scalatags" %% "scalatags" % "0.4.2",
-    "com.lihaoyi" %%% "upickle" % "0.2.5"
+    "com.lihaoyi" %%% "upickle" % "0.2.5",
+    "com.lihaoyi" %% "scalatex-site" % "0.1.0"
   ),
   (resources in Compile) += {
     (fullOptJS in (demos, Compile)).value

@@ -36,9 +36,3 @@ lazy val scalatexSbtPlugin = project.settings(sharedSettings:_*)
   scalaVersion := "2.10.4",
   sbtPlugin := true
 )
-lazy val compilerPlugin = project.settings(sharedSettings:_*)
-                                 .dependsOn(api)
-                                 .settings(
-    name := "scalatex-compiler-plugin",
-  libraryDependencies += "org.scala-lang" % "scala-compiler" % scalaVersion.value
-)

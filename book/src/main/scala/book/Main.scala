@@ -3,40 +3,74 @@ import acyclic.file
 import java.io.InputStream
 import java.nio.file.{Paths, Files}
 
+import scalatags.Text.{attrs, tags2, all}
+import scalatags.Text.all._
+import scalatex.site.Section.Tree
+import scalatex.site.Site
 
 
 object Main {
-  def write(txt: String, dest: String) = {
-    Paths.get(dest).toFile.getParentFile.mkdirs()
-    Files.deleteIfExists(Paths.get(dest))
-    Files.write(Paths.get(dest), txt.getBytes)
-  }
-  def copy(src: InputStream, dest: String) = {
-    Paths.get(dest).toFile.getParentFile.mkdirs()
-    Files.deleteIfExists(Paths.get(dest))
-    Files.copy(src, Paths.get(dest))
-  }
-
   def main(args: Array[String]): Unit = {
-    println("Writing Book")
-    val outputRoot = System.getProperty("output.root") + "/"
-    write(Book.site, s"$outputRoot/index.html")
+    val googleAnalytics =
+      """
+        |(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        |    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        |  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        |  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        |
+        |  ga('create', 'UA-27464920-4', 'auto');
+        |  ga('send', 'pageview');
+      """.stripMargin
 
-    val jsFiles = Book.autoResources.filter(_.endsWith(".js")).toSet
-    val cssFiles = Book.autoResources.filter(_.endsWith(".css")).toSet
-    val miscFiles = Book.autoResources -- cssFiles -- jsFiles
+    val data = upickle.write(sect.structure)
 
-    for(res <- Book.manualResources ++ miscFiles) {
-      copy(getClass.getResourceAsStream("/" + res), outputRoot + res)
+    val s = new Site {
+      def content = Map("index.html" -> Index())
+
+      override def autoResources = super.autoResources | Set(
+        "META-INF/resources/webjars/pure/0.5.0/grids-responsive-min.css",
+        "css/side-menu.css",
+        "example-opt.js",
+        "webpage/weather.js",
+        "favicon.svg",
+        "favicon.png"
+      )
+      override def manualResources = super.manualResources | Set(
+        "images/javascript-the-good-parts-the-definitive-guide.jpg",
+        "images/Hello World.png",
+        "images/Hello World White.png",
+        "images/Hello World Console.png",
+        "images/IntelliJ Hello.png",
+        "images/Dropdown.png",
+        "images/Scalatags Downloads.png"
+      )
+      override def headFrags = super.headFrags ++ Seq(
+        meta(charset:="utf-8"),
+        meta(name:="viewport", attrs.content:="width=device-width, initial-scale=1.0"),
+        link(rel:="shortcut icon", `type`:="image/png", href:="favicon.png"),
+        tags2.title("Hands-on Scala.js"),
+        script(raw(googleAnalytics))
+      )
+      override def bodyFrag(frag: Frag) = body(
+        onload:=s"Controller().main($data)",
+        div(id:="layout")(
+          a(href:="#menu", id:="menuLink", cls:="menu-link")(
+            span
+          ),
+          div(id:="menu")
+
+        ),
+        div(id:="main",
+          div(id:="main-box")(
+            frag
+          )
+        )
+      )
+
     }
 
-    for((resources, dest) <- Seq(jsFiles -> "scripts.js", cssFiles -> "styles.css")) {
-      val blobs = for(res <- resources.iterator) yield {
-        io.Source.fromInputStream(getClass.getResourceAsStream("/"+res)).mkString
-      }
+    s.renderTo(System.getProperty("output.root") + "/")
 
-      write(blobs.mkString("\n"), outputRoot + dest)
-    }
 
     val allNames = {
       def rec(n: Tree[String]): Seq[String] = {
@@ -61,6 +95,5 @@ object Main {
     // can be used to verify that no links are broken
     // lnk.usedLinks
   }
-
 
 }

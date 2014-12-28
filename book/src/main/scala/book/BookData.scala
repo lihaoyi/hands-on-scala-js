@@ -50,11 +50,22 @@ object BookData {
   def half = div(cls:="pure-u-1 pure-u-md-1-2")
 
 
-  val hl = new Highlighter(
-    Seq(
+  val hl = new scalatex.site.Highlighter {
+    override val pathMappings = Seq(
       s"$cloneRoot/scala-js" -> "https://github.com/scala-js/scala-js",
       s"$cloneRoot/workbench-example-app" -> "https://github.com/lihaoyi/workbench-example-app",
       "" -> "https://github.com/lihaoyi/hands-on-scala-js"
     )
-  )
+    override val suffixMappings = Map(
+      "scala" -> "scala",
+      "sbt" -> "scala",
+      "js" -> "javascript"
+    )
+    def scala(s: String) = this.highlight(s, "scala")
+    def bash(s: String) = this.highlight(s, "bash")
+    def html(s: String) = this.highlight(s, "html")
+    def xml(s: String) = this.highlight(s, "xml")
+    def diff(s: String) = this.highlight(s, "diff")
+    def javascript(s: String) = this.highlight(s, "javascript")
+  }
 }
