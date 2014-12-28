@@ -22,7 +22,7 @@ object Main {
         |  ga('send', 'pageview');
       """.stripMargin
 
-    val data = upickle.write(sect.structure)
+    def data = upickle.write(sect.structure)
 
     val s = new Site {
       def content = Map("index.html" -> Index())
@@ -52,7 +52,7 @@ object Main {
         script(raw(googleAnalytics))
       )
       override def bodyFrag(frag: Frag) = body(
-        onload:=s"Controller().main($data)",
+
         div(id:="layout")(
           a(href:="#menu", id:="menuLink", cls:="menu-link")(
             span
@@ -64,7 +64,8 @@ object Main {
           div(id:="main-box")(
             frag
           )
-        )
+        ),
+        onload:=s"Controller().main($data)"
       )
 
     }
