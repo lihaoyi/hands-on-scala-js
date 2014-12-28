@@ -1,6 +1,6 @@
 @import BookData._
 @p
-  Although Scala.js tries very hard to maintain compatibility with Scala-JVM, there are some parts where the two platforms differs. This can be roughly grouped into two things: differences in the libraries available,and differences in the language itself. This chapter will cover both of these facets.
+  Although Scala.js tries very hard to maintain compatibility with Scala-JVM, there are some parts where the two platforms differs. This can be roughly grouped into two things: differences in the libraries available, and differences in the language itself. This chapter will cover both of these facets.
 
 @sect{Language Differences}
   @sect{Floats are Doubles}
