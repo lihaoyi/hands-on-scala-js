@@ -65,7 +65,7 @@ object Main {
           div(
             id:="main-box",
             cls:="scalatex-content",
-            maxWidth:="800px",
+            maxWidth:="840px",
             lineHeight:="1.6em",
             frag
           )
