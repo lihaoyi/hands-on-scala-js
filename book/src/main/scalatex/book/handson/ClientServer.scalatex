@@ -1,8 +1,8 @@
 @import BookData._
 
-@def lazyload(id: String) = script(raw("""
-  document.addEventListener("load", function(){
-    document.getElementById(id).src = 'https://hands-on-scala-js.herokuapp.com/'
+@def lazyload(id: String) = script(raw(s"""
+  window.addEventListener("load", function(){
+    document.getElementById("$id").src = 'https://hands-on-scala-js.herokuapp.com/'
   })
 """))
 
