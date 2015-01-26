@@ -16,6 +16,8 @@
 @p
   One note is that these are "Techniques" rather than "Libraries" because they have not been packaged up in a way that is sufficiently nice that you can use them out-of-the-box just by adding a dependency somewhere. Thus, they each require some small amount of boilerplate before use, though the amount of boilerplate is fixed: it does not grow with the size of your program, and anyway gives you a chance to tweak it to do exactly what you want.
 
+@val advanced = wd/'examples/'demos/'src/'main/'scala/'advanced
+
 @sect{Functional-Reactive UIs}
   @p
     @lnk("Functional-reactive Programming", "http://en.wikipedia.org/wiki/Functional_reactive_programming") (FRP) is a field with encompasses several things:
@@ -43,7 +45,7 @@
     @p
       @lnk("Scala.Rx", "https://github.com/lihaoyi/scala.rx") is a change-propagation library that implements the @b{Continuous} style of FRP. To begin with, we need to include it in our @code{build.sbt} dependencies:
 
-    @hl.ref("examples/demos/build.sbt", "com.scalarx")
+    @hl.ref(wd/'examples/'demos/"build.sbt", "com.scalarx")
 
     @p
       Scala.Rx provides you with smart variables that automatically track dependencies with each other, such that if one smart variable changes, the rest re-compute immediately and automatically. The main primitives in Scala.Rx are:
@@ -62,7 +64,7 @@
     @p
       To begin with, let's set up our imports:
 
-    @hl.ref("examples/demos/src/main/scala/advanced/BasicRx.scala", "package advanced", "@JSExport")
+    @hl.ref(advanced/"BasicRx.scala", "package advanced", "@JSExport")
 
     @p
       Here we are seeing the same @hl.scala{dom} and @hl.scala{scalatags}, imports we saw in the hands-on tutorial, as well a new @hl.scala{import rx._} which bring all the Scala.Rx names into the local namespace.
@@ -70,7 +72,7 @@
     @p
       Scala.Rx does not "natively" bind to Scalatags, but integrating them yourself is simple enough that it's not worth putting into a separate library. He's a simple integration:
 
-    @hl.ref("examples/demos/src/main/scala/advanced/BasicRx.scala", "implicit def")
+    @hl.ref(advanced/"BasicRx.scala", "implicit def")
 
     @p
       Scalatags requires that anything you want to embed in a Scalatags fragment be implicitly convertible to @hl.scala{Frag}; here we are providing one for any Scala.Rx @hl.scala{Rx[T]}s, as long as the @hl.scala{T} provided is itself convertible to a @hl.scala{Frag}. We call @hl.scala{r().render} to extract the "current" value of the @hl.scala{Rx}, and then set up an @hl.scala{Obs} that watches the @hl.scala{Rx}, replacing the previous value with the current one every time its value changes.
@@ -80,7 +82,7 @@
 
     @split
       @more
-        @hl.ref("examples/demos/src/main/scala/advanced/BasicRx.scala", "val txt =")
+        @hl.ref(advanced/"BasicRx.scala", "val txt =")
 
       @less
         @example(div, "BasicRx().main")
@@ -104,7 +106,7 @@
 
     @split
       @more
-        @hl.ref("examples/demos/src/main/scala/advanced/BasicRx.scala", "val fruits =")
+        @hl.ref(advanced/"BasicRx.scala", "val fruits =")
 
       @less
         @example(div, "BasicRx().main2")
@@ -154,22 +156,22 @@
     @p
       To begin with, let's write the scaffolding code, that will display the input box, deal with the listeners, and all that:
     
-    @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "val myInput")
+    @hl.ref(advanced/"Futures.scala", "val myInput")
 
     @p
       So far so good. The only thing that's missing here is the mysterious @hl.scala{handle} function, which is given the list of names and the @hl.scala{output} div, and must handle the Ajax requests, aggregating the results, and displaying them in @hl.scala{output}. Let's also define a small number of helper functions that we'll use later:
 
-    @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def urlFor", "def parseTemp")
+    @hl.ref(advanced/"Futures.scala", "def urlFor", "def parseTemp")
 
     @p
       @hl.scala{urlFor} encapsulates the messy URL-construction logic that we need to make the Ajax call to the right place.
 
-    @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "parseTemp", "def formatResults")    
+    @hl.ref(advanced/"Futures.scala", "parseTemp", "def formatResults")    
 
     @p
       @hl.scala{parseTemp} encapsulates the messy result-extraction logic that we need to get the data we want (current temperature, in celsius) out of the structured JSON return blob.
 
-    @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def formatResults", "def main")
+    @hl.ref(advanced/"Futures.scala", "def formatResults", "def main")
 
     @p
       @hl.scala{formatResults} encapsulates the conversion of the final @hl.scala{(name, celsius)} data back into readable HTML.
@@ -181,7 +183,7 @@
 
     @sect{Direct Use of XMLHttpRequest}
       @example(exampleDiv, "Futures().main0")
-      @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def handle0", "main")
+      @hl.ref(advanced/"Futures.scala", "def handle0", "main")
 
       @p
         This is a simple solution that directly uses the @hl.scala{XMLHttpRequest} class that is available in Javascript in order to perform the Ajax call. Every Ajax call that returns, we aggregate in a @hl.scala{results} buffer, and when the @hl.scala{results} buffer is full we then append the formatted results to the output div.
@@ -193,7 +195,7 @@
 
     @sect{Using dom.extensions.Ajax}
       @example(exampleDiv, "Futures().main1")
-      @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def handle1", "main")
+      @hl.ref(advanced/"Futures.scala", "def handle1", "main")
 
       @p
         This solution uses the @hl.scala{dom.extensions.Ajax} object, as described in @hl.scala{dom.extensions}. This basically wraps the messy @hl.scala{XMLHttpRequest} interface in a single function that returns a @hl.scala{scala.concurrent.Future}, which you can then map/foreach over to perform the action when the @hl.scala{Future} is complete.
@@ -202,7 +204,7 @@
 
     @sect{Future Combinators}
       @example(exampleDiv, "Futures().main2")
-      @hl.ref("examples/demos/src/main/scala/advanced/Futures.scala", "def handle2", "main")
+      @hl.ref(advanced/"Futures.scala", "def handle2", "main")
 
       @p
         Since we're using Scala's @hl.scala{Future}s, we aren't limited to just map/foreach-ing over them. @hl.scala{scala.concurrent.Future} provides a @lnk("rich api", "http://www.scala-lang.org/files/archive/nightly/docs/library/scala/concurrent/Future.html") that can be used to deal with common tasks like working with lists of futures in parallel, or aggregating the result of futures together.
@@ -234,7 +236,7 @@
     @p
       This is a toy example, but is enough to bring out the difficulty of doing things the "traditional" way, and why using Scala-Async with Scala.js is superior. To begin with, let's set the stage:
 
-    @hl.ref("examples/demos/src/main/scala/advanced/Async.scala", "val renderer")
+    @hl.ref(advanced/"Async.scala", "val renderer")
 
     @p
       To initialize the canvas with the part of the code which will remain the same, so we can look more closely at the code which differs.
@@ -245,7 +247,7 @@
 
       @split
         @more
-          @hl.ref("examples/demos/src/main/scala/advanced/Async.scala", "// traditional")
+          @hl.ref(advanced/"Async.scala", "// traditional")
 
         @less
           @example(canvas, "Async().main0")
@@ -278,7 +280,7 @@
 
       @split
         @more
-          @hl.ref("examples/demos/src/main/scala/advanced/Async.scala", "// async")
+          @hl.ref(advanced/"Async.scala", "// async")
 
         @less
           @example(canvas, "Async().main")
@@ -291,7 +293,7 @@
       @p
         You may be wondering what these @hl.scala{Channel} things are, and where they are coming from. Although these are not provided by Scala, they are pretty straightforward to define ourselves:
 
-      @hl.ref("examples/demos/src/main/scala/advanced/Async.scala", "class Channel")
+      @hl.ref(advanced/"Async.scala", "class Channel")
 
       @p
         The point of @hl.scala{Channel} is to allow us to turn event-callbacks (like those provided by the DOM's @hl.scala{onmouseXXX} properties) into some kind of event-stream, that we can listen to asynchronously (via @hl.scala{apply} that returns a @hl.scala{Future}) or merge via @hl.scala{|}. This is a minimal implementation for what we need now, but it would be easy to provide more functionality (filter, map, etc.) as necessary.

@@ -24,7 +24,8 @@ lazy val book = Project(
   libraryDependencies ++= Seq(
     "com.scalatags" %% "scalatags" % "0.4.2",
     "com.lihaoyi" %%% "upickle" % "0.2.5",
-    "com.lihaoyi" %% "scalatex-site" % "0.1.0"
+    "com.lihaoyi" %% "scalatex-site" % "0.1.1",
+    "com.lihaoyi" %% "ammonite" % "0.1.0"
   ),
   (resources in Compile) += {
     (fullOptJS in (demos, Compile)).value
@@ -92,6 +93,7 @@ lazy val book = Project(
     streams.value.log("Pushing to Github Pages complete!")
   }
 )
+
 
 lazy val demos = project.in(file("examples/demos"))
 

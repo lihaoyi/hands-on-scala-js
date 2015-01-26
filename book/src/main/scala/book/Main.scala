@@ -3,13 +3,16 @@ import acyclic.file
 import java.io.InputStream
 import java.nio.file.{Paths, Files}
 
+import ammonite.ops.Path
+
 import scalatags.Text.{attrs, tags2, all}
 import scalatags.Text.all._
 import scalatex.site.Section.Tree
 import scalatex.site.Site
-
+import ammonite.all.{rel => _, _}
 
 object Main {
+  val wd = processWorkingDir
   def main(args: Array[String]): Unit = {
     val googleAnalytics =
       """
@@ -27,22 +30,23 @@ object Main {
     val s = new Site {
       def content = Map("index.html" -> Index())
 
-      override def autoResources = super.autoResources | Set(
-        "META-INF/resources/webjars/pure/0.5.0/grids-responsive-min.css",
-        "css/side-menu.css",
-        "example-opt.js",
-        "webpage/weather.js",
-        "favicon.svg",
-        "favicon.png"
+      override def autoResources = super.autoResources ++ Seq(
+        wd/"META-INF"/'resources/'webjars/'pure/"0.5.0"/"grids-responsive-min.css",
+        wd/'css/"side-menu.css",
+        wd/"example-opt.js",
+        wd/'webpage/"weather.js",
+        wd/"favicon.svg",
+        wd/"favicon.png"
       )
-      override def manualResources = super.manualResources | Set(
-        "images/javascript-the-good-parts-the-definitive-guide.jpg",
-        "images/Hello World.png",
-        "images/Hello World White.png",
-        "images/Hello World Console.png",
-        "images/IntelliJ Hello.png",
-        "images/Dropdown.png",
-        "images/Scalatags Downloads.png"
+
+      override def manualResources = super.manualResources ++ Seq(
+        wd/'images/"javascript-the-good-parts-the-definitive-guide.jpg",
+        wd/'images/"Hello World.png",
+        wd/'images/"Hello World White.png",
+        wd/'images/"Hello World Console.png",
+        wd/'images/"IntelliJ Hello.png",
+        wd/'images/"Dropdown.png",
+        wd/'images/"Scalatags Downloads.png"
       )
       override def headFrags = super.headFrags ++ Seq(
         meta(charset:="utf-8"),
@@ -72,10 +76,9 @@ object Main {
         ),
         onload:=s"Controller().main($data)"
       )
-
     }
 
-    s.renderTo(System.getProperty("output.root") + "/")
+    s.renderTo(Path(System.getProperty("output.root")))
 
 
     val allNames = {

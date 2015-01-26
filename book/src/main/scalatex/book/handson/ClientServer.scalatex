@@ -21,6 +21,9 @@
 @p
   Scala.js lets you share code between client and server relatively straightforwardly. As we saw in the previous chapter, where we made a shared module. Let's work to turn that shared module into a working client-server application!
 
+@val server = wd/'examples/'crossBuilds/'clientserver/'server/'src/'main/'scala/'simple
+@val client = wd/'examples/'crossBuilds/'clientserver/'client/'src/'main/'scala/'simple
+
 @sect{A Client-Server Setup}
   @p
     Getting started with client-server integration, let's go with the simplest configuration possible: a Spray server and a Scala.js client. Most of the other web-frameworks (@lnk.misc.Play, @lnk.misc.Scalatra, etc.) will have more complex configurations, but the basic mechanism of wiring up Scala.js to your web framework will be the same. Our project will look like this:
@@ -43,7 +46,7 @@
   @p
     First, let's do the wiring in @code{build.sbt}:
 
-  @hl.ref("examples/crossBuilds/clientserver/build.sbt")
+  @hl.ref(wd/'examples/'crossBuilds/'clientserver/"build.sbt")
 
   @p
     We have two projects: @code{client} and @code{server}, one of which is a Scala.js project (indicated by the presence of @hl.scala{scalaJSSettings}). Both projects share a number of settings: the presence of the @code{shared/} folder, which shared code can live in (similar to what we saw in @sect.ref{Cross Publishing Libraries}) and the settings to add @lnk.github.Scalatags and @lnk.github.uPickle to the build. Note that those two dependencies use the triple @code{%%%} instead of the double @code{%%} to declare: this means that for each dependency, we will pull in the Scala-JVM or Scala.js version depending on whether it's being used in a Scala.js project. Note also the @hl.scala{packageArchetype.java_application} setting, which isn't strictly necessary depending on what you want to do with the application, but this example needs it as part of the deployment to Heroku.
@@ -54,7 +57,8 @@
   @p
     Next, let's kick off the Spray server in our Scala-JVM main method:
 
-  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala")
+
+  @hl.ref(server/"Server.scala")
 
   @p
     This is a not-very-interesting @lnk("spray-routing", "http://spray.io/documentation/1.2.2/spray-routing/") application: we set up a server on @code{localhost:8080}, have the root URL serve the main page on GET, and have other GET URLs serve resources. This includes the @code{js-fastopt.js} file that is now in our resources because of our @code{build.sbt} config earlier! We also add a POST route to allow the client ask the server to list files various directories.
@@ -62,14 +66,14 @@
   @p
     The HTML template @hl.scala{Page.skeleton} is not shown above; I put it in a separate file for neatness:
 
-  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Page.scala")
+  @hl.ref(server/"Page.scala")
 
   @p
     This is a typical @lnk.github.Scalatags HTML snippet. Note that since we're serving it directly from the server in Scala code, we do not need to leave a @code{.html} file somewhere on the filesystem! We can declare all HTML, including the skeleton of the page, in Scalatags. Otherwise it's the same as what we saw in earlier chapters: A simple HTML page which includes a script tag to run our Scala.js application.
   @p
     Lastly, we'll set up the Scala.js main method, which we are calling in the @hl.html{<script>} tag above to kick off the client-side application.
 
-  @hl.ref("examples/crossBuilds/clientserver/client/src/main/scala/simple/Client.scala")
+  @hl.ref(client/"Client.scala")
 
   @p
     Again this is a simple Scala.js application, not unlike what we saw in earlier chapters. However, there is one difference: earlier, we made our Ajax calls to @code{api.openweathermap.org/...}. Here, we're making it to @code{/ajax}: the same server the page is served from!
@@ -77,7 +81,7 @@
   @p
     You may have noticed in both client and server, we have made reference to a mysterious @hl.scala{FileData} type which holds the name and size of each file. @hl.scala{FileData} is defined in the @code{shared/} folder, so it can be accessed from both Scala-JVM and Scala.js:
 
-  @hl.ref("examples/crossBuilds/clientserver/client/shared/main/scala/simple/FileData.scala")
+  @hl.ref(client/"FileData.scala")
 
   @p
     Now, if we go to the browser at @code{localhost:8080}, we should see our web-page!
@@ -120,10 +124,10 @@
   @p
     However, there is still some amount of duplication in the code. In particular, the definition of the endpoint name "list" is duplicated 4 times:
 
-  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala", """path("ajax" / "list")""", "")
-  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala", "list(", "")
-  @hl.ref("examples/crossBuilds/clientserver/server/src/main/scala/simple/Server.scala", "def list", "")
-  @hl.ref("examples/crossBuilds/clientserver/client/src/main/scala/simple/Client.scala", "ajax/list", "")
+  @hl.ref(server/"Server.scala", """path("ajax" / "list")""", "")
+  @hl.ref(server/"Server.scala", "list(", "")
+  @hl.ref(server/"Server.scala", "def list", "")
+  @hl.ref(client/"Client.scala", "ajax/list", "")
 
   @p
     Three times on the server and once on the client! What's worse, two of the appearances of @hl.scala{"list"} are in string literals, which are not checked by the compiler to match up with themselves or the name of the method @hl.scala{list}. Apart from this, there is one other piece of duplication that is unchecked: the type being returned from @hl.scala{list} (@hl.scala{Seq[FileData]}) is being repeated on the client in @hl.scala{upickle.read[Seq[FileData]]} in order to de-serialize the serialized data. This leaves three opportunities for error wide-open:
@@ -146,12 +150,14 @@
   @p
     @lnk("Autowire", "https://github.com/lihaoyi/autowire") is a library that turns your request routing layer from a fragile, hand-crafted mess into a solid, type-checked, boilerplate-free experience. Autowire basically turns what was previously a stringly-typed, hand-crafted Ajax call and route:
 
-  @hl.ref("examples/crossBuilds/clientserver/client/src/main/scala/simple/Client.scala", "ajax/list", "")
+  @hl.ref(client/"Client.scala", "ajax/list", "")
 
   @p
     Into a safe, type-checked function call:
 
-  @hl.ref("examples/crossBuilds/clientserver2/client/src/main/scala/simple/Client.scala", ".call()", "")
+  @val client2 = wd/'examples/'crossBuilds/'clientserver2/'client/'src/'main/'scala/'simple
+  @val server2 = wd/'examples/'crossBuilds/'clientserver2/'server/'src/'main/'scala/'simple
+  @hl.ref(client2/"Client.scala", ".call()", "")
 
   @p
     Let's see how we can do that.
@@ -172,7 +178,7 @@
     @p
       Let's start with our client-server interface definition
 
-    @hl.ref("examples/crossBuilds/clientserver2/client/shared/main/scala/simple/Shared.scala")
+    @hl.ref(client2/"Shared.scala")
 
     @p
       Here, you can see that in addition to sharing the @hl.scala{FileData} class, we are also creating an @hl.scala{Api} trait which contains the signature of our @hl.scala{list} method. The exact name of the trait doesn't matter. We need it to be in @code{shared/} so that the code in both client and server can reference it.
@@ -180,16 +186,16 @@
     @p
       Next, let's look at modifying our server code to make use of Autowire:
 
-    @hl.ref("examples/crossBuilds/clientserver2/server/src/main/scala/simple/Server.scala")
+    @hl.ref(server2/"Server.scala")
 
     @p
       Now, instead of hard-coding the route @hl.scala{"ajax" / "list"}, we now take in any route matching @hl.scala{"ajax" / Segments}, feeding the resultant path segments into the @hl.scala{Router} object:
 
-    @hl.ref("examples/crossBuilds/clientserver2/server/src/main/scala/simple/Server.scala", "path(")
+    @hl.ref(server2/"Server.scala", "path(")
     @p
       The @hl.scala{Router} object in turn simply defines how you intend the objects to be serialized and deserialized:
 
-    @hl.ref("examples/crossBuilds/clientserver2/server/src/main/scala/simple/Server.scala", "object Router", "object Server")
+    @hl.ref(server2/"Server.scala", "object Router", "object Server")
 
     @p
       In this case using uPickle. Note how the @hl.scala{route} call explicitly states the type (here @hl.scala{Api}) that it is to generate routes against; this ensures that only methods which you explicitly put in your public interface @hl.scala{Api} are publically reachable.
@@ -197,12 +203,12 @@
     @p
       Next, let's look at the modified client code:
 
-    @hl.ref("examples/crossBuilds/clientserver2/client/src/main/scala/simple/Client.scala")
+    @hl.ref(client2/"Client.scala")
 
     @p
       There are two main modifications here: the existence of the new @hl.scala{Ajaxer} object, and the modification to the Ajax call-site. Let's first look at @hl.scala{Ajaxer}:
 
-    @hl.ref("examples/crossBuilds/clientserver2/client/src/main/scala/simple/Client.scala", "object Ajaxer", "@JSExport")
+    @hl.ref(client2/"Client.scala", "object Ajaxer", "@JSExport")
 
     @p
       Like the @hl.scala{Router} object, @hl.scala{Ajaxer} also defines how you perform the serialization and deserialization of data-structures, again using uPickle. Unlike the @hl.scala{Router} object, @hl.scala{Ajaxer} also defines how the out-going Ajax call gets sent over the network. Here we're doing it using the @hl.scala{Ajax.post} method.
@@ -210,7 +216,7 @@
     @p
       Lastly, let's look at the modified callsite for the ajax call itself:
 
-    @hl.ref("examples/crossBuilds/clientserver2/client/src/main/scala/simple/Client.scala", "def update", "")
+    @hl.ref(client2/"Client.scala", "def update", "")
 
     @p
       There are a few things of note here:

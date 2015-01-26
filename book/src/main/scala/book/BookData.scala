@@ -3,33 +3,31 @@ package book
 import java.io.File
 
 import acyclic.file
+import ammonite.all._
 import scalatags.Text.TypedTag
 import scalatags.Text.all._
 object BookData {
-  val cloneRoot = System.getProperty("clone.root") + "/"
+  val wd = processWorkingDir
+  val cloneRoot = root/System.getProperty("clone.root").split('/')
 
 
   lazy val javaAPIs = {
     import java.io.File
-    def recursiveListFiles(f: File): Array[File] = {
-      val these = f.listFiles
-      these ++ these.filter(_.isDirectory).flatMap(recursiveListFiles)
-    }
+
 
     val roots = Seq(
-      "scala-js/javalanglib/src/main/scala",
-      "scala-js/javalib/src/main/scala"
+      "scala-js"/'javalanglib/'src/'main/'scala,
+      "scala-js"/'javalib/'src/'main/'scala
     )
     for{
       root <- roots
-      file <- recursiveListFiles(new File(cloneRoot + root))
-      if file != null
-      if file.isFile
+      file <- ls.rec! cloneRoot/root
+      if file.ext == "scala"
     } yield{
-      val path = file.getPath
-        .drop(cloneRoot.length + root.length + 1)
-        .dropRight(".scala".length)
+
+      val path = (file - cloneRoot).toString.stripSuffix(".scala")
       val filename = path.replace('/', '.')
+
       val docpath = s"https://docs.oracle.com/javase/7/docs/api/$path.html"
       filename -> docpath
     }
@@ -52,9 +50,9 @@ object BookData {
 
   val hl = new scalatex.site.Highlighter {
     override val pathMappings = Seq(
-      s"$cloneRoot/scala-js" -> "https://github.com/scala-js/scala-js",
-      s"$cloneRoot/workbench-example-app" -> "https://github.com/lihaoyi/workbench-example-app",
-      "" -> "https://github.com/lihaoyi/hands-on-scala-js"
+      cloneRoot/"scala-js" -> "https://github.com/scala-js/scala-js/blob/master",
+      cloneRoot/"workbench-example-app" -> "https://github.com/lihaoyi/workbench-example-app/blob/master",
+      wd -> "https://github.com/lihaoyi/hands-on-scala-js/blob/master"
     )
     override val suffixMappings = Map(
       "scala" -> "scala",

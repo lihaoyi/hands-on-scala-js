@@ -9,7 +9,7 @@ is a set of detailed expositions on various parts of the Scala.js platform. Noth
 @sect("Hands-on Scala.js", "Writing client-side web applications in Scala")
   @split
     @more
-      @hl.ref("examples/demos/src/main/scala/Splash.scala", "var x")
+      @hl.ref(wd/'examples/'demos/'src/'main/'scala/"Splash.scala", "var x")
 
     @less
       @BookData.example(canvas, "Splash().main")
