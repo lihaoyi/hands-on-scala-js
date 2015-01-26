@@ -31,22 +31,22 @@ object Main {
       def content = Map("index.html" -> Index())
 
       override def autoResources = super.autoResources ++ Seq(
-        wd/"META-INF"/'resources/'webjars/'pure/"0.5.0"/"grids-responsive-min.css",
-        wd/'css/"side-menu.css",
-        wd/"example-opt.js",
-        wd/'webpage/"weather.js",
-        wd/"favicon.svg",
-        wd/"favicon.png"
+        root/"META-INF"/'resources/'webjars/'pure/"0.5.0"/"grids-responsive-min.css",
+        root/'css/"side-menu.css",
+        root/"example-opt.js",
+        root/'webpage/"weather.js",
+        root/"favicon.svg",
+        root/"favicon.png"
       )
 
       override def manualResources = super.manualResources ++ Seq(
-        wd/'images/"javascript-the-good-parts-the-definitive-guide.jpg",
-        wd/'images/"Hello World.png",
-        wd/'images/"Hello World White.png",
-        wd/'images/"Hello World Console.png",
-        wd/'images/"IntelliJ Hello.png",
-        wd/'images/"Dropdown.png",
-        wd/'images/"Scalatags Downloads.png"
+        root/'images/"javascript-the-good-parts-the-definitive-guide.jpg",
+        root/'images/"Hello World.png",
+        root/'images/"Hello World White.png",
+        root/'images/"Hello World Console.png",
+        root/'images/"IntelliJ Hello.png",
+        root/'images/"Dropdown.png",
+        root/'images/"Scalatags Downloads.png"
       )
       override def headFrags = super.headFrags ++ Seq(
         meta(charset:="utf-8"),

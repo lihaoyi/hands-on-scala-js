@@ -147,7 +147,7 @@
 
     @split
       @more
-        @hl.ref(webpage/"weather.js", "var xhr")
+        @hl.ref(wd/'examples/'demos/'src/'main/'resources/'webpage/"weather.js", "var xhr")
 
       @less
         @BookData.example(div, "WeatherJs")

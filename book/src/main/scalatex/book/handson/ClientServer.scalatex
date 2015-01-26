@@ -81,7 +81,8 @@
   @p
     You may have noticed in both client and server, we have made reference to a mysterious @hl.scala{FileData} type which holds the name and size of each file. @hl.scala{FileData} is defined in the @code{shared/} folder, so it can be accessed from both Scala-JVM and Scala.js:
 
-  @hl.ref(client/"FileData.scala")
+
+  @hl.ref(wd/'examples/'crossBuilds/'clientserver/'client/'shared/'main/'scala/'simple/"FileData.scala")
 
   @p
     Now, if we go to the browser at @code{localhost:8080}, we should see our web-page!
@@ -178,7 +179,7 @@
     @p
       Let's start with our client-server interface definition
 
-    @hl.ref(client2/"Shared.scala")
+    @hl.ref(wd/'examples/'crossBuilds/'clientserver2/'client/'shared/'main/'scala/'simple/"Shared.scala")
 
     @p
       Here, you can see that in addition to sharing the @hl.scala{FileData} class, we are also creating an @hl.scala{Api} trait which contains the signature of our @hl.scala{list} method. The exact name of the trait doesn't matter. We need it to be in @code{shared/} so that the code in both client and server can reference it.
