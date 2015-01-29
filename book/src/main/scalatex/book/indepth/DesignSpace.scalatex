@@ -151,7 +151,7 @@
       (15 / 4) | 0        // 3
 
     @p
-      This gives the correct result for most numbers, and is reasonably efficient. However, what about dividing-by-zero?
+      This gives the correct result for most numbers, and is reasonably efficient (actually, it tends to be @i{more} efficient on modern VMs). However, what about dividing-by-zero?
 
     @hl.scala
       /*JVM*/
@@ -185,7 +185,7 @@
     @p
       The decision to not support these exceptional cases comes down to a value judgement: how often do people actually depend on an exception being thrown as part of their program semantics, e.g. by catching it and performing actions? And how often are they just a way of indicating bugs? It turns out that very few @hl.scala{ArithmeticException}s, @hl.scala{ArrayIndexOutOfBoundsException}s, or similar are actually a necessary part of the program! They exist during debugging, but after that, these code paths are never relied upon "in production".
     @p
-      Thus Scala.js goes for a compromise: in the Fast Optimization mode, we run the code with all these checks in place, so as to catch cases where these errors occur close-to-the-source and make it easy for you to debug them. In Full Optimization mode, on the other hand, we remove these checks, assuming you've already ran through these cases and found any bugs during development.
+      Thus Scala.js goes for a compromise: in the Fast Optimization mode, we run the code with all these checks in place (this is work in progress; currently only @code{asInstanceOf}s are thus checked), so as to catch cases where these errors occur close-to-the-source and make it easy for you to debug them. In Full Optimization mode, on the other hand, we remove these checks, assuming you've already ran through these cases and found any bugs during development.
     @p
       This is a common pattern in situations where there's a tradeoff between debuggability and speed. In Scala.js' case, it allows us to get good debuggability in development, as well as good performance in production. There's some loss in debuggability in development, sacrificed in exchange for greater performance.
 

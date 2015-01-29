@@ -74,7 +74,7 @@ object Main {
             frag
           )
         ),
-        onload:=s"Controller().main($data)"
+        onload:=s"scrollmenu.Controller().main($data)"
       )
     }
 

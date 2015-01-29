@@ -40,7 +40,7 @@
     @hl.ref(wd/'examples/'crossBuilds/'simple/"build.sbt")
 
     @p
-      Unlike the equivalent @code{build.sbt} files you saw in earlier chapters, this does not simply add @hl.scala{scalaJSSettings} to the root project. Rather, it sets up two projects: one in the @code{js/} folder and one in the @code{jvm/} folder, with the @code{js/} version getting the settings from the Scala.js plugin. To both of these, we add @code{shared/main/scala} to the list of source directories. This means that both projects will pick up the sources we symlinked between @code{js/shared/} and @code{jvm/shared/}.
+      Unlike the equivalent @code{build.sbt} files you saw in earlier chapters, this does not simply enable the @hl.scala{ScalaJSPlugin} to the root project. Rather, it sets up two projects: one in the @code{js/} folder and one in the @code{jvm/} folder, with the @code{js/} version getting the Scala.js plugin. To both of these, we add @code{shared/main/scala} to the list of source directories. This means that both projects will pick up the sources we symlinked between @code{js/shared/} and @code{jvm/shared/}.
 
   @sect{Source Files}
     @val simple = wd/'examples/'crossBuilds/'simple

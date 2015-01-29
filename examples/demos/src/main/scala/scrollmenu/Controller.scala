@@ -23,7 +23,7 @@ object Controller{
 
     val Seq(main, menu, layout, menuLink) = Seq(
       "main", "menu", "layout", "menuLink"
-    ).map(dom.document.getElementById)
+    ).map(dom.document.getElementById(_).asInstanceOf[dom.HTMLElement])
 
     val snippets = dom.document.getElementsByClassName("highlight-me")
 

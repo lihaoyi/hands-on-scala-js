@@ -1,8 +1,6 @@
-import scalajs.sbtplugin.ScalaJSPlugin.ScalaJSKeys._
-
 (emitSourceMaps in fullOptJS) := false
 
-scalaJSSettings
+enablePlugins(ScalaJSPlugin)
 
 name := "Example"
 
@@ -12,12 +10,12 @@ scalaVersion := "2.11.4"
 
 libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided"
 
-libraryDependencies += "com.lihaoyi" %%% "upickle" % "0.2.5"
+libraryDependencies += "com.lihaoyi" %%% "upickle" % "0.2.6-RC1"
 
-libraryDependencies += "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"
+libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.7.0"
 
-libraryDependencies += "com.scalatags" %%% "scalatags" % "0.4.2"
+libraryDependencies += "com.lihaoyi" %%% "scalatags" % "0.4.3-RC1"
 
-libraryDependencies += "com.scalarx" %%% "scalarx" % "0.2.6"
+libraryDependencies += "com.lihaoyi" %%% "scalarx" % "0.2.7-RC1"
 
 libraryDependencies += "org.scala-lang.modules" %% "scala-async" % "0.9.2"

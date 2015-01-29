@@ -27,14 +27,14 @@
     @li
       @b{Initial Compilation}: @code{.scala} files to @code{.class} and @code{.sjsir} files
     @li
-      @b{Fast Optimization}: @code{.sjsir} files to smallish/fast @code{.js} files
+      @b{Fast Optimization}: @code{.sjsir} files to one smallish/fast @code{.js} file, or
     @li
-      @b{Full Optimization}: @code{.js} files to smaller/faster @code{.js} files
+      @b{Full Optimization}: @code{.sjsir} files to one smaller/faster @code{.js} file
 
   @p
-    @code{.scala} files are the source code you're familiar with. @code{.class} files are the JVM-targetted artifacts which aren't used, but we keep around: tools such as @lnk.misc.IntelliJ or @lnk.misc.Eclipse use these files to provide IDE support for Scala.js code, even if they take no part in compilation. @code{.js} files are the output Javascript, which we can execute in a web browser.
+    @code{.scala} files are the source code you're familiar with. @code{.class} files are the JVM-targetted artifacts which aren't used for actually producing @code{.js} files, but are kept around for pretty much everything else: the compiler uses them for separate compilation and macros, and tools such as @lnk.misc.IntelliJ or @lnk.misc.Eclipse use these files to provide IDE support for Scala.js code. @code{.js} files are the output Javascript, which we can execute in a web browser.
   @p
-    @code{.sjsir} files are worth calling out: the name stands for "ScalaJS Intermediate Representation", and these files contain compiled code half-way between Scala and Javascript: most Scala features have by this point been replaced their Java/Javascript equivalents, but it still contains Types (which have all been inferred) that can aid in analysis. Many Scala.js specific optimizations take place on this IR.
+    @code{.sjsir} files are worth calling out: the name stands for "ScalaJS Intermediate Representation", and these files contain compiled code half-way between Scala and Javascript: most Scala features have by this point been replaced by their Java/Javascript equivalents, but it still contains Types (which have all been inferred) that can aid in analysis. Many Scala.js specific optimizations take place on this IR.
 
   @p
     Each stage has a purpose, and together the stages do bring benefits to offset their cost in complexity. The original compilation pipeline was much more simple:
@@ -83,7 +83,7 @@
 
     @ul
       @li
-        The original @code{.class} files, as if it were compiled on the JVM. For code that does not use any Javascript interop, these are perfectly valid Java @code{.class} files full of bytecode and can even be executed on the JVM.
+        The original @code{.class} files, @i{almost} as if they were compiled on the JVM, but not quite. They are sufficiently valid that the compiler can execute macros defined in them, but they should not be used to actually run.
       @li
         The @code{.sjsir} files, destined for further compilation in the Scala.js pipeline.
 
@@ -94,25 +94,25 @@
       This is the only phase in the Scala.js compilation pipeline that separate compilation is possible: you can compile many different sets of Scala.js @code{.scala} files separately, only to combine them later. This is used e.g. for distributing Scala.js libraries as Maven Jars, which are compiled separately by library authors to be combined into a final executable later.
 
   @sect{Fast Optimization}
+    @p
+      Without optimizations, the actual JavaScript code emitted for the above snippet would look like this:
     @hl.javascript
-      ScalaJS.c.LExample$.prototype.main__V = (function() {
+      ScalaJS.c.Lexample_ScalaJSExample$.prototype.main__V = (function() {
         var x = 0;
         while ((x < 999)) {
           x = ((x + new ScalaJS.c.sci_StringOps().init___T(
-            ScalaJS.m.s_Predef().augmentString__T__T("2")
-          ).toInt__I()) | 0)
+            ScalaJS.m.s_Predef$().augmentString__T__T("2")).toInt__I()) | 0)
         };
-        ScalaJS.m.s_Predef().println__O__V(x)
+        ScalaJS.m.s_Predef$().println__O__V(x)
       });
-
     @p
-      This phase is a whole-program optimization of the @code{.sjsir} files, and lives in the @lnk("tools/", "https://github.com/scala-js/scala-js/tree/master/tools") folder of the Scala.js repository. The end result is a rough translation of Scala into the equivalent Javascript (e.g. above):
+      This is a pretty straightforward translation from the intermediate reprensentation into vanilla JavaScript code:
 
     @ul
       @li
         Scala-style method @hl.scala{def}s become Javascript-style prototype-function-assignment
       @li
-        Scala @hl.scala{var}s become Javascript @hl.scala{var}s
+        Scala @hl.scala{val}s and @hl.scala{var}s become Javascript @hl.scala{var}s
       @li
         Scala @hl.scala{while}s become Javascript @hl.scala{while}s
       @li
@@ -126,32 +126,57 @@
       This is an incomplete description of the translation, but it should give a good sense of how the translation from Scala to Javascript looks like. In general, the output is verbose but straightforward.
 
     @p
-      In addition to this superficial translation, the optimizer does a number of things which are more subtle and vary from case to case. The rough operations that get performed are:
+      In addition to this superficial translation, the optimizer does a number of things which are more subtle and vary from case to case. Without diving into too much detail, here are a few optimizations that are performed:
 
     @ul
       @li
-        @b{Dead-code elimination}: entry-points to the program such as @hl.scala("@JSExport")ed methods/classes are kept, as are any methods/classes that these reference. All others are removed. This reduces the potentially 20mb of Javascript generated by a naive compilation to a more manageable 700kb-1mb for a typical application
+        @b{Dead-code elimination}: entry-points to the program such as @hl.scala("@JSExport")ed methods/classes are kept, as are any methods/classes that these reference. All others are removed. This reduces the potentially 20mb of Javascript generated by a naive compilation to a more manageable 400kb-1mb for a typical application
       @li
-        @b{Inlining}: in cases where a method is only called in a few places, the optimizer inlines the implementation of the method at those callsites. This typically reduces the code size by a small amount, but offers a several-times speedup of the generated code by inlining away much of the overhead from the abstractions (implicit-conversions, higher-order-functions, etc.) in Scala's standard library.
+        @b{Inlining}: under some circumstances, the optimizer inlines the implementation of methods at call sites. For example, it does so for all "small enough" methods. This typically reduces the code size by a small amount, but offers a several-times speedup of the generated code by inlining away much of the overhead from the abstractions (implicit-conversions, higher-order-functions, etc.) in Scala's standard library.
+      @li
+        @b{Constant-folding}: due to inlining and other optimizations, some variables that could have arbitrary are known to contain a constant. These variables are replaced by their respective constants, which, in turn, can trigger more optimizations.
+      @li
+        @b{Closure elimination}: probably one of the most important optimizations. When inlining a higher-order method such as @code{map}, the optimizer can in turn inline the anonymous function inside the body of the loop, effectively turning polymorphic dispatch with closures into bare-metal loops.
+    @p
+      Applying these optimizations on our examples results in the following JavaScript code instead, which is what you typically execute in fastOpt stage:
+
+    @hl.javascript
+      ScalaJS.c.Lexample_ScalaJSExample$.prototype.main__V = (function() {
+        var x = 0;
+        while ((x < 999)) {
+          var jsx$1 = x;
+          var this$2 = new ScalaJS.c.sci_StringOps().init___T("2");
+          var this$4 = ScalaJS.m.jl_Integer$();
+          var s = this$2.repr$1;
+          x = ((jsx$1 + this$4.parseInt__T__I__I(s, 10)) | 0)
+        };
+        var x$1 = x;
+        var this$6 = ScalaJS.m.s_Console$();
+        var this$7 = this$6.outVar$2;
+        ScalaJS.as.Ljava_io_PrintStream(this$7.tl$1.get__O()).println__O__V(x$1)
+      });
+
     @p
       As a whole-program optimization, it tightly ties together the code it is compiling and does not let you e.g. inject additional classes later. This does not mean you cannot interact with external code at all: you can, but it has to go through explicitly @hl.scala{@@JSExport}ed methods and classes via Javascript Interop, and not on ad-hoc classes/methods within the module. Thus it's entirely possible to have multiple "whole-programs" running in the same browser; they just will likely have duplicate copies of e.g. standard library classes inside of them, since they cannot share the code as it's not exported.
 
     @p
-      While the input for this phase is the aggregate @code{.sjsir} files from your project and all your dependencies, the output is executable Javascript. This phase usually runs in less than a second, outputs a Javascript blob in the 700kb-1mb range, and is suitable for repeated use during development. This corresponds to the @code{fastOptJS} command in SBT.
+      While the input for this phase is the aggregate @code{.sjsir} files from your project and all your dependencies, the output is executable Javascript. This phase usually runs in less than a second, outputs a Javascript blob in the 400kb-1mb range, and is suitable for repeated use during development. This corresponds to the @code{fastOptJS} command in SBT.
 
   @sect{Full Optimization}
     @hl.javascript
-      be.prototype.main=function(){
-          for(var a=0;999>a;)
-              a=a+(new de).g(S(L(),"2")).ne()|0;
-          ee(); L();
-          var b=F(fe); ge();
-          a=(new he).g(w(a)); b=bc(0,J(q(b,[a])));
-          ie(bc(L(),J(q(F(fe),[je(ke(ge().Vg),b)]))))
-      }
+      Fd.prototype.main = function() {
+        for(var a = 0;999 > a;) {
+          var b = (new D).j("2");
+          E();
+          a = a + Ja(0, b.R) | 0
+        }
+        b = Xa(ed().pc.Sb);
+        fd(b, gd(s(), a));
+        fd(b, "\n");
+      };
 
     @p
-      The @lnk("Google Closure Compiler", "https://developers.google.com/closure/compiler/") (GCC) is a set of tools that work with Javascript. It has multiple @lnk("levels of optimization", "https://developers.google.com/closure/compiler/docs/compilation_levels"), doing everything from basic whitespace-removal to heavy optimization. It is a old, relatively mature project that is relied on both inside and outside google to optimize the delivery of Javascript to the browser.
+      The @lnk("Google Closure Compiler", "https://developers.google.com/closure/compiler/") (GCC) is a set of tools that work with Javascript. It has multiple @lnk("levels of optimization", "https://developers.google.com/closure/compiler/docs/compilation_levels"), doing everything from basic whitespace-removal to heavy optimization. It is an old, relatively mature project that is relied on both inside and outside Google to optimize the delivery of Javascript to the browser.
 
     @p
       Scala.js uses GCC in its most aggressive mode: @lnk("Advanced Optimization", "https://developers.google.com/closure/compiler/docs/api-tutorial3"). GCC spits out a compressed, minified version of the Javascript (above) that @sect.ref{Fast Optimization} spits out: e.g. in the example above, all identifiers have been renamed to short strings, the @hl.javascript{while}-loop has been replaced by a @hl.javascript{for}-loop, and the @hl.scala{println} function has been inlined.
@@ -172,10 +197,9 @@
     @p
       Notably, GCC @i{does not preserve the semantics of arbitrary Javascript}! In particular, it only works for a subset of Javascript that it understands and can properly analyze. This is an issue when hand-writing Javascript for GCC since it's very easy to step outside that subset and have GCC break your code, but is not a worry when using Scala.js: the Scala.js optimizer (the previous phase in the pipeline) automatically outputs Javascript which GCC understands and can work with.
     @p
-      GCC duplicates a lot of functionality that the Scala.js optimizer already does, such as DCE and inlining. It is entirely possible to skip the optimization phase, output the naive 20mb Javascript blob, and run GCC on it to bring the size down. However, GCC is much slower than the Scala.js optimizer, taking 60 seconds where the optimizer takes less than 1.
-
+      There is some overlap between the optimizations performed by the Scala.js optimizer and GCC. For example, both apply DCE and inlining in some form. However, there are also a lot of optimizations specific to each tool. In general, the Scala.js optimizer is more concerned about producing very efficient JavaScript code, while GCC shines at making that JavaScript as small as possible (in terms of the number of characters).
     @p
-      Empirically, running GCC on the output of the optimizer produces the smallest output blobs: ~150-400kb, significantly smaller than the output of running either of them alone, and so that is what we do. This takes 5-10 seconds to run, which makes it somewhat slow for iterative development, so it's typically only run right before final testing and deployment. This corresponds to the @code{fullOptJS} command in SBT.
+      The combination of both these tools produces small and fast output blobs: ~100-400kb. This takes 5-10 seconds to run, which makes it somewhat slow for iterative development, so it's typically only run right before final testing and deployment. This corresponds to the @code{fullOptJS} command in SBT.
 
 @hr
 
