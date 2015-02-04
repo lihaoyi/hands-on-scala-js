@@ -1,7 +1,8 @@
 package scrollmenu
 
 import org.scalajs.dom
-import org.scalajs.dom.extensions._
+import dom.html
+import org.scalajs.dom.ext._
 
 import scalajs.js
 import scalajs.js.annotation.JSExport
@@ -23,7 +24,7 @@ object Controller{
 
     val Seq(main, menu, layout, menuLink) = Seq(
       "main", "menu", "layout", "menuLink"
-    ).map(dom.document.getElementById(_).asInstanceOf[dom.HTMLElement])
+    ).map(dom.document.getElementById(_).asInstanceOf[html.Element])
 
     val snippets = dom.document.getElementsByClassName("highlight-me")
 
@@ -73,8 +74,8 @@ object Controller{
       menuLink.classList.toggle("active")
     }
 
-    main.onscroll = (e: dom.UIEvent) => updateScroll()
-    updateScroll()
+//    main.onscroll = (e: dom.UIEvent) => updateScroll()
+//    updateScroll()
 
   }
 }

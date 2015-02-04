@@ -134,7 +134,7 @@
       @li
         @b{Inlining}: under some circumstances, the optimizer inlines the implementation of methods at call sites. For example, it does so for all "small enough" methods. This typically reduces the code size by a small amount, but offers a several-times speedup of the generated code by inlining away much of the overhead from the abstractions (implicit-conversions, higher-order-functions, etc.) in Scala's standard library.
       @li
-        @b{Constant-folding}: due to inlining and other optimizations, some variables that could have arbitrary are known to contain a constant. These variables are replaced by their respective constants, which, in turn, can trigger more optimizations.
+        @b{Constant-folding}: due to inlining and other optimizations, some variables that could have arbitrary values are known to contain a constant. These variables are replaced by their respective constants, which, in turn, can trigger more optimizations.
       @li
         @b{Closure elimination}: probably one of the most important optimizations. When inlining a higher-order method such as @code{map}, the optimizer can in turn inline the anonymous function inside the body of the loop, effectively turning polymorphic dispatch with closures into bare-metal loops.
     @p

@@ -5,12 +5,13 @@ import org.scalajs.dom.{Node, Element}
 import scalajs.js
 import scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
+import dom.html
 
 @JSExport
 object Weather2 extends{
   @JSExport
-  def main(target: dom.HTMLDivElement) = {
-    import dom.extensions._
+  def main(target: html.Div) = {
+    import dom.ext._
     import scala.scalajs
                 .concurrent
                 .JSExecutionContext

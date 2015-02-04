@@ -20,7 +20,7 @@ object Ajaxer extends autowire.Client[String, upickle.Reader, upickle.Writer]{
 @JSExport
 object Client extends{
   @JSExport
-  def main(container: dom.HTMLDivElement) = {
+  def main(container: html.Div) = {
     val inputBox = input.render
     val outputBox = ul.render
     def update() = Ajaxer[Api].list(inputBox.value).call().foreach{ data =>

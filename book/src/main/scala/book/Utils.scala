@@ -35,14 +35,19 @@ object lnk{
     a(name, href:=url)
   }
   object dom{
-    def mdnThing(name: String) = lnk(name, "https://developer.mozilla.org/en-US/docs/Web/API/" + name)
+    def mdnThing(name: String, scalaJsName: String = null) = lnk(
+      Option(scalaJsName).getOrElse(name),
+      "https://developer.mozilla.org/en-US/docs/Web/API/" + name
+    )
     def mdnEvent(name: String) = lnk(name, "https://developer.mozilla.org/en-US/docs/Web/Events/" + name)
     val CanvasRenderingContext2D = mdnThing("CanvasRenderingContext2D")
-    val HTMLCanvasElement = mdnThing("HTMLCanvasElement")
     val Element = mdnThing("Element")
-    val HTMLElement = mdnThing("HTMLElement")
-    val HTMLInputElement = mdnThing("HTMLInputElement")
-    val HTMLSpanElement = mdnThing("HTMLSpanElement")
+    object html{
+      val Canvas = mdnThing("HTMLCanvasElement", "html.Canvas")
+      val Element = mdnThing("HTMLElement", "html.Element")
+      val Input = mdnThing("HTMLInputElement", "html.Input")
+      val Span = mdnThing("HTMLSpanElement", "html.Span")
+    }
     val XMLHttpRequest = mdnThing("XMLHttpRequest")
     val getElementById = mdnThing("document.getElementById")
     val setInterval = mdnThing("WindowTimers.setInterval")

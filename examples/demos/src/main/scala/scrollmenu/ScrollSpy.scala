@@ -1,20 +1,21 @@
 package scrollmenu
 
 import org.scalajs.dom
-import org.scalajs.dom.extensions._
+import dom.html
+import org.scalajs.dom.ext._
 import scalajs.js
 import scalatags.JsDom.all._
 
 case class Tree[T](value: T, children: Vector[Tree[T]])
 
-case class MenuNode(frag: dom.HTMLElement, id: String, start: Int, end: Int)
+case class MenuNode(frag: html.Element, id: String, start: Int, end: Int)
 
 /**
  * High performance scrollspy to work keep the left menu bar in sync.
  * Lots of sketchy imperative code in order to maximize performance.
  */
 class ScrollSpy(structure: Tree[String],
-                main: dom.HTMLElement){
+                main: html.Element){
   lazy val domTrees = {
     var i = -1
     def recurse(t: Tree[String], depth: Int): Tree[MenuNode] = {
@@ -44,9 +45,9 @@ class ScrollSpy(structure: Tree[String],
     val domTrees = recurse(structure, 0)
     domTrees
   }
-  def offset(el: dom.HTMLElement, parent: dom.HTMLElement): Double = {
+  def offset(el: html.Element, parent: html.Element): Double = {
     if (el == parent) 0
-    else el.offsetTop + offset(el.offsetParent.asInstanceOf[dom.HTMLElement], parent)
+    else el.offsetTop + offset(el.offsetParent.asInstanceOf[html.Element], parent)
   }
   lazy val headers = {
     val menuItems = {
@@ -57,7 +58,7 @@ class ScrollSpy(structure: Tree[String],
     }
 
     js.Array(
-      menuItems.map(name => dom.document.getElementById(Controller.munge(name)).asInstanceOf[dom.HTMLElement])
+      menuItems.map(name => dom.document.getElementById(Controller.munge(name)).asInstanceOf[html.Element])
                .map((el) => () => offset(el, main)):_*
     )
   }
@@ -79,7 +80,7 @@ class ScrollSpy(structure: Tree[String],
   def setFullHeight(mn: MenuNode) = {
     mn.frag
       .children(1)
-      .asInstanceOf[dom.HTMLElement]
+      .asInstanceOf[html.Element]
       .style
       .maxHeight = (mn.end - mn.start + 1) * 44 + "px"
   }
@@ -88,7 +89,7 @@ class ScrollSpy(structure: Tree[String],
   def apply(): Unit = {
     if (!scrolling) {
       scrolling = true
-      scrollTop = main.scrollTop
+      scrollTop = main.scrollTop.toInt
       dom.setTimeout({() =>
           scrolling = false
           if (scrollTop == main.scrollTop) start()
@@ -140,7 +141,7 @@ class ScrollSpy(structure: Tree[String],
         } walkHide(child)
 
         val size = walkTree(rest) + children.length
-        mn.frag.children(1).asInstanceOf[dom.HTMLElement].style.maxHeight =
+        mn.frag.children(1).asInstanceOf[html.Element].style.maxHeight =
           if (!open) size * 44 + "px" else "none"
         size
     }
@@ -151,7 +152,7 @@ class ScrollSpy(structure: Tree[String],
       frag.children(0).classList.remove("pure-menu-selected")
       frag.classList.add("hide")
 
-      frag.children(1).asInstanceOf[dom.HTMLElement].style.maxHeight =
+      frag.children(1).asInstanceOf[html.Element].style.maxHeight =
         if (!open) "0px" else "none"
 
       if (tree.value.start < winItem.start) frag.classList.add("selected")

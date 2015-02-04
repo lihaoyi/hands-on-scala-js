@@ -1,16 +1,17 @@
 package webpage
 
 import org.scalajs.dom
-import dom.extensions._
+import dom.ext._
 import scalajs.concurrent.JSExecutionContext.Implicits.runNow
 import scalajs.js
 import scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
+import dom.html
 
 @JSExport
 object WeatherSearch extends{
   @JSExport
-  def main(target: dom.HTMLDivElement) = {
+  def main(target: html.Div) = {
 
     lazy val box = input(
       `type`:="text",

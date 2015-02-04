@@ -1,13 +1,12 @@
-import utest.jsrunner.JsCrossBuild
 
-val cross = new JsCrossBuild(
+val cross = crossProject.settings(
   // Shared settings here
-)
-
-lazy val js = cross.js.settings(
+).jsSettings(
   // JS-specific settings here
-)
-
-lazy val jvm = cross.jvm.settings(
+).jvmSettings(
   // JVM-specific settings here
 )
+
+lazy val js = cross.js
+
+lazy val jvm = cross.jvm

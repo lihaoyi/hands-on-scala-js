@@ -5,11 +5,11 @@ import scalajs.js
 import scalajs.js.annotation.JSExport
 import rx._
 import scalatags.JsDom.all._
-
+import dom.html
 @JSExport
 object BasicRx {
   @JSExport
-  def main(container: dom.HTMLDivElement) = {
+  def main(container: html.Div) = {
     val txt = Var("")
     val numChars = Rx{txt().length}
     val numWords = Rx{
@@ -39,7 +39,7 @@ object BasicRx {
     )
   }
   @JSExport
-  def main2(container: dom.HTMLDivElement) = {
+  def main2(container: html.Div) = {
     val fruits = Seq(
       "Apple", "Apricot", "Banana", "Cherry",
       "Mango", "Mangosteen", "Mandarin",

@@ -1,13 +1,14 @@
 package webpage
 
 import org.scalajs.dom
+import dom.html
 import scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
 
 @JSExport
 object Inputs extends{
   @JSExport
-  def main(target: dom.HTMLDivElement) = {
+  def main(target: html.Div) = {
     val box = input(
       `type`:="text",
       placeholder:="Type here!"

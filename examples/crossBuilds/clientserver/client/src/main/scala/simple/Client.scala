@@ -9,7 +9,7 @@ import scalajs.js.annotation.JSExport
 @JSExport
 object Client extends{
   @JSExport
-  def main(container: dom.HTMLDivElement) = {
+  def main(container: html.Div) = {
     val inputBox = input.render
     val outputBox = ul.render
     def update() = Ajax.post("/ajax/list", inputBox.value).foreach{ xhr =>

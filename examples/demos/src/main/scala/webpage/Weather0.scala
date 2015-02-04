@@ -5,11 +5,11 @@ import org.scalajs.dom.{Node, Element}
 import scalajs.js
 import scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
-
+import dom.html
 @JSExport
 object Weather0 extends{
   @JSExport
-  def main(target: dom.HTMLDivElement) = {
+  def main(target: html.Div) = {
     val xhr = new dom.XMLHttpRequest()
     xhr.open("GET",
       "http://api.openweathermap.org/" +

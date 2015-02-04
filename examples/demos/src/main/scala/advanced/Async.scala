@@ -1,6 +1,7 @@
 package advanced
 
 import org.scalajs.dom
+import dom.html
 import concurrent._
 import async.Async._
 import scalajs.js.annotation.JSExport
@@ -8,7 +9,7 @@ import scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 @JSExport
 object Async {
-  def init(canvas: dom.HTMLCanvasElement) = {
+  def init(canvas: html.Canvas) = {
     val renderer = canvas.getContext("2d")
       .asInstanceOf[dom.CanvasRenderingContext2D]
 
@@ -22,7 +23,7 @@ object Async {
     renderer
   }
   @JSExport
-  def main(canvas: dom.HTMLCanvasElement) = {
+  def main(canvas: html.Canvas) = {
     val renderer = init(canvas)
     // async
     def rect = canvas.getBoundingClientRect()
@@ -36,7 +37,7 @@ object Async {
       new Channel[ME](canvas.onmousedown = _)
 
     // Disabled due to scala-js#1469
-    /*async{
+    async{
       while(true){
         val start = await(mousedown())
         renderer.beginPath()
@@ -59,10 +60,10 @@ object Async {
         await(mouseup())
         renderer.clearRect(0, 0, 1000, 1000)
       }
-    }*/
+    }
   }
   @JSExport
-  def main0(canvas: dom.HTMLCanvasElement) = {
+  def main0(canvas: html.Canvas) = {
     val renderer = init(canvas)
     // traditional
     def rect = canvas.getBoundingClientRect()

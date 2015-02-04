@@ -1,8 +1,9 @@
 package advanced
 
 import org.scalajs.dom
+import dom.html
 import org.scalajs.dom.XMLHttpRequest
-import org.scalajs.dom.extensions.{Ajax, KeyCode}
+import org.scalajs.dom.ext.{Ajax, KeyCode}
 import scala.collection.mutable
 import scala.concurrent.Future
 import scalajs.js
@@ -11,8 +12,8 @@ import scalajs.js.annotation.JSExport
 import scalajs.concurrent.JSExecutionContext.Implicits.runNow
 @JSExport
 object Futures {
-  def main(container: dom.HTMLDivElement,
-            handle: (Seq[String], dom.HTMLDivElement) => Unit) = {
+  def main(container: html.Div,
+            handle: (Seq[String], html.Div) => Unit) = {
     val myInput = input(value:="London,Singapore,Berlin,New York").render
     val output = div.render
     myInput.onkeyup = (e: dom.KeyboardEvent) => {
@@ -42,7 +43,7 @@ object Futures {
                       .asInstanceOf[Double]
     kelvins - 272.15
   }
-  def formatResults(output: dom.HTMLElement, results: Seq[(String, Double)]) = {
+  def formatResults(output: html.Element, results: Seq[(String, Double)]) = {
     output.innerHTML = ""
     output.appendChild(ul(
       for((name, temp) <- results) yield li(
@@ -51,8 +52,8 @@ object Futures {
     ).render)
   }
   @JSExport
-  def main0(container: dom.HTMLDivElement) = {
-    def handle0(names: Seq[String], output: dom.HTMLDivElement) = {
+  def main0(container: html.Div) = {
+    def handle0(names: Seq[String], output: html.Div) = {
       val results = mutable.Buffer.empty[(String, Double)]
       for(name <- names){
         val xhr = new XMLHttpRequest
@@ -70,8 +71,8 @@ object Futures {
     main(container, handle0)
   }
   @JSExport
-  def main1(container: dom.HTMLDivElement) = {
-    def handle1(names: Seq[String], output: dom.HTMLDivElement) = {
+  def main1(container: html.Div) = {
+    def handle1(names: Seq[String], output: html.Div) = {
       val results = mutable.Buffer.empty[(String, Double)]
       for{
         name <- names
@@ -87,8 +88,8 @@ object Futures {
     main(container, handle1)
   }
   @JSExport
-  def main2(container: dom.HTMLDivElement) = {
-    def handle2(names: Seq[String], output: dom.HTMLDivElement) = {
+  def main2(container: html.Div) = {
+    def handle2(names: Seq[String], output: html.Div) = {
       val futures = for(name <- names) yield{
         Ajax.get(urlFor(name)).map( xhr =>
           (name, parseTemp(xhr.responseText))

@@ -2,13 +2,13 @@ package canvasapp
 
 
 import org.scalajs.dom
-
+import dom.html
 import scalajs.js
 import scalajs.js.annotation.JSExport
 @JSExport
 object Clock extends{
   @JSExport
-  def main(canvas: dom.HTMLCanvasElement) = {
+  def main(canvas: html.Canvas) = {
     /*setup*/
     val renderer = canvas.getContext("2d")
                          .asInstanceOf[dom.CanvasRenderingContext2D]

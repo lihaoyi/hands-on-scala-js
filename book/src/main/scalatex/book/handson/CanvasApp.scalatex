@@ -41,7 +41,7 @@
     This code sets up the @lnk.dom.mousedown and @lnk.dom.mouseup events to keep track of whether or not the mouse has currently been clicked. It then draws black squares any time you move the mouse while the button is down. This lets you basically click-and-drag to draw pictures on the canvas. Try it out!
 
   @p
-    In general, you have access to all the DOM APIs through the @hl.scala{dom} package as well as through Javascript objects such as the @lnk.dom.HTMLCanvasElement. Setting the @code{onmouseXXX} callbacks is just one way of interacting with the DOM. With Scala.js, you also get a very handy autocomplete in the editor, which you can use to browse the various other APIs that are available for use:
+    In general, you have access to all the DOM APIs through the @hl.scala{dom} package as well as through Javascript objects such as the @lnk.dom.html.Canvas. Setting the @code{onmouseXXX} callbacks is just one way of interacting with the DOM. With Scala.js, you also get a very handy autocomplete in the editor, which you can use to browse the various other APIs that are available for use:
 
   @img(src:="images/Dropdown.png", maxWidth:="100%")
 

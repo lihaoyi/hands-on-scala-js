@@ -1,11 +1,12 @@
 package webpage
 import org.scalajs.dom
+import dom.html
 import scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
 @JSExport
 object HelloWorld1 extends{
   @JSExport
-  def main(target: dom.HTMLDivElement) = {
+  def main(target: html.Div) = {
     val (animalA, animalB) = ("fox", "dog")
     target.appendChild(
       div(

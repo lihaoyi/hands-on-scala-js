@@ -3,11 +3,11 @@ package webpage
 import org.scalajs.dom
 import scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
-
+import dom.html
 @JSExport
 object Search1 extends{
   @JSExport
-  def main(target: dom.HTMLDivElement) = {
+  def main(target: html.Div) = {
     val listings = Seq(
       "Apple", "Apricot", "Banana", "Cherry",
       "Mango", "Mangosteen", "Mandarin",

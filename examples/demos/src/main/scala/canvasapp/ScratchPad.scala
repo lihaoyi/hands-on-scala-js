@@ -4,11 +4,12 @@ package canvasapp
 import org.scalajs.dom
 
 import scalajs.js.annotation.JSExport
+import dom.html
 
 @JSExport
 object ScratchPad extends{
   @JSExport
-  def main(canvas: dom.HTMLCanvasElement) = {
+  def main(canvas: html.Canvas) = {
     /*setup*/
     val renderer = canvas.getContext("2d")
                          .asInstanceOf[dom.CanvasRenderingContext2D]

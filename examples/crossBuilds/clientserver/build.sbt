@@ -3,8 +3,8 @@ val sharedSettings = Seq(
   unmanagedSourceDirectories in Compile +=
     baseDirectory.value  / "shared" / "main" / "scala",
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %%% "scalatags" % "0.4.3-RC1",
-    "com.lihaoyi" %%% "upickle" % "0.2.6-RC1"
+    "com.lihaoyi" %%% "scalatags" % "0.4.5",
+    "com.lihaoyi" %%% "upickle" % "0.2.7"
   ),
   scalaVersion := "2.11.5"
 )
@@ -14,7 +14,7 @@ lazy val client = project.in(file("client"))
                          .settings(sharedSettings:_*)
                          .settings(
   libraryDependencies ++= Seq(
-    "org.scala-js" %%% "scalajs-dom" % "0.7.0"
+    "org.scala-js" %%% "scalajs-dom" % "0.8.0"
   )
 )
 

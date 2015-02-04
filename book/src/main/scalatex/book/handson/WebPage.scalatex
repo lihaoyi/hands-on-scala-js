@@ -21,7 +21,7 @@
       @BookData.example(div, "webpage.HelloWorld0().main")
 
   @p
-    Remember that we're now requiring a @hl.scala{dom.HTMLDivElement} instead of a @hl.scala{dom.HTMLCanvasElement} to be passed in when the Javascript calls @hl.javascript{webpage.HelloWorld0().main(...)}. If you're coming to this point from the previous chapter, you'll need to update the on-page Javascript's @hl.javascript{document.getElementById} to pick a @hl.html{<div>} rather than the @hl.html{<canvas>} we were using in the previous chapter.
+    Remember that we're now requiring a @hl.scala{html.Div} instead of a @hl.scala{html.Canvas} to be passed in when the Javascript calls @hl.javascript{webpage.HelloWorld0().main(...)}. If you're coming to this point from the previous chapter, you'll need to update the on-page Javascript's @hl.javascript{document.getElementById} to pick a @hl.html{<div>} rather than the @hl.html{<canvas>} we were using in the previous chapter.
 
   @p
     This approach works, as the above example shows, but has a couple of disadvantages:
@@ -66,7 +66,7 @@
         @BookData.example(div(height:="150px"), "webpage.Inputs().main")
 
     @p
-      In Scalatags, you build up fragments of type @hl.scala{Frag} using functions like @hl.scala{div}, @hl.scala{h1}, etc., and call @hl.scala{.render} on it to turn it into a real @lnk.dom.Element. Different fragments render to different things: e.g. @hl.scala{input.render} gives you a @lnk.dom.HTMLInputElement, @hl.scala{span.render} gives you a @lnk.dom.HTMLSpanElement. You can then access the properties of these elements: adding callbacks, checking their value, anything you want.
+      In Scalatags, you build up fragments of type @hl.scala{Frag} using functions like @hl.scala{div}, @hl.scala{h1}, etc., and call @hl.scala{.render} on it to turn it into a real @lnk.dom.Element. Different fragments render to different things: e.g. @hl.scala{input.render} gives you a @lnk.dom.html.Input, @hl.scala{span.render} gives you a @lnk.dom.html.Span. You can then access the properties of these elements: adding callbacks, checking their value, anything you want.
 
     @p
       In this example, we render and @hl.scala{input} element and a @hl.scala{span}, wire up the input to set the value of the span whenever you press a key in the input, and then stuff both of them into a larger HTML fragment that forms the contents of our @hl.scala{target} element.

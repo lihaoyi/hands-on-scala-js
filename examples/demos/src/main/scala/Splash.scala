@@ -1,13 +1,13 @@
 import java.lang.Math._
 
 import org.scalajs.dom
-
+import dom.html
 import scalajs.js.annotation.JSExport
 
 @JSExport
 object Splash extends{
   @JSExport
-  def main(canvas: dom.HTMLCanvasElement) = {
+  def main(canvas: html.Canvas) = {
 
     def clear() = {
       canvas.width = canvas.parentElement.clientWidth
