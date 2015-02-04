@@ -1,7 +1,7 @@
 //jvm/src/main/scala/simple/Platform.scala
 package simple
 import java.text.SimpleDateFormat
-import java.util.{TimeZone, Locale}
+import java.util.TimeZone
 
 object Platform{
   def format(ts: Long) = {
@@ -10,13 +10,5 @@ object Platform{
     )
     fmt.setTimeZone(TimeZone.getTimeZone("UTC"))
     fmt.format(new java.util.Date(ts))
-  }
-  def main(args: Array[String]) = {
-    val times = Seq(
-      0L,
-      1L << 32
-    )
-    println("Running on JVM! " + 1.0d)
-    println(Simple.formatTimes(times))
   }
 }

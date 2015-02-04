@@ -1,9 +1,12 @@
-val sharedSettings = Seq(
-  unmanagedSourceDirectories in Compile +=
-    baseDirectory.value  / "shared" / "main" / "scala"
+
+val cross = crossProject.settings(
+  // Shared settings here
+).jsSettings(
+  // JS-specific settings here
+).jvmSettings(
+  // JVM-specific settings here
 )
 
-lazy val js = project.in(file("js")).enablePlugins(ScalaJSPlugin)
-                                    .settings(sharedSettings:_*)
+lazy val js = cross.js
 
-lazy val jvm = project.in(file("jvm")).settings(sharedSettings:_*)
+lazy val jvm = cross.jvm
