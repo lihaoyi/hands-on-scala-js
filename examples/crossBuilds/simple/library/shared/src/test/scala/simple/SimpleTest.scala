@@ -1,5 +1,5 @@
-/*js/shared/test/scala/simple/SimpleTest.scala*/
-/*jvm/shared/test/scala/simple/SimpleTest.scala*/
+// library/shared/src/test/scala/simple/SimpleTest.scala
+
 package simple
 import utest._
 object SimpleTest extends TestSuite{
@@ -15,6 +15,9 @@ object SimpleTest extends TestSuite{
         val formatted = Simple.formatTimes(timestamps)
         assert(formatted == expected)
       }
+    }
+    'zero{
+      0.0
     }
   }
 }

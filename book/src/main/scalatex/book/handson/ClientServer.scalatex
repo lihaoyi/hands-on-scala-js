@@ -21,8 +21,8 @@
 @p
   Scala.js lets you share code between client and server relatively straightforwardly. As we saw in the previous chapter, where we made a shared module. Let's work to turn that shared module into a working client-server application!
 
-@val server = wd/'examples/'crossBuilds/'clientserver/'server/'src/'main/'scala/'simple
-@val client = wd/'examples/'crossBuilds/'clientserver/'client/'src/'main/'scala/'simple
+@val server = wd/'examples/'crossBuilds/'clientserver/'app/'jvm/'src/'main/'scala/'simple
+@val client = wd/'examples/'crossBuilds/'clientserver/'app/'js/'src/'main/'scala/'simple
 
 @sect{A Client-Server Setup}
   @p
@@ -82,7 +82,7 @@
     You may have noticed in both client and server, we have made reference to a mysterious @hl.scala{FileData} type which holds the name and size of each file. @hl.scala{FileData} is defined in the @code{shared/} folder, so it can be accessed from both Scala-JVM and Scala.js:
 
 
-  @hl.ref(wd/'examples/'crossBuilds/'clientserver/'client/'shared/'main/'scala/'simple/"FileData.scala")
+  @hl.ref(wd/'examples/'crossBuilds/'clientserver/'app/'shared/'src/'main/'scala/'simple/"FileData.scala")
 
   @p
     Now, if we go to the browser at @code{localhost:8080}, we should see our web-page!
@@ -156,8 +156,8 @@
   @p
     Into a safe, type-checked function call:
 
-  @val client2 = wd/'examples/'crossBuilds/'clientserver2/'client/'src/'main/'scala/'simple
-  @val server2 = wd/'examples/'crossBuilds/'clientserver2/'server/'src/'main/'scala/'simple
+  @val client2 = wd/'examples/'crossBuilds/'clientserver2/'app/'js/'src/'main/'scala/'simple
+  @val server2 = wd/'examples/'crossBuilds/'clientserver2/'app/'jvm/'src/'main/'scala/'simple
   @hl.ref(client2/"Client.scala", ".call()", "")
 
   @p
@@ -179,7 +179,7 @@
     @p
       Let's start with our client-server interface definition
 
-    @hl.ref(wd/'examples/'crossBuilds/'clientserver2/'client/'shared/'main/'scala/'simple/"Shared.scala")
+    @hl.ref(wd/'examples/'crossBuilds/'clientserver2/'app/'shared/'src/'main/'scala/'simple/"Shared.scala")
 
     @p
       Here, you can see that in addition to sharing the @hl.scala{FileData} class, we are also creating an @hl.scala{Api} trait which contains the signature of our @hl.scala{list} method. The exact name of the trait doesn't matter. We need it to be in @code{shared/} so that the code in both client and server can reference it.

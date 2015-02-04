@@ -1,4 +1,4 @@
-//jvm/src/main/scala/simple/Platform.scala
+// library/jvm/src/main/scala/simple/Platform.scala
 package simple
 import java.text.SimpleDateFormat
 import java.util.TimeZone

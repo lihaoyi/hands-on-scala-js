@@ -1,4 +1,4 @@
-//js/src/main/scala/simple/Platform.scala
+// library/js/src/main/scala/simple/Platform.scala
 package simple
 import scalajs.js
 

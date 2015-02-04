@@ -75,7 +75,7 @@
 
   @sect{Javascript-the-platform}
     @p
-      However, even as Javascript-the-language sucks, Javascript-the-platform has some very nice properties that make it a good target for application developers:
+      However, even though Javascript-the-language is pretty bad, Javascript-the-platform has some very nice properties that make it a good target for application developers:
 
     @ul
       @li
