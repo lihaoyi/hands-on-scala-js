@@ -21,7 +21,7 @@
         while ((x < 10)) {
           x = ((x + 3) | 0)
         };
-        ScalaJS.m.s_Predef()
+        ScalaJS.m.s_Predef$()
                  .println__O__V(x)
         // 12
       });

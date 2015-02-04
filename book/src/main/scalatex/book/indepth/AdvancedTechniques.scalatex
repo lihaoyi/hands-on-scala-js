@@ -45,7 +45,7 @@
     @p
       @lnk("Scala.Rx", "https://github.com/lihaoyi/scala.rx") is a change-propagation library that implements the @b{Continuous} style of FRP. To begin with, we need to include it in our @code{build.sbt} dependencies:
 
-    @hl.ref(wd/'examples/'demos/"build.sbt", "com.scalarx")
+    @hl.ref(wd/'examples/'demos/"build.sbt", "scalarx", "")
 
     @p
       Scala.Rx provides you with smart variables that automatically track dependencies with each other, such that if one smart variable changes, the rest re-compute immediately and automatically. The main primitives in Scala.Rx are:
@@ -85,7 +85,7 @@
         @hl.ref(advanced/"BasicRx.scala", "val txt =")
 
       @less
-        @example(div, "BasicRx().main")
+        @example(div, "advanced.BasicRx().main")
 
     @p
       This snippet sets up a basic data-flow graph. We have our @hl.scala{txt} @hl.scala{Var}, and a bunch of @hl.scala{Rx}s (@hl.scala{numChars}, @hl.scala{numWords}, @hl.scala{avgWordLength}) that are computed based on @hl.scala{txt}.
@@ -109,7 +109,7 @@
         @hl.ref(advanced/"BasicRx.scala", "val fruits =")
 
       @less
-        @example(div, "BasicRx().main2")
+        @example(div, "advanced.BasicRx().main2")
 
     @p
       This is a basic re-implementation of the autocomplete widget we created in the chapter @sect.ref{Interactive Web Pages}, except done using Scala.Rx. Note that unlike the original implementation, we don't need to manage the clearing of the output area via @hl.scala{innerHTML = ""} and the re-rendering via @hl.scala{appendChild(...)}. All this is handled by the same @hl.scala{rxFrag} code we wrote earlier. 
@@ -182,7 +182,7 @@
     @def exampleDiv = div(height:="200px")
 
     @sect{Direct Use of XMLHttpRequest}
-      @example(exampleDiv, "Futures().main0")
+      @example(exampleDiv, "advanced.Futures().main0")
       @hl.ref(advanced/"Futures.scala", "def handle0", "main")
 
       @p
@@ -194,7 +194,7 @@
         This solution is basically equivalent to the initial code given in the @sect.ref{Raw Javascript} section of @sect.ref{Interactive Web Pages}, with the additional code necessary for aggregation. As described in @sect.ref{dom.extensions}, we can make use of the @hl.scala{Ajax} object to make it slightly tidier.
 
     @sect{Using dom.extensions.Ajax}
-      @example(exampleDiv, "Futures().main1")
+      @example(exampleDiv, "advanced.Futures().main1")
       @hl.ref(advanced/"Futures.scala", "def handle1", "main")
 
       @p
@@ -203,7 +203,7 @@
         However, we still have the messiness inherent in the result aggregation: we don't actually want to perform our action (writing to the @hl.scala{output} div) when one @hl.scala{Future} is complete, but only when @i{all} the @hl.scala{Future}s are complete. Thus we still need to do some amount of manual book-keeping in the @hl.scala{results} buffer.
 
     @sect{Future Combinators}
-      @example(exampleDiv, "Futures().main2")
+      @example(exampleDiv, "advanced.Futures().main2")
       @hl.ref(advanced/"Futures.scala", "def handle2", "main")
 
       @p
@@ -250,7 +250,7 @@
           @hl.ref(advanced/"Async.scala", "// traditional")
 
         @less
-          @example(canvas, "Async().main0")
+          @example(canvas, "advanced.Async().main0")
       @p
         This is a working implementation, and you can play with it on the right. We basically set the three listeners:
 
@@ -283,7 +283,7 @@
           @hl.ref(advanced/"Async.scala", "// async")
 
         @less
-          @example(canvas, "Async().main")
+          @example(canvas, "advanced.Async().main")
 
       @p
         We have an @hl.scala{async} block, which contains a while loop. Each round around the loop, we wait for the @hl.scala{mousedown} channel to start the path, waiting for either @hl.scala{mousemove} or @hl.scala{mouseup} (which continues the path or ends it respectively), fill the shape, and then wait for another @hl.scala{mousedown} before clearing the canvas and going again.

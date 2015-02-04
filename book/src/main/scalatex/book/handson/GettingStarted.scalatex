@@ -182,7 +182,7 @@
       This is the HTML page which our toy app lives in, and the same page that we have so far been using to view the app in the browser. To anyone who has used HTML, most of it is probably familiar. Things of note are the @hl.html{<script>} tags: @hl.scala{"../example-fastopt.js"} Is the executable blob spat out by the compiler, which we need to include in the HTML page for anything to happen. This is where the results of your compiled Scala code appear. @hl.scala{"workbench.js"} is the client for the Workbench plugin that connects to SBT, reloads the browser and forwards logspam to the browser console.
 
     @p
-      The @hl.scala{ScalaJSExample().main()} call is what kicks off the Scala.js application and starts its execution. Scala.js follows Scala semantics in that @hl.scala{object}s are evaluated lazily, with no top-level code allowed. This is in contrast to Javascript, where you can include top-level statements and object-literals in your code which execute immediately. In Scala.js, nothing happens when @code{../example-fastopt.js} is imported! We have to call the main-method first. In this case, we're passing the canvas object (attained using @hl.javascript{getElementById}) to it so it knows where to do its thing.
+      The @hl.scala{example.ScalaJSExample().main()} call is what kicks off the Scala.js application and starts its execution. Scala.js follows Scala semantics in that @hl.scala{object}s are evaluated lazily, with no top-level code allowed. This is in contrast to Javascript, where you can include top-level statements and object-literals in your code which execute immediately. In Scala.js, nothing happens when @code{../example-fastopt.js} is imported! We have to call the main-method first. In this case, we're passing the canvas object (attained using @hl.javascript{getElementById}) to it so it knows where to do its thing.
 
 
   @p
@@ -193,7 +193,7 @@
 
 @sect{Publishing}
   @p
-    The last thing that we'll do with our toy application is to publish it. If you look in the @code{target/scala2.11} folder, you'll see the output of everything we've done so far:
+    The last thing that we'll do with our toy application is to publish it. If you look in the @code{target/scala-2.11} folder, you'll see the output of everything we've done so far:
 
   @hl.bash
     target/scala-2.11
@@ -222,28 +222,26 @@
 
   @hl.bash
     haoyi-mbp:temp haoyi$ du -h target/scala-2.11/example-fastopt.js
-    856K  target/scala-2.11/example-fastopt.js
+    656K  target/scala-2.11/example-fastopt.js
 
   @p
-    856 Kilobytes for a hello world app! That is clearly too large. If you examine the contents of the file, you'll see that your code has been translated into something like this:
+    656 Kilobytes for a hello world app! That is clearly too large. If you examine the contents of the file, you'll see that your code has been translated into something like this:
 
   @hl.javascript
-    var i$2 = i;
-    if (((ScalaJS.m.Lexample_ScalaJSExample().count$1 % 30000) === 0)) {
-      ScalaJS.m.Lexample_ScalaJSExample().clear__V()
+    var v1 = i;
+    if (((count$1.elem$1 % 3000) === 0)) {
+      ScalaJS.m.Lexample_ScalaJSExample$().example$ScalaJSExample$$clear$1__Lorg_scalajs_dom_CanvasRenderingContext2D__V(ctx$1)
     };
-    ScalaJS.m.Lexample_ScalaJSExample().count$1 = ((ScalaJS.m.Lexample_ScalaJSExample().count$1 + 1) | 0);
-    var jsx$3 = ScalaJS.m.Lexample_ScalaJSExample();
-    var jsx$2 = ScalaJS.m.Lexample_ScalaJSExample().p$1;
-    var jsx$1 = ScalaJS.m.Lexample_ScalaJSExample().corners$1;
-    var this$5 = ScalaJS.m.s_util_Random();
-    jsx$3.p$1 = jsx$2.$$plus__Lexample_Point__Lexample_Point(ScalaJS.as.Lexample_Point(jsx$1.apply__I__O(this$5.self$1.nextInt__I__I(3)))).$$div__I__Lexample_Point(2);
-    var height = (512.0 / ((255 + ScalaJS.m.Lexample_ScalaJSExample().p$1.y$1) | 0));
-    var r = ((ScalaJS.m.Lexample_ScalaJSExample().p$1.x$1 * height) | 0);
-    var g = ((((255 - ScalaJS.m.Lexample_ScalaJSExample().p$1.x$1) | 0) * height) | 0);
+    count$1.elem$1 = ((1 + count$1.elem$1) | 0);
+    var jsx$1 = ScalaJS.as.Lexample_Point(p$1.elem$1);
+    var this$4 = ScalaJS.m.s_util_Random$();
+    p$1.elem$1 = jsx$1.$$plus__Lexample_Point__Lexample_Point(ScalaJS.as.Lexample_Point(corners$1.apply__I__O(this$4.self$1.nextInt__I__I(3)))).$$div__I__Lexample_Point(2);
+    var height = (512.0 / ((255 + ScalaJS.as.Lexample_Point(p$1.elem$1).y$1) | 0));
+    var r = ((ScalaJS.as.Lexample_Point(p$1.elem$1).x$1 * height) | 0);
+    var g = ((((255 - ScalaJS.as.Lexample_Point(p$1.elem$1).x$1) | 0) * height) | 0);
 
   @p
-    As you can see, this code is still very verbose, with lots of unnecessarily long identifiers such as @hl.javascript{Lexample_ScalaJSExample} in it. This is because we've only performed the @sect.ref{Fast Optimization} on this file, to try and keep the time taken to edit -> compile while developing reasonably short.
+    As you can see, this code is still very verbose, with lots of unnecessarily long identifiers such as @hl.javascript{Lexample_ScalaJSExample$} in it. This is because we've only performed the @sect.ref{Fast Optimization} on this file, to try and keep the time taken to edit -> compile while developing reasonably short.
 
   @sect{Optimization}
     @p
@@ -251,13 +249,13 @@
 
     @hl.bash
       haoyi-mbp:temp haoyi$ du -h target/scala-2.11/example-opt.js
-      144K  target/scala-2.11/example-opt.js
+      104K  target/scala-2.11/example-opt.js
 
     @p
-      144 Kilobytes! Better. Not great, though! In general, Scala.js does not produce tiny executables, although the output size of the compiled executables is dropping all the time. If you look inside that file, you'll see all of the long identifiers have been replaced by short ones by the @lnk("Google Closure Compiler", "https://developers.google.com/closure/compiler/").
+      104 Kilobytes! Better. Not great, though! In general, Scala.js does not produce tiny executables, although the output size of the compiled executables is dropping all the time. If you look inside that file, you'll see all of the long identifiers have been replaced by short ones by the @lnk("Google Closure Compiler", "https://developers.google.com/closure/compiler/").
 
     @hl.javascript("""
-      Rb(P(),N(r(L(Ea),["rgb(",", ",", ",")"])))),Sb(P(),r(L(K),[n,s,C])));fe().te.fillRect(fe().Oc.jc,fe().Oc.kc,1,1);e=e+1|0;c=c+k|0}},50))}ae.prototype.Zf=function(){this.te.fillStyle="black";this.te.fillRect(0,0,255,255)};ae.prototype.main=function(){return ee(),void 0};ae.prototype.a=new I({lj:0},!1,"example.ScalaJSExample$",K,{lj:1,b:1});var be=void 0;function fe(){be||(be=(new ae).c());return be}ba.ScalaJSExample=fe;function le(){}le.prototype=new J;function me(){}me.prototype=le.prototype;
+      y=fb(gb((new F).Ya(["rgb(",", ",", ",")"])),(new F).Ya([(255-c.l.Db|0)*y|0,c.l.Db*y|0,c.l.Eb]));a.fillStyle=y;a.fillRect(c.l.Db,c.l.Eb,1,1);w=1+w|0}}}(a,b,c,e),50)}Xa.prototype.main=function(a){Ya(a)};Xa.prototype.a=new x({$g:0},!1,"example.ScalaJSExample$",B,{$g:1,b:1});var hb=void 0;function bb(){hb||(hb=(new Xa).c());return hb}ba.example=ba.example||{};ba.example.ScalaJSExample=bb;function Da(){this.Pb=null}Da.prototype=new A;
     """)
 
     @p
@@ -272,9 +270,9 @@
 
     @ul
       @li
-        A large portion of this 144k is the Scala standard library, and so the size of the compiled blob does not grow that fast as your program grows. For example, while this ~50 line application is 144k, a @lnk("much larger ~2000 line application", "https://github.com/lihaoyi/roll") is only 288k.
+        A large portion of this 104k is the Scala standard library, and so the size of the compiled blob does not grow that fast as your program grows. For example, while this ~50 line application is 104k, a @lnk("much larger ~2000 line application", "https://github.com/lihaoyi/roll") is only 288k.
       @li
-        This size is pre-@lnk("gzip", "http://en.wikipedia.org/wiki/Gzip"), and most webservers serve their contents compressed via gzip to reduce the download size. Gzip cuts the actual download size down to 43k, which is more acceptable.
+        This size is pre-@lnk("gzip", "http://en.wikipedia.org/wiki/Gzip"), and most webservers serve their contents compressed via gzip to reduce the download size. Gzip cuts the actual download size down to 28k, which is more acceptable.
       @li
         You will likely have other portions of the page that are of similar size: e.g. @lnk("JQuery", "http://jquery.com/") is extremely popular, and weights in at a comparable 32kb minified and gzipped, while @lnk("React.js", "http://facebook.github.io/react/downloads.html") weighs in at a cool 150kb gzipped. Scala.js arguably provides more than either of these libraries.
 

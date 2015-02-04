@@ -3,7 +3,7 @@ import scalatags.Text.all._
 
 object Page{
   val boot =
-    "Client().main(document.getElementById('contents'))"
+    "simple.Client().main(document.getElementById('contents'))"
   val skeleton =
     html(
       head(

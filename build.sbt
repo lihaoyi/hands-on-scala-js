@@ -4,9 +4,6 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.merge.MergeStrategy
 import org.eclipse.jgit.transport.{UsernamePasswordCredentialsProvider, RefSpec}
 
-import scalajs.sbtplugin.ScalaJSPlugin._
-import ScalaJSKeys._
-
 val cloneRepos = taskKey[Unit]("Clone stuff from github")
 
 val sharedSettings = Seq(
@@ -27,10 +24,7 @@ lazy val book = Project(
     "com.lihaoyi" %% "scalatex-site" % "0.1.1",
     "com.lihaoyi" %% "ammonite" % "0.1.0"
   ),
-  (resources in Compile) += {
-    (fullOptJS in (demos, Compile)).value
-    (artifactPath in (demos, Compile, fullOptJS)).value
-  },
+  (resources in Compile) += (fullOptJS in (demos, Compile)).value.data,
 
   (unmanagedResourceDirectories in Compile) ++=
     (unmanagedResourceDirectories in (demos, Compile)).value,

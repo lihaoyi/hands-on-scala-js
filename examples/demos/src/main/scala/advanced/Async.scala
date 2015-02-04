@@ -35,7 +35,8 @@ object Async {
     val mousedown =
       new Channel[ME](canvas.onmousedown = _)
 
-    async{
+    // Disabled due to scala-js#1469
+    /*async{
       while(true){
         val start = await(mousedown())
         renderer.beginPath()
@@ -58,7 +59,7 @@ object Async {
         await(mouseup())
         renderer.clearRect(0, 0, 1000, 1000)
       }
-    }
+    }*/
   }
   @JSExport
   def main0(canvas: dom.HTMLCanvasElement) = {

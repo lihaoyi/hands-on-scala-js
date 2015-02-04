@@ -3,130 +3,150 @@
   Although Scala.js tries very hard to maintain compatibility with Scala-JVM, there are some parts where the two platforms differs. This can be roughly grouped into two things: differences in the libraries available, and differences in the language itself. This chapter will cover both of these facets.
 
 @sect{Language Differences}
-  @sect{Floats are Doubles}
-    @p
-      Since JavaScript doesn't have a native float type, we sometimes represent Floats using doubles/numbers, rather than with lower-precision 32-bit floats.
-    @p
-      The choice of how to represent floats is up to the implementation. You may not rely on floats providing 64-bit floating point precision.
-    @p
-      Float literals are truncated to their (binary) precision. However, output does not truncate to that precision. This can lead to the following behavior (this works as expected when using doubles):
 
-  @split
-    @half
+  @sect{Primitive data types}
+    @p
+      All primitive data types work exactly as on the JVM, with the three following
+      exceptions.
+
+    @sect{Floats can behave as Doubles by default}
+      @p
+        Scala.js underspecifies the behavior of @code{Float}s by default. Any @code{Float} value can be stored as a @code{Double} instead, and any operation on @code{Float}s can be computed with double precision. The choice of whether or not to behave as such, when and where, is left to the
+        implementation.
+      @p
+        If exact single precision operations are important to your application, you can enable strict-floats semantics in Scala.js, with the following sbt setting:
       @hl.scala
-        // Scala-JVM
-        > println(13.345f)
-        13.345
+        scalaJSSemantics ~= { _.withStrictFloats(true) }
+      @p
+        Note that this can have a major impact on performance of your application on JS interpreters that do not support @lnk("the Math.fround function", "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/fround").
 
-    @half
+    @sect{toString of Float, Double and Unit}
+      @p
+        @code{x.toString()} returns slightly different results for floating point numbers and @code{()} (@code{Unit}).
+
+      @split
+        @half
+          @hl.scala
+            // Scala-JVM
+            > println(())
+            ()
+            > println(1.0)
+            1.0
+            > println(1.4f)
+            1.4
+
+        @half
+          @hl.scala
+            // Scala.js
+            > println(())
+            undefined
+            > println(1.0)
+            1
+            > println(1.4f)
+            1.399999976158142
+
+      @p
+        In general, a trailing @code{.0} is omitted. Floats print in a weird way because they are printed as if they were Doubles, which means their lack of precision shows up.
+      @p
+        To get sensible and portable string representation of floating point numbers, use @code{String.format()} or related methods.
+
+    @sect{Runtime type tests are based on values}
+      @p
+        Instance tests (and consequently pattern matching) on any of @code{Byte}, @code{Short}, @code{Int}, @code{Float}, @code{Double} are based on the value and not the type they were created with. The following are examples:
+      @ul
+        @li
+          1 matches @code{Byte}, @code{Short}, @code{Int}, @code{Float}, @code{Double}
+        @li
+          128 (@code{> Byte.MaxValue}) matches @code{Short}, @code{Int}, @code{Float}, @code{Double}
+        @li
+          32768 (@code{> Short.MaxValue}) matches @code{Int}, @code{Float}, @code{Double}
+        @li
+          2147483647 matches @code{Int}, @code{Double} if strict-floats are enabled, otherwise @code{Float} as well
+        @li
+          2147483648 (@code{> Int.MaxValue}) matches @code{Float}, @code{Double}
+        @li
+          1.5 matches @code{Float}, @code{Double}
+        @li
+          1.4 matches @code{Double} only if strict-floats are enabled, otherwise @code{Float} and @code{Double}
+        @li
+          @code{NaN}, @code{Infinity}, @code{-Infinity} and @code{-0.0} match @code{Float}, @code{Double}
+      @p
+        As a consequence, the following apparent subtyping relationships hold:
       @hl.scala
-        // Scala.js
-        > println(13.345f)
-        13.345000267028809
+        Byte <:< Short <:<  Int  <:< Double
+                       <:< Float <:<
+      @p
+        if strict-floats are enabled, or
+      @hl.scala
+        Byte <:< Short <:< Int <:< Float =:= Double
+      @p
+        otherwise.
 
-  @sect{Int division by 0 is undefined}
+  @sect{Undefined behaviors}
     @p
-      Unlike the JVM where dividing an integer type by 0 throws an exception, in Scala.js integer division by 0 is undefined. This allows for efficient implementation of division. Dividing a Double or Float by 0 yields positive or negative infinity as expected.
-
-    @split
-      @half
-        @hl.scala
-          // Scala-JVM
-          > 10 / 0
-          java.lang.ArithmeticException: / by zero
-      @half
-        @hl.scala
-          // Scala.js
-          > 10 / 0
-          0
-
-    @p
-      This is a consequence of the eternal trade-off between performance and correctness, as described in the section @sect.ref{Why does error behavior differ?}
-
-  @sect{Primitive isInstanceOf tests are based on value}
-    @p
-      Instance tests (and consequently pattern matching) on any of @hl.scala{Byte}, @hl.scala{Short}, @hl.scala{Int}, @hl.scala{Float}, @hl.scala{Double} are based on the value and not the type they were created with. The following are examples:
-
+      The JVM is a very well specified environment, which even specifies how some bugs are reported as exceptions. Some examples are:
     @ul
       @li
-        @hl.scala{1} matches @hl.scala{Byte}, @hl.scala{Short}, @hl.scala{Int}, @hl.scala{Float}, @hl.scala{Double}
+        @code{NullPointerException}
       @li
-        @hl.scala{128} (> @hl.scala{Byte.MaxValue}) matches @hl.scala{Short}, @hl.scala{Int}, @hl.scala{Float}, @hl.scala{Double}
+        @code{ArrayIndexOutOfBoundsException} and @code{StringIndexOutOfBoundsException}
       @li
-        @hl.scala{32768} (> @hl.scala{Short.MaxValue}) matches @hl.scala{Int}, @hl.scala{Float}, @hl.scala{Double}
+        @code{ClassCastException}
       @li
-        @hl.scala{2147483648} (> @hl.scala{Int.MaxValue}) matches @hl.scala{Float}, @hl.scala{Double}
+        @code{ArithmeticException} (such as integer division by 0)
       @li
-        @hl.scala{1.2} matches @hl.scala{Float}, @hl.scala{Double}
+        @code{StackOverflowError} and other @code{VirtualMachineError}s
     @p
-      As a consequence, the following apparent subtyping relationship holds:
-
+      Because Scala.js does not receive VM support to detect such erroneous conditions, checking them is typically too expensive.
+    @p
+      Therefore, all of these are considered @lnk("undefined behavior", "http://en.wikipedia.org/wiki/Undefined_behavior").
+    @p
+      Some of these, however, can be configured to be compliant with sbt settings. Currently, only @code{ClassCastException}s (thrown by invalid @code{asInstanceOf} calls) are configurable, but the list will probably expand in future versions.
+    @p
+      Every configurable undefined behavior has 3 possible modes:
+    @ul
+      @li
+        @b{Compliant}: behaves as specified on a JVM
+      @li
+        @b{Unchecked}: completely unchecked and undefined
+      @li
+        @b{Fatal}: checked, but throws @lnk("UndefinedBehaviorError", "http://www.scala-js.org/api/scalajs-library/0.6.0/#scala.scalajs.runtime.UndefinedBehaviorError")s instead of the specified exception.
+    @p
+      By default, undefined behaviors are in Fatal mode for fastOptJS and in Unchecked mode for fullOptJS. This is so that bugs can be detected more easily during development, with predictable exceptions and stack traces. In production code (fullOptJS), the checks are removed for maximum efficiency.
+    @p
+      @code{UndefinedBehaviorError}s are @i{fatal} in the sense that they are not matched by @code{case NonFatal(e)} handlers. This makes sure that they always crash your program as early as possible, so that you can detect and fix the bug. It is @i{never} OK to catch an @code{UndefinedBehaviorError} (other than in a testing framework), since that means your program will behave differently in fullOpt stage than in fastOpt.
+    @p
+      If you need a particular kind of exception to be thrown in compliance with the JVM semantics, you can do so with an sbt setting. For example, this setting enables compliant @code{asInstanceOf}s:
     @hl.scala
-      Byte <:< Short <:< Int <:< Float =:= Double
-
-  @sect{toString for integral Floats and Doubles}
+      scalaJSSemantics ~= { _.withAsInstanceOfs(
+        org.scalajs.core.tools.sem.CheckedBehavior.Compliant) }
     @p
-      Calling toString on a Float or a Double that holds an integral value, will not append ".0" to that value:
-
-    @split
-      @half
-        @hl.scala
-          // Scala-JVM:
-          > println(1.0)
-          1.0
-      @half
-        @hl.scala
-          // Scala.js:
-          > println(1.0)
-          1
+      Note that this will have (potentially major) performance impacts.
     @p
-      This is due to how numeric values are represented at runtime in Scala.js: @hl.scala{Float}s and @hl.scala{Double}s are raw Javascript @hl.scala{Number}s, and their @hl.scala{toString} behavior follows from that.
-
-    @p
-      Use a formatting interpolator if you always want to show decimals:
-
-    @hl.scala
-      val x = 1.0
-      println(f"$x%.1f")
-      // Scala-JVM:    1.0
-      // Scala.js: 1.0
-
-  @sect{Unit}
-    @p
-      @hl.scala{scala.Unit} is represented using JavaScript's undefined. Therefore, calling @hl.scala{toString()} on @hl.scala{Unit} will return @hl.scala{"undefined"} rather than @hl.scala{"()"}. In practice, this shouldn't matter for most use cases.
+      For a more detailed rationale, see the section @sect.ref{Why does error behavior differ?}.
 
   @sect{Reflection}
     @p
-      Java reflection and Scala reflection, are not supported. There is limited support for @lnk("java.lang.Class", "https://docs.oracle.com/javase/7/docs/api/java/lang/Class.html"), e.g., @hl.scala{obj.getClass.getName} will work for any Scala.js object but not for objects that come from JavaScript interop (i.e. anything which @hl.scala{extends js.Object}). Reflection makes it difficult to perform the optimizations that Scala.js heavily relies on. For a more detailed discussion on this topic, take a look at the section @sect.ref{Why No Reflection?}.
-
-  @sect{Exceptions}
-    @p
-      In general, Scala.js supports exceptions, including catching them based on their type. However, exceptions that are typically triggered by the JVM have flaky semantics, in particular:
-
-    @ul
-      @li
-        @hl.scala{ArrayIndexOutOfBoundsException} is never thrown. Instead, the value becomes @hl.javascript{undefined}, which will probably propagate through your program and blow up somewhat later.
-      @li
-        @hl.scala{NullPointerException} is reported as JavaScript @hl.scala{TypeError} instead.
-      @li
-        @hl.scala{StackOverflowError} is unsupported since the underlying JavaScript exception type varies based on the browser. e.g. in Chrome the browser just hangs and kills the process/tab without any chance for the developer to catch the error.
+      Java reflection and, a fortiori, Scala reflection, are not supported. There is limited support for @code{java.lang.Class}, e.g., @code{obj.getClass.getName} will work for any Scala.js object (not for objects that come from JavaScript interop). Reflection makes it difficult to perform the optimizations that Scala.js heavily relies on. For a more detailed discussion on this topic, take a look at the section @sect.ref{Why No Reflection?}.
 
   @sect{Regular expressions}
     @p
-      JavaScript regular expressions are slightly different from Java regular expressions. The support for regular expressions in Scala.js is implemented on top of JavaScript regexes.
+      @lnk("JavaScript regular expressions", "http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Guide:Regular_Expressions") are slightly different from @lnk("Java regular expressions", "http://docs.oracle.com/javase/6/docs/api/java/util/regex/Pattern.html"). The support for regular expressions in Scala.js is implemented on top of JavaScript regexes.
     @p
-      This sometimes has an impact on functions in the Scala library that use regular expressions themselves. A list of known functions that are affected is given here:
+      This sometimes has an impact on functions in the Scala library that use regular expressions themselves. A list of known functions that are
+      affected is given here:
     @ul
       @li
-        @hl.scala{StringLike.split(x: Array[Char])}
+        @code{StringLike.split(x: Array[Char])}
 
   @sect{Symbols}
     @p
-      @hl.scala{scala.Symbol} is supported, but is a potential source of memory leaks in applications that make heavy use of symbols. The main reason is that JavaScript does not support weak references, causing all symbols created by Scala.js tow remain in memory throughout the lifetime of the application.
+      @code{scala.Symbol} is supported, but is a potential source of memory leaks in applications that make heavy use of symbols. The main reason is that
+      JavaScript does not support weak references, causing all symbols created by Scala.js to remain in memory throughout the lifetime of the application.
 
   @sect{Enumerations}
     @p
-      The methods @hl.scala{Value()} and @hl.scala{Value(i: Int)} on @lnk.scala{scala.Enumeration} use reflection to retrieve a string representation of the member name and are therefore -- in principle -- unsupported. However, since Enumerations are an integral part of the Scala library, Scala.js adds limited support for these two methods:
+      The methods @code{Value()} and @code{Value(i: Int)} on @code{scala.Enumeration} use reflection to retrieve a string representation of the member name and are therefore -- in principle -- unsupported. However, since Enumerations are an integral part of the Scala library, Scala.js adds limited support for these two methods:
     @p
       Calls to either of these two methods of the forms:
     @hl.scala
@@ -136,17 +156,17 @@
       are statically rewritten to (a slightly more complicated version of):
     @hl.scala
       val <ident> = Value("<ident>")
-      val <ident> = Value(<num>,"<ident>")
+      val <ident> = Value(<num>, "<ident>")
     @p
       Note that this also includes calls like
     @hl.scala
-      val A,B,C,D = Value
+      val A, B, C, D = Value
     @p
-      since they are desugared into separate val definitions.
+      since they are desugared into separate @code{val} definitions.
     @p
-      Calls to either of these two methods which could not be rewritten, or calls to constructors of the protected Val class without an explicit name as parameter, will issue a warning.
+      Calls to either of these two methods which could not be rewritten, or calls to constructors of the protected <code>Val</code> class without an explicit name as parameter, will issue a warning.
     @p
-      Note that the name rewriting honors the @hl.scala{nextName} iterator. Therefore, the full rewrite is:
+      Note that the name rewriting honors the @code{nextName} iterator. Therefore, the full rewrite is:
     @hl.scala
       val <ident> = Value(
         if (nextName != null && nextName.hasNext)
@@ -155,7 +175,7 @@
           "<ident>"
       )
     @p
-      We believe that this covers most use cases of scala.Enumeration. Please let us know if another (generalized) rewrite would make your life easier.
+      We believe that this covers most use cases of @code{scala.Enumeration}. Please let us know if another (generalized) rewrite would make your life easier.
 
 @sect{Library Differences}
   @val myTable = Seq(

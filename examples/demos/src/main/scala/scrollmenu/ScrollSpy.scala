@@ -57,7 +57,7 @@ class ScrollSpy(structure: Tree[String],
     }
 
     js.Array(
-      menuItems.map(name => dom.document.getElementById(Controller.munge(name)))
+      menuItems.map(name => dom.document.getElementById(Controller.munge(name)).asInstanceOf[dom.HTMLElement])
                .map((el) => () => offset(el, main)):_*
     )
   }

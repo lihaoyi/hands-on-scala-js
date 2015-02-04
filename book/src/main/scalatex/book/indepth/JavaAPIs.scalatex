@@ -21,7 +21,7 @@
     @li
       Write a clean-room implementation in Scala, without looking at the source code of @lnk("OpenJDK", "http://openjdk.java.net/"). This is due to legal-software-license incompatibility between OpenJDK and Scala.js. Reading the docs or specification are fine, as is looking at the source of alternate implementations such as @lnk("Harmony", "http://harmony.apache.org/")
     @li
-      Submit a pull-request to the @lnk("Scala.js repository", "https://github.com/scala-js/scala-js"), including your implementation, together with tests. See the @lnk("existing tests", "https://github.com/scala-js/scala-js/tree/master/test-suite/src/test/scala/scala/scalajs/testsuite/javalib") in the repository if you need examples of how to write your own.
+      Submit a pull-request to the @lnk("Scala.js repository", "https://github.com/scala-js/scala-js"), including your implementation, together with tests. See the @lnk("existing tests", "https://github.com/scala-js/scala-js/tree/master/test-suite/src/test/scala/org/scalajs/testsuite/javalib") in the repository if you need examples of how to write your own.
 
   @p
     In general, this is a simple process, for "pure-Java" classes which do not use any special JVM/Java-specific APIs. However, this will not be possible for classes which do! This means that classes that make use of Java-specific things like:
