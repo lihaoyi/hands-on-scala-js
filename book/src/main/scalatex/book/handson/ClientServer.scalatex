@@ -26,22 +26,19 @@
 
 @sect{A Client-Server Setup}
   @p
-    Getting started with client-server integration, let's go with the simplest configuration possible: a Spray server and a Scala.js client. Most of the other web-frameworks (@lnk.misc.Play, @lnk.misc.Scalatra, etc.) will have more complex configurations, but the basic mechanism of wiring up Scala.js to your web framework will be the same. Our project will look like this:
+    Getting started with client-server integration, let's go with the simplest configuration possible: a Spray server and a Scala.js client. Most of the other web-frameworks (@lnk.misc.Play, @lnk.misc.Scalatra, etc.) will have more complex configurations, but the basic mechanism of wiring up Scala.js to your web framework will be the same. Just like our project in @sect.ref{Cross Publishing Libraries}, our project will look like this:
 
   @hl.bash
     $ tree
     .
     ├── build.sbt
-    ├── client
-    │   ├── shared/main/scala/simple/FileData.scala
-    │   └── src/main/scala/simple/Client.scala
-    ├── project
-    │   └── build.sbt
-    └── server
-        ├── shared -> ../client/shared
-        └── src/main/scala/simple
-                           ├── Page.scala
-                           └── Server.scala
+    ├── project/build.sbt
+    └── app
+        ├── shared/src/main/scala/simple/FileData.scala
+        ├── js/src/main/scala/simple/Client.scala
+        └── jvm/src/main/scala/simple/
+                                ├── Page.scala
+                                └── Server.scala
 
   @p
     First, let's do the wiring in @code{build.sbt}:
@@ -49,10 +46,10 @@
   @hl.ref(wd/'examples/'crossBuilds/'clientserver/"build.sbt")
 
   @p
-    We have two projects: @code{client} and @code{server}, one of which is a Scala.js project (indicated by the presence of @hl.scala{enablePlugins(ScalaJSPlugin)}). Both projects share a number of settings: the presence of the @code{shared/} folder, which shared code can live in (similar to what we saw in @sect.ref{Cross Publishing Libraries}) and the settings to add @lnk.github.Scalatags and @lnk.github.uPickle to the build. Note that those two dependencies use the triple @code{%%%} instead of the double @code{%%} to declare: this means that for each dependency, we will pull in the Scala-JVM or Scala.js version depending on whether it's being used in a Scala.js project. Note also the @hl.scala{packageArchetype.java_application} setting, which isn't strictly necessary depending on what you want to do with the application, but this example needs it as part of the deployment to Heroku.
+    Again, we are using @hl.scala{crossProject} to define our @code{js/} and @code{jvm/} sub-projects. Both projects share a number of settings: the settings to add @lnk.github.Scalatags and @lnk.github.uPickle to the build. Note that those two dependencies use the triple @code{%%%} instead of the double @code{%%} to declare: this means that for each dependency, we will pull in the Scala-JVM or Scala.js version depending on whether it's being used in a Scala.js project. Note also the @hl.scala{packageArchetype.java_application} setting, which isn't strictly necessary depending on what you want to do with the application, but this example needs it as part of the deployment to Heroku.
 
   @p
-    The @code{client} subproject is uneventful, with a dependency on the by-now-familiar @code{scalajs-dom} library. The @code{server} project, on the other hand, is interesting: it contains the dependencies required for us to set up out Spray server, and one additional thing: we add the output of @code{fastOptJS} from the client to the @code{resources} on the server. This will allow the @code{server} to serve the compiled-javascript from our @code{client} project from its resources.
+    The @code{js/} sub-project is uneventful, with a dependency on the by-now-familiar @code{scalajs-dom} library. The @code{jvm/} project, on the other hand, is interesting: it contains the dependencies required for us to set up out Spray server, and one additional thing: we add the output of @code{fastOptJS} from the client to the @code{resources} on the server. This will allow the @code{server} to serve the compiled-javascript from our @code{client} project from its resources.
 
   @p
     Next, let's kick off the Spray server in our Scala-JVM main method:
