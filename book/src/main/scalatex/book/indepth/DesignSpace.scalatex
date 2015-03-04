@@ -12,9 +12,9 @@
     @li
       @b{Full Output} - ~20mb
     @li
-      @b{Naive Dead-Code-Elimnation} - ~800kb
+      @b{Naive Dead-Code-Elimination} - ~800kb
     @li
-      @b{Inlining Dead-Code-Elimnation} - ~600kb
+      @b{Inlining Dead-Code-Elimination} - ~600kb
     @li
       @b{Minified by Google Closure Compiler} - ~200kb
 
