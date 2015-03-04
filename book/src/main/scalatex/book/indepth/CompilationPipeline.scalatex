@@ -88,7 +88,7 @@
         The @code{.sjsir} files, destined for further compilation in the Scala.js pipeline.
 
     @p
-      The ASTs defined in the @code{.sjsir} files is at about the same level of abstraction as the @hl.scala{Tree}s that the Scala compiler is working with at this stage. However, the @hl.scala{Tree}s within the Scala compiler contain a lot of cruft related to the compiler internals, and are also not easily serializable. This phase cleans them up into a "purer" format, (defined in the @lnk("ir/", "https://github.com/scala-js/scala-js/blob/master/ir/src/main/scala/scala/scalajs/ir/Trees.scala") folder) which is also serializable.
+      The ASTs defined in the @code{.sjsir} files is at about the same level of abstraction as the @hl.scala{Tree}s that the Scala compiler is working with at this stage. However, the @hl.scala{Tree}s within the Scala compiler contain a lot of cruft related to the compiler internals, and are also not easily serializable. This phase cleans them up into a "purer" format, (defined in the @lnk("ir/", "https://github.com/scala-js/scala-js/blob/master/ir/src/main/scala/org/scalajs/core/ir/Trees.scala") folder) which is also serializable.
 
     @p
       This is the only phase in the Scala.js compilation pipeline that separate compilation is possible: you can compile many different sets of Scala.js @code{.scala} files separately, only to combine them later. This is used e.g. for distributing Scala.js libraries as Maven Jars, which are compiled separately by library authors to be combined into a final executable later.
