@@ -1,4 +1,4 @@
-@import BookData._
+@import book.BookData._
 
 @val firstHalfDescription = Seq[Frag]("""
 is a set of tutorials that walks you through getting started with Scala.js. You'll build a range of small projects, from """, sect.ref("Making a Canvas App"), " to ", sect.ref("Interactive Web Pages"), " to ", sect.ref("Integrating Client-Server"), """, and in the process will get a good overview of both Scala.js's use cases as well as the development experience

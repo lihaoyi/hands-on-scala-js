@@ -1,4 +1,4 @@
-@import BookData._
+@import book.BookData._
 @p
   We've spent several chapters exploring the experience of making web apps using Scala.js, but any large application (web or not!) likely relies on a host of libraries in order to implement large chunks of its functionality. Ideally these libraries would be re-usable, and can be shared among different projects, teams or even companies.
 

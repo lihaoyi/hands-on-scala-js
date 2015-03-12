@@ -1,4 +1,4 @@
-@import BookData._
+@import book.BookData._
 
 @p
   We've by this point done a bunch of work in the browser: we've made a small game that runs in the web browser on the HTML5 canvas, and we've made a number of small web-apps that interact with HTML and 3rd party web-services. However, there's a whole other side to the Scala.js ecosystem: the command line interace, or CLI.

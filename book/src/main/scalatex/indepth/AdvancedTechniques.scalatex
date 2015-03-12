@@ -1,4 +1,4 @@
-@import BookData._
+@import book.BookData._
 @p
   @sect.ref{Getting Started} walks you through how to set up some basic Scala.js applications, but that only scratches the surface of the things you can do with Scala.js. Apart from being able to use the same techniques you're used to in Scala-JVM in the browser, Scala.js opens up a whole range of possibilities and novel techniques that are not found in typical Scala-JVM applications.
 

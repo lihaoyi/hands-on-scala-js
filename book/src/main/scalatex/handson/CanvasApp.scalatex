@@ -1,4 +1,4 @@
-@import BookData._
+@import book.BookData._
 @val canvasapp = wd/'examples/'demos/'src/'main/'scala/'canvasapp
 @p
   By this point, you've already cloned and got your hands dirty fiddling around with the toy @lnk("workbench-example-app", "https://github.com/lihaoyi/workbench-example-app"). You have your editor set up, SBT installed, and have published the example application in a way you can host online for other people to see. Maybe you've even made some changes to the application to see what happens. Hopefully you're curious, and want to learn more.

@@ -1,4 +1,4 @@
-@import BookData._
+@import book.BookData._
 
 @p
   Most web applications aren't neat little games which live on a single canvas: they are large, structured HTML pages, which involve displaying data (whether from the user or from the web) in multiple ways, while allowing the user to make changes to the data that can be saved back to whatever remote web-service/database it came from.

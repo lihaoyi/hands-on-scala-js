@@ -1,4 +1,4 @@
-@import BookData._
+@import book.BookData._
 
 @p
   Scala.js is implemented as a compiler plugin in the Scala compiler. Despite this, the overall process looks very different from that of a normal Scala application. This is because Scala.js optimizes for the size of the compiled executable, which is something that Scala-JVM does not usually do.

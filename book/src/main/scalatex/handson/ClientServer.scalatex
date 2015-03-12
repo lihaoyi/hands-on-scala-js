@@ -1,4 +1,4 @@
-@import BookData._
+@import book.BookData._
 
 @def lazyload(id: String) = script(raw(s"""
   window.addEventListener("load", function(){

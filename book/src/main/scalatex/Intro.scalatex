@@ -1,4 +1,4 @@
-@import BookData._
+@import book.BookData._
 @p
   Scala.js compiles Scala code to equivalent, executable Javascript. Here's the compilation of a trivial hello-world example:
 

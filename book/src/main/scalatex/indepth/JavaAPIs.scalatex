@@ -1,4 +1,4 @@
-@import BookData._
+@import book.BookData._
 
 @p
   Below is a list of classes from the Java Standard Library that are available from Scala.js. In general, much of @hl.scala{java.lang}, and parts of @hl.scala{java.io}, @hl.scala{java.util} and @hl.scala{java.net} have been ported over. This means that all these classes are available for use in Scala.js applications despite being part of the Java standard library.

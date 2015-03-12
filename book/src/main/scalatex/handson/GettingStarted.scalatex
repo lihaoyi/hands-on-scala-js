@@ -1,4 +1,4 @@
-@import BookData._
+@import book.BookData._
 
 @p
   To get started with Scala.js, you will need to prepare a few things:

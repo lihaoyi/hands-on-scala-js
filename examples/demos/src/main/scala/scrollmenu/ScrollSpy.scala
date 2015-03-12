@@ -57,10 +57,12 @@ class ScrollSpy(structure: Tree[String],
       rec(structure).tail
     }
 
-    js.Array(
-      menuItems.map(name => dom.document.getElementById(Controller.munge(name)).asInstanceOf[html.Element])
-               .map((el) => () => offset(el, main)):_*
-    )
+    val offsets = for(name <- menuItems) yield {
+      val el = dom.document.getElementById(Controller.munge(name)).asInstanceOf[html.Element]
+      () => offset(el, dom.document.body)
+
+    }
+    js.Array(offsets:_*)
   }
 
   var open = false
@@ -87,21 +89,11 @@ class ScrollSpy(structure: Tree[String],
   private[this] var scrolling = false
   private[this] var scrollTop = -1
   def apply(): Unit = {
-    if (!scrolling) {
-      scrolling = true
-      scrollTop = main.scrollTop.toInt
-      dom.setTimeout({() =>
-          scrolling = false
-          if (scrollTop == main.scrollTop) start()
-          else apply()
-        },
-        75
-      )
-    }
+    start()
   }
   private[this] var previousWin: MenuNode = null
   private[this] def start(force: Boolean = false) = {
-    val scrollTop = main.scrollTop
+    val scrollTop = dom.document.body.scrollTop
     def walkIndex(tree: Tree[MenuNode]): List[Tree[MenuNode]] = {
       val t @ Tree(m, children) = tree
       val win = if(m.start == -1) true
@@ -118,6 +110,7 @@ class ScrollSpy(structure: Tree[String],
     }
 
     val winPath = walkIndex(domTrees)
+
     val winItem = winPath.last.value
     def walkTree(indices: List[Tree[MenuNode]]): Int = indices match {
       case Nil => 0
@@ -130,8 +123,9 @@ class ScrollSpy(structure: Tree[String],
         for {
           child <- children
           if !indices.headOption.exists(_.value.frag == child.value.frag)
-        } walkHide(child)
-
+        } {
+          walkHide(child)
+        }
         val size = walkTree(rest) + children.length
         mn.frag.children(1).asInstanceOf[html.Element].style.maxHeight =
           if (!open) size * 44 + "px" else "none"
@@ -153,10 +147,7 @@ class ScrollSpy(structure: Tree[String],
     }
 
     if (winItem != previousWin || force){
-//      scroll(winItem.frag.children(0))
-//      dom.history.replaceState(null, null, "#" + winItem.id)
       previousWin = winItem
-//      println(winPath.map(_.value.id))
       walkTree(winPath)
     }
   }
