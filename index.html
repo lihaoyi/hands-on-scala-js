@@ -1103,7 +1103,7 @@ object HelloWorld0 extends{
   <p>
     <a href="https://github.com/lihaoyi/scalatags">Scalatags</a> is a cross-platform Scala.js/Scala-JVM library that is designed to generate HTML. To use Scalatags, you need to add it as a dependency to your Scala.js SBT project, in the <code>build.sbt</code> file:
 </p>
-  <pre class="scalatex-hover-container"><code class="scala scalatex-highlight-js hljs">libraryDependencies += &quot;com.lihaoyi&quot; %%% &quot;scalatags&quot; % &quot;0.4.5&quot;</code><a class="scalatex-header-link" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/demos/build.sbt#L16-L17" target="_blank"><i class="fa fa-link "></i></a></pre>
+  <pre class="scalatex-hover-container"><code class="scala scalatex-highlight-js hljs">libraryDependencies += &quot;com.lihaoyi&quot; %%% &quot;scalatags&quot; % &quot;0.4.6&quot;</code><a class="scalatex-header-link" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/demos/build.sbt#L16-L17" target="_blank"><i class="fa fa-link "></i></a></pre>
 
   <p>
     With that, the above snippet of code re-written using Scalatags looks as follows:
@@ -1925,7 +1925,9 @@ object Platform{
     <li>
       <a href="https://github.com/InTheNow/zcheck">zCheck</a></li>
     <li>
-      <a href="https://github.com/cgta/otest">oTest</a>
+      <a href="https://github.com/cgta/otest">oTest</a></li>
+    <li>
+      <a href="https://github.com/greencatsoft/greenlight">Greenlight</a>
 </li></ul>
   <p>
     These (and others) are built and maintained by members of the community, so if one of them does not fit your tastes, it is worth trying the others.
@@ -1978,8 +1980,8 @@ val app = crossProject.settings(
   unmanagedSourceDirectories in Compile +=
     baseDirectory.value  / &quot;shared&quot; / &quot;main&quot; / &quot;scala&quot;,
   libraryDependencies ++= Seq(
-    &quot;com.lihaoyi&quot; %%% &quot;scalatags&quot; % &quot;0.4.5&quot;,
-    &quot;com.lihaoyi&quot; %%% &quot;upickle&quot; % &quot;0.2.6&quot;
+    &quot;com.lihaoyi&quot; %%% &quot;scalatags&quot; % &quot;0.4.6&quot;,
+    &quot;com.lihaoyi&quot; %%% &quot;upickle&quot; % &quot;0.2.7&quot;
   ),
   scalaVersion := &quot;2.11.5&quot;
 ).jsSettings(
@@ -2517,7 +2519,7 @@ is a set of detailed expositions on various parts of the Scala.js platform. Noth
     <p>
       <a href="https://github.com/lihaoyi/scala.rx">Scala.Rx</a> is a change-propagation library that implements the <b>Continuous</b> style of FRP. To begin with, we need to include it in our <code>build.sbt</code> dependencies:
 </p>
-    <pre class="scalatex-hover-container"><code class="scala scalatex-highlight-js hljs">libraryDependencies += &quot;com.lihaoyi&quot; %%% &quot;scalarx&quot; % &quot;0.2.7&quot;</code><a class="scalatex-header-link" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/demos/build.sbt#L18-L19" target="_blank"><i class="fa fa-link "></i></a></pre>
+    <pre class="scalatex-hover-container"><code class="scala scalatex-highlight-js hljs">libraryDependencies += &quot;com.lihaoyi&quot; %%% &quot;scalarx&quot; % &quot;0.2.8&quot;</code><a class="scalatex-header-link" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/demos/build.sbt#L18-L19" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
       Scala.Rx provides you with smart variables that automatically track dependencies with each other, such that if one smart variable changes, the rest re-compute immediately and automatically. The main primitives in Scala.Rx are:
