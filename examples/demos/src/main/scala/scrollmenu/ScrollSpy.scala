@@ -101,14 +101,6 @@ class ScrollSpy(structure: Tree[String],
   }
   private[this] var previousWin: MenuNode = null
   private[this] def start(force: Boolean = false) = {
-
-    def scroll(el: dom.Element) = {
-      val rect = el.getBoundingClientRect()
-      if (rect.top <= 0)
-        el.scrollIntoView(true)
-      else if (rect.top > dom.innerHeight)
-        el.scrollIntoView(false)
-    }
     val scrollTop = main.scrollTop
     def walkIndex(tree: Tree[MenuNode]): List[Tree[MenuNode]] = {
       val t @ Tree(m, children) = tree
@@ -161,8 +153,8 @@ class ScrollSpy(structure: Tree[String],
     }
 
     if (winItem != previousWin || force){
-      scroll(winItem.frag.children(0))
-      dom.history.replaceState(null, null, "#" + winItem.id)
+//      scroll(winItem.frag.children(0))
+//      dom.history.replaceState(null, null, "#" + winItem.id)
       previousWin = winItem
 //      println(winPath.map(_.value.id))
       walkTree(winPath)
