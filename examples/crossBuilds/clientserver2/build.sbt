@@ -2,9 +2,9 @@ val app = crossProject.settings(
   unmanagedSourceDirectories in Compile +=
     baseDirectory.value  / "shared" / "main" / "scala",
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %%% "scalatags" % "0.4.5",
-    "com.lihaoyi" %%% "upickle" % "0.2.6",
-    "com.lihaoyi" %%% "autowire" % "0.2.4"
+    "com.lihaoyi" %%% "scalatags" % "0.4.6",
+    "com.lihaoyi" %%% "upickle" % "0.2.7",
+    "com.lihaoyi" %%% "autowire" % "0.2.5"
   ),
   scalaVersion := "2.11.5"
 ).jsSettings(
