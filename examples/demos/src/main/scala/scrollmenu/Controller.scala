@@ -75,6 +75,7 @@ object Controller{
     }
 
     dom.addEventListener("scroll", (e: dom.UIEvent) => updateScroll())
+
     updateScroll()
 
   }
