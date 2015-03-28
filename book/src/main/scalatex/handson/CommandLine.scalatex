@@ -29,7 +29,7 @@
 @p
   Now, let's open up your SBT console in your Scala.js app
 
-@hl.bash
+@hl.sh
   >
 
 @p
@@ -40,13 +40,13 @@
     The most fundamental thing you can do in the Scala.js CLI is to compile your code. Let's go through the various mechanisms of "compiling" things:
 
   @sect{The compile Command}
-    @hl.bash
+    @hl.sh
       > compile
 
     @p
       Just as you can @code{compile} Scala-JVM projects, you can also @code{compile} Scala.js projects. Like compiling Scala-JVM projects, this leaves a bunch of @code{.class} files in your @code{target} directory. Unlike Scala-JVM projects, this also leaves a bunch of @code{.sjsir} files, which correspond to your Scala.js output files:
 
-    @hl.bash
+    @hl.sh
       classes
       └── example
           ├── Point$.class
@@ -63,12 +63,12 @@
       However, unlike on Scala-JVM, you cannot directly run the @code{.sjsir} files spat out by the Scala.js compiler. These files are an Intermediate Representation, which needs to go through the next step in the compilation pipeline before being turned into Javascript.
 
   @sect{The package Command}
-    @hl.bash
+    @hl.sh
       > package
     @p
       Also like on Scala-JVM, Scala.js also supports the @code{package} command. This command generates a @code{.jar} like it does in Scala-JVM, except this version appends this weird @code{_sjs0.6} suffix.
 
-    @hl.bash
+    @hl.sh
       target/scala-2.11/
       └── example_sjs0.6_2.11-0.1-SNAPSHOT.jar
 
@@ -79,24 +79,24 @@
       Again, unlike Scala-JVM, these @code{.jar} files are not directly executable: the @code{.sjsir} files need further processing to turn into runnable Javascript. Instead, their sole purpose is to hold bundles of @code{.sjsir} files to be published and depended-upon: they can be @code{publishLocal}ed to be used by other projects on your computer, or @code{publishSigned}ed to @lnk("Maven Central", "http://search.maven.org/"), just like any Scala-JVM project.
 
   @sect{The fastOptJS Command}
-    @hl.bash
+    @hl.sh
       > fastOptJS
     @p
-      @code{fastOptJS} is a command we've used in earlier chapters. It basically runs the @sect.ref{Fast Optimization} stage of the compilation pipeline. This results in a moderately-sized executable, which you can then load in the browser with a @hl.html{<script>} tag and run.
+      @code{fastOptJS} is a command we've used in earlier chapters. It basically runs the @sect.ref{Fast Optimization} stage of the compilation pipeline. This results in a moderately-sized executable, which you can then load in the browser with a @hl.xml{<script>} tag and run.
 
     @p
       This is the first phase which actually results in an executable blob of Javascript. I won't go into much detail about this command: you've used it before, and more details about the particular kind of optimization and how it fits into the large process is available in the chapter on The Compilation Pipeline. Nonetheless, it's fast, produces not-too-huge output code, and is what you typically use for iterative development in the browser.
 
   @sect{The fullOptJS Command}
-    @hl.bash
+    @hl.sh
       > fullOptJS
     @p
-      @code{fullOptJS} is another command that we've seen before: it performs an aggressive, somewhat slower @sect.ref{Full Optimization} pass on the generated Javascript. This results in a much smaller executable Javascript blob, which you can also load via a @hl.html{<script>} tag and run.
+      @code{fullOptJS} is another command that we've seen before: it performs an aggressive, somewhat slower @sect.ref{Full Optimization} pass on the generated Javascript. This results in a much smaller executable Javascript blob, which you can also load via a @hl.xml{<script>} tag and run.
     @p
       Again, I won't go into much details, as exactly what this optimization does is described in the chapter on the Compilation Pipeline. This command is somewhat too-slow to be running during iterative development, and is instead typically used just before deployment to minimize the size of the file your users have to download.
 
   @sect{The run Command}
-    @hl.bash
+    @hl.sh
       > run
     @p
       Here's something you haven't seen before: the @code{run} command gives you the ability to run a Scala.js program from the command line. This prints its output to standard output (i.e. the terminal). Like Scala-JVM, you need a @code{main} method to run to kick off your program. Unlike Scala-JVM, the main method is marked on an @hl.scala{object} which @hl.scala{extends scala.scalajs.js.JSApp}, e.g.
@@ -113,7 +113,7 @@
     @p
       Running @code{sbt run} with the above Scala.js code will print out
 
-    @hl.bash
+    @hl.sh
       Hello World!
       In Scala.js, (1.0).toString is 1!
 
@@ -129,7 +129,7 @@
     @p
       You can enable a different stage, @code{FastOptStage} or @code{FullOptStage}, with the following sbt command:
 
-    @hl.bash
+    @hl.sh
       > set scalaJSStage in Global := FastOptStage
 
     @p
@@ -145,7 +145,7 @@
       Typically, the best way to get started is using Rhino, since it's setup-free, and setting up Node.js or PhantomJS later as necessary. The next two sections elaborate on the differences between these ways of running your code. Check out the later sections on @sect.ref{Headless Runtimes} and @sect.ref{Stages} to learn more about the other settings and why you would want to use them.
 
   @sect{The test Command}
-    @hl.bash
+    @hl.sh
       > test
 
     @p

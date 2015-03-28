@@ -78,7 +78,7 @@
       Scalatags requires that anything you want to embed in a Scalatags fragment be implicitly convertible to @hl.scala{Frag}; here we are providing one for any Scala.Rx @hl.scala{Rx[T]}s, as long as the @hl.scala{T} provided is itself convertible to a @hl.scala{Frag}. We call @hl.scala{r().render} to extract the "current" value of the @hl.scala{Rx}, and then set up an @hl.scala{Obs} that watches the @hl.scala{Rx}, replacing the previous value with the current one every time its value changes.
 
     @p
-      Now that the set-up is out of the way, let's consider a simple HTML widget that lets you enter text in a @hl.html{<textarea>}, and keeps track of the number of words, characters, and counts how long each word is.
+      Now that the set-up is out of the way, let's consider a simple HTML widget that lets you enter text in a @hl.xml{<textarea>}, and keeps track of the number of words, characters, and counts how long each word is.
 
     @split
       @more

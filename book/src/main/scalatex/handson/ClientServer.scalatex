@@ -28,7 +28,7 @@
   @p
     Getting started with client-server integration, let's go with the simplest configuration possible: a Spray server and a Scala.js client. Most of the other web-frameworks (@lnk.misc.Play, @lnk.misc.Scalatra, etc.) will have more complex configurations, but the basic mechanism of wiring up Scala.js to your web framework will be the same. Just like our project in @sect.ref{Cross Publishing Libraries}, our project will look like this:
 
-  @hl.bash
+  @hl.sh
     $ tree
     .
     ├── build.sbt
@@ -68,7 +68,7 @@
   @p
     This is a typical @lnk.github.Scalatags HTML snippet. Note that since we're serving it directly from the server in Scala code, we do not need to leave a @code{.html} file somewhere on the filesystem! We can declare all HTML, including the skeleton of the page, in Scalatags. Otherwise it's the same as what we saw in earlier chapters: A simple HTML page which includes a script tag to run our Scala.js application.
   @p
-    Lastly, we'll set up the Scala.js main method, which we are calling in the @hl.html{<script>} tag above to kick off the client-side application.
+    Lastly, we'll set up the Scala.js main method, which we are calling in the @hl.xml{<script>} tag above to kick off the client-side application.
 
   @hl.ref(client/"Client.scala")
 

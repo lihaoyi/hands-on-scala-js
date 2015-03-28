@@ -13,20 +13,6 @@ case class pureTable(header: Frag*){
     )
   }
 }
-object sect extends scalatex.site.Section{
-  var indent = 0
-
-  override val headers: Seq[Header] = Seq(
-    Header(
-      (l, h, s) => div(cls:="header")(h1(h, l), br, h2(s)),
-      f => div(cls:="content", f)
-    ),
-    Header(
-      (l, h, s) => div(cls:="header")(h1(id:=munge(h), h, l), br)),
-    h1, h2, h3, h4, h5, h6
-  )
-}
-
 
 object lnk{
   val usedLinks = mutable.Set.empty[String]

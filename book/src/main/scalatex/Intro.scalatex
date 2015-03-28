@@ -15,7 +15,7 @@
       }
 
   @half
-    @hl.javascript
+    @hl.js
       ScalaJS.c.LMain$.prototype.main__V = (function() {
         var x = 0;
         while ((x < 10)) {
@@ -111,7 +111,7 @@
     @p
       At a first approximation, Scala.js provides you a sane language to do development in the web browser. This saves you from an endless stream of Javascript warts like this one:
 
-    @hl.javascript
+    @hl.js
       javascript> ["10", "10", "10", "10"].map(parseInt)
       [10, NaN, 2, 3] // WTF
 

@@ -8,7 +8,7 @@
 @sect{Available Java APIs}
 
   @ul
-    @for(data <- BookData.javaAPIs)
+    @for(data <- book.BookData.javaAPIs)
       @li
         @a(data._1, href:=data._2)
 

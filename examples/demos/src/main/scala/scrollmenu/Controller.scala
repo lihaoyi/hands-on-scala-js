@@ -74,7 +74,7 @@ object Controller{
       menuLink.classList.toggle("active")
     }
 
-    dom.document.body.onscroll = (e: dom.UIEvent) => updateScroll()
+    dom.addEventListener("scroll", (e: dom.UIEvent) => updateScroll())
     updateScroll()
 
   }

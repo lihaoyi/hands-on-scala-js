@@ -19,10 +19,10 @@ lazy val book = Project(
   base = file("book")
 ).settings(sharedSettings ++ scalatex.SbtPlugin.projectSettings:_*).settings(
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %% "scalatags" % "0.4.6",
-    "com.lihaoyi" %%% "upickle" % "0.2.7",
-    "com.lihaoyi" %% "scalatex-site" % "0.1.1",
-    "com.lihaoyi" %% "ammonite" % "0.1.0"
+    "com.lihaoyi" %% "scalatex-site" % "0.2.1",
+    "com.lihaoyi" %% "scalatags" % "0.5.1",
+    "com.lihaoyi" %% "upickle" % "0.2.7",
+    "com.lihaoyi" %% "ammonite-ops" % "0.2.4"
   ),
   (resources in Compile) += (fullOptJS in (demos, Compile)).value.data,
 

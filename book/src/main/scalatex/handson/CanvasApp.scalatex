@@ -35,7 +35,7 @@
       @hl.ref(canvasapp/"ScratchPad.scala", "/*code*/")
 
     @less
-      @BookData.example(canvas, "canvasapp.ScratchPad().main")
+      @book.BookData.example(canvas, "canvasapp.ScratchPad().main")
 
   @p
     This code sets up the @lnk.dom.mousedown and @lnk.dom.mouseup events to keep track of whether or not the mouse has currently been clicked. It then draws black squares any time you move the mouse while the button is down. This lets you basically click-and-drag to draw pictures on the canvas. Try it out!
@@ -69,7 +69,7 @@
       @hl.ref(canvasapp/"Clock.scala", "/*code*/")
 
     @less
-      @BookData.example(canvas, "canvasapp.Clock().main")
+      @book.BookData.example(canvas, "canvasapp.Clock().main")
 
   @p
     As you can see, we're using more @lnk("Canvas APIs", "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D"), in this case dealing with rendering text on the canvas. Another thing we're using is the Javascript @lnk("Date", "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date") class, in Scala.js under the full name @hl.scala{scala.scalajs.js.Date}, here imported as @hl.scala{js.Date}. Again, click on the link @i(cls:="fa fa-link ") icon to view the full-code if you're having trouble here.
@@ -151,7 +151,7 @@
       At almost 100 lines of code, this is quite a meaty example! Nonetheless, when all is said and done, you will find that the example actually works! Try it out!
 
     @div
-      @BookData.example(canvas, "canvasapp.FlappyLine().main")
+      @book.BookData.example(canvas, "canvasapp.FlappyLine().main")
 
 @sect{Canvas Recap}
   @p
@@ -180,9 +180,9 @@
       @li
         @hl.scala{renderer} is a Javascript @lnk.dom.CanvasRenderingContext2D, and all the methods on it are Javascript method calls directly on the Javascript object
       @li
-        @hl.scala{frame} is a Scala @hl.scala{Int}, and obeys Scala semantics, though it is implemented as a Javascript @hl.javascript{Number} under the hood.
+        @hl.scala{frame} is a Scala @hl.scala{Int}, and obeys Scala semantics, though it is implemented as a Javascript @hl.js{Number} under the hood.
       @li
-        @hl.scala{playerY} and @hl.scala{playerV} are Scala @hl.scala{Double}s, implemented directly as Javascript @hl.javascript{Number}s
+        @hl.scala{playerY} and @hl.scala{playerV} are Scala @hl.scala{Double}s, implemented directly as Javascript @hl.js{Number}s
 
     @p
       This reveals something pretty interesting about Scala.js: even though Scala at-first-glance is a very different language from Javascript, the interoperation with Javascript is so seamless that you can't even tell from the code which values/methods are defined in Scala and which values/methods come from Javascript!

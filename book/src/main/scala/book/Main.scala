@@ -7,12 +7,14 @@ import ammonite.ops.Path
 
 import scalatags.Text.{attrs, tags2, all}
 import scalatags.Text.all._
-import scalatex.site.Section.Tree
-import scalatex.site.Site
-import ammonite.all.{rel => _, _}
+import scalatex.site
+
+import scalatex.site.{Tree, Site}
+import ammonite.ops._
 
 object Main {
-  val wd = processWorkingDir
+  val wd = cwd
+
   def main(args: Array[String]): Unit = {
     val googleAnalytics =
       """
@@ -25,12 +27,15 @@ object Main {
         |  ga('send', 'pageview');
       """.stripMargin
 
-    def data = upickle.write(sect.structure)
+
 
     val s = new Site {
-      def content = Map("index.html" -> Index())
+      def content = Map("index.html" -> scalatex.Index())
 
-      override def autoResources = super.autoResources ++ Seq(
+      override def autoResources =
+        super.autoResources ++
+        BookData.hl.autoResources ++
+        site.Sidebar.autoResources ++ Seq(
         root/"META-INF"/'resources/'webjars/'pure/"0.5.0"/"grids-responsive-min.css",
         root/'css/"side-menu.css",
         root/"example-opt.js",
@@ -56,25 +61,9 @@ object Main {
         script(raw(googleAnalytics))
       )
       override def bodyFrag(frag: Frag) = body(
-
-        div(id:="layout")(
-          a(href:="#menu", id:="menuLink", cls:="menu-link")(
-            span
-          ),
-          div(id:="menu")
-
-        ),
-        div(
-          id:="main",
-          div(
-            id:="main-box",
-            cls:="scalatex-content",
-            maxWidth:="840px",
-            lineHeight:="1.6em",
-            frag
-          )
-        ),
-        onload:=s"scrollmenu.Controller().main($data)"
+        super.bodyFrag(frag),
+        site.Sidebar.snippet(BookData.sect.structure.children),
+        scalatex.site.Highlighter.snippet
       )
     }
 
@@ -85,7 +74,7 @@ object Main {
       def rec(n: Tree[String]): Seq[String] = {
         n.value +: n.children.flatMap(rec)
       }
-      rec(sect.structure).toSet
+      rec(BookData.sect.structure).toSet
     }
     val dupes = allNames.groupBy(x => x)
                         .values
@@ -95,7 +84,7 @@ object Main {
 
     assert(dupes.size == 0, s"Duplicate names: $dupes")
 
-    val dangling = sect.usedRefs -- allNames
+    val dangling = BookData.sect.usedRefs -- allNames
 
     assert(dangling.size == 0, s"Dangling Refs: $dangling")
 

@@ -96,7 +96,7 @@
   @sect{Fast Optimization}
     @p
       Without optimizations, the actual JavaScript code emitted for the above snippet would look like this:
-    @hl.javascript
+    @hl.js
       ScalaJS.c.Lexample_ScalaJSExample$.prototype.main__V = (function() {
         var x = 0;
         while ((x < 999)) {
@@ -140,7 +140,7 @@
     @p
       Applying these optimizations on our examples results in the following JavaScript code instead, which is what you typically execute in fastOpt stage:
 
-    @hl.javascript
+    @hl.js
       ScalaJS.c.Lexample_ScalaJSExample$.prototype.main__V = (function() {
         var x = 0;
         while ((x < 999)) {
@@ -163,7 +163,7 @@
       While the input for this phase is the aggregate @code{.sjsir} files from your project and all your dependencies, the output is executable Javascript. This phase usually runs in less than a second, outputs a Javascript blob in the 400kb-1mb range, and is suitable for repeated use during development. This corresponds to the @code{fastOptJS} command in SBT.
 
   @sect{Full Optimization}
-    @hl.javascript
+    @hl.js
       Fd.prototype.main = function() {
         for(var a = 0;999 > a;) {
           var b = (new D).j("2");
@@ -179,7 +179,7 @@
       The @lnk("Google Closure Compiler", "https://developers.google.com/closure/compiler/") (GCC) is a set of tools that work with Javascript. It has multiple @lnk("levels of optimization", "https://developers.google.com/closure/compiler/docs/compilation_levels"), doing everything from basic whitespace-removal to heavy optimization. It is an old, relatively mature project that is relied on both inside and outside Google to optimize the delivery of Javascript to the browser.
 
     @p
-      Scala.js uses GCC in its most aggressive mode: @lnk("Advanced Optimization", "https://developers.google.com/closure/compiler/docs/api-tutorial3"). GCC spits out a compressed, minified version of the Javascript (above) that @sect.ref{Fast Optimization} spits out: e.g. in the example above, all identifiers have been renamed to short strings, the @hl.javascript{while}-loop has been replaced by a @hl.javascript{for}-loop, and the @hl.scala{println} function has been inlined.
+      Scala.js uses GCC in its most aggressive mode: @lnk("Advanced Optimization", "https://developers.google.com/closure/compiler/docs/api-tutorial3"). GCC spits out a compressed, minified version of the Javascript (above) that @sect.ref{Fast Optimization} spits out: e.g. in the example above, all identifiers have been renamed to short strings, the @hl.js{while}-loop has been replaced by a @hl.js{for}-loop, and the @hl.scala{println} function has been inlined.
 
     @p
       As described in the linked documentation, GCC performs optimizations such as:

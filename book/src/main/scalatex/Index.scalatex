@@ -12,7 +12,7 @@ is a set of detailed expositions on various parts of the Scala.js platform. Noth
       @hl.ref(wd/'examples/'demos/'src/'main/'scala/"Splash.scala", "var x")
 
     @less
-      @BookData.example(canvas, "Splash().main")
+      @example(canvas, "Splash().main")
 
   @p
     @lnk("Scala.js", "http://www.scala-js.org/") is a compiler that compiles Scala source code to equivalent Javascript code. That lets you write Scala code that you can run in a web browser, or other environments (Chrome plugins, Node.js, etc.) where Javascript is supported. This book is an introduction to Scala.js, which aims to get you from knowing-nothing about it to being relatively proficient.

@@ -21,7 +21,7 @@
 @p
   The quickest way to get started with Scala.js is to @code{git clone} @lnk("workbench-example-app", "https://github.com/lihaoyi/workbench-example-app"), go into the repository root, and run @code{sbt ~fastOptJS}
 
-@hl.bash
+@hl.sh
   git clone https://github.com/lihaoyi/workbench-example-app
   cd workbench-example-app
   sbt ~fastOptJS
@@ -152,7 +152,7 @@
   @hl.ref(example/"ScalaJSExample.scala", "dom.setInterval")
 
   @p
-    Now this is the call that actually does the useful work. All this method does is call @hl.scala{dom.setInterval}, which tells the browser to run the @hl.scala{run} method every 50 milliseconds. As mentioned earlier, the @hl.scala{dom.*} methods are simply facades to their native Javascript equivalents, and @hl.scala{dom.setInterval} is @lnk("no different", "https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers.setInterval"). Note how you can pass a Scala lambda to @hl.scala{setInterval} to have it called by the browser, where in Javascript you'd need to pass a Javascript @hl.javascript{function(){...}}
+    Now this is the call that actually does the useful work. All this method does is call @hl.scala{dom.setInterval}, which tells the browser to run the @hl.scala{run} method every 50 milliseconds. As mentioned earlier, the @hl.scala{dom.*} methods are simply facades to their native Javascript equivalents, and @hl.scala{dom.setInterval} is @lnk("no different", "https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers.setInterval"). Note how you can pass a Scala lambda to @hl.scala{setInterval} to have it called by the browser, where in Javascript you'd need to pass a Javascript @hl.js{function(){...}}
 
 @sect{The Project Code}
 
@@ -185,10 +185,10 @@
     @hl.ref(cloneRoot/"workbench-example-app"/'src/'main/'resources/"index-dev.html")
 
     @p
-      This is the HTML page which our toy app lives in, and the same page that we have so far been using to view the app in the browser. To anyone who has used HTML, most of it is probably familiar. Things of note are the @hl.html{<script>} tags: @hl.scala{"../example-fastopt.js"} Is the executable blob spat out by the compiler, which we need to include in the HTML page for anything to happen. This is where the results of your compiled Scala code appear. @hl.scala{"workbench.js"} is the client for the Workbench plugin that connects to SBT, reloads the browser and forwards logspam to the browser console.
+      This is the HTML page which our toy app lives in, and the same page that we have so far been using to view the app in the browser. To anyone who has used HTML, most of it is probably familiar. Things of note are the @hl.xml{<script>} tags: @hl.scala{"../example-fastopt.js"} Is the executable blob spat out by the compiler, which we need to include in the HTML page for anything to happen. This is where the results of your compiled Scala code appear. @hl.scala{"workbench.js"} is the client for the Workbench plugin that connects to SBT, reloads the browser and forwards logspam to the browser console.
 
     @p
-      The @hl.scala{example.ScalaJSExample().main()} call is what kicks off the Scala.js application and starts its execution. Scala.js follows Scala semantics in that @hl.scala{object}s are evaluated lazily, with no top-level code allowed. This is in contrast to Javascript, where you can include top-level statements and object-literals in your code which execute immediately. In Scala.js, nothing happens when @code{../example-fastopt.js} is imported! We have to call the main-method first. In this case, we're passing the canvas object (attained using @hl.javascript{getElementById}) to it so it knows where to do its thing.
+      The @hl.scala{example.ScalaJSExample().main()} call is what kicks off the Scala.js application and starts its execution. Scala.js follows Scala semantics in that @hl.scala{object}s are evaluated lazily, with no top-level code allowed. This is in contrast to Javascript, where you can include top-level statements and object-literals in your code which execute immediately. In Scala.js, nothing happens when @code{../example-fastopt.js} is imported! We have to call the main-method first. In this case, we're passing the canvas object (attained using @hl.js{getElementById}) to it so it knows where to do its thing.
 
 
   @p
@@ -201,7 +201,7 @@
   @p
     The last thing that we'll do with our toy application is to publish it. If you look in the @code{target/scala-2.11} folder, you'll see the output of everything we've done so far:
 
-  @hl.bash
+  @hl.sh
     target/scala-2.11
     ├── classes
     │   ├── JS_DEPENDENCIES
@@ -226,14 +226,14 @@
   @p
     These two files can be extracted and published as-is: you can put them on @lnk("Github-Pages", "https://pages.github.com/"), @lnk("Amazon Web Services", "http://docs.aws.amazon.com/gettingstarted/latest/swh/website-hosting-intro.html"), or a hundred other places. However, one thing of note is the fact that the generated Javascript file is quite large:
 
-  @hl.bash
+  @hl.sh
     haoyi-mbp:temp haoyi$ du -h target/scala-2.11/example-fastopt.js
     656K  target/scala-2.11/example-fastopt.js
 
   @p
     656 Kilobytes for a hello world app! That is clearly too large. If you examine the contents of the file, you'll see that your code has been translated into something like this:
 
-  @hl.javascript
+  @hl.js
     var v1 = i;
     if (((count$1.elem$1 % 3000) === 0)) {
       ScalaJS.m.Lexample_ScalaJSExample$().example$ScalaJSExample$$clear$1__Lorg_scalajs_dom_CanvasRenderingContext2D__V(ctx$1)
@@ -247,20 +247,20 @@
     var g = ((((255 - ScalaJS.as.Lexample_Point(p$1.elem$1).x$1) | 0) * height) | 0);
 
   @p
-    As you can see, this code is still very verbose, with lots of unnecessarily long identifiers such as @hl.javascript{Lexample_ScalaJSExample$} in it. This is because we've only performed the @sect.ref{Fast Optimization} on this file, to try and keep the time taken to edit -> compile while developing reasonably short.
+    As you can see, this code is still very verbose, with lots of unnecessarily long identifiers such as @hl.js{Lexample_ScalaJSExample$} in it. This is because we've only performed the @sect.ref{Fast Optimization} on this file, to try and keep the time taken to edit -> compile while developing reasonably short.
 
   @sect{Optimization}
     @p
       If we're planning on publishing the app for real, we can run the @sect.ref{Full Optimization}. This takes several seconds longer than the @sect.ref{Fast Optimization}, but results in a significantly smaller and leaner output file @code{example-opt.js}.
 
-    @hl.bash
+    @hl.sh
       haoyi-mbp:temp haoyi$ du -h target/scala-2.11/example-opt.js
       104K  target/scala-2.11/example-opt.js
 
     @p
       104 Kilobytes! Better. Not great, though! In general, Scala.js does not produce tiny executables, although the output size of the compiled executables is dropping all the time. If you look inside that file, you'll see all of the long identifiers have been replaced by short ones by the @lnk("Google Closure Compiler", "https://developers.google.com/closure/compiler/").
 
-    @hl.javascript("""
+    @hl.js("""
       y=fb(gb((new F).Ya(["rgb(",", ",", ",")"])),(new F).Ya([(255-c.l.Db|0)*y|0,c.l.Db*y|0,c.l.Eb]));a.fillStyle=y;a.fillRect(c.l.Db,c.l.Eb,1,1);w=1+w|0}}}(a,b,c,e),50)}Xa.prototype.main=function(a){Ya(a)};Xa.prototype.a=new x({$g:0},!1,"example.ScalaJSExample$",B,{$g:1,b:1});var hb=void 0;function bb(){hb||(hb=(new Xa).c());return hb}ba.example=ba.example||{};ba.example.ScalaJSExample=bb;function Da(){this.Pb=null}Da.prototype=new A;
     """)
 

@@ -134,19 +134,19 @@
     @hl.scala
       /*JVM*/
       15 / 4              // 3
-    @hl.javascript
+    @hl.js
       /*JS*/
       15 / 4              // 3.25
     @p
-      On the JVM, integer division is a primitive, and dividing @hl.scala{15 / 4} gives @hl.scala{3}. However, in Javascript, it gives @hl.javascript{3.25}, since all numbers of double-precision floating points.
+      On the JVM, integer division is a primitive, and dividing @hl.scala{15 / 4} gives @hl.scala{3}. However, in Javascript, it gives @hl.js{3.25}, since all numbers of double-precision floating points.
 
     @p
-      Scala.js works around this in the general case by adding a @hl.javascript{| 0} to the translation, e.g.
+      Scala.js works around this in the general case by adding a @hl.js{| 0} to the translation, e.g.
 
     @hl.scala
       /*JVM*/
       15 / 4              // 3
-    @hl.javascript
+    @hl.js
       /*JS*/
       (15 / 4) | 0        // 3
 
@@ -156,19 +156,19 @@
     @hl.scala
       /*JVM*/
       15 / 0              // ArithmeticException
-    @hl.javascript
+    @hl.js
       /*JS*/
       15 / 0              // Infinity
       (15 / 0) | 0        // 0
 
     @p
-      On the JVM, the JVM is kind enough to throw an exception for you. However, in Javascript, the integer simply wraps around to @hl.javascript{Infinity}, which then gets truncated down to zero.
+      On the JVM, the JVM is kind enough to throw an exception for you. However, in Javascript, the integer simply wraps around to @hl.js{Infinity}, which then gets truncated down to zero.
     @p
       So that's the current behavior of integers in Scala.js. One may ask: can we fix it? And the answer is, we can:
     @hl.scala
       /*JVM*/
       1 / 0               // ArithmeticException
-    @hl.javascript
+    @hl.js
       /*JS*/
       function intDivide(x, y){
         var z = x / y
@@ -207,7 +207,7 @@
     @p
       Scala.js compiles to Javascript source code, while Scala-JVM compiles to Java bytecode. Java bytecode is a binary format and thus somewhat optimized for size, while Javascript is textual and is designed to be easy to read and write by hand.
     @p
-      What does these mean, concretely? This means that a symbol marking something, e.g. the start of a function, is often a single byte in Java bytecode. Even more, it may not have any delimiter at all, instead the meaning of the binary data being inferred from its position in the file! On the other hand, in Javascript, declaring a function takes a long-and-verbose @hl.javascript{function} keyword, which together with peripheral punctuation (@code{.}, @code{ = }, etc.) often adds up to tens of bytes to express a single idea.
+      What does these mean, concretely? This means that a symbol marking something, e.g. the start of a function, is often a single byte in Java bytecode. Even more, it may not have any delimiter at all, instead the meaning of the binary data being inferred from its position in the file! On the other hand, in Javascript, declaring a function takes a long-and-verbose @hl.js{function} keyword, which together with peripheral punctuation (@code{.}, @code{ = }, etc.) often adds up to tens of bytes to express a single idea.
     @p
       What does this mean concretely? This means that expressing the same meaning in Javascript usually takes more "raw code" than expressing the same meaning in Java bytecode. Even though Java bytecode is relatively verbose for a binary format, it still is significantly more concise the Javascript, and it shows: the Scala standard library weighs in at a cool 6mb on Scala-JVM, while it weighs 20mb on Scala.js.
     @p

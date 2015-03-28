@@ -11,7 +11,7 @@
   @p
     As always, we will start with an example: in this case a toy library whose sole purpose in life is to take a series of timestamps (milliseconds UTC) and format them into a single, newline-delimited string. This is what the project layout looks like:
 
-  @hl.bash
+  @hl.sh
     $ tree
     .
     ├── build.sbt
@@ -59,13 +59,13 @@
         @hl.ref(simple/'library/'jvm/'src/'main/'scala/'simple/"Platform.scala")
 
     @p
-      In the @code{js/} version, we are using the Javascript @hl.javascript{Date} object to take the millis and do what we want. In the @code{jvm/} version, we instead use @hl.scala{java.text.SimpleDateFormat} with a custom formatter (The syntax is defined @lnk("here", "http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html")).
+      In the @code{js/} version, we are using the Javascript @hl.js{Date} object to take the millis and do what we want. In the @code{jvm/} version, we instead use @hl.scala{java.text.SimpleDateFormat} with a custom formatter (The syntax is defined @lnk("here", "http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html")).
 
     @p
       Again, you can put as much platform-specific logic in these files as you want, to account for differences in the available APIs. Maybe you want to use @lnk.dom.JSONparse for parsing JSON blobs in @code{js/}, but @lnk("Jackson", "http://jackson.codehaus.org/") or @lnk("GSON", "https://code.google.com/p/google-gson/") for parsing them in @code{jvm/}.
 
   @sect{Running the Module}
-    @hl.bash
+    @hl.sh
       > ;libraryJS/test ;libraryJVM/test
       [info] Compiling 1 Scala source to library/js/target/scala-2.10/test-classes...
       [info] ---------------------------Results---------------------------

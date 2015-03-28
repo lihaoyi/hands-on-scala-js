@@ -3,15 +3,18 @@ package book
 import java.io.File
 
 import acyclic.file
-import ammonite.all._
+import ammonite.ops._
 import ammonite.ops.Path
 import scalatags.Text.TypedTag
 import scalatags.Text.all._
+import scalatex.site
+import scalatex.site.Highlighter
+
 object BookData {
-  val wd = processWorkingDir
+  val wd = cwd
   val cloneRoot = Path(System.getProperty("clone.root"))
-
-
+  val lnk = book.lnk
+  val pureTable = book.pureTable
   lazy val javaAPIs = {
     import java.io.File
 
@@ -48,23 +51,13 @@ object BookData {
   def less = div(cls:="pure-u-1 pure-u-md-11-24")
   def half = div(cls:="pure-u-1 pure-u-md-1-2")
 
-
-  val hl = new scalatex.site.Highlighter {
-    override val pathMappings = Seq(
+  lazy val hl = new Highlighter {
+    override def pathMappings = Seq(
       cloneRoot/"scala-js" -> "https://github.com/scala-js/scala-js/blob/master",
       cloneRoot/"workbench-example-app" -> "https://github.com/lihaoyi/workbench-example-app/blob/master",
       wd -> "https://github.com/lihaoyi/hands-on-scala-js/blob/master"
     )
-    override val suffixMappings = Map(
-      "scala" -> "scala",
-      "sbt" -> "scala",
-      "js" -> "javascript"
-    )
-    def scala(s: String) = this.highlight(s, "scala")
-    def bash(s: String) = this.highlight(s, "bash")
-    def html(s: String) = this.highlight(s, "html")
-    def xml(s: String) = this.highlight(s, "xml")
-    def diff(s: String) = this.highlight(s, "diff")
-    def javascript(s: String) = this.highlight(s, "javascript")
   }
+
+  val sect = new site.Section{}
 }
