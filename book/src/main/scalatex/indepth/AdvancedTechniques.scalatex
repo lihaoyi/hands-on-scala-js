@@ -24,9 +24,9 @@
 
   @ul
     @li
-      @b{Discrete}: Handling of first-class event-streams like in @link("RxJS", "https://github.com/Reactive-Extensions/RxJS")
+      @b{Discrete}: Handling of first-class event-streams like in @lnk("RxJS", "https://github.com/Reactive-Extensions/RxJS")
     @li
-      @b{Continuous}: Handling of first-class signals, like in @link("Elm", "http://elm-lang.org/learn/What-is-FRP.elm")
+      @b{Continuous}: Handling of first-class signals, like in @lnk("Elm", "http://elm-lang.org/learn/What-is-FRP.elm")
 
   @sect{Why FRP}
     @p
