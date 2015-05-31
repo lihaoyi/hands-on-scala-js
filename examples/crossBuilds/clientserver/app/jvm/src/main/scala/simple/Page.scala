@@ -7,7 +7,7 @@ object Page{
   val skeleton =
     html(
       head(
-        script(src:="/appjs-fastopt.js"),
+        script(src:="/app-fastopt.js"),
         link(
           rel:="stylesheet",
           href:="https://cdnjs.cloudflare.com/ajax/libs/pure/0.5.0/pure-min.css"
