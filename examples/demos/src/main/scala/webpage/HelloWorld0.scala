@@ -12,7 +12,7 @@ object HelloWorld0 extends{
       <h1>Hello World!</h1>
       <p>
         The quick brown <b>$f</b>
-        jumps over the lazy <i>$d</b>
+        jumps over the lazy <i>$d</i>
       </p>
     </div>
     """
