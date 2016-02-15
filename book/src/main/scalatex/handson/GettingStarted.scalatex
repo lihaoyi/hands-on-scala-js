@@ -112,10 +112,10 @@
   @hl.ref(example/"ScalaJSExample.scala", "@JSExport", "val ctx")
 
   @p
-    This @hl.scala("@JSExport") annotation is used to tell Scala.js that you want this method to be visible and callable from Javascript. By default, Scala.js does @sect.ref("Fast Optimization", "dead code elimination") and removes any methods or classes which are not used. This is done to keep the compiled executables a reasonable size, since most projects use only a small fraction of e.g. the standard library. @hl.scala("@JSExport") is used to tell Scala.js that the @hl.scala{ScalaJSExample} object and its @hl.scala{def main} method are entry points to the program. Even if they aren't called anywhere internally, they are called externally by Javascript that the Scala.js compiler is not aware of, and should not be removed. In this case, we are going to call this method from Javascript to start the Scala.js program.
+    This @hl.scala("@JSExport") annotation is used to tell Scala.js that you want this method to be visible and callable from JavaScript. By default, Scala.js does @sect.ref("Fast Optimization", "dead code elimination") and removes any methods or classes which are not used. This is done to keep the compiled executables a reasonable size, since most projects use only a small fraction of e.g. the standard library. @hl.scala("@JSExport") is used to tell Scala.js that the @hl.scala{ScalaJSExample} object and its @hl.scala{def main} method are entry points to the program. Even if they aren't called anywhere internally, they are called externally by JavaScript that the Scala.js compiler is not aware of, and should not be removed. In this case, we are going to call this method from JavaScript to start the Scala.js program.
 
   @p
-    Apart from this annotation, @hl.scala{ScalaJSExample} is just a normal Scala @hl.scala{object}, and behaves like one in every way. Note that the main-method in this case takes a @lnk.dom.html.Canvas: your exported methods can have any signature, with arbitrary arity or types for parameters or the return value. This is in contrast to the main method on the JVM which always takes an @hl.scala{Array[String]} and returns @hl.scala{Unit}. In fact, there's nothing special about this method at all! It's like any other exported method, we just happen to attribute it the "main" entry point. It is entirely possible to define multiple exported classes and methods, and build a "library" using Scala.js of methods that are intended for external Javascript to use.
+    Apart from this annotation, @hl.scala{ScalaJSExample} is just a normal Scala @hl.scala{object}, and behaves like one in every way. Note that the main-method in this case takes a @lnk.dom.html.Canvas: your exported methods can have any signature, with arbitrary arity or types for parameters or the return value. This is in contrast to the main method on the JVM which always takes an @hl.scala{Array[String]} and returns @hl.scala{Unit}. In fact, there's nothing special about this method at all! It's like any other exported method, we just happen to attribute it the "main" entry point. It is entirely possible to define multiple exported classes and methods, and build a "library" using Scala.js of methods that are intended for external JavaScript to use.
 
   @hl.ref(example/"ScalaJSExample.scala", "val ctx", "var count")
 
@@ -152,7 +152,7 @@
   @hl.ref(example/"ScalaJSExample.scala", "dom.setInterval")
 
   @p
-    Now this is the call that actually does the useful work. All this method does is call @hl.scala{dom.setInterval}, which tells the browser to run the @hl.scala{run} method every 50 milliseconds. As mentioned earlier, the @hl.scala{dom.*} methods are simply facades to their native Javascript equivalents, and @hl.scala{dom.setInterval} is @lnk("no different", "https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers.setInterval"). Note how you can pass a Scala lambda to @hl.scala{setInterval} to have it called by the browser, where in Javascript you'd need to pass a Javascript @hl.js{function(){...}}
+    Now this is the call that actually does the useful work. All this method does is call @hl.scala{dom.setInterval}, which tells the browser to run the @hl.scala{run} method every 50 milliseconds. As mentioned earlier, the @hl.scala{dom.*} methods are simply facades to their native JavaScript equivalents, and @hl.scala{dom.setInterval} is @lnk("no different", "https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers.setInterval"). Note how you can pass a Scala lambda to @hl.scala{setInterval} to have it called by the browser, where in JavaScript you'd need to pass a JavaScript @hl.js{function(){...}}
 
 @sect{The Project Code}
 
@@ -163,10 +163,10 @@
     @hl.ref(cloneRoot/"workbench-example-app"/'project/"build.sbt")
 
     @p
-      This is the list of SBT plugins used by this small example application. There are two of them: the Scala.js plugin (which contains the Scala.js compiler and other things, e.g. tasks such as @code{fastOptJS}) and the @lnk("Workbench", "https://github.com/lihaoyi/workbench") plugin, which is used to provide the auto-reload-on-change behavior and the forwarding of SBT logspam to the browser console.
+      This is the list of SBT plugins used by this small example application. There are two of them: the Scala.js plugin (which contains the Scala.js compiler and other things, e.g. tasks such as @code{fastOptJS}) and the @lnk("Workbench", "https://github.com/lihaoyi/workbench") plugin, which is used to provide the auto-reload-on-change behavior and the forwarding of SBT log messages to the browser console.
 
     @p
-      Of the two, only the Scala.js plugin is really necessary. The Workbench plugin is a convenience that makes development easier. Without it you'd need to keep a terminal open to view the SBT logspam, and manually refresh the page when compilation finished. Not the end of the world.
+      Of the two, only the Scala.js plugin is really necessary. The Workbench plugin is a convenience that makes development easier. Without it you'd need to keep a terminal open to view the SBT log, and manually refresh the page when compilation finished. Not the end of the world.
 
 
   @sect{build.sbt}
@@ -185,17 +185,17 @@
     @hl.ref(cloneRoot/"workbench-example-app"/'src/'main/'resources/"index-dev.html")
 
     @p
-      This is the HTML page which our toy app lives in, and the same page that we have so far been using to view the app in the browser. To anyone who has used HTML, most of it is probably familiar. Things of note are the @hl.xml{<script>} tags: @hl.scala{"../example-fastopt.js"} Is the executable blob spat out by the compiler, which we need to include in the HTML page for anything to happen. This is where the results of your compiled Scala code appear. @hl.scala{"workbench.js"} is the client for the Workbench plugin that connects to SBT, reloads the browser and forwards logspam to the browser console.
+      This is the HTML page which our toy app lives in, and the same page that we have so far been using to view the app in the browser. To anyone who has used HTML, most of it is probably familiar. Things of note are the @hl.xml{<script>} tags: @hl.scala{"../example-fastopt.js"} Is the executable blob spat out by the compiler, which we need to include in the HTML page for anything to happen. This is where the results of your compiled Scala code appear. @hl.scala{"workbench.js"} is the client for the Workbench plugin that connects to SBT, reloads the browser and forwards log messages to the browser console.
 
     @p
-      The @hl.scala{example.ScalaJSExample().main()} call is what kicks off the Scala.js application and starts its execution. Scala.js follows Scala semantics in that @hl.scala{object}s are evaluated lazily, with no top-level code allowed. This is in contrast to Javascript, where you can include top-level statements and object-literals in your code which execute immediately. In Scala.js, nothing happens when @code{../example-fastopt.js} is imported! We have to call the main-method first. In this case, we're passing the canvas object (attained using @hl.js{getElementById}) to it so it knows where to do its thing.
+      The @hl.scala{example.ScalaJSExample().main()} call is what kicks off the Scala.js application and starts its execution. Scala.js follows Scala semantics in that @hl.scala{object}s are evaluated lazily, with no top-level code allowed. This is in contrast to JavaScript, where you can include top-level statements and object-literals in your code which execute immediately. In Scala.js, nothing happens when @code{../example-fastopt.js} is imported! We have to call the main-method first. In this case, we're passing the canvas object (attained using @hl.js{getElementById}) to it so it knows where to do its thing.
 
 
   @p
-    @hl.scala{document.getElementById} is the exact same API that's used in normal Javascript, as documented @lnk("here", "https://developer.mozilla.org/en-US/docs/Web/API/document.getElementById"). In fact, the entire @hl.scala{org.scalajs.dom} namespace (imported at the top of the file) comprises statically typed facades for the javascript APIs provided by the browser.
+    @hl.scala{document.getElementById} is the exact same API that's used in normal JavaScript, as documented @lnk("here", "https://developer.mozilla.org/en-US/docs/Web/API/document.getElementById"). In fact, the entire @hl.scala{org.scalajs.dom} namespace (imported at the top of the file) comprises statically typed facades for the javascript APIs provided by the browser.
 
     @p
-      Lastly, only @hl.scala("@JSExport")ed objects and methods can be called from Javascript. Also, although this example only exports the @hl.scala{main} method which is called once, there is nothing stopping you from exporting any number of objects and methods and calling them whenever you need to. In this way, you can easily make a Scala.js "library" which is available to external Javascript as an API.
+      Lastly, only @hl.scala("@JSExport")ed objects and methods can be called from JavaScript. Also, although this example only exports the @hl.scala{main} method which is called once, there is nothing stopping you from exporting any number of objects and methods and calling them whenever you need to. In this way, you can easily make a Scala.js "library" which is available to external JavaScript as an API.
 
 @sect{Publishing}
   @p
@@ -224,7 +224,7 @@
     All the @code{.class} and @code{.sjsir} files are the direct output of the Scala.js compiler, and aren't necessary to actually run the application. The only two files necessary are @code{index-dev.html} and @code{example-fastopt.js}. You may recognize @code{index-dev.html} as the file that we were navigating to in the browser earlier.
 
   @p
-    These two files can be extracted and published as-is: you can put them on @lnk("Github-Pages", "https://pages.github.com/"), @lnk("Amazon Web Services", "http://docs.aws.amazon.com/gettingstarted/latest/swh/website-hosting-intro.html"), or a hundred other places. However, one thing of note is the fact that the generated Javascript file is quite large:
+    These two files can be extracted and published as-is: you can put them on @lnk("Github-Pages", "https://pages.github.com/"), @lnk("Amazon Web Services", "http://docs.aws.amazon.com/gettingstarted/latest/swh/website-hosting-intro.html"), or a hundred other places. However, one thing of note is the fact that the generated JavaScript file is quite large:
 
   @hl.sh
     haoyi-mbp:temp haoyi$ du -h target/scala-2.11/example-fastopt.js
@@ -268,7 +268,7 @@
       These files are basically unreadable, but nonetheless behave the same as the @code{-fastopt} versions. Try it out by opening the @code{index-opt.html} file in the @code{target/scala-2.11/classes} directory with your browser: you should see the thing as when opening @code{index-dev}, except it will be pulling in the fully-optmized version of your application.
 
     @p
-      This means you can develop and debug using @code{fastOptJS}, and only spend the extra time (and increased debugging-difficulty) on the @code{fullOptJS} version just as you're going to publish it, with the assurance that although the code is much more compact, its behavior will not change.
+      This means you can develop and debug using @code{fastOptJS}, and only spend the extra time (and increased debugging difficulty) on the @code{fullOptJS} version just as you're going to publish it, with the assurance that although the code is much more compact, its behavior will not change.
 
   @sect{Blob Size}
     @p
@@ -320,7 +320,7 @@
 
   @ul
     @li
-      Javascript includes APIs for @lnk("getting the size of the window", "http://stackoverflow.com/questions/1248081/get-the-browser-viewport-dimensions-with-javascript") and @lnk("changing the size of a canvas", "http://stackoverflow.com/questions/9251480/set-canvas-size-using-javascript"). These Javascript APIs are available in Scala.js, and we've already used some of them in the course of this example. Try making the Canvas full-screen, and re-positioning the corners of the triangle to match.
+      JavaScript includes APIs for @lnk("getting the size of the window", "http://stackoverflow.com/questions/1248081/get-the-browser-viewport-dimensions-with-javascript") and @lnk("changing the size of a canvas", "http://stackoverflow.com/questions/9251480/set-canvas-size-using-javascript"). These JavaScript APIs are available in Scala.js, and we've already used some of them in the course of this example. Try making the Canvas full-screen, and re-positioning the corners of the triangle to match.
     @li
       The @lnk.dom.CanvasRenderingContext2D has a bunch of methods on it that can be used to draw things. Here we only draw 1x1 rectangles to put points on the canvas; try modifying the code to make it draw something else.
     @li

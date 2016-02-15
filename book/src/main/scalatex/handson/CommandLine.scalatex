@@ -22,7 +22,7 @@
   @li
     @code{fullOptJS}: aggregating our Scala.js IR and converting it to a smaller, faster @code{.js} executable.
   @li
-    @code{run}: run your compiled Scala.js code as Javascript in Rhino, Node.js or Phantom.js
+    @code{run}: run your compiled Scala.js code as JavaScript in Rhino, Node.js or Phantom.js
   @li
     @code{test}: run your compiled Scala.js code as a test suite in Rhino, Node.js or Phantom.js
 
@@ -60,7 +60,7 @@
           └── ScalaJSExample.class
 
     @p
-      However, unlike on Scala-JVM, you cannot directly run the @code{.sjsir} files spat out by the Scala.js compiler. These files are an Intermediate Representation, which needs to go through the next step in the compilation pipeline before being turned into Javascript.
+      However, unlike on Scala-JVM, you cannot directly run the @code{.sjsir} files spat out by the Scala.js compiler. These files are an Intermediate Representation, which needs to go through the next step in the compilation pipeline before being turned into JavaScript.
 
   @sect{The package Command}
     @hl.sh
@@ -76,7 +76,7 @@
       The purpose of this suffix is to link the compiled @code{.jar} file to the version of Scala.js used to compile it. This allows you to make sure that you don't accidentally depend on a version of a jar that is incompatible with your current version.
 
     @p
-      Again, unlike Scala-JVM, these @code{.jar} files are not directly executable: the @code{.sjsir} files need further processing to turn into runnable Javascript. Instead, their sole purpose is to hold bundles of @code{.sjsir} files to be published and depended-upon: they can be @code{publishLocal}ed to be used by other projects on your computer, or @code{publishSigned}ed to @lnk("Maven Central", "http://search.maven.org/"), just like any Scala-JVM project.
+      Again, unlike Scala-JVM, these @code{.jar} files are not directly executable: the @code{.sjsir} files need further processing to turn into runnable JavaScript. Instead, their sole purpose is to hold bundles of @code{.sjsir} files to be published and depended-upon: they can be @code{publishLocal}ed to be used by other projects on your computer, or @code{publishSigned}ed to @lnk("Maven Central", "http://search.maven.org/"), just like any Scala-JVM project.
 
   @sect{The fastOptJS Command}
     @hl.sh
@@ -85,13 +85,13 @@
       @code{fastOptJS} is a command we've used in earlier chapters. It basically runs the @sect.ref{Fast Optimization} stage of the compilation pipeline. This results in a moderately-sized executable, which you can then load in the browser with a @hl.xml{<script>} tag and run.
 
     @p
-      This is the first phase which actually results in an executable blob of Javascript. I won't go into much detail about this command: you've used it before, and more details about the particular kind of optimization and how it fits into the large process is available in the chapter on The Compilation Pipeline. Nonetheless, it's fast, produces not-too-huge output code, and is what you typically use for iterative development in the browser.
+      This is the first phase which actually results in an executable blob of JavaScript. I won't go into much detail about this command: you've used it before, and more details about the particular kind of optimization and how it fits into the large process is available in the chapter on The Compilation Pipeline. Nonetheless, it's fast, produces not-too-huge output code, and is what you typically use for iterative development in the browser.
 
   @sect{The fullOptJS Command}
     @hl.sh
       > fullOptJS
     @p
-      @code{fullOptJS} is another command that we've seen before: it performs an aggressive, somewhat slower @sect.ref{Full Optimization} pass on the generated Javascript. This results in a much smaller executable Javascript blob, which you can also load via a @hl.xml{<script>} tag and run.
+      @code{fullOptJS} is another command that we've seen before: it performs an aggressive, somewhat slower @sect.ref{Full Optimization} pass on the generated JavaScript. This results in a much smaller executable JavaScript blob, which you can also load via a @hl.xml{<script>} tag and run.
     @p
       Again, I won't go into much details, as exactly what this optimization does is described in the chapter on the Compilation Pipeline. This command is somewhat too-slow to be running during iterative development, and is instead typically used just before deployment to minimize the size of the file your users have to download.
 
@@ -121,7 +121,7 @@
       This exhibits the weirdness of @hl.scala{Double.toString} in Scala.js, which is one of the few ways in which @sect.ref("Deviations from Scala-JVM", "Scala.js deviates from Scala-JVM"). This also shows us we're really running on Scala.js: on Scala-JVM, @hl.scala{(1.0).toString} returns @hl.scala{"1.0"} rather than @hl.scala{"1"}!
 
     @p
-      One thing you may be wondering is: when you run a Scala.js program in the terminal, how does it execute the output Javascript? What about the DOM? and Ajax calls? Can it access the filesystem? The answer to all these questions is "it depends": it turns out there are multiple ways you can run Scala.js from the command-line, dictated by the @i{stage} and the @i{environment}.
+      One thing you may be wondering is: when you run a Scala.js program in the terminal, how does it execute the output JavaScript? What about the DOM? and Ajax calls? Can it access the filesystem? The answer to all these questions is "it depends": it turns out there are multiple ways you can run Scala.js from the command-line, dictated by the @i{stage} and the @i{environment}.
 
     @p
       By default, runs are done in the @code{PreLinkStage}, which uses the Rhino environment. With the sbt setting @hl.scala{jsDependencies += RuntimeDOM}, the Scala.js runner will automatically set up @b{env.js} in Rhino so that you have access to an emulation of the DOM API.
@@ -160,7 +160,7 @@
     @li
       @lnk.misc.Rhino is the default way of running Scala.js applications. The upside of using Rhino is that it is pure-Java, and doesn't need any additional binaries or installation. The downside of using Rhino is that it is slow: maybe a hundred times slower than the alternatives, making it not suitable for running long-running, compute-intensive programs.
     @li
-      @lnk.misc.Nodejs, a relatively new Javascript runtime based on Google's V8 Javascript engine, Node.js lets you run your Scala.js application from the command line much faster than in Rhino, with performance that matches that of modern browsers. However, you need to separately @lnk("install Node.js", "http://nodejs.org/download/") in order to use it. Node.js does not have DOM or browser-related functionality. You need to set the stage with @code{set scalaJSStage in Global := FastOptStage} to run using Node.js.
+      @lnk.misc.Nodejs, a relatively new JavaScript runtime based on Google's V8 JavaScript engine, Node.js lets you run your Scala.js application from the command line much faster than in Rhino, with performance that matches that of modern browsers. However, you need to separately @lnk("install Node.js", "http://nodejs.org/download/") in order to use it. Node.js does not have DOM or browser-related functionality. You need to set the stage with @code{set scalaJSStage in Global := FastOptStage} to run using Node.js.
     @li
       @lnk.misc.PhantomJS is a headless Webkit browser. This means that unlike Node.js, PhantomJS provides you with a full DOM and all its APIs to use in your tests, if you wish to e.g. test interactions with the HTML of the web page. On the other hand, it is somewhat slower than Node.js, though still much faster than Rhino. Like Node.js, it needs to be installed separately. You need to set the stage with @code{set scalaJSStage in Global := FastOptStage}, as well as setting the @hl.scala{jsDependencies += RuntimeDOM} flag in your SBT configuration, to use PhantomJS.
   @p
@@ -172,7 +172,7 @@
 
   @ul
     @li
-      @code{PreLinkStage} (the default): this does not perform any optimization of the output Scala.js files, and does lazy-loading to minimize the amount of files being loading into the interpreter. This is necessary for Rhino because it can't handle large blobs of Javascript, but doesn't map to any compilation mode you'd use for the browser.
+      @code{PreLinkStage} (the default): this does not perform any optimization of the output Scala.js files, and does lazy-loading to minimize the amount of files being loading into the interpreter. This is necessary for Rhino because it can't handle large blobs of JavaScript, but doesn't map to any compilation mode you'd use for the browser.
     @li
       @code{FastOptStage}: this performs the same compilation and optimization as @code{sbt fastOptJS}, as described under Fast Optimizations. It then takes the entire output executable (which probably weighs around 1mb) and hands it to Node.js or PhantomJS, which then run it.
     @li

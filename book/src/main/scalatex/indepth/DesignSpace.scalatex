@@ -10,16 +10,16 @@
 
   @ul
     @li
-      @b{Full Output} - ~20mb
+      @b{Full Output} - ~20MB
     @li
-      @b{Naive Dead-Code-Elimnation} - ~800kb
+      @b{Naive Dead-Code-Elimination} - ~800KB
     @li
-      @b{Inlining Dead-Code-Elimnation} - ~600kb
+      @b{Inlining Dead-Code-Elimination} - ~600KB
     @li
-      @b{Minified by Google Closure Compiler} - ~200kb
+      @b{Minified by Google Closure Compiler} - ~200KB
 
   @p
-    The default output size of 20mb makes the executables difficult to work with. Even though browsers can deal with 20mb Javascript blobs, it takes the browser several seconds to even load it, and up to a minute after that for the JIT to optimize the whole thing.
+    The default output size of 20MB makes the executables difficult to work with. Even though browsers can deal with 20MB JavaScript blobs, it takes the browser several seconds to even load it, and up to a minute after that for the JIT to optimize the whole thing.
 
   @sect{Dead Code Elimination}
     @p
@@ -53,7 +53,7 @@
         @hl.scala{Dead}, including @hl.scala{Dead.complexFunction}, are not called from any live code, and can be eliminated.
 
     @p
-      The actual process is a bit more involved than this, but this is a first-approximation of how the dead-code-elimination works: you start with a small set of live code (e.g. @hl.scala{@@JSExport}ed things), search out to find the things which are recursively reachable from that set, and eliminate all the rest. This means that the Scala.js compiler can eliminate, e.g., parts of the Scala standard library that you are not using. The standard library is not small, and makes up the bulk of the 20mb of the uncompressed blob.
+      The actual process is a bit more involved than this, but this is a first-approximation of how the dead-code-elimination works: you start with a small set of live code (e.g. @hl.scala{@@JSExport}ed things), search out to find the things which are recursively reachable from that set, and eliminate all the rest. This means that the Scala.js compiler can eliminate, e.g., parts of the Scala standard library that you are not using. The standard library is not small, and makes up the bulk of the 20MB of the uncompressed blob.
 
   @sect{Whither Reflection?}
     @p
@@ -82,7 +82,7 @@
 
     @ul
       @li
-        Keep every method or class around at runtime. This severely hampers the compiler's ability to optimize, and results in massive 20mb executables.
+        Keep every method or class around at runtime. This severely hampers the compiler's ability to optimize, and results in massive 20MB executables.
       @li
         Ignore reflection, and go ahead and eliminate/optimize things assuming reflection did not exist.
       @li
@@ -129,7 +129,7 @@
     Scala.js deviates from the semantics of Scala-JVM in several ways. Many of these ways revolve around the edge-conditions of a program: what happens when something goes wrong? An array index is out of bounds? An integer is divided-by-zero? These differences cause some amount of annoyance when debugging, since when you mess up an array index, you expect an exception, not silently-invalid-data!
 
   @p
-    In most of these cases, it was a trade-off between performance and correctness. These are situations where the default semantics of Scala deviate from that of Javascript, and Scala.js would have to perform extra work to emulate the desired behavior. For example, compare the division behavior of the JVM and Javascript.
+    In most of these cases, it was a trade-off between performance and correctness. These are situations where the default semantics of Scala deviate from that of JavaScript, and Scala.js would have to perform extra work to emulate the desired behavior. For example, compare the division behavior of the JVM and JavaScript.
   @sect{Divide-by-zero: a case study}
     @hl.scala
       /*JVM*/
@@ -138,7 +138,7 @@
       /*JS*/
       15 / 4              // 3.25
     @p
-      On the JVM, integer division is a primitive, and dividing @hl.scala{15 / 4} gives @hl.scala{3}. However, in Javascript, it gives @hl.js{3.25}, since all numbers of double-precision floating points.
+      On the JVM, integer division is a primitive, and dividing @hl.scala{15 / 4} gives @hl.scala{3}. However, in JavaScript, it gives @hl.js{3.25}, since all numbers of double-precision floating points.
 
     @p
       Scala.js works around this in the general case by adding a @hl.js{| 0} to the translation, e.g.
@@ -162,7 +162,7 @@
       (15 / 0) | 0        // 0
 
     @p
-      On the JVM, the JVM is kind enough to throw an exception for you. However, in Javascript, the integer simply wraps around to @hl.js{Infinity}, which then gets truncated down to zero.
+      On the JVM, the JVM is kind enough to throw an exception for you. However, in JavaScript, the integer simply wraps around to @hl.js{Infinity}, which then gets truncated down to zero.
     @p
       So that's the current behavior of integers in Scala.js. One may ask: can we fix it? And the answer is, we can:
     @hl.scala
@@ -194,7 +194,7 @@
 
   @ul
     @li
-      When cross-compiling Scala to Javascript, the end-result tends to be much more verbose than when cross-compiled to Java Bytecode.
+      When cross-compiling Scala to JavaScript, the end-result tends to be much more verbose than when cross-compiled to Java bytecode.
     @li
       Scala.js typically is run in web browsers, which typically do not work well with large executables compared to e.g. the JVM
     @li
@@ -205,19 +205,19 @@
 
   @sect{Raw Verbosity}
     @p
-      Scala.js compiles to Javascript source code, while Scala-JVM compiles to Java bytecode. Java bytecode is a binary format and thus somewhat optimized for size, while Javascript is textual and is designed to be easy to read and write by hand.
+      Scala.js compiles to JavaScript source code, while Scala-JVM compiles to Java bytecode. Java bytecode is a binary format and thus somewhat optimized for size, while JavaScript is textual and is designed to be easy to read and write by hand.
     @p
-      What does these mean, concretely? This means that a symbol marking something, e.g. the start of a function, is often a single byte in Java bytecode. Even more, it may not have any delimiter at all, instead the meaning of the binary data being inferred from its position in the file! On the other hand, in Javascript, declaring a function takes a long-and-verbose @hl.js{function} keyword, which together with peripheral punctuation (@code{.}, @code{ = }, etc.) often adds up to tens of bytes to express a single idea.
+      What does these mean, concretely? This means that a symbol marking something, e.g. the start of a function, is often a single byte in Java bytecode. Even more, it may not have any delimiter at all, instead the meaning of the binary data being inferred from its position in the file! On the other hand, in JavaScript, declaring a function takes a long-and-verbose @hl.js{function} keyword, which together with peripheral punctuation (@code{.}, @code{ = }, etc.) often adds up to tens of bytes to express a single idea.
     @p
-      What does this mean concretely? This means that expressing the same meaning in Javascript usually takes more "raw code" than expressing the same meaning in Java bytecode. Even though Java bytecode is relatively verbose for a binary format, it still is significantly more concise the Javascript, and it shows: the Scala standard library weighs in at a cool 6mb on Scala-JVM, while it weighs 20mb on Scala.js.
+      What does this mean concretely? This means that expressing the same meaning in JavaScript usually takes more "raw code" than expressing the same meaning in Java bytecode. Even though Java bytecode is relatively verbose for a binary format, it still is significantly more concise the JavaScript, and it shows: the Scala standard library weighs in at a cool 6MB on Scala-JVM, while it weighs 20MB on Scala.js.
     @p
       All things being equal, this would mean that Scala.js would have to work harder to keep down code-size than Scala-JVM would have to. Alas, not all other things are equal.
 
   @sect{Browsers Performance}
     @p
-      Without any optimization, a naive compilation to Scala.js results in an executable (Including the standard library) weighing around 20mb. On the surface, this isn't a problem: runtimes like the JVM have no issue with loading 20mb of Java bytecode to execute; many large desktop applications weigh in the 100s of megabytes while still loading and executing fine.
+      Without any optimization, a naive compilation to Scala.js results in an executable (Including the standard library) weighing around 20mb. On the surface, this isn't a problem: runtimes like the JVM have no issue with loading 20MB of Java bytecode to execute; many large desktop applications weigh in the 100s of megabytes while still loading and executing fine.
     @p
-      However, the web browser isn't a native execution environment; loading 20mb of Javascript is sufficient to heavily tax even the most modern web browsers such as Chrome and Firefox. Even though most of the code comprises class and method definitions that never have their contents executed, loading such a heavy load into e.g. Chrome makes it freeze for 5-10 seconds initially. Even after that, even after the code has all been parsed and isn't been actively executed, having all this Javascript makes the browser sluggish for up to a minute before the JIT compiler can speed things up.
+      However, the web browser isn't a native execution environment; loading 20MB of JavaScript is sufficient to heavily tax even the most modern web browsers such as Chrome and Firefox. Even though most of the code comprises class and method definitions that never have their contents executed, loading such a heavy load into e.g. Chrome makes it freeze for 5-10 seconds initially. Even after that, even after the code has all been parsed and isn't been actively executed, having all this JavaScript makes the browser sluggish for up to a minute before the JIT compiler can speed things up.
     @p
       Overall, this means that you probably do not want to work with un-optimized Scala.js executables. Even for development, the slow load times and initial sluggishness make testing the results of your hard-work in the browser a frustrating experience. But that's not all...
 
@@ -233,9 +233,9 @@
       Scala.js is different: it runs in the browsers of your users. Before it can run in their browser, it first has to be downloaded, probably over a connection that is much slower than the one used to deploy your code to your servers or data-center. It probably is downloaded thousands of times per day, and every user which downloads it must pay the cost of waiting for it to finish downloading before they can take any actions on your website.
 
     @p
-      A typical website loads ~100kb-1mb of Javascript, and 1mb is on the heavy side. Most Javascript libraries weigh in on the order of 50-100kb. For Scala.js to be useful in the browser, it has to be able to compare favorably with these numbers.
+      A typical website loads ~100KB-1MB of JavaScript, and 1MB is on the heavy side. Most JavaScript libraries weigh in on the order of 50-100KB. For Scala.js to be useful in the browser, it has to be able to compare favorably with these numbers.
 
   @hr
 
   @p
-    Thus, while on Scala-JVM you typically have executables that (including dependencies) end up weighing 10s to 100s of megabytes, Scala.js has a much tighter budget. A hello world Scala.js application weighs in at around 100kb, and as you write more code and use more libraries (and parts of the standard library) this number rises to the 100s of kb. This isn't tiny, especially compared to the many small Javascript libraries out there, but it definitely is much smaller than what you'd be used to on the JVM.
+    Thus, while on Scala-JVM you typically have executables that (including dependencies) end up weighing 10s to 100s of megabytes, Scala.js has a much tighter budget. A hello world Scala.js application weighs in at around 100KB, and as you write more code and use more libraries (and parts of the standard library) this number rises to the 100s of kilobytes. This isn't tiny, especially compared to the many small JavaScript libraries out there, but it definitely is much smaller than what you'd be used to on the JVM.

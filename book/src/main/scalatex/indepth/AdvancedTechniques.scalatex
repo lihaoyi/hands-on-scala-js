@@ -70,12 +70,12 @@
       Here we are seeing the same @hl.scala{dom} and @hl.scala{scalatags}, imports we saw in the hands-on tutorial, as well a new @hl.scala{import rx._} which bring all the Scala.Rx names into the local namespace.
 
     @p
-      Scala.Rx does not "natively" bind to Scalatags, but integrating them yourself is simple enough that it's not worth putting into a separate library. He's a simple integration:
+      Scala.Rx does not "natively" bind to ScalaTags, but integrating them yourself is simple enough that it's not worth putting into a separate library. He's a simple integration:
 
     @hl.ref(advanced/"BasicRx.scala", "implicit def")
 
     @p
-      Scalatags requires that anything you want to embed in a Scalatags fragment be implicitly convertible to @hl.scala{Frag}; here we are providing one for any Scala.Rx @hl.scala{Rx[T]}s, as long as the @hl.scala{T} provided is itself convertible to a @hl.scala{Frag}. We call @hl.scala{r().render} to extract the "current" value of the @hl.scala{Rx}, and then set up an @hl.scala{Obs} that watches the @hl.scala{Rx}, replacing the previous value with the current one every time its value changes.
+      ScalaTags requires that anything you want to embed in a ScalaTags fragment be implicitly convertible to @hl.scala{Frag}; here we are providing one for any Scala.Rx @hl.scala{Rx[T]}s, as long as the @hl.scala{T} provided is itself convertible to a @hl.scala{Frag}. We call @hl.scala{r().render} to extract the "current" value of the @hl.scala{Rx}, and then set up an @hl.scala{Obs} that watches the @hl.scala{Rx}, replacing the previous value with the current one every time its value changes.
 
     @p
       Now that the set-up is out of the way, let's consider a simple HTML widget that lets you enter text in a @hl.xml{<textarea>}, and keeps track of the number of words, characters, and counts how long each word is.
@@ -91,7 +91,7 @@
       This snippet sets up a basic data-flow graph. We have our @hl.scala{txt} @hl.scala{Var}, and a bunch of @hl.scala{Rx}s (@hl.scala{numChars}, @hl.scala{numWords}, @hl.scala{avgWordLength}) that are computed based on @hl.scala{txt}.
 
     @p
-      Next, we construct our Scalatags fragment: a @hl.scala{textarea} tag with a listener that updates @hl.scala{txt}, and a @hl.scala{div} containing the @hl.scala{textarea} and a list containing the bound values of our @hl.scala{Rx}s.
+      Next, we construct our ScalaTags fragment: a @hl.scala{textarea} tag with a listener that updates @hl.scala{txt}, and a @hl.scala{div} containing the @hl.scala{textarea} and a list containing the bound values of our @hl.scala{Rx}s.
 
     @p
       That's all we need to end up with a live-updating widget, which re-renders the necessary bits of the page when the contents of the text box changes! Note how the code basically flows top-to-bottom, like a batch-rendering program, but at the end of it we get a live widget. The code is much simpler than a similar widget built up using jQuery or Backbone.
@@ -130,10 +130,10 @@
     In a traditional setting, Scala applications tend to have a mix of concurrency models: some spawn multiple threads and use thread-blocking operations or libraries, others do things with Actors or Futures, trying hard to stay non-blocking throughout, while most are a mix of these two paradigms.
 
   @p
-    On Scala.js, things are different: multi-threaded concurrency is a non-starter, since Javascript engines are all single-threaded. As a result, there are virtually no blocking APIs in Javascript: all operations need to be asynchronous if you don't want them to freeze the user interface of the browser while the operation is happening. Scala.js uses standard Javascript APIs and is no different.
+    On Scala.js, things are different: multi-threaded concurrency is a non-starter, since JavaScript engines are all single-threaded. As a result, there are virtually no blocking APIs in JavaScript: all operations need to be asynchronous if you don't want them to freeze the user interface of the browser while the operation is happening. Scala.js uses standard JavaScript APIs and is no different.
 
   @p
-    However, Scala.js has much more powerful tools to work with than your typical Javascript libraries. The Scala standard library comes with a rich API for @sect.ref{Futures & Promises}, which are thankfully 100% asynchronous. Though this design was chosen for performance on the JVM, it perfectly fits our 100% asynchronous Javascript APIs. We have tools like @sect.ref{Scala-Async}, which works perfectly with Scala.js, and lets you create asynchronous computations in a much less confusing manner.
+    However, Scala.js has much more powerful tools to work with than your typical JavaScript libraries. The Scala standard library comes with a rich API for @sect.ref{Futures & Promises}, which are thankfully 100% asynchronous. Though this design was chosen for performance on the JVM, it perfectly fits our 100% asynchronous JavaScript APIs. We have tools like @sect.ref{Scala-Async}, which works perfectly with Scala.js, and lets you create asynchronous computations in a much less confusing manner.
 
   @sect{Futures & Promises}
     @p
@@ -186,12 +186,12 @@
       @hl.ref(advanced/"Futures.scala", "def handle0", "main")
 
       @p
-        This is a simple solution that directly uses the @hl.scala{XMLHttpRequest} class that is available in Javascript in order to perform the Ajax call. Every Ajax call that returns, we aggregate in a @hl.scala{results} buffer, and when the @hl.scala{results} buffer is full we then append the formatted results to the output div.
+        This is a simple solution that directly uses the @hl.scala{XMLHttpRequest} class that is available in JavaScript in order to perform the Ajax call. Every Ajax call that returns, we aggregate in a @hl.scala{results} buffer, and when the @hl.scala{results} buffer is full we then append the formatted results to the output div.
       @p
         This is relatively straightforward, though maybe knottier than people would be used to. For example, we have to "construct" the Ajax call via calling mutating methods and setting properties on the @hl.scala{XMLHttpRequest} object, where it's easy to make a mistake. Furthermore, we need to manually aggregate the @hl.scala{results} and keep track ourselves whether or not the calls have all completed, which again is messy and error-prone.
 
       @p
-        This solution is basically equivalent to the initial code given in the @sect.ref{Raw Javascript} section of @sect.ref{Interactive Web Pages}, with the additional code necessary for aggregation. As described in @sect.ref{dom.extensions}, we can make use of the @hl.scala{Ajax} object to make it slightly tidier.
+        This solution is basically equivalent to the initial code given in the @sect.ref{Raw JavaScript} section of @sect.ref{Interactive Web Pages}, with the additional code necessary for aggregation. As described in @sect.ref{dom.extensions}, we can make use of the @hl.scala{Ajax} object to make it slightly tidier.
 
     @sect{Using dom.extensions.Ajax}
       @example(exampleDiv, "advanced.Futures().main1")
@@ -243,7 +243,7 @@
 
     @sect{Traditional Asynchrony}
       @p
-        Let's look at a traditional implementation, using Scala.js but no special features. We'll just use the Javascript @hl.scala{canvas.onmouveXXX} operations directly. 
+        Let's look at a traditional implementation, using Scala.js but no special features. We'll just use the JavaScript @hl.scala{canvas.onmouveXXX} operations directly. 
 
       @split
         @more
