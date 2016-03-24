@@ -36,7 +36,6 @@ object Async {
     val mousedown =
       new Channel[ME](canvas.onmousedown = _)
 
-    // Disabled due to scala-js#1469
     async{
       while(true){
         val start = await(mousedown())
