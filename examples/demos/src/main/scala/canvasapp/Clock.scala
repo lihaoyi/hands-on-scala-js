@@ -29,6 +29,11 @@ object Clock extends{
     renderer.textBaseline = "middle"
 
     /*code*/
+
+    // format the number with size 2 and optional '0' prefix
+    // so '1' becomes '01'
+    def format(n: Int) = f"$n%02d"
+    
     def render() = {
       val date = new js.Date()
       renderer.clearRect(
@@ -41,7 +46,7 @@ object Clock extends{
           date.getHours(),
           date.getMinutes(),
           date.getSeconds()
-        ).mkString(":"),
+        ).map(format).mkString(":"),
         canvas.width / 2,
         canvas.height / 2
       )
