@@ -1,4 +1,4 @@
-import NativePackagerKeys._
+/*build.sbt*/
 
 val app = crossProject.settings(
   unmanagedSourceDirectories in Compile +=
