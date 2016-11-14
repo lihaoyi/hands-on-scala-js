@@ -28,10 +28,7 @@ object Server{
       } ~
       post{
         path("ajax" / "list"){
-          extract(_.request.entity match {
-            case HttpEntity.Strict(nb: ContentType.NonBinary, data) =>
-              data.decodeString(nb.charset.value)
-          }) { e =>
+          entity(as[String]) { e =>
             complete {
               upickle.default.write(list(e))
             }
