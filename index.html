@@ -76,7 +76,7 @@ val graphs = Seq[Graph](
   (&quot;green&quot;, x =&gt; abs(x % 4 - 2) - 1),
   (&quot;blue&quot;, x =&gt; sin(x/12) * sin(x))
 ).zipWithIndex
-dom.setInterval(() =&gt; {
+dom.window.setInterval(() =&gt; {
   x = (x + 1) % w; if (x == 0) clear()
   for (((color, f), i) &lt;- graphs) {
     val offset = h / 3 * (i + 0.5)
@@ -446,7 +446,7 @@ object ScalaJSExample {
       ctx.fillRect(p.x, p.y, 1, 1)
     }
 
-    dom.setInterval(() =&gt; run, 50)
+    dom.window.setInterval(() =&gt; run, 50)
   }
 }</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/workbench-example-app/blob/master/src/main/scala/example/ScalaJSExample.scala#L0-L44" target="_blank"><i class="fa fa-link "></i></a></pre>
 
@@ -485,21 +485,9 @@ object ScalaJSExample {
     Note how the <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement">html.Canvas</a> comes from the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">html</code> namespace, while the <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D">CanvasRenderingContext2D</a> comes from the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">dom</code> namespace. Traditionally, these types are imported via their qualified names: e.g. <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">html.Canvas</code> rather than just <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Canvas</code>.
 </p>
   <p>
-    In general, <a href="http://scala-js.github.io/scala-js-dom/">scala-js-dom</a> provides <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">org.scalajs.dom.html</code> to access the HTML element types of the browser, and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">org.scalajs.dom</code> to access other things. There are a number of other namespaces (<code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">dom.svg</code>, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">dom.idb</code>, etc.) accessible inside <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">org.scalajs.dom</code>: read the <a href="http://scala-js.github.io/scala-js-dom/">scala-js-dom docs</a> to learn more.
+    In general, <a href="http://scala-js.github.io/scala-js-dom/">scala-js-dom</a> provides <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">org.scalajs.dom.html</code> to access the HTML element types of the browser, an <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">org.scalajs.dom</code> to access other things. There are a number of other namespaces (<code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">dom.svg</code>, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">dom.idb</code>, etc.) accessible inside <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">org.scalajs.dom</code>: read the <a href="http://scala-js.github.io/scala-js-dom/">scala-js-dom docs</a> to learn more.
 </p>
-  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">def run = for (i &lt;- 0 until 10){
-  if (count % 3000 == 0) clear()
-  count += 1
-  p = (p + corners(Random.nextInt(3))) / 2
-
-  val height = 512.0 / (255 + p.y)
-  val r = (p.x * height).toInt
-  val g = ((255-p.x) * height).toInt
-  val b = p.y
-  ctx.fillStyle = s&quot;rgb($g, $r, $b)&quot;
-
-  ctx.fillRect(p.x, p.y, 1, 1)
-}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/workbench-example-app/blob/master/src/main/scala/example/ScalaJSExample.scala#L27-L41" target="_blank"><i class="fa fa-link "></i></a></pre>
+  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe"></code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/workbench-example-app/blob/master/src/main/scala/example/ScalaJSExample.scala" target="_blank"><i class="fa fa-link "></i></a></pre>
 
   <p>
     This is the part of the Scala.js program which does the real work. It runs 10 iterations of a <a href="http://en.wikipedia.org/wiki/Sierpinski_triangle#Chaos_game">small algorithm</a> that generates a Sierpinski Triangle point-by-point. The steps, as described by the linked article, are roughly:
@@ -517,7 +505,50 @@ object ScalaJSExample {
   <p>
     In this example, the triangle is hard-coded to be 255 pixels high by 255 pixels wide, and some math is done to pick a color for each dot which will give the triangle a pretty gradient.
 </p>
-  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">dom.setInterval(() =&gt; run, 50)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/workbench-example-app/blob/master/src/main/scala/example/ScalaJSExample.scala#L41-L42" target="_blank"><i class="fa fa-link "></i></a></pre>
+  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">package example
+import scala.scalajs.js.annotation.JSExport
+import org.scalajs.dom
+import org.scalajs.dom.html
+import scala.util.Random
+
+case class Point(x: Int, y: Int){
+  def +(p: Point) = Point(x + p.x, y + p.y)
+  def /(d: Int) = Point(x / d, y / d)
+}
+
+@JSExport
+object ScalaJSExample {
+  @JSExport
+  def main(canvas: html.Canvas): Unit = {
+    val ctx = canvas.getContext(&quot;2d&quot;)
+                    .asInstanceOf[dom.CanvasRenderingContext2D]
+
+    var count = 0
+    var p = Point(0, 0)
+    val corners = Seq(Point(255, 255), Point(0, 255), Point(128, 0))
+
+    def clear() = {
+      ctx.fillStyle = &quot;black&quot;
+      ctx.fillRect(0, 0, 255, 255)
+    }
+
+    def run = for (i &lt;- 0 until 10){
+      if (count % 3000 == 0) clear()
+      count += 1
+      p = (p + corners(Random.nextInt(3))) / 2
+
+      val height = 512.0 / (255 + p.y)
+      val r = (p.x * height).toInt
+      val g = ((255-p.x) * height).toInt
+      val b = p.y
+      ctx.fillStyle = s&quot;rgb($g, $r, $b)&quot;
+
+      ctx.fillRect(p.x, p.y, 1, 1)
+    }
+
+    dom.window.setInterval(() =&gt; run, 50)
+  }
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/workbench-example-app/blob/master/src/main/scala/example/ScalaJSExample.scala#L0-L44" target="_blank"><i class="fa fa-link "></i></a></pre>
 
   <p>
     Now this is the call that actually does the useful work. All this method does is call <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">dom.setInterval</code>, which tells the browser to run the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">run</code> method every 50 milliseconds. As mentioned earlier, the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">dom.*</code> methods are simply facades to their native Javascript equivalents, and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">dom.setInterval</code> is <a href="https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers.setInterval">no different</a>. Note how you can pass a Scala lambda to <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">setInterval</code> to have it called by the browser, where in Javascript you'd need to pass a Javascript <code class="javascript scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">function(){...</code>}
@@ -528,9 +559,9 @@ object ScalaJSExample {
     We've already taken a look at the application code for a simple, self-contained Scala.js application, but this application is not <i>entirely</i> self contained. It's wrapped in a small SBT project that sets up the necessary dependencies and infrastructure for this application to work.
 </p>
   <h2 id="project/build.sbt" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#project/build.sbt" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>project/build.sbt</h2>
-    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">addSbtPlugin(&quot;org.scala-js&quot; % &quot;sbt-scalajs&quot; % &quot;0.6.0&quot;)
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">addSbtPlugin(&quot;org.scala-js&quot; % &quot;sbt-scalajs&quot; % &quot;0.6.13&quot;)
 
-addSbtPlugin(&quot;com.lihaoyi&quot; % &quot;workbench&quot; % &quot;0.2.3&quot;)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/workbench-example-app/blob/master/project/build.sbt#L0-L3" target="_blank"><i class="fa fa-link "></i></a></pre>
+addSbtPlugin(&quot;com.lihaoyi&quot; % &quot;workbench&quot; % &quot;0.3.0&quot;)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/workbench-example-app/blob/master/project/build.sbt#L0-L3" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
       This is the list of SBT plugins used by this small example application. There are two of them: the Scala.js plugin (which contains the Scala.js compiler and other things, e.g. tasks such as <code>fastOptJS</code>) and the <a href="https://github.com/lihaoyi/workbench">Workbench</a> plugin, which is used to provide the auto-reload-on-change behavior and the forwarding of SBT logspam to the browser console.
@@ -540,25 +571,18 @@ addSbtPlugin(&quot;com.lihaoyi&quot; % &quot;workbench&quot; % &quot;0.2.3&quot;
 
 </p>
   <h2 id="build.sbt" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#build.sbt" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>build.sbt</h2>
-    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">import com.lihaoyi.workbench.Plugin._
-
-enablePlugins(ScalaJSPlugin)
-
-workbenchSettings
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">enablePlugins(ScalaJSPlugin, WorkbenchPlugin)
 
 name := &quot;Example&quot;
 
 version := &quot;0.1-SNAPSHOT&quot;
 
-scalaVersion := &quot;2.11.4&quot;
+scalaVersion := &quot;2.11.8&quot;
 
 libraryDependencies ++= Seq(
-  &quot;org.scala-js&quot; %%% &quot;scalajs-dom&quot; % &quot;0.8.0&quot;
-)
-
-bootSnippet := &quot;example.ScalaJSExample().main(document.getElementById('canvas'));&quot;
-
-updateBrowsers &lt;&lt;= updateBrowsers.triggeredBy(fastOptJS in Compile)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/workbench-example-app/blob/master/build.sbt#L0-L20" target="_blank"><i class="fa fa-link "></i></a></pre>
+  &quot;org.scala-js&quot; %%% &quot;scalajs-dom&quot; % &quot;0.9.1&quot;,
+  &quot;com.lihaoyi&quot; %%% &quot;scalatags&quot; % &quot;0.6.1&quot;
+)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/workbench-example-app/blob/master/build.sbt#L0-L12" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
       The <code>build.sbt</code> project file for this application is similarly unremarkable: It includes the settings for the two SBT plugins we saw earlier, as well as boilerplate <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">name</code>/<code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">version</code>/<code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">scalaVersion</code> values common to all projects.
@@ -862,7 +886,7 @@ def render() = {
     canvas.height / 2
   )
 }
-dom.setInterval(render _, 1000)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/demos/src/main/scala/canvasapp/Clock.scala#L30-L49" target="_blank"><i class="fa fa-link "></i></a></pre>
+dom.window.setInterval(render _, 1000)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/demos/src/main/scala/canvasapp/Clock.scala#L30-L49" target="_blank"><i class="fa fa-link "></i></a></pre>
 </div>
     <div class="pure-u-1 pure-u-md-11-24">
       <canvas id="example2" style="display: block;overflow: scroll;"></canvas><script>canvasapp.Clock().main(document.getElementById('example2'))</script>
@@ -1019,7 +1043,7 @@ val obstacles = collection.mutable.Queue.empty[Int]</code><a class=" scalatex-si
   else runLive()
 }
 
-dom.setInterval(run _, 20)
+dom.window.setInterval(run _, 20)
 
 canvas.onclick = (e: dom.MouseEvent) =&gt; {
   playerV -= 5
@@ -1099,7 +1123,7 @@ canvas.onclick = (e: dom.MouseEvent) =&gt; {
   Most web applications aren't neat little games which live on a single canvas: they are large, structured HTML pages, which involve displaying data (whether from the user or from the web) in multiple ways, while allowing the user to make changes to the data that can be saved back to whatever remote web-service/database it came from.
 </p>
 <p>
-  At this point, you are already competent at using Scala.js to make basic, self-contained canvas applications. In this chapter, we will cover how to use Scala.js to build the sort of interactive-web-pages that make up the bulk of the modern-day internet. We'll cover how to use powerful libraries that turn front-end development form the typical fragile-mess into a structured, robust piece of software.
+  At this point, you are already competent at using Scala.js to make basic, self-contained canvas applications. In this chapter, we will cover how to use Scala.js to build the sort of interactive-web-pages that make up the bulk of the modern-day internet. We'll cover how to use powerful libraries that turn front-end development from the typical fragile-mess into a structured, robust piece of software.
 </p>
 
 
@@ -1153,7 +1177,7 @@ object HelloWorld0 extends{
   <p>
     <a href="https://github.com/lihaoyi/scalatags">Scalatags</a> is a cross-platform Scala.js/Scala-JVM library that is designed to generate HTML. To use Scalatags, you need to add it as a dependency to your Scala.js SBT project, in the <code>build.sbt</code> file:
 </p>
-  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; %%% &quot;scalatags&quot; % &quot;0.4.6&quot;</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/demos/build.sbt#L16-L17" target="_blank"><i class="fa fa-link "></i></a></pre>
+  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; %%% &quot;scalatags&quot; % &quot;0.6.2&quot;</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/demos/build.sbt#L16-L17" target="_blank"><i class="fa fa-link "></i></a></pre>
 
   <p>
     With that, the above snippet of code re-written using Scalatags looks as follows:
@@ -2030,19 +2054,19 @@ val app = crossProject.settings(
   unmanagedSourceDirectories in Compile +=
     baseDirectory.value  / &quot;shared&quot; / &quot;main&quot; / &quot;scala&quot;,
   libraryDependencies ++= Seq(
-    &quot;com.lihaoyi&quot; %%% &quot;scalatags&quot; % &quot;0.4.6&quot;,
-    &quot;com.lihaoyi&quot; %%% &quot;upickle&quot; % &quot;0.2.7&quot;
+    &quot;com.lihaoyi&quot; %%% &quot;scalatags&quot; % &quot;0.6.2&quot;,
+    &quot;com.lihaoyi&quot; %%% &quot;upickle&quot; % &quot;0.4.4&quot;
   ),
   scalaVersion := &quot;2.11.5&quot;
 ).jsSettings(
   libraryDependencies ++= Seq(
-    &quot;org.scala-js&quot; %%% &quot;scalajs-dom&quot; % &quot;0.8.0&quot;
+    &quot;org.scala-js&quot; %%% &quot;scalajs-dom&quot; % &quot;0.9.1&quot;
   )
 ).jvmSettings(
   libraryDependencies ++= Seq(
-    &quot;io.spray&quot; %% &quot;spray-can&quot; % &quot;1.3.2&quot;,
-    &quot;io.spray&quot; %% &quot;spray-routing&quot; % &quot;1.3.2&quot;,
-    &quot;com.typesafe.akka&quot; %% &quot;akka-actor&quot; % &quot;2.3.6&quot;
+    &quot;com.typesafe.akka&quot; %% &quot;akka-http-experimental&quot; % &quot;2.4.11&quot;,
+    &quot;com.typesafe.akka&quot; %% &quot;akka-actor&quot; % &quot;2.4.12&quot;,
+    &quot;org.webjars&quot; % &quot;bootstrap&quot; % &quot;3.2.0&quot;
   )
 )
 
@@ -2064,21 +2088,25 @@ lazy val appJVM = app.jvm.settings(
   <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">package simple
 
 import akka.actor.ActorSystem
-import spray.http.{HttpEntity, MediaTypes}
-import spray.routing.SimpleRoutingApp
-
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.model._
+import akka.http.scaladsl.server.Directives._
+import akka.stream.ActorMaterializer
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Properties
 
-object Server extends SimpleRoutingApp{
+object Server{
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem()
+    implicit val materializer = ActorMaterializer()
+
     val port = Properties.envOrElse(&quot;PORT&quot;, &quot;8080&quot;).toInt
-    startServer(&quot;0.0.0.0&quot;, port = port){
+    val route = {
       get{
         pathSingleSlash{
           complete{
             HttpEntity(
-              MediaTypes.`text/html`,
+              ContentTypes.`text/html(UTF-8)`,
               Page.skeleton.render
             )
           }
@@ -2087,14 +2115,18 @@ object Server extends SimpleRoutingApp{
       } ~
       post{
         path(&quot;ajax&quot; / &quot;list&quot;){
-          extract(_.request.entity.asString) { e =&gt;
+          extract(_.request.entity match {
+            case HttpEntity.Strict(nb: ContentType.NonBinary, data) =&gt;
+              data.decodeString(nb.charset.value)
+          }) { e =&gt;
             complete {
-              upickle.write(list(e))
+              upickle.default.write(list(e))
             }
           }
         }
       }
     }
+    Http().bindAndHandle(route, &quot;0.0.0.0&quot;, port = port)
   }
   def list(path: String) = {
     val (dir, last) = path.splitAt(path.lastIndexOf(&quot;/&quot;) + 1)
@@ -2106,7 +2138,7 @@ object Server extends SimpleRoutingApp{
       if f.getName.startsWith(last)
     } yield FileData(f.getName, f.length())
   }
-}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/crossBuilds/clientserver/app/jvm/src/main/scala/simple/Server.scala#L0-L46" target="_blank"><i class="fa fa-link "></i></a></pre>
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/crossBuilds/clientserver/app/jvm/src/main/scala/simple/Server.scala#L0-L54" target="_blank"><i class="fa fa-link "></i></a></pre>
 
   <p>
     This is a not-very-interesting <a href="http://spray.io/documentation/1.2.2/spray-routing/">spray-routing</a> application: we set up a server on <code>localhost:8080</code>, have the root URL serve the main page on GET, and have other GET URLs serve resources. This includes the <code>js-fastopt.js</code> file that is now in our resources because of our <code>build.sbt</code> config earlier! We also add a POST route to allow the client ask the server to list files various directories.
@@ -2123,7 +2155,7 @@ object Page{
   val skeleton =
     html(
       head(
-        script(src:=&quot;/appjs-fastopt.js&quot;),
+        script(src:=&quot;/app-fastopt.js&quot;),
         link(
           rel:=&quot;stylesheet&quot;,
           href:=&quot;https://cdnjs.cloudflare.com/ajax/libs/pure/0.5.0/pure-min.css&quot;
@@ -2157,7 +2189,7 @@ object Client extends{
     val inputBox = input.render
     val outputBox = ul.render
     def update() = Ajax.post(&quot;/ajax/list&quot;, inputBox.value).foreach{ xhr =&gt;
-      val data = upickle.read[Seq[FileData]](xhr.responseText)
+      val data = upickle.default.read[Seq[FileData]](xhr.responseText)
       outputBox.innerHTML = &quot;&quot;
       for(FileData(name, size) &lt;- data){
         outputBox.appendChild(
@@ -2235,9 +2267,9 @@ case class FileData(name: String, size: Long)</code><a class=" scalatex-site-Sty
   <p>
     However, there is still some amount of duplication in the code. In particular, the definition of the endpoint name &quot;list&quot; is duplicated 4 times:
 </p>
-  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">path(&quot;ajax&quot; / &quot;list&quot;){</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/crossBuilds/clientserver/app/jvm/src/main/scala/simple/Server.scala#L25-L26" target="_blank"><i class="fa fa-link "></i></a></pre>
-  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">upickle.write(list(e))</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/crossBuilds/clientserver/app/jvm/src/main/scala/simple/Server.scala#L28-L29" target="_blank"><i class="fa fa-link "></i></a></pre>
-  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">def list(path: String) = {</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/crossBuilds/clientserver/app/jvm/src/main/scala/simple/Server.scala#L35-L36" target="_blank"><i class="fa fa-link "></i></a></pre>
+  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">path(&quot;ajax&quot; / &quot;list&quot;){</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/crossBuilds/clientserver/app/jvm/src/main/scala/simple/Server.scala#L29-L30" target="_blank"><i class="fa fa-link "></i></a></pre>
+  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">upickle.default.write(list(e))</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/crossBuilds/clientserver/app/jvm/src/main/scala/simple/Server.scala#L35-L36" target="_blank"><i class="fa fa-link "></i></a></pre>
+  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">def list(path: String) = {</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/crossBuilds/clientserver/app/jvm/src/main/scala/simple/Server.scala#L43-L44" target="_blank"><i class="fa fa-link "></i></a></pre>
   <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">def update() = Ajax.post(&quot;/ajax/list&quot;, inputBox.value).foreach{ xhr =&gt;</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/crossBuilds/clientserver/app/js/src/main/scala/simple/Client.scala#L15-L16" target="_blank"><i class="fa fa-link "></i></a></pre>
 
   <p>
@@ -2305,45 +2337,54 @@ trait Api{
     <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">package simple
 
 import akka.actor.ActorSystem
-import spray.http.{HttpEntity, MediaTypes}
-import spray.routing.SimpleRoutingApp
-import scala.concurrent.ExecutionContext.Implicits.global
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.model._
+import akka.http.scaladsl.server.Directives._
+import akka.stream.ActorMaterializer
 
-object Router extends autowire.Server[String, upickle.Reader, upickle.Writer]{
-  def read[Result: upickle.Reader](p: String) = upickle.read[Result](p)
-  def write[Result: upickle.Writer](r: Result) = upickle.write(r)
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Properties
+
+
+object Router extends autowire.Server[String, upickle.default.Reader, upickle.default.Writer]{
+  def read[Result: upickle.default.Reader](p: String) = upickle.default.read[Result](p)
+  def write[Result: upickle.default.Writer](r: Result) = upickle.default.write(r)
 }
 
-object Server extends SimpleRoutingApp with Api{
+object Server extends Api{
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem()
-    startServer(&quot;localhost&quot;, port = 8080){
+    implicit val materializer = ActorMaterializer()
+
+    val port = Properties.envOrElse(&quot;PORT&quot;, &quot;8080&quot;).toInt
+    val route = {
       get{
         pathSingleSlash{
           complete{
             HttpEntity(
-              MediaTypes.`text/html`,
+              ContentTypes.`text/html(UTF-8)`,
               Page.skeleton.render
             )
           }
         } ~
-        getFromResourceDirectory(&quot;&quot;)
+          getFromResourceDirectory(&quot;&quot;)
       } ~
-      post{
-        path(&quot;ajax&quot; / Segments){ s =&gt;
-          extract(_.request.entity.asString) { e =&gt;
-            complete {
-              Router.route[Api](Server)(
-                autowire.Core.Request(
-                  s,
-                  upickle.read[Map[String, String]](e)
+        post{
+          path(&quot;ajax&quot; / Segments){s =&gt;
+            entity(as[String]) { e =&gt;
+              complete {
+                Router.route[Api](Server)(
+                  autowire.Core.Request(
+                    s,
+                    upickle.default.read[Map[String, String]](e)
+                  )
                 )
-              )
+              }
             }
           }
         }
-      }
     }
+    Http().bindAndHandle(route, &quot;0.0.0.0&quot;, port = port)
   }
   def list(path: String) = {
     val (dir, last) = path.splitAt(path.lastIndexOf(&quot;/&quot;) + 1)
@@ -2355,30 +2396,30 @@ object Server extends SimpleRoutingApp with Api{
       if f.getName.startsWith(last)
     } yield FileData(f.getName, f.length())
   }
-}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/crossBuilds/clientserver2/app/jvm/src/main/scala/simple/Server.scala#L0-L54" target="_blank"><i class="fa fa-link "></i></a></pre>
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/crossBuilds/clientserver2/app/jvm/src/main/scala/simple/Server.scala#L0-L63" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
       Now, instead of hard-coding the route <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">&quot;ajax&quot; / &quot;list&quot;</code>, we now take in any route matching <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">&quot;ajax&quot; / Segments</code>, feeding the resultant path segments into the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Router</code> object:
 </p>
-    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">path(&quot;ajax&quot; / Segments){ s =&gt;
-  extract(_.request.entity.asString) { e =&gt;
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">path(&quot;ajax&quot; / Segments){s =&gt;
+  entity(as[String]) { e =&gt;
     complete {
       Router.route[Api](Server)(
         autowire.Core.Request(
           s,
-          upickle.read[Map[String, String]](e)
+          upickle.default.read[Map[String, String]](e)
         )
       )
     }
   }
-}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/crossBuilds/clientserver2/app/jvm/src/main/scala/simple/Server.scala#L28-L40" target="_blank"><i class="fa fa-link "></i></a></pre>
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/crossBuilds/clientserver2/app/jvm/src/main/scala/simple/Server.scala#L36-L48" target="_blank"><i class="fa fa-link "></i></a></pre>
     <p>
       The <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Router</code> object in turn simply defines how you intend the objects to be serialized and deserialized:
 </p>
-    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">object Router extends autowire.Server[String, upickle.Reader, upickle.Writer]{
-  def read[Result: upickle.Reader](p: String) = upickle.read[Result](p)
-  def write[Result: upickle.Writer](r: Result) = upickle.write(r)
-}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/crossBuilds/clientserver2/app/jvm/src/main/scala/simple/Server.scala#L7-L12" target="_blank"><i class="fa fa-link "></i></a></pre>
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">object Router extends autowire.Server[String, upickle.default.Reader, upickle.default.Writer]{
+  def read[Result: upickle.default.Reader](p: String) = upickle.default.read[Result](p)
+  def write[Result: upickle.default.Writer](r: Result) = upickle.default.write(r)
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/crossBuilds/clientserver2/app/jvm/src/main/scala/simple/Server.scala#L12-L17" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
       In this case using uPickle. Note how the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">route</code> call explicitly states the type (here <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Api</code>) that it is to generate routes against; this ensures that only methods which you explicitly put in your public interface <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Api</code> are publically reachable.
@@ -2394,16 +2435,16 @@ import scalajs.js.annotation.JSExport
 import scalajs.concurrent.JSExecutionContext.Implicits.runNow
 import autowire._
 
-object Ajaxer extends autowire.Client[String, upickle.Reader, upickle.Writer]{
+object Ajaxer extends autowire.Client[String, upickle.default.Reader, upickle.default.Writer]{
   override def doCall(req: Request) = {
     dom.ext.Ajax.post(
       url = &quot;/ajax/&quot; + req.path.mkString(&quot;/&quot;),
-      data = upickle.write(req.args)
+      data = upickle.default.write(req.args)
     ).map(_.responseText)
   }
 
-  def read[Result: upickle.Reader](p: String) = upickle.read[Result](p)
-  def write[Result: upickle.Writer](r: Result) = upickle.write(r)
+  def read[Result: upickle.default.Reader](p: String) = upickle.default.read[Result](p)
+  def write[Result: upickle.default.Writer](r: Result) = upickle.default.write(r)
 }
 
 @JSExport
@@ -2437,16 +2478,16 @@ object Client extends{
     <p>
       There are two main modifications here: the existence of the new <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Ajaxer</code> object, and the modification to the Ajax call-site. Let's first look at <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Ajaxer</code>:
 </p>
-    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">object Ajaxer extends autowire.Client[String, upickle.Reader, upickle.Writer]{
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">object Ajaxer extends autowire.Client[String, upickle.default.Reader, upickle.default.Writer]{
   override def doCall(req: Request) = {
     dom.ext.Ajax.post(
       url = &quot;/ajax/&quot; + req.path.mkString(&quot;/&quot;),
-      data = upickle.write(req.args)
+      data = upickle.default.write(req.args)
     ).map(_.responseText)
   }
 
-  def read[Result: upickle.Reader](p: String) = upickle.read[Result](p)
-  def write[Result: upickle.Writer](r: Result) = upickle.write(r)
+  def read[Result: upickle.default.Reader](p: String) = upickle.default.read[Result](p)
+  def write[Result: upickle.default.Writer](r: Result) = upickle.default.write(r)
 }</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/hands-on-scala-js/blob/master/examples/crossBuilds/clientserver2/app/js/src/main/scala/simple/Client.scala#L8-L20" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
@@ -2548,9 +2589,9 @@ is a set of detailed expositions on various parts of the Scala.js platform. Noth
 </p>
   <ul>
     <li>
-      <b>Discrete</b>: Handling of first-class event-streams like in <link>RxJShttps://github.com/Reactive-Extensions/RxJS</link></li>
+      <b>Discrete</b>: Handling of first-class event-streams like in <a href="https://github.com/Reactive-Extensions/RxJS">RxJS</a></li>
     <li>
-      <b>Continuous</b>: Handling of first-class signals, like in <link>Elmhttp://elm-lang.org/learn/What-is-FRP.elm</link>
+      <b>Continuous</b>: Handling of first-class signals, like in <a href="http://elm-lang.org/learn/What-is-FRP.elm">Elm</a>
 </li></ul>
   <h2 id="WhyFRP" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#WhyFRP" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Why FRP</h2>
     <p>
@@ -3789,7 +3830,7 @@ intDivide(1, 0)     // ArithmeticException</code></pre>
 <p>
   Below is a list of classes from the Java Standard Library that are available from Scala.js. In general, much of <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">java.lang</code>, and parts of <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">java.io</code>, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">java.util</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">java.net</code> have been ported over. This means that all these classes are available for use in Scala.js applications despite being part of the Java standard library.</p>
 <p>
-  There are many reasons you may want to port a Java class to Scala.js: you want to use it directly, you may be trying to port a library which uses it. In general, we haven't been porting things &quot;for fun&quot;, and obscure classes like <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">org.omg.corba</code> will likely never be ported: we've been porting things as the need arises in order to support libraries (e.g. <a href="https://github.com/lihaoyi/scala.rx">Scala.Rx</a> that need them.
+  There are many reasons you may want to port a Java class to Scala.js: you want to use it directly, you may be trying to port a library which uses it. In general, we haven't been porting things &quot;for fun&quot;, and obscure classes like <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">org.omg.corba</code> will likely never be ported: we've been porting things as the need arises in order to support libraries (e.g. <a href="https://github.com/lihaoyi/scala.rx">Scala.Rx</a> that need them).
 </p>
 <h1 id="AvailableJavaAPIs" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#AvailableJavaAPIs" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Available Java APIs</h1>
 
@@ -3829,6 +3870,9 @@ intDivide(1, 0)     // ArithmeticException</code></pre>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/Double.html">java.lang.Double</a>
 </li>
       <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/Enum.html">java.lang.Enum</a>
+</li>
+      <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/Float.html">java.lang.Float</a>
 </li>
       <li>
@@ -3838,10 +3882,16 @@ intDivide(1, 0)     // ArithmeticException</code></pre>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html">java.lang.Integer</a>
 </li>
       <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/Iterable.html">java.lang.Iterable</a>
+</li>
+      <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/Long.html">java.lang.Long</a>
 </li>
       <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/Math.html">java.lang.Math</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/MathJDK8Bridge.html">java.lang.MathJDK8Bridge</a>
 </li>
       <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/Number.html">java.lang.Number</a>
@@ -3883,6 +3933,9 @@ intDivide(1, 0)     // ArithmeticException</code></pre>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/Void.html">java.lang.Void</a>
 </li>
       <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Annotation.html">java.lang.annotation.Annotation</a>
+</li>
+      <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/ref/PhantomReference.html">java.lang.ref.PhantomReference</a>
 </li>
       <li>
@@ -3914,6 +3967,9 @@ intDivide(1, 0)     // ArithmeticException</code></pre>
 </li>
       <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/io/DataInput.html">java.io.DataInput</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/io/DataInputStream.html">java.io.DataInputStream</a>
 </li>
       <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/io/FilterInputStream.html">java.io.FilterInputStream</a>
@@ -3961,10 +4017,49 @@ intDivide(1, 0)     // ArithmeticException</code></pre>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/io/Writer.html">java.io.Writer</a>
 </li>
       <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/MathJDK8Bridge.html">java.lang.MathJDK8Bridge</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/math/BigDecimal.html">java.math.BigDecimal</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/math/BigInteger.html">java.math.BigInteger</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/math/BitLevel.html">java.math.BitLevel</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/math/Conversion.html">java.math.Conversion</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/math/Division.html">java.math.Division</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/math/Elementary.html">java.math.Elementary</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/math/Logical.html">java.math.Logical</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/math/MathContext.html">java.math.MathContext</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/math/Multiplication.html">java.math.Multiplication</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/math/Primality.html">java.math.Primality</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/math/RoundingMode.html">java.math.RoundingMode</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/net/Throwables.html">java.net.Throwables</a>
+</li>
+      <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/net/URI.html">java.net.URI</a>
 </li>
       <li>
-        <a href="https://docs.oracle.com/javase/7/docs/api/java/net/URISyntaxException.html">java.net.URISyntaxException</a>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/net/URLDecoder.html">java.net.URLDecoder</a>
 </li>
       <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/Buffer.html">java.nio.Buffer</a>
@@ -3976,6 +4071,9 @@ intDivide(1, 0)     // ArithmeticException</code></pre>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/BufferUnderflowException.html">java.nio.BufferUnderflowException</a>
 </li>
       <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/ByteArrayBits.html">java.nio.ByteArrayBits</a>
+</li>
+      <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/ByteBuffer.html">java.nio.ByteBuffer</a>
 </li>
       <li>
@@ -3985,19 +4083,118 @@ intDivide(1, 0)     // ArithmeticException</code></pre>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/CharBuffer.html">java.nio.CharBuffer</a>
 </li>
       <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/DataViewCharBuffer.html">java.nio.DataViewCharBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/DataViewDoubleBuffer.html">java.nio.DataViewDoubleBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/DataViewFloatBuffer.html">java.nio.DataViewFloatBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/DataViewIntBuffer.html">java.nio.DataViewIntBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/DataViewLongBuffer.html">java.nio.DataViewLongBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/DataViewShortBuffer.html">java.nio.DataViewShortBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/DoubleBuffer.html">java.nio.DoubleBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/FloatBuffer.html">java.nio.FloatBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/GenBuffer.html">java.nio.GenBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/GenDataViewBuffer.html">java.nio.GenDataViewBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/GenHeapBuffer.html">java.nio.GenHeapBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/GenHeapBufferView.html">java.nio.GenHeapBufferView</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/GenTypedArrayBuffer.html">java.nio.GenTypedArrayBuffer</a>
+</li>
+      <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/HeapByteBuffer.html">java.nio.HeapByteBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/HeapByteBufferCharView.html">java.nio.HeapByteBufferCharView</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/HeapByteBufferDoubleView.html">java.nio.HeapByteBufferDoubleView</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/HeapByteBufferFloatView.html">java.nio.HeapByteBufferFloatView</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/HeapByteBufferIntView.html">java.nio.HeapByteBufferIntView</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/HeapByteBufferLongView.html">java.nio.HeapByteBufferLongView</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/HeapByteBufferShortView.html">java.nio.HeapByteBufferShortView</a>
 </li>
       <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/HeapCharBuffer.html">java.nio.HeapCharBuffer</a>
 </li>
       <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/HeapDoubleBuffer.html">java.nio.HeapDoubleBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/HeapFloatBuffer.html">java.nio.HeapFloatBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/HeapIntBuffer.html">java.nio.HeapIntBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/HeapLongBuffer.html">java.nio.HeapLongBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/HeapShortBuffer.html">java.nio.HeapShortBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/IntBuffer.html">java.nio.IntBuffer</a>
+</li>
+      <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/InvalidMarkException.html">java.nio.InvalidMarkException</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/LongBuffer.html">java.nio.LongBuffer</a>
 </li>
       <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/ReadOnlyBufferException.html">java.nio.ReadOnlyBufferException</a>
 </li>
       <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/ShortBuffer.html">java.nio.ShortBuffer</a>
+</li>
+      <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/StringCharBuffer.html">java.nio.StringCharBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/TypedArrayByteBuffer.html">java.nio.TypedArrayByteBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/TypedArrayCharBuffer.html">java.nio.TypedArrayCharBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/TypedArrayDoubleBuffer.html">java.nio.TypedArrayDoubleBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/TypedArrayFloatBuffer.html">java.nio.TypedArrayFloatBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/TypedArrayIntBuffer.html">java.nio.TypedArrayIntBuffer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/TypedArrayShortBuffer.html">java.nio.TypedArrayShortBuffer</a>
 </li>
       <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/charset/CharacterCodingException.html">java.nio.charset.CharacterCodingException</a>
@@ -4033,13 +4230,67 @@ intDivide(1, 0)     // ArithmeticException</code></pre>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/nio/charset/UnsupportedCharsetException.html">java.nio.charset.UnsupportedCharsetException</a>
 </li>
       <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/security/Guard.html">java.security.Guard</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/security/Permission.html">java.security.Permission</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/security/Throwables.html">java.security.Throwables</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/AbstractCollection.html">java.util.AbstractCollection</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/AbstractList.html">java.util.AbstractList</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/AbstractMap.html">java.util.AbstractMap</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/AbstractQueue.html">java.util.AbstractQueue</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/AbstractRandomAccessListIterator.html">java.util.AbstractRandomAccessListIterator</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/AbstractSequentialList.html">java.util.AbstractSequentialList</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/AbstractSet.html">java.util.AbstractSet</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/ArrayDeque.html">java.util.ArrayDeque</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/ArrayList.html">java.util.ArrayList</a>
+</li>
+      <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Arrays.html">java.util.Arrays</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Collection.html">java.util.Collection</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Collections.html">java.util.Collections</a>
 </li>
       <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Comparator.html">java.util.Comparator</a>
 </li>
       <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Date.html">java.util.Date</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Deque.html">java.util.Deque</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Dictionary.html">java.util.Dictionary</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Enumeration.html">java.util.Enumeration</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/EventObject.html">java.util.EventObject</a>
 </li>
       <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Formattable.html">java.util.Formattable</a>
@@ -4051,16 +4302,121 @@ intDivide(1, 0)     // ArithmeticException</code></pre>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html">java.util.Formatter</a>
 </li>
       <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/HashMap.html">java.util.HashMap</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/HashSet.html">java.util.HashSet</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Hashtable.html">java.util.Hashtable</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Iterator.html">java.util.Iterator</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/LinkedHashMap.html">java.util.LinkedHashMap</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/LinkedHashSet.html">java.util.LinkedHashSet</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/LinkedList.html">java.util.LinkedList</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/List.html">java.util.List</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/ListIterator.html">java.util.ListIterator</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">java.util.Map</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/NavigableMap.html">java.util.NavigableMap</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/NavigableSet.html">java.util.NavigableSet</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/NavigableView.html">java.util.NavigableView</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Objects.html">java.util.Objects</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Optional.html">java.util.Optional</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/package.html">java.util.package</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/PriorityQueue.html">java.util.PriorityQueue</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Properties.html">java.util.Properties</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Queue.html">java.util.Queue</a>
+</li>
+      <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Random.html">java.util.Random</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/RandomAccess.html">java.util.RandomAccess</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Set.html">java.util.Set</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/SizeChangeEvent.html">java.util.SizeChangeEvent</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/SortedMap.html">java.util.SortedMap</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/SortedSet.html">java.util.SortedSet</a>
 </li>
       <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Throwables.html">java.util.Throwables</a>
 </li>
       <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Timer.html">java.util.Timer</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/TimerTask.html">java.util.TimerTask</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/TreeSet.html">java.util.TreeSet</a>
+</li>
+      <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/util/UUID.html">java.util.UUID</a>
 </li>
       <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Callable.html">java.util.concurrent.Callable</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ConcurrentHashMap.html">java.util.concurrent.ConcurrentHashMap</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ConcurrentLinkedQueue.html">java.util.concurrent.ConcurrentLinkedQueue</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ConcurrentMap.html">java.util.concurrent.ConcurrentMap</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ConcurrentSkipListSet.html">java.util.concurrent.ConcurrentSkipListSet</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/CopyOnWriteArrayList.html">java.util.concurrent.CopyOnWriteArrayList</a>
+</li>
+      <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Executor.html">java.util.concurrent.Executor</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ThreadFactory.html">java.util.concurrent.ThreadFactory</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ThreadLocalRandom.html">java.util.concurrent.ThreadLocalRandom</a>
 </li>
       <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Throwables.html">java.util.concurrent.Throwables</a>
@@ -4078,7 +4434,19 @@ intDivide(1, 0)     // ArithmeticException</code></pre>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/atomic/AtomicLong.html">java.util.concurrent.atomic.AtomicLong</a>
 </li>
       <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/atomic/AtomicLongArray.html">java.util.concurrent.atomic.AtomicLongArray</a>
+</li>
+      <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/atomic/AtomicReference.html">java.util.concurrent.atomic.AtomicReference</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/atomic/AtomicReferenceArray.html">java.util.concurrent.atomic.AtomicReferenceArray</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/locks/Lock.html">java.util.concurrent.locks.Lock</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/locks/ReentrantLock.html">java.util.concurrent.locks.ReentrantLock</a>
 </li>
       <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html">java.util.regex.Matcher</a>
@@ -4088,6 +4456,9 @@ intDivide(1, 0)     // ArithmeticException</code></pre>
 </li>
       <li>
         <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">java.util.regex.Pattern</a>
+</li>
+      <li>
+        <a href="https://docs.oracle.com/javase/7/docs/api/scala/scalajs/js/typedarray/TypedArrayBufferBridge.html">scala.scalajs.js.typedarray.TypedArrayBufferBridge</a>
 </li></ul>
 <h1 id="PortingJavaAPIs" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#PortingJavaAPIs" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Porting Java APIs</h1>
   <p>
