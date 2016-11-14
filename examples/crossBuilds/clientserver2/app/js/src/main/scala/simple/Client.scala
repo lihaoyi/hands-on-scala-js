@@ -6,16 +6,16 @@ import scalajs.js.annotation.JSExport
 import scalajs.concurrent.JSExecutionContext.Implicits.runNow
 import autowire._
 
-object Ajaxer extends autowire.Client[String, upickle.Reader, upickle.Writer]{
+object Ajaxer extends autowire.Client[String, upickle.default.Reader, upickle.default.Writer]{
   override def doCall(req: Request) = {
     dom.ext.Ajax.post(
       url = "/ajax/" + req.path.mkString("/"),
-      data = upickle.write(req.args)
+      data = upickle.default.write(req.args)
     ).map(_.responseText)
   }
 
-  def read[Result: upickle.Reader](p: String) = upickle.read[Result](p)
-  def write[Result: upickle.Writer](r: Result) = upickle.write(r)
+  def read[Result: upickle.default.Reader](p: String) = upickle.default.read[Result](p)
+  def write[Result: upickle.default.Writer](r: Result) = upickle.default.write(r)
 }
 
 @JSExport

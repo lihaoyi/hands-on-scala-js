@@ -29,7 +29,7 @@ object Splash extends{
       ("green", x => abs(x % 4 - 2) - 1),
       ("blue", x => sin(x/12) * sin(x))
     ).zipWithIndex
-    dom.setInterval(() => {
+    dom.window.setInterval(() => {
       x = (x + 1) % w; if (x == 0) clear()
       for (((color, f), i) <- graphs) {
         val offset = h / 3 * (i + 0.5)

@@ -46,6 +46,6 @@ object Clock extends{
         canvas.height / 2
       )
     }
-    dom.setInterval(render _, 1000)
+    dom.window.setInterval(render _, 1000)
   }
 }

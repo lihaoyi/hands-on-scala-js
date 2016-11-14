@@ -20,7 +20,7 @@ object Controller{
   @JSExport
   def main(data: scala.scalajs.js.Any) = {
 
-    val structure = upickle.readJs[Tree[String]](upickle.json.readJs(data))
+    val structure = upickle.default.readJs[Tree[String]](upickle.json.readJs(data))
 
     val Seq(main, menu, layout, menuLink) = Seq(
       "main", "menu", "layout", "menuLink"
@@ -74,7 +74,7 @@ object Controller{
       menuLink.classList.toggle("active")
     }
 
-    dom.addEventListener("scroll", (e: dom.UIEvent) => updateScroll())
+    dom.window.addEventListener("scroll", (e: dom.UIEvent) => updateScroll())
 
     updateScroll()
 

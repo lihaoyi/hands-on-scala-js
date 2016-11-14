@@ -8,13 +8,13 @@ version := "0.1-SNAPSHOT"
 
 scalaVersion := "2.11.4"
 
-libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided"
+libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.5" % "provided"
 
-libraryDependencies += "com.lihaoyi" %%% "upickle" % "0.2.7"
+libraryDependencies += "com.lihaoyi" %%% "upickle" % "0.4.4"
 
-libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.8.0"
+libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.1"
 
-libraryDependencies += "com.lihaoyi" %%% "scalatags" % "0.4.6"
+libraryDependencies += "com.lihaoyi" %%% "scalatags" % "0.6.2"
 
 libraryDependencies += "com.lihaoyi" %%% "scalarx" % "0.2.8"
 

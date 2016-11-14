@@ -7,7 +7,7 @@ import org.eclipse.jgit.transport.{UsernamePasswordCredentialsProvider, RefSpec}
 val cloneRepos = taskKey[Unit]("Clone stuff from github")
 
 val sharedSettings = Seq(
-  scalaVersion := "2.11.4",
+  scalaVersion := "2.11.8",
   libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
   autoCompilerPlugins := true

@@ -1,21 +1,25 @@
 package simple
 
 import akka.actor.ActorSystem
-import spray.http.{HttpEntity, MediaTypes}
-import spray.routing.SimpleRoutingApp
-
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.model._
+import akka.http.scaladsl.server.Directives._
+import akka.stream.ActorMaterializer
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Properties
 
-object Server extends SimpleRoutingApp{
+object Server{
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem()
+    implicit val materializer = ActorMaterializer()
+
     val port = Properties.envOrElse("PORT", "8080").toInt
-    startServer("0.0.0.0", port = port){
+    val route = {
       get{
         pathSingleSlash{
           complete{
             HttpEntity(
-              MediaTypes.`text/html`,
+              ContentTypes.`text/html(UTF-8)`,
               Page.skeleton.render
             )
           }
@@ -24,14 +28,18 @@ object Server extends SimpleRoutingApp{
       } ~
       post{
         path("ajax" / "list"){
-          extract(_.request.entity.asString) { e =>
+          extract(_.request.entity match {
+            case HttpEntity.Strict(nb: ContentType.NonBinary, data) =>
+              data.decodeString(nb.charset.value)
+          }) { e =>
             complete {
-              upickle.write(list(e))
+              upickle.default.write(list(e))
             }
           }
         }
       }
     }
+    Http().bindAndHandle(route, "0.0.0.0", port = port)
   }
   def list(path: String) = {
     val (dir, last) = path.splitAt(path.lastIndexOf("/") + 1)

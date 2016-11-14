@@ -1,45 +1,54 @@
 package simple
 
 import akka.actor.ActorSystem
-import spray.http.{HttpEntity, MediaTypes}
-import spray.routing.SimpleRoutingApp
-import scala.concurrent.ExecutionContext.Implicits.global
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.model._
+import akka.http.scaladsl.server.Directives._
+import akka.stream.ActorMaterializer
 
-object Router extends autowire.Server[String, upickle.Reader, upickle.Writer]{
-  def read[Result: upickle.Reader](p: String) = upickle.read[Result](p)
-  def write[Result: upickle.Writer](r: Result) = upickle.write(r)
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Properties
+
+
+object Router extends autowire.Server[String, upickle.default.Reader, upickle.default.Writer]{
+  def read[Result: upickle.default.Reader](p: String) = upickle.default.read[Result](p)
+  def write[Result: upickle.default.Writer](r: Result) = upickle.default.write(r)
 }
 
-object Server extends SimpleRoutingApp with Api{
+object Server extends Api{
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem()
-    startServer("localhost", port = 8080){
+    implicit val materializer = ActorMaterializer()
+
+    val port = Properties.envOrElse("PORT", "8080").toInt
+    val route = {
       get{
         pathSingleSlash{
           complete{
             HttpEntity(
-              MediaTypes.`text/html`,
+              ContentTypes.`text/html(UTF-8)`,
               Page.skeleton.render
             )
           }
         } ~
-        getFromResourceDirectory("")
+          getFromResourceDirectory("")
       } ~
-      post{
-        path("ajax" / Segments){ s =>
-          extract(_.request.entity.asString) { e =>
-            complete {
-              Router.route[Api](Server)(
-                autowire.Core.Request(
-                  s,
-                  upickle.read[Map[String, String]](e)
+        post{
+          path("ajax" / Segments){s =>
+            entity(as[String]) { e =>
+              complete {
+                Router.route[Api](Server)(
+                  autowire.Core.Request(
+                    s,
+                    upickle.default.read[Map[String, String]](e)
+                  )
                 )
-              )
+              }
             }
           }
         }
-      }
     }
+    Http().bindAndHandle(route, "0.0.0.0", port = port)
   }
   def list(path: String) = {
     val (dir, last) = path.splitAt(path.lastIndexOf("/") + 1)
