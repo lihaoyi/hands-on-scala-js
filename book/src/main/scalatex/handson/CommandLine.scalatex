@@ -99,7 +99,7 @@
     @hl.sh
       > run
     @p
-      Here's something you haven't seen before: the @code{run} command gives you the ability to run a Scala.js program from the command line. This prints its output to standard output (i.e. the terminal). Like Scala-JVM, you need a @code{main} method to run to kick off your program. Unlike Scala-JVM, the main method is marked on an @hl.scala{object} which @hl.scala{extends scala.scalajs.js.JSApp}, e.g.
+      Here's something you haven't seen before: the @code{run} command gives you the ability to run a Scala.js program from the command line. This prints its output to standard output (i.e. the terminal). Like Scala-JVM, you need a @code{main} method to run, or kick off, your program. Unlike Scala-JVM, the main method is marked on an @hl.scala{object} which @hl.scala{extends scala.scalajs.js.JSApp}, e.g.
 
     @hl.scala
       // src/main/scala/RunMe.scala

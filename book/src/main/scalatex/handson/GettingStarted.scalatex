@@ -283,7 +283,7 @@
         You will likely have other portions of the page that are of similar size: e.g. @lnk("JQuery", "http://jquery.com/") is extremely popular, and weights in at a comparable 32kb minified and gzipped, while @lnk("React.js", "http://facebook.github.io/react/downloads.html") weighs in at a cool 150kb gzipped. Scala.js arguably provides more than either of these libraries.
 
     @p
-      Regardless, there is ongoing work to shrink the size of these executables. If you want to read more about this, check out the section on @sect.ref("The Compilation Pipeline") to learn about what we currently do to crunch the executables down.
+      Regardless, there is ongoing work to shrink the size of these executables. If you want to read more about this, check out the section on @sect.ref("The Compilation Pipeline") to learn about what Scala.JS currently does to crunch the executables down.
 
   @hr
 
