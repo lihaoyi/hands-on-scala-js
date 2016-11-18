@@ -120,10 +120,10 @@
   @hl.ref(example/"ScalaJSExample.scala", "val ctx", "var count")
 
   @p
-    Here we are retrieving a handle to the canvas we will draw on using @hl.scala{document.getElementById}, and from it we can get a @lnk.dom.CanvasRenderingContext2D which we actually use to draw on it.
+    Here we are retrieving a @lnk.dom.CanvasRenderingContext2D which we actually use to draw on the canvas.  The @hl.scala{canvas} parameter is passed from the calling JavaScript code.
 
   @p
-    We need to perform the @hl.scala{asInstanceOf} call because depending on what you pass to @hl.scala{getElementById} and @hl.scala{getContext}, you could be returned elements and contexts of different types. Hence we need to tell the compiler explicitly that we're expecting a @lnk.dom.html.Canvas and @lnk.dom.CanvasRenderingContext2D back from these methods for the strings we passed in.
+    We need to perform the @hl.scala{asInstanceOf} call because depending on what you pass to @hl.scala{getContext}, you could be returned elements and contexts of different types. Hence we need to tell the compiler explicitly that we're expecting a @lnk.dom.html.Canvas and @lnk.dom.CanvasRenderingContext2D back from these methods for the strings we passed in.
 
   @p
     Note how the @lnk.dom.html.Canvas comes from the @hl.scala{html} namespace, while the @lnk.dom.CanvasRenderingContext2D comes from the @hl.scala{dom} namespace. Traditionally, these types are imported via their qualified names: e.g. @hl.scala{html.Canvas} rather than just @hl.scala{Canvas}.
