@@ -190,10 +190,6 @@
     @p
       The @hl.scala{example.ScalaJSExample().main()} call is what kicks off the Scala.js application and starts its execution. Scala.js follows Scala semantics in that @hl.scala{object}s are evaluated lazily, with no top-level code allowed. This is in contrast to JavaScript, where you can include top-level statements and object-literals in your code which execute immediately. In Scala.js, nothing happens when @code{../example-fastopt.js} is imported! We have to call the main-method first. In this case, we're passing the canvas object (attained using @hl.js{getElementById}) to it so it knows where to do its thing.
 
-
-  @p
-    @hl.scala{document.getElementById} is the exact same API that's used in normal JavaScript, as documented @lnk("here", "https://developer.mozilla.org/en-US/docs/Web/API/document.getElementById"). In fact, the entire @hl.scala{org.scalajs.dom} namespace (imported at the top of the file) comprises statically typed facades for the javascript APIs provided by the browser.
-
     @p
       Lastly, only @hl.scala("@JSExport")ed objects and methods can be called from JavaScript. Also, although this example only exports the @hl.scala{main} method which is called once, there is nothing stopping you from exporting any number of objects and methods and calling them whenever you need to. In this way, you can easily make a Scala.js "library" which is available to external JavaScript as an API.
 
