@@ -25,7 +25,7 @@
   @hl.ref(canvasapp/"ScratchPad.scala", "/*setup*/", end = "/*code*/")
 
   @p
-    As described earlier, this code uses the @lnk.dom.getElementById function to fish out the @code{canvas} element that we interested in from the DOM. It then gets a rendering context from that @code{canvas}, and sets the height and width of the canvas to completely fill its containing element. Lastly, it fills out the canvas light-gray, so that we can see it on the page.
+    As described earlier, this code uses the @code{getContext} function to get a rendering context from the  @code{canvas}, and sets the height and width of the canvas to completely fill its containing element. Lastly, it fills out the canvas light-gray, so that we can see it on the page.
 
   @p
     Next, let's set some event handlers on the canvas:
