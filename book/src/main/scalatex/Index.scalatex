@@ -15,7 +15,7 @@ is a set of detailed expositions on various parts of the Scala.js platform. Noth
       @example(canvas, "Splash().main")
 
   @p
-    @lnk("Scala.js", "http://www.scala-js.org/") is a compiler that compiles Scala source code to equivalent JavaScript code. Scala.js lets you write Scala code that you can run in a web browser or other environments like Chrome plugins and Node.js where JavaScript is supported. This book is an introduction to Scala.js, which aims to get you from knowing nothing about it to being relatively proficient.
+    @lnk("Scala.js", "http://www.scala-js.org/") is a compiler that compiles Scala source code to equivalent JavaScript code. Scala.js lets you write Scala code that you can run in a web browser or other environments, like Chrome plugins and Node.js, where JavaScript is supported. This book is an introduction to Scala.js, which aims to get you from knowing nothing about it to being relatively proficient.
 
   @p
     This book contains something for all levels of experience with Scala.js: absolute beginners can get started with the @sect.ref{Intro to Scala.js} and @sect.ref{Hands On} tutorial, people who have used it before can skip ahead to the later parts of the tutorial: @sect.ref{Making a Canvas App} or @sect.ref{Interactive Web Pages}. Intermediate users will find interest in the chapters on @sect.ref{Cross Publishing Libraries} with Scala.js or @sect.ref{Integrating Client-Server}, and even experienced users will find the @sect.ref{In Depth} documentation useful. Feel free to explore the navigation bar on the left to find chapters of interest.
