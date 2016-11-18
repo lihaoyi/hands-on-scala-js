@@ -178,9 +178,6 @@
     @p
       Of interest is the @hl.scala{libraryDependencies}. In Scala-JVM, this key is used to declare dependencies on libraries from Maven Central, so you can use them in your Scala-JVM projects. In Scala.js, the same key is used to declare dependencies on libraries so you can use them in your Scala.js projects! Re-usable libraries can be built and published with Scala.js just as you do on Scala-JVM, and here we make use of one which provides the typed facades with which we used to access the DOM in the application code.
 
-    @p
-      Lastly, we have two Workbench related settings: @hl.scala{bootSnippet} basically tells Workbench how to restart your application when a new compilation run finishes, and @hl.scala{updateBrowsers} actually tells it to perform this application-restarting.
-
   @sect{src/main/resources/index-dev.html}
     @hl.ref(cloneRoot/"workbench-example-app"/'src/'main/'resources/"index-dev.html")
 
