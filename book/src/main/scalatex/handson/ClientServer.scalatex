@@ -8,15 +8,15 @@
 
 
 @p
-  Historically, sharing code across client & server has been a holy-grail for web development. There are many things which have made it hard in the past:
+  Historically, sharing code across client and server has been a holy grail for web development. There are many things which have made it hard in the past:
 
 @ul
   @li
-    Javascript on the client v.s. PHP/Perl/Python/Ruby/Java on the server
+    JavaScript on the client vs. PHP/Perl/Python/Ruby/Java on the server
   @li
-    Most back-ends make heavy use of C extensions, and front-end code was tightly coupled to the DOM. Even if you manage to port the main language
+    Most backends make heavy use of C extensions, and frontend code was tightly coupled to the DOM. Even if you manage to port the main language
 @p
-  There have been some attempts in recent years with more traction: Node.js, for example, has been very successful at running Javascript on the server, the Clojure/Clojurescript community has their own version of cross-built code, and there are a number of smaller, more esoteric platforms.
+  There have been some attempts in recent years with more traction: Node.js, for example, has been very successful at running JavaScript on the server, the Clojure/ClojureScript community has their own version of cross-built code, and there are a number of smaller, more esoteric platforms.
 
 @p
   Scala.js lets you share code between client and server relatively straightforwardly. As we saw in the previous chapter, where we made a shared module. Let's work to turn that shared module into a working client-server application!
@@ -26,7 +26,7 @@
 
 @sect{A Client-Server Setup}
   @p
-    Getting started with client-server integration, let's go with the simplest configuration possible: a Spray server and a Scala.js client. Most of the other web-frameworks (@lnk.misc.Play, @lnk.misc.Scalatra, etc.) will have more complex configurations, but the basic mechanism of wiring up Scala.js to your web framework will be the same. Just like our project in @sect.ref{Cross Publishing Libraries}, our project will look like this:
+    Getting started with client-server integration, let's go with the simplest configuration possible: a Spray server and a Scala.js client. Most of the other web frameworks (@lnk.misc.Play, @lnk.misc.Scalatra, etc.) will have more complex configurations, but the basic mechanism of wiring up Scala.js to your web framework will be the same. Just like our project in @sect.ref{Cross Publishing Libraries}, our project will look like this:
 
   @hl.sh
     $ tree
@@ -41,29 +41,24 @@
                                 └── Server.scala
 
   @p
-    First, let's do the wiring in @code{project/build.sbt}:
-
-  @hl.ref(wd/'examples/'crossBuilds/'clientserver/'project/"build.sbt")
-
-  @p
-    And @code{build.sbt}:
+    First, let's do the wiring in @code{build.sbt}:
 
   @hl.ref(wd/'examples/'crossBuilds/'clientserver/"build.sbt")
 
   @p
-    Again, we are using @hl.scala{crossProject} to define our @code{js/} and @code{jvm/} sub-projects. Both projects share a number of settings: the settings to add @lnk.github.Scalatags and @lnk.github.uPickle to the build. Note that those two dependencies use the triple @code{%%%} instead of the double @code{%%} to declare: this means that for each dependency, we will pull in the Scala-JVM or Scala.js version depending on whether it's being used in a Scala.js project. Note also the @hl.scala{packageArchetype.java_application} setting, which isn't strictly necessary depending on what you want to do with the application, but this example needs it as part of the deployment to Heroku.
+    Again, we are using @hl.scala{crossProject} to define our @code{js/} and @code{jvm/} subprojects. Both projects share a number of settings: the settings to add @lnk.github.ScalaTags and @lnk.github.uPickle to the build. Note that those two dependencies use the triple @code{%%%} instead of the double @code{%%} to declare: this means that for each dependency, we will pull in the Scala JVM or Scala.js version depending on whether it's being used in a Scala.js project. Note also the @hl.scala{packageArchetype.java_application} setting, which isn't strictly necessary depending on what you want to do with the application, but this example needs it as part of the deployment to Heroku.
 
   @p
-    The @code{js/} sub-project is uneventful, with a dependency on the by-now-familiar @code{scalajs-dom} library. The @code{jvm/} project, on the other hand, is interesting: it contains the dependencies required for us to set up out Spray server, and one additional thing: we add the output of @code{fastOptJS} from the client to the @code{resources} on the server. This will allow the @code{server} to serve the compiled-javascript from our @code{client} project from its resources.
+    The @code{js/} subproject is uneventful, with a dependency on the by-now-familiar @code{scalajs-dom} library. The @code{jvm/} project, on the other hand, is interesting: it contains the dependencies required for us to set up out Spray server, and one additional thing: we add the output of @code{fastOptJS} from the client to the @code{resources} on the server. This will allow the @code{server} to serve the compiled JavaScript from our @code{client} project from its resources.
 
   @p
-    Next, let's kick off the Akka-HTTP server in our Scala-JVM main method:
+    Next, let's kick off the Spray server in our Scala JVM main method:
 
 
   @hl.ref(server/"Server.scala")
 
   @p
-    This is a not-very-interesting akka-http application: we set up a server on @code{localhost:8080}, have the root URL serve the main page on GET, and have other GET URLs serve resources. This includes the @code{js-fastopt.js} file that is now in our resources because of our @code{build.sbt} config earlier! We also add a POST route to allow the client ask the server to list files various directories.
+    This is a not very interesting @lnk("spray-routing", "http://spray.io/documentation/1.2.2/spray-routing/") application: we set up a server on @code{localhost:8080}, have the root URL serve the main page on GET, and have other GET URLs serve resources. This includes the @code{js-fastopt.js} file that is now in our resources because of our @code{build.sbt} config earlier! We also add a POST route to allow the client ask the server to list files various directories.
 
   @p
     The HTML template @hl.scala{Page.skeleton} is not shown above; I put it in a separate file for neatness:
@@ -71,7 +66,7 @@
   @hl.ref(server/"Page.scala")
 
   @p
-    This is a typical @lnk.github.Scalatags HTML snippet. Note that since we're serving it directly from the server in Scala code, we do not need to leave a @code{.html} file somewhere on the filesystem! We can declare all HTML, including the skeleton of the page, in Scalatags. Otherwise it's the same as what we saw in earlier chapters: A simple HTML page which includes a script tag to run our Scala.js application.
+    This is a typical @lnk.github.ScalaTags HTML snippet. Note that since we're serving it directly from the server in Scala code, we do not need to leave a @code{.html} file somewhere on the file system! We can declare all HTML, including the skeleton of the page, in ScalaTags. Otherwise it's the same as what we saw in earlier chapters: A simple HTML page which includes a script tag to run our Scala.js application.
   @p
     Lastly, we'll set up the Scala.js main method, which we are calling in the @hl.xml{<script>} tag above to kick off the client-side application.
 
@@ -81,20 +76,20 @@
     Again this is a simple Scala.js application, not unlike what we saw in earlier chapters. However, there is one difference: earlier, we made our Ajax calls to @code{api.openweathermap.org/...}. Here, we're making it to @code{/ajax}: the same server the page is served from!
 
   @p
-    You may have noticed in both client and server, we have made reference to a mysterious @hl.scala{FileData} type which holds the name and size of each file. @hl.scala{FileData} is defined in the @code{shared/} folder, so it can be accessed from both Scala-JVM and Scala.js:
+    You may have noticed in both client and server, we have made reference to a mysterious @hl.scala{FileData} type which holds the name and size of each file. @hl.scala{FileData} is defined in the @code{shared/} folder, so it can be accessed from both Scala JVM and Scala.js:
 
 
   @hl.ref(wd/'examples/'crossBuilds/'clientserver/'app/'shared/'src/'main/'scala/'simple/"FileData.scala")
 
   @p
-    Now, if we start the server with @code{sbt appJVM/reStart} and go to the browser at @code{localhost:8080}, we should see our web-page!
+    Now, if we go to the browser at @code{localhost:8080}, we should see our web page!
 
   @iframe(id:="heroku1", width:="100%", height:="350px", "frameBorder".attr:="0")
   @lazyload("heroku1")
 
 
   @p
-    This is a real, live example running on a @lnk("Heroku server", "https://hands-on-scala-js.herokuapp.com/"). Feel free to poke around and explore the filesystem on the server, just to convince yourself that this actually works and is not just a mock up.
+    This is a real, live example running on a @lnk("Heroku server", "https://hands-on-scala-js.herokuapp.com/"). Feel free to poke around and explore the file system on the server, just to convince yourself that this actually works and is not just a mock up.
 
 @sect{Client-Server Reflections}
   @p
@@ -103,26 +98,26 @@
   @sect{Shared Templating}
 
     @p
-      In both the client code and the server code, we made use of the same Scalatags HTML generation library. This is pretty neat: transferring rendering logic between client and server no longer means an annoying/messy rewrite! You can simply C&P the Scalatags snippet over. That means it's easy if you want to e.g. shift the logic from one side to the other in order to optimize for performance or time-to-load or other things.
+      In both the client code and the server code, we made use of the same ScalaTags HTML generation library. This is pretty neat: transferring rendering logic between client and server no longer means an annoying/messy rewrite! You can simply C&P the ScalaTags snippet over. That means it's easy if you want to e.g. shift the logic from one side to the other in order to optimize for performance or time-to-load or other things.
     @p
-      One thing to take note of is that we're actually using subtly @i{different} implementations of Scalatags on both sides: on the server, we're importing from @hl.scala{scalatags.Text}, while on the client we're using @hl.scala{scalatags.JsDom}. The @hl.scala{Text} backend renders directly to Strings, and is available on both Scala-JVM and Scala.js. The @hl.scala{JsDom} backend, on the other hand, renders to @lnk.dom.html.Element-s which only exist on Scala.js. Thus while on the client you can do things like attach event listeners to the rendered @lnk.dom.html.Element objects, or checking their runtime @code{.value}, on the server you can't. And that's exactly what you want!
+      One thing to take note of is that we're actually using subtly @i{different} implementations of ScalaTags on both sides: on the server, we're importing from @hl.scala{ScalaTags.Text}, while on the client we're using @hl.scala{ScalaTags.JsDom}. The @hl.scala{Text} back end renders directly to Strings, and is available on both Scala JVM and Scala.js. The @hl.scala{JsDom} back end, on the other hand, renders to @lnk.dom.html.Element-s which only exist on Scala.js. Thus while on the client you can do things like attach event listeners to the rendered @lnk.dom.html.Element objects, or checking their runtime @code{.value}, on the server you can't. And that's exactly what you want!
 
   @sect{Shared Code}
     @p
-      One thing that we skimmed over is the fact that we could easily define our @hl.scala{case class FileData(name: String, size: Long)} in the @code{shared/} folder, and have it instantly and consistently available on both client and server. This perhaps does not seem so amazing: we've already done many similar things earlier when we were building Cross-platform Modules. Nevertheless, in the context of web development, it is a relatively novel idea to be able to ad-hoc share bits of code between client and server.
+      One thing that we skimmed over is the fact that we could easily define our @hl.scala{case class FileData(name: String, size: Long)} in the @code{shared/} folder, and have it instantly and consistently available on both client and server. This perhaps does not seem so amazing: we've already done many similar things earlier when we were building cross-platform modules. Nevertheless, in the context of web development, it is a relatively novel idea to be able to ad hoc share bits of code between client and server.
     @p
-      Sharing code is not limited to class definitions: @i{anything} can be shared. Objects, classes, interfaces/traits, functions and algorithms, constants: all of these are things that you will likely want to share at some point or another. Traditionally, people have simply re-implemented the same code twice in two languages, or have resorted to awkward Ajax calls to push the logic to the server. With Scala.js, you no longer need to do so: you can easily, create ad-hoc bits of code which are available on both platforms.
+      Sharing code is not limited to class definitions: @i{anything} can be shared. Objects, classes, interfaces/traits, functions and algorithms, constants: all of these are things that you will likely want to share at some point or another. Traditionally, people have simply re-implemented the same code twice in two languages, or have resorted to awkward Ajax calls to push the logic to the server. With Scala.js, you no longer need to do so: you can easily, create ad hoc bits of code which are available on both platforms.
 
   @sect{Boilerplate-free Serialization}
     @p
-      The Ajax/RPC layer is one of the more fragile parts of web applications. Often, you have your various Ajax endpoints written once on the server, have a set of routes written to connect those Ajax endpoints to URLs, and client code (traditionally Javascript) made calls to those URLs with "raw" data: basically whatever you wanted, packed in an ad-hoc mix of CSV and JSON and raw-strings.
+      The Ajax/RPC layer is one of the more fragile parts of web applications. Often, you have your various Ajax endpoints written once on the server, have a set of routes written to connect those Ajax endpoints to URLs, and client code (traditionally JavaScript) made calls to those URLs with "raw" data: basically whatever you wanted, packed in an ad hoc mix of CSV and JSON and raw-strings.
 
     @p
       This has always been annoying boilerplate, and Scala.js removes it. With @lnk.github.uPickle, you can simply call @hl.scala{upickle.write(...)} and @hl.scala{upickle.read[T](...)} to convert your collections, primitives or case-classes to and from JSON. This means you do not need to constantly re-invent different ways of making Ajax calls: you can just fling the data right across the network from client to server and back again.
 
 @sect{What's Left?}
   @p
-    We've built a small client-server web application with a Scala.js web-client that makes Ajax calls to a Scala-JVM web-server running on Spray. We performed these Ajax calls using uPickle to serialize the data back and forth, so serializing the arguments and return-value was boilerplate-free and correct.
+    We've built a small client-server web application with a Scala.js web-client that makes Ajax calls to a Scala JVM web-server running on Spray. We performed these Ajax calls using uPickle to serialize the data back and forth, so serializing the arguments and return-value was boilerplate-free and correct.
 
   @p
     However, there is still some amount of duplication in the code. In particular, the definition of the endpoint name "list" is duplicated 4 times:
@@ -139,14 +134,14 @@
     @li
       You could change the string literals @hl.scala{"list"} and forget to change the method-name @hl.scala{list}, thus confusing future maintainers of the code.
     @li
-      You could change one of literal @hl.scala{"list"}s but forget to change the other, thus causing an error at run-time (e.g. a 404 NOT FOUND response)
+      You could change one of literal @hl.scala{"list"}s but forget to change the other, thus causing an error at runtime (e.g. a 404 NOT FOUND response)
     @li
       You could update the return type of the @hl.scala{list} method and forget to update the @hl.scala{upickle.read} deserialization call on the client, resulting in a deserialization failure at runtime.
 
   @p
 
   @p
-    Neither of these scenarios is great! Although we've already made great progress in making our client-server application type-safe (via Scala.js on the client) and DRY (via shared code in @code{shared/}) we still have this tiny bit of annoying, un-checked duplication and danger lurking in the code-base. The basic problem is that what is normally called the "routing layer" in the web application is still unsafe, and so these silly errors can go un-caught and blow up on unsuspecting developers at run-time. Let's see how we can fix it.
+    Neither of these scenarios is great! Although we've already made great progress in making our client-server application type-safe (via Scala.js on the client) and DRY (via shared code in @code{shared/}) we still have this tiny bit of annoying, unchecked duplication and danger lurking in the code base. The basic problem is that what is normally called the "routing layer" in the web application is still unsafe, and so these silly errors can go uncaught and blow up on unsuspecting developers at runtime. Let's see how we can fix it.
 
 @sect{Autowire}
 
@@ -201,7 +196,7 @@
     @hl.ref(server2/"Server.scala", "object Router", "object Server")
 
     @p
-      In this case using uPickle. Note how the @hl.scala{route} call explicitly states the type (here @hl.scala{Api}) that it is to generate routes against; this ensures that only methods which you explicitly put in your public interface @hl.scala{Api} are publically reachable.
+      In this case using uPickle. Note how the @hl.scala{route} call explicitly states the type (here @hl.scala{Api}) that it is to generate routes against; this ensures that only methods which you explicitly put in your public interface @hl.scala{Api} are publicly reachable.
 
     @p
       Next, let's look at the modified client code:
@@ -217,7 +212,7 @@
       Like the @hl.scala{Router} object, @hl.scala{Ajaxer} also defines how you perform the serialization and deserialization of data-structures, again using uPickle. Unlike the @hl.scala{Router} object, @hl.scala{Ajaxer} also defines how the out-going Ajax call gets sent over the network. Here we're doing it using the @hl.scala{Ajax.post} method.
 
     @p
-      Lastly, let's look at the modified callsite for the ajax call itself:
+      Lastly, let's look at the modified call site for the Ajax call itself:
 
     @hl.ref(client2/"Client.scala", "def update", "")
 
@@ -251,13 +246,13 @@
       @li
         It is impossible for the route and the endpoint method-name to diverge accidentally: if the endpoint is called @hl.scala{list}, the requests will go through the @code{/list} URL. No room for discussion, or to make a mistake
       @li
-        You cannot accidentally rename the route on the server without changing the client, or vice versa. Attempts to do so will cause a compilation error, and even your IDE should highlight it as red. Try it out!
+        You cannot accidentally rename the route on the server without changing the client, or vice versa. Attempts to do so will cause a compilation error and even your IDE should highlight it as red. Try it out!
 
       @li
-        There is no chance of messing up the serialization/deserialization code, e.g. writing a response of type A on the server and trying to read a data-structure of type B on the client. You have no opportunity to make an error: you pass arguments to the Ajax call, and they are serialized/deserialized automatically, such that by the time you get access to the value on the server, it is already of the correct type! The same applies to serializing/deserializing the return-value on the client. There is simply no place for you as a developer to accidentally make a mistake!
+        There is no chance of messing up the serialization/deserialization code, e.g. writing a response of type A on the server and trying to read a data-structure of type B on the client. You have no opportunity to make an error: you pass arguments to the Ajax call, and they are serialized/deserialized automatically, such that by the time you get access to the value on the server, it is already of the correct type! The same applies to serializing/deserializing the return value on the client. There is simply no place for you as a developer to accidentally make a mistake!
 
     @p
-      Although the functionality of the web application is the same, it is mostly in terms of @i{safety} that we have made the biggest gains. All of the common failure modes described earlier have been guarded against, and you as a developer will have a hard time trying to make a mal-formed Ajax call. It's worth taking some time to poke at the source code to see the boundaries of the type-safety provided by autowire, as it is a very different experience from the traditional "route it manually" approach to making interactive client-server applications.
+      Although the functionality of the web application is the same, it is mostly in terms of @i{safety} that we have made the biggest gains. All of the common failure modes described earlier have been guarded against, and you as a developer will have a hard time trying to make a malformed Ajax call. It's worth taking some time to poke at the source code to see the boundaries of the type safety provided by Autowire, as it is a very different experience from the traditional "route it manually" approach to making interactive client-server applications.
 
 @hr
 

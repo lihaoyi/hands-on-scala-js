@@ -183,7 +183,7 @@
     ("Almost all of scala.*", "scala.collection.parallel, scala.tools.nsc"),
     ("Some of java.util.*", "org.omg.CORBA, sun.misc.*"),
     ("Macros: uPickle, Scala-Async, Scalaxy, etc", "Reflection: Scala-Pickling, Scala-Reflect"),
-    ("Shapeless, Scalaz, Scalatags, uTest", "Scalatest, Scalate"),
+    ("Shapeless, Scalaz, ScalaTags, uTest", "Scalatest, Scalate"),
     ("XMLHttpRequest, Websockets. Localstorage", "Netty, Akka, Spray, File IO, JNI"),
     ("HTML DOM, Canvas, WebGL", "AWT, Swing, SWT, OpenGL"),
     ("Chipmunk.js, Hand.js, React.js, jQuery", "Guice, JUnit, Apache-Commons, log4j"),
@@ -191,7 +191,7 @@
   )
 
   @p
-    Scala.js differs from Scala-JVM not just in the corner-cases of the language, but also in the libraries available. Scala-JVM has access to JVM APIs and the wealth of the Java libraries, while Scala.js has access to Javascript APIs and Javascript libraries. It's also possible to write pure-Scala libraries that run on both Scala.js and Scala-JVM, as detailed @a("here").
+    Scala.js differs from Scala-JVM not just in the corner-cases of the language, but also in the libraries available. Scala-JVM has access to JVM APIs and the wealth of the Java libraries, while Scala.js has access to JavaScript APIs and JavaScript libraries. It's also possible to write pure-Scala libraries that run on both Scala.js and Scala-JVM, as detailed @a("here").
   @p
     This table gives a quick overview of the sorts of libraries you can and can't use when working on Scala.js:
 
@@ -238,7 +238,7 @@
     @p
       You cannot use any libraries which have a Java dependency. This means libraries like @lnk.misc.ScalaTest or @lnk.misc.Scalate, which depend on a number of external Java libraries or source files, cannot be used from Scala.js. You can only use libraries which have no dependency on Java libraries or sources.
 
-  @sect{Javascript APIs v.s. JVM APIs}
+  @sect{JavaScript APIs v.s. JVM APIs}
     @tableHead
       @for(tuple <- myTable.slice(5, 7))
         @tr
@@ -262,6 +262,6 @@
     @p
       Lastly, there is the matter of tools. Naturally, all the Scala tools which depend on the JVM are out. This means things like the @lnk("Yourkit", "http://www.yourkit.com/"), @lnk("VisualVM", "http://visualvm.java.net/") and @lnk("JProfiler", "https://www.ej-technologies.com/products/jprofiler/overview.html") profilers, as well as things like the Scala command-line REPL which relies on classloaders and other such things to run on the JVM
     @p
-      On the other hand, you do get to keep and continue using many tools which are build for Scala but JVM-agnostic. For example, IDEs such a @lnk.misc.IntelliJ and @lnk.misc.Eclipse work great with Scala.js; from their point of view, it's just Scala, and things like code-navigation, refactoring and error-highlighting all work out of the box. SBT works with Scala.js too, and you see the same compile-erorrs in the command-line as you would in vanilla Scala, and even things like incremental compilation work un-changed.
+      On the other hand, you do get to keep and continue using many tools which are build for Scala but JVM-agnostic. For example, IDEs such a @lnk.misc.IntelliJ and @lnk.misc.Eclipse work great with Scala.js; from their point of view, it's just Scala, and things like code-navigation, refactoring and error-highlighting all work out of the box. SBT works with Scala.js too, and you see the same compile-erorrs in the command-line as you would in vanilla Scala, and even things like incremental compilation work unchanged.
     @p
       Lastly, you gain access to browser tools that don't work with normal Scala: you can use the Chrome or Firefox consoles to poke at your Scala.js application from the command line, or their profilers/debuggers. With source maps set up, you can even step-through debug your Scala.js application directly in Chrome.

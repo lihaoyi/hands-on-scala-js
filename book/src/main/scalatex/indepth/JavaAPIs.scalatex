@@ -37,10 +37,10 @@
       @hl.scala{sun.misc.Unsafe}
 
   @p
-    And other similar APIs will either need to be rewritten to not-use them. For example, @hl.scala{AtomicXXXs} can be written without threading/unsafe APIs because Javascript is single-threaded, making the implementation for e.g. an @hl.scala{AtomicBoolean} pretty trivial:
+    And other similar APIs will either need to be rewritten to not-use them. For example, @hl.scala{AtomicXXXs} can be written without threading/unsafe APIs because JavaScript is single-threaded, making the implementation for e.g. an @hl.scala{AtomicBoolean} pretty trivial:
 
   @hl.ref(cloneRoot/"scala-js"/'javalib/'src/'main/'scala/'java/'util/'concurrent/'atomic/"AtomicBoolean.scala")
 
   @p
-    Others can't be ported at all (e.g. @code{java.io.File}) simply because the API capabilities they provide (blocking reads & writes to files) do not exist in the Javascript runtime.
+    Others can't be ported at all (e.g. @code{java.io.File}) simply because the API capabilities they provide (blocking reads and writes to files) do not exist in the JavaScript runtime.
 

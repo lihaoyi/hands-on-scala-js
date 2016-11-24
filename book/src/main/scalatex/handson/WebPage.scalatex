@@ -1,7 +1,7 @@
 @import book.BookData._
 
 @p
-  Most web applications aren't neat little games which live on a single canvas: they are large, structured HTML pages, which involve displaying data (whether from the user or from the web) in multiple ways, while allowing the user to make changes to the data that can be saved back to whatever remote web-service/database it came from.
+  Most web applications aren't neat little games which live on a single canvas: they are large, structured HTML pages, which involve displaying data (whether from the user or from the web) in multiple ways, while allowing the user to make changes to the data that can be saved back to whatever remote web service or database it came from.
 
 @p
   At this point, you are already competent at using Scala.js to make basic, self-contained canvas applications. In this chapter, we will cover how to use Scala.js to build the sort of interactive-web-pages that make up the bulk of the modern-day internet. We'll cover how to use powerful libraries that turn front-end development from the typical fragile-mess into a structured, robust piece of software.
@@ -11,7 +11,7 @@
 @sect{Hello World: HTML}
 
   @p
-    The most basic way of building interactive web pages using Scala.js is to use the Javascript APIs to blat HTML strings directly into some container @hl.xml{<div>} or @hl.xml{<body>}. This approach works, as the following code snippet demonstrates:
+    The most basic way of building interactive web pages using Scala.js is to use the JavaScript APIs to blat HTML strings directly into some container @hl.xml{<div>} or @hl.xml{<body>}. This approach works, as the following code snippet demonstrates:
 
   @split
     @more
@@ -21,7 +21,7 @@
       @book.BookData.example(div, "webpage.HelloWorld0().main")
 
   @p
-    Remember that we're now requiring a @hl.scala{html.Div} instead of a @hl.scala{html.Canvas} to be passed in when the Javascript calls @hl.js{webpage.HelloWorld0().main(...)}. If you're coming to this point from the previous chapter, you'll need to update the on-page Javascript's @hl.js{document.getElementById} to pick a @hl.xml{<div>} rather than the @hl.xml{<canvas>} we were using in the previous chapter.
+    Remember that we're now requiring a @hl.scala{html.Div} instead of a @hl.scala{html.Canvas} to be passed in when the JavaScript calls @hl.js{webpage.HelloWorld0().main(...)}. If you're coming to this point from the previous chapter, you'll need to update the on-page JavaScript's @hl.js{document.getElementById} to pick a @hl.xml{<div>} rather than the @hl.xml{<canvas>} we were using in the previous chapter.
 
   @p
     This approach works, as the above example shows, but has a couple of disadvantages:
@@ -35,14 +35,14 @@
   @p
     There are more, but we won't go deep into the intricacies of these problems. Suffice to say it makes mistakes easy to make and hard to catch, and we have something better...
 
-@sect{Scalatags}
+@sect{ScalaTags}
   @p
-    @lnk("Scalatags", "https://github.com/lihaoyi/scalatags") is a cross-platform Scala.js/Scala-JVM library that is designed to generate HTML. To use Scalatags, you need to add it as a dependency to your Scala.js SBT project, in the @code{build.sbt} file:
+    @lnk.github.ScalaTags is a cross-platform Scala.js/Scala-JVM library that is designed to generate HTML. To use ScalaTags, you need to add it as a dependency to your Scala.js SBT project, in the @code{build.sbt} file:
 
   @hl.ref(wd/'examples/'demos/"build.sbt", "scalatags", "")
 
   @p
-    With that, the above snippet of code re-written using Scalatags looks as follows:
+    With that, the above snippet of code re-written using ScalaTags looks as follows:
 
   @split
     @more
@@ -52,10 +52,10 @@
       @book.BookData.example(div, "webpage.HelloWorld1().main")
 
   @p
-    Scalatags has some nice advantages over plain HTML: it's type-safe, so typos like @hl.scala{dvi} get caught at compile-time. It's also secure, such that you don't need to worry about script-tags in strings or similar. The @lnk("Scalatags Readme", "https://github.com/lihaoyi/scalatags#scalatags") elaborates on these points and other advantages. As you can see, it takes just 1 import at the top of the file to bring it in scope, and then you can use all of Scalatags' functionality.
+    ScalaTags has some nice advantages over plain HTML: it's type-safe, so typos like @hl.scala{dvi} get caught at compile-time. It's also secure, such that you don't need to worry about script-tags in strings or similar. The @lnk("ScalaTags Readme", "https://github.com/lihaoyi/scalatags#scalatags") elaborates on these points and other advantages. As you can see, it takes just 1 import at the top of the file to bring it in scope, and then you can use all of ScalaTags' functionality.
 
   @p
-    The Scalatags github page has @lnk("comprehensive documentation", "https://github.com/lihaoyi/scalatags#hello-world") on how to express all manner of HTML fragments using Scalatags, so anyone who's familiar with how HTML works can quickly get up to speed. Instead of a detailed listing, we'll walk through some interactive examples to show Scalatags in action!
+    The ScalaTags GitHub page has @lnk("comprehensive documentation", "https://github.com/lihaoyi/scalatags#hello-world") on how to express all manner of HTML fragments using ScalaTags, so anyone who's familiar with how HTML works can quickly get up to speed. Instead of a detailed listing, we'll walk through some interactive examples to show ScalaTags in action!
 
   @sect{User Input}
     @split
@@ -66,7 +66,7 @@
         @example(div(height:="150px"), "webpage.Inputs().main")
 
     @p
-      In Scalatags, you build up fragments of type @hl.scala{Frag} using functions like @hl.scala{div}, @hl.scala{h1}, etc., and call @hl.scala{.render} on it to turn it into a real @lnk.dom.Element. Different fragments render to different things: e.g. @hl.scala{input.render} gives you a @lnk.dom.html.Input, @hl.scala{span.render} gives you a @lnk.dom.html.Span. You can then access the properties of these elements: adding callbacks, checking their value, anything you want.
+      In ScalaTags, you build up fragments of type @hl.scala{Frag} using functions like @hl.scala{div}, @hl.scala{h1}, etc., and call @hl.scala{.render} on it to turn it into a real @lnk.dom.Element. Different fragments render to different things: e.g. @hl.scala{input.render} gives you a @lnk.dom.html.Input, @hl.scala{span.render} gives you a @lnk.dom.html.Span. You can then access the properties of these elements: adding callbacks, checking their value, anything you want.
 
     @p
       In this example, we render and @hl.scala{input} element and a @hl.scala{span}, wire up the input to set the value of the span whenever you press a key in the input, and then stuff both of them into a larger HTML fragment that forms the contents of our @hl.scala{target} element.
@@ -86,10 +86,10 @@
     @hl.ref(webpage/"Search0.scala", "def renderListings", "lazy val")
 
     @p
-      Using a @hl.scala{for}-loop with a filter inside the Scalatags fragment is just normal Scala, since you can nest arbitrary Scala expressions inside a Scalatags snippet. In this case, we're converting both the fruit and the search query to lower case so we can compare them case-insensitively.
+      Using a @hl.scala{for}-loop with a filter inside the ScalaTags fragment is just normal Scala, since you can nest arbitrary Scala expressions inside a ScalaTags snippet. In this case, we're converting both the fruit and the search query to lower case so we can compare them case-insensitively.
 
     @p
-      Lastly, we just need to define the input box and output-container (as we did earlier), set the @lnk.dom.onkeyup event handler, and place it in a larger fragment, and then into our target:
+      Lastly, we just need to define the input box and the output container (as we did earlier), set the @lnk.dom.onkeyup event handler, and place it in a larger fragment, and then into our target:
 
     @split
       @more
@@ -114,25 +114,25 @@
   @hr
 
   @p
-    Hopefully this has given you a good overview of how to do things using Scala.js and Scalatags. I won't go too deep into the various ways you can use Scalatags: the @lnk("documentation", "https://github.com/lihaoyi/scalatags") should cover most of it. Now that you've gone through this experience, it's worth re-iterating a few things you've probably already noticed about Scalatags
+    Hopefully this has given you a good overview of how to do things using Scala.js and ScalaTags. I won't go too deep into the various ways you can use ScalaTags: the @lnk("documentation", "https://github.com/lihaoyi/scalatags") should cover most of it. Now that you've gone through this experience, it's worth re-iterating a few things you've probably already noticed about ScalaTags
 
   @ul
     @li
-      It's safe! If you make a trivial syntactic mistake, the compiler will catch it, because Scalatags is plain Scala. Try it!
+      It's safe! If you make a trivial syntactic mistake, the compiler will catch it, because ScalaTags is plain Scala. Try it!
     @li
-      It's composable! You can easily define fragments and assign them to variables, to be used later. You can break apart large Scalatags fragments the same way you break apart normal code, avoiding the huge monolithic HTML templates that are common in other templating systems.
+      It's composable! You can easily define fragments and assign them to variables, to be used later. You can break apart large ScalaTags fragments the same way you break apart normal code, avoiding the huge monolithic HTML templates that are common in other templating systems.
     @li
       It's Scala! You have the full power of the Scala language to write your fragments. No need to learn special syntax/cases for conditionals or repetitions: you can use plain-old-Scala @hl.scala{if}-@hl.scala{else}s, @hl.scala{for}-loops, etc.
 
   @p
-    Now that you've gotten a quick overview of the kinds of things you can do with Scalatags, let's move on to the next section of our hands-on tutorial...
+    Now that you've gotten a quick overview of the kinds of things you can do with ScalaTags, let's move on to the next section of our hands-on tutorial...
 
 @sect{Using Web Services}
 
   @p
-    One half of the web application faces forwards towards the user, managing and rendering HTML or Canvas for the user to view and interact with. Another half faces backwards, talking to various web-services or databases which turn the application from a standalone-widget into part of a greater whole. We've already seen how to make the front half, let's now talk about working with the back half.
+    One half of the web application faces forwards towards the user, managing and rendering HTML or the canvas for the user to view and interact with. Another half faces backwards, talking to various web services or databases which turn the application from a standalone-widget into part of a greater whole. We've already seen how to make the front half, let's now talk about working with the back half.
 
-  @sect{Raw Javascript}
+  @sect{Raw JavaScript}
     @split
       @more
         @hl.ref(webpage/"Weather0.scala", "val xhr")
@@ -140,10 +140,10 @@
       @less
         @example(div(height:="400px"), "webpage.Weather0().main")
     @p
-      The above snippet of code uses the raw Javascript Ajax API in order to make a request to @lnk("openweathermap.org", "http://openweathermap.org/"), to get the weather data for the city of Singapore as a JSON blob. The part of the API that we'll be using is documented @lnk("here", "http://openweathermap.org/current"), and if you're interested you can read all about the various options that they provide. For now, we're unceremoniously dumping it in a @hl.scala{pre} so you can see the raw response data.
+      The above snippet of code uses the raw JavaScript Ajax API in order to make a request to @lnk("openweathermap.org", "http://openweathermap.org/"), to get the weather data for the city of Singapore as a JSON blob. The part of the API that we'll be using is documented @lnk("here", "http://openweathermap.org/current"), and if you're interested you can read all about the various options that they provide. For now, we're unceremoniously dumping it in a @hl.scala{pre} so you can see the raw response data.
 
     @p
-      As you can see, using the raw Javascript API to make the Ajax call looks almost identical to actually doing this in Javascript, shown below:
+      As you can see, using the raw JavaScript API to make the Ajax call looks almost identical to actually doing this in JavaScript, shown below:
 
     @split
       @more
@@ -161,14 +161,14 @@
       @li
         @hl.scala("=>") v.s. @hl.js{function} to define the callback.
       @li
-        Scalatags' @hl.scala{pre} v.s. @hl.js{document.createElement("pre")}
+        ScalaTags' @hl.scala{pre} v.s. @hl.js{document.createElement("pre")}
 
     @p
-      Overall, they're pretty close, which is a common theme in Scala.js: using Javascript APIs in Scala.js is often as seamless and easy as using them in Javascript itself, and it often looks almost identical.
+      Overall, they're pretty close, which is a common theme in Scala.js: using JavaScript APIs in Scala.js is often as seamless and easy as using them in JavaScript itself, and it often looks almost identical.
 
   @sect{dom.extensions}
     @p
-      Although the Javascript XMLHttpRequest API is workable, it's kind of awkward and clunky compared to what you're used to in Scala. We create a half-baked object, set some magic properties, and call a magic function, which all has to be done in the correct order or it won't work.
+      Although the JavaScript XMLHttpRequest API is workable, it's kind of awkward and clunky compared to what you're used to in Scala. We create a half-baked object, set some magic properties, and call a magic function, which all has to be done in the correct order or it won't work.
 
     @p
       With Scala.js, we provide a simpler API that is more clearly functional. First, you need to import some things into scope:
@@ -219,14 +219,14 @@
         @example(div(height:="400px", overflow:="scroll"), "webpage.Weather3().main")
 
     @p
-      First we parse the incoming response, extract a bunch of values from it, and then stick it in a Scalatags fragment for us to see. Note how we can use the names of the attributes e.g. @hl.scala{json.name} even though @hl.scala{name} is a dynamic property which you can't be sure exists: this is because @hl.scala{json} is of type @hl.scala{js.Dynamic}, which allows us to refer to arbitrary parameters and methods on the underlying object without type-checking.
+      First we parse the incoming response, extract a bunch of values from it, and then stick it in a ScalaTags fragment for us to see. Note how we can use the names of the attributes e.g. @hl.scala{json.name} even though @hl.scala{name} is a dynamic property which you can't be sure exists: this is because @hl.scala{json} is of type @hl.scala{js.Dynamic}, which allows us to refer to arbitrary parameters and methods on the underlying object without type-checking.
 
     @p
       Calls on @hl.scala{js.Dynamic} resolve directly to javascript property/method references, and will fail at run-time with an exception if used wrongly. This is also why we need to call @hl.scala{.toString} or @hl.scala{.asInstanceOf}on the values before use: without these casts, the compiler can't be sure what kind of value is underneath the @hl.scala{js.Dynamic} type, and so we have to provide it the guarantee that it is what it needs.
 
 @sect{Tying it together: Weather Search}
   @p
-    At this point we've made a small app that allows us to search from a pre-populated list of words, as well as a small app that lets us query a remote web-service to find the weather in Singapore. The natural thing to do is to put these things together to make a app that will let us search from a list of countries and query the weather in any country we desire. Let's start!
+    At this point we've made a small app that allows us to search from a pre-populated list of words, as well as a small app that lets us query a remote web service to find the weather in Singapore. The natural thing to do is to put these things together to make a app that will let us search from a list of countries and query the weather in any country we desire. Let's start!
 
   @hl.ref(webpage/"WeatherSearch.scala", "lazy val box", "def fetchWeather")
 
@@ -253,17 +253,17 @@
 
 @sect{Interactive Web Pages Recap}
   @p
-    In this chapter, we've explored the basics of how you can use Scala.js to build interactive web pages. The two main contributions are using Scalatags to render HTML in a concise, safe way, and making Ajax calls to external web services. We combined these two capabilities in a small weather-search app that let a user interactively search for the weather in different cities around the world.
+    In this chapter, we've explored the basics of how you can use Scala.js to build interactive web pages. The two main contributions are using ScalaTags to render HTML in a concise, safe way, and making Ajax calls to external web services. We combined these two capabilities in a small weather-search app that let a user interactively search for the weather in different cities around the world.
   @p
     Some things you may have noticed in the process:
 
   @ul
     @li
-      Using Scalatags to render HTML fragments, and managing them at runtime with callbacks and getting/setting properties, is really quite nice
+      Using ScalaTags to render HTML fragments, and managing them at runtime with callbacks and getting/setting properties, is really quite nice
     @li
-      Using @hl.scala{new dom.XMLHttpRequest} to make web requests feels just like the Javascript code to do so
+      Using @hl.scala{new dom.XMLHttpRequest} to make web requests feels just like the JavaScript code to do so
     @li
-      Using @hl.scala{Ajax.get(...)} and working with the resultant : @hl.scala{Future} feels a lot cleaner than directly using the Javascript API
+      Using @hl.scala{Ajax.get(...)} and working with the resultant : @hl.scala{Future} feels a lot cleaner than directly using the JavaScript API
 
   @p
     You're at this point reasonably pro

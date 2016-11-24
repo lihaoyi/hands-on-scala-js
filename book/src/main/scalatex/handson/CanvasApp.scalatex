@@ -1,14 +1,14 @@
 @import book.BookData._
 @val canvasapp = wd/'examples/'demos/'src/'main/'scala/'canvasapp
 @p
-  By this point, you've already cloned and got your hands dirty fiddling around with the toy @lnk("workbench-example-app", "https://github.com/lihaoyi/workbench-example-app"). You have your editor set up, SBT installed, and have published the example application in a way you can host online for other people to see. Maybe you've even made some changes to the application to see what happens. Hopefully you're curious, and want to learn more.
+  By this point, you've already cloned and got your hands dirty fiddling around with the toy @lnk("workbench-example-app", "https://github.com/lihaoyi/workbench-example-app"). You have your editor set up, SBT installed, and have published the example application in a way you can host online for other people to see. Maybe you've even made some changes to the application to see what happens. Hopefully you're curious and want to learn more.
 
 @p
   In this section of the book, we will walk through making a small canvas application. This will expose you to important concepts like:
 
 @ul
   @li
-    Taking input with Javascript event handlers
+    Taking input with JavaScript event handlers
   @li
     Writing your application logic in Scala
   @li
@@ -41,7 +41,7 @@
     This code sets up the @lnk.dom.mousedown and @lnk.dom.mouseup events to keep track of whether or not the mouse has currently been clicked. It then draws black squares any time you move the mouse while the button is down. This lets you basically click-and-drag to draw pictures on the canvas. Try it out!
 
   @p
-    In general, you have access to all the DOM APIs through the @hl.scala{dom} package as well as through Javascript objects such as the @lnk.dom.html.Canvas. Setting the @code{onmouseXXX} callbacks is just one way of interacting with the DOM. With Scala.js, you also get a very handy autocomplete in the editor, which you can use to browse the various other APIs that are available for use:
+    In general, you have access to all the DOM APIs through the @hl.scala{dom} package as well as through JavaScript objects such as the @lnk.dom.html.Canvas. Setting the @code{onmouseXXX} callbacks is just one way of interacting with the DOM. With Scala.js, you also get a very handy autocomplete in the editor, which you can use to browse the various other APIs that are available for use:
 
   @img(src:="images/Dropdown.png", maxWidth:="100%")
 
@@ -72,12 +72,12 @@
       @book.BookData.example(canvas, "canvasapp.Clock().main")
 
   @p
-    As you can see, we're using more @lnk("Canvas APIs", "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D"), in this case dealing with rendering text on the canvas. Another thing we're using is the Javascript @lnk("Date", "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date") class, in Scala.js under the full name @hl.scala{scala.scalajs.js.Date}, here imported as @hl.scala{js.Date}. Again, click on the link @i(cls:="fa fa-link ") icon to view the full-code if you're having trouble here.
+    As you can see, we're using more @lnk("Canvas APIs", "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D"), in this case dealing with rendering text on the canvas. Another thing we're using is the JavaScript @lnk("Date", "https://developer.mozilla.org/en-US/docs/Web/Javascript/Reference/Global_Objects/Date") class, in Scala.js under the full name @hl.scala{scala.scalajs.js.Date}, here imported as @hl.scala{js.Date}. Again, click on the link @i(cls:="fa fa-link ") icon to view the full-code if you're having trouble here.
 
 @sect{Tying it together: Flappy Box}
 
   @p
-    You've just seen two examples of how to use Scala.js, together with the Javascript DOM APIs, to make simple applications. However, we've only used the "Scala" in Scala.js in the most rudimentary fashion: setting a few primitives here and there, defining some methods, mainly just gluing together a few Javascript APIs
+    You've just seen two examples of how to use Scala.js, together with the JavaScript DOM APIs, to make simple applications. However, we've only used the "Scala" in Scala.js in the most rudimentary fashion: setting a few primitives here and there, defining some methods, mainly just gluing together a few JavaScript APIs
 
   @p
     In this example we will make a spiritual clone of the popular @lnk("Flappy Bird", "http://en.wikipedia.org/wiki/Flappy_Bird") video game. This game involves a few simple rules
@@ -104,7 +104,7 @@
       This section of the code is peripherally necessary, but not core to the implementation or logic of Flappy Box. We see the same @hl.scala{canvas}/@hl.scala{renderer} logic we've seen in all our examples, along with some logic to make the canvas a reasonable size, and some configuration of how we will render text to the canvas.
 
     @p
-      In general, code like this will usually end up being necessary in a Scala.js program: the Javascript APIs that the browser provides to do things often ends up being somewhat roundabout and verbose. It's somewhat annoying to have to do for a small program such as this one, but in a larger application, the cost is both spread out over thousands of lines of code and also typically hidden away in helper functions, so the verbosity and non-idiomatic-scala-ness doesn't bother you much.
+      In general, code like this will usually end up being necessary in a Scala.js program: the JavaScript APIs that the browser provides to do things often ends up being somewhat roundabout and verbose. It's somewhat annoying to have to do for a small program such as this one, but in a larger application, the cost is both spread out over thousands of lines of code and also typically hidden away in helper functions, so the verbosity and non-idiomatic-scala-ness doesn't bother you much.
 
   @sect{Defining our State}
     @hl.ref(canvasapp/"FlappyLine.scala", "/*variables*/", end="def runLive")
@@ -161,36 +161,36 @@
     @p
       We've by now written a good chunk of Scala.js code, and perhaps debugged some mysterious errors, and tried some new things. One thing you've probably noticed is the efficiency of the process: you make a change in your editor, the browser reloads itself, and life goes on. There is a compile cycle, but after a few runs the compiler warms up and the compilation cycle drops to less than a second.
     @p
-      Apart from the compilation/reload speed, you've probably noticed the benefit of tooling around Scala.js. Unlike Javascript editors, your existing Scala IDEs like @lnk.misc.IntelliJ or @lnk.misc.Eclipse can give very useful help when you're working with Scala.js. Autocomplete, error-highlighting, jump-to-definition, and a myriad other modern conveniences that are missing when working in dynamically-typed languages are present when working in Scala.js. This makes the code much less mysterious: you're no longer trying to guess what methods a value has, or what a method returns: it's all laid out in front of you in plain sight.
+      Apart from the compilation/reload speed, you've probably noticed the benefit of tooling around Scala.js. Unlike JavaScript editors, your existing Scala IDEs like @lnk.misc.IntelliJ or @lnk.misc.Eclipse can give very useful help when you're working with Scala.js. Autocomplete, error-highlighting, jump-to-definition, and a myriad other modern conveniences that are missing when working in dynamically-typed languages are present when working in Scala.js. This makes the code much less mysterious: you're no longer trying to guess what methods a value has, or what a method returns: it's all laid out in front of you in plain sight.
 
   @sect{Full Scala}
     @p
       All of the examples so far have been very self-contained: they do not touch the HTML DOM, they do not make Ajax calls, or try to access web services. They don't push the limits of the browser's API.
 
     @p
-      Nevertheless, these examples have exercised a good amount of the Scala language. List comprehensions, collections, the math library, and more. In general, most of the Scala standard library works under Scala.js, as well as a large number of third-party libraries. Unlike many other compile-to-Javascript languages out there, this isn't a language-that-looks-like-Scala: it is Scala through and through, with a tiny number of semantic differences.
+      Nevertheless, these examples have exercised a good amount of the Scala language. List comprehensions, collections, the math library, and more. In general, most of the Scala standard library works under Scala.js, as well as a large number of third-party libraries. Unlike many other compile-to-JavaScript languages out there, this isn't a language-that-looks-like-Scala: it is Scala through and through, with a tiny number of semantic differences.
 
-  @sect{Seamless Javascript Interop}
+  @sect{Seamless JavaScript Interop}
     @p
-      Even if we take some time to read through the code we've written, it is not immediately obvious which bits of code are Scala and which bits are Javascript! It all kind of meshes together, for example if we take the Flappy Box source code:
+      Even if we take some time to read through the code we've written, it is not immediately obvious which bits of code are Scala and which bits are JavaScript! It all kind of meshes together, for example if we take the Flappy Box source code:
 
     @ul
       @li
         @hl.scala{obstacles} is a Scala @lnk("mutable.Queue", "http://docs.scala-lang.org/overviews/collections/concrete-mutable-collection-classes.html"), as we defined it earlier, and all the methods on it are Scala method calls
       @li
-        @hl.scala{renderer} is a Javascript @lnk.dom.CanvasRenderingContext2D, and all the methods on it are Javascript method calls directly on the Javascript object
+        @hl.scala{renderer} is a JavaScript @lnk.dom.CanvasRenderingContext2D, and all the methods on it are JavaScript method calls directly on the JavaScript object
       @li
-        @hl.scala{frame} is a Scala @hl.scala{Int}, and obeys Scala semantics, though it is implemented as a Javascript @hl.js{Number} under the hood.
+        @hl.scala{frame} is a Scala @hl.scala{Int}, and obeys Scala semantics, though it is implemented as a JavaScript @hl.js{Number} under the hood.
       @li
-        @hl.scala{playerY} and @hl.scala{playerV} are Scala @hl.scala{Double}s, implemented directly as Javascript @hl.js{Number}s
+        @hl.scala{playerY} and @hl.scala{playerV} are Scala @hl.scala{Double}s, implemented directly as JavaScript @hl.js{Number}s
 
     @p
-      This reveals something pretty interesting about Scala.js: even though Scala at-first-glance is a very different language from Javascript, the interoperation with Javascript is so seamless that you can't even tell from the code which values/methods are defined in Scala and which values/methods come from Javascript!
+      This reveals something pretty interesting about Scala.js: even though Scala at-first-glance is a very different language from JavaScript, the interoperation with JavaScript is so seamless that you can't even tell from the code which values/methods are defined in Scala and which values/methods come from JavaScript!
     @p
-      These two classes of values/methods are treated very differently by the compiler when it comes to emitting the executable Javascript blob, but the compiler does not need extra syntax telling it which things belong to Scala and which to Javascript: the types are sufficient. @hl.scala{renderer}, for example is of type @lnk.dom.CanvasRenderingContext2D which is a subtype of @hl.scala{scalajs.js.Object}, indicating to the compiler that it needs special treatment. Primitives like @hl.scala{Double}s and @hl.scala{Int}s have similar treatment
+      These two classes of values/methods are treated very differently by the compiler when it comes to emitting the executable JavaScript blob, but the compiler does not need extra syntax telling it which things belong to Scala and which to JavaScript: the types are sufficient. @hl.scala{renderer}, for example is of type @lnk.dom.CanvasRenderingContext2D which is a subtype of @hl.scala{scalajs.js.Object}, indicating to the compiler that it needs special treatment. Primitives like @hl.scala{Double}s and @hl.scala{Int}s have similar treatment
 
     @p
-      Overall, this seamless mix of Scala and Javascript values/methods/functions is a common theme in Scala.js applications, so you should expect to see more of it in later chapters of the book.
+      Overall, this seamless mix of Scala and JavaScript values/methods/functions is a common theme in Scala.js applications, so you should expect to see more of it in later chapters of the book.
 
   @hr
 
@@ -202,7 +202,7 @@
       Make more video games! I have a set of @lnk("retro-games ported to Scala.js", "http://lihaoyi.github.io/scala-js-games/"). Maybe re-make one of them without looking at the source, or maybe port some other game you're familiar with and enjoy playing. Even just drawing things on canvas, games can get @lnk("pretty elaborate", "http://lihaoyi.github.io/roll/").
 
     @li
-      Explore the APIs! We've touched on a small number of Javascript APIs here, mainly for dealign with the canvas, but modern browsers offer a whole @lnk("zoo of functionality", "https://developer.mozilla.org/en-US/docs/Web/API"). Try making an application that uses @lnk("localStorage", "https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Storage") to save state even when you close the tab, or an application that works with the HTML DOM.
+      Explore the APIs! We've touched on a small number of JavaScript APIs here, mainly for dealign with the canvas, but modern browsers offer a whole @lnk("zoo of functionality", "https://developer.mozilla.org/en-US/docs/Web/API"). Try making an application that uses @lnk("localStorage", "https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Storage") to save state even when you close the tab, or an application that works with the HTML DOM.
 
     @li
       Draw something pretty! We have a working canvas, a nice programming language, and a way to easily publish the results online. @lnk("Various", "http://www.scala-js-fiddle.com/gist/77a3840678d154257ca1/KochSnowflake.scala") @lnk("fractals", "http://www.scala-js-fiddle.com/gist/77a3840678d154257ca1/KochCurve.scala"), or @lnk("colorful visualizations", "http://www.scala-js-fiddle.com/gist/9443f8e0ecc68d1058ad/RayTracer.scala") are all possibilities.

@@ -1,9 +1,9 @@
 @import book.BookData._
 @p
-  We've spent several chapters exploring the experience of making web apps using Scala.js, but any large application (web or not!) likely relies on a host of libraries in order to implement large chunks of its functionality. Ideally these libraries would be re-usable, and can be shared among different projects, teams or even companies.
+  We've spent several chapters exploring the experience of making web apps using Scala.js, but any large application (web or not!) likely relies on a host of libraries in order to implement large chunks of its functionality. Ideally these libraries would be reusable, and can be shared among different projects, teams or even companies.
 
 @p
-  Not all code is developed in the browser. Maybe you want to run simple snippets of Scala.js which don't interact with the browser at all, and having to keep a browser open is an overkill. Maybe you want to write unit tests for your browser-destined code, so you can verify that it works without firing up Chrome. Maybe it's not a simple script but a re-distributable library, and you want to run the same command-line unit tests on both Scala.js and Scala-JVM to verify that the behavior is identical. This chapter will go through all these cases.
+  Not all code is developed in the browser. Maybe you want to run simple snippets of Scala.js which don't interact with the browser at all, and having to keep a browser open is an overkill. Maybe you want to write unit tests for your browser-destined code, so you can verify that it works without firing up Chrome. Maybe it's not a simple script but a redistributable library, and you want to run the same commandline unit tests on both Scala.js and Scala-JVM to verify that the behavior is identical. This chapter will go through all these cases.
 
 
 @sect{A Simple Cross-Built Library}
@@ -46,10 +46,10 @@
     @hl.ref(simple/'library/'shared/'src/'main/'scala/'simple/"Simple.scala")
 
     @p
-      In @code{Simple.scala} we have the shared, cross-platform API of our library: a single @hl.scala{object} with a single method @hl.scala{def} which does what we want, which can then be used in either Scala.js or Scala-JVM. In general, you can put as much shared logic here as you want: classes, objects, methods, anything that can run on both Javascript and on the JVM. We're chopping off the last 5 characters (the milliseconds) to keep the formatted dates slightly less verbose.
+      In @code{Simple.scala} we have the shared, cross-platform API of our library: a single @hl.scala{object} with a single method @hl.scala{def} which does what we want, which can then be used in either Scala.js or Scala-JVM. In general, you can put as much shared logic here as you want: classes, objects, methods, anything that can run on both JavaScript and on the JVM. We're chopping off the last 5 characters (the milliseconds) to keep the formatted dates slightly less verbose.
 
     @p
-      However, when it comes to actually formatting the date, we have a problem: Javascript and Java provide different utilities for formatting dates! They both let you format them, but they provide different APIs. Thus, to do the formatting of each individual date, we call out to the @hl.scala{Platform.format} function, which is implemented twice: once in @code{js/} and once in @code{jvm/}:
+      However, when it comes to actually formatting the date, we have a problem: JavaScript and Java provide different utilities for formatting dates! They both let you format them, but they provide different APIs. Thus, to do the formatting of each individual date, we call out to the @hl.scala{Platform.format} function, which is implemented twice: once in @code{js/} and once in @code{jvm/}:
 
     @split
       @half
@@ -59,7 +59,7 @@
         @hl.ref(simple/'library/'jvm/'src/'main/'scala/'simple/"Platform.scala")
 
     @p
-      In the @code{js/} version, we are using the Javascript @hl.js{Date} object to take the millis and do what we want. In the @code{jvm/} version, we instead use @hl.scala{java.text.SimpleDateFormat} with a custom formatter (The syntax is defined @lnk("here", "http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html")).
+      In the @code{js/} version, we are using the JavaScript @hl.js{Date} object to take the millis and do what we want. In the @code{jvm/} version, we instead use @hl.scala{java.text.SimpleDateFormat} with a custom formatter (The syntax is defined @lnk("here", "http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html")).
 
     @p
       Again, you can put as much platform-specific logic in these files as you want, to account for differences in the available APIs. Maybe you want to use @lnk.dom.JSONparse for parsing JSON blobs in @code{js/}, but @lnk("Jackson", "http://jackson.codehaus.org/") or @lnk("GSON", "https://code.google.com/p/google-gson/") for parsing them in @code{jvm/}.
@@ -112,7 +112,7 @@
         In Scala-JVM the double 1.0 is printed as @code{1.0}, while in Scala.js it's printed as @code{1}. This is one of a small number of differences between Scala.js and Scala-JVM, and verifies that we are indeed running on both platforms!
 
     @p
-      Apart from running each sub-project manually as we did above, you can also simply hit @code{test} and SBT will run tests for both
+      Apart from running each sub project manually as we did above, you can also simply hit @code{test} and SBT will run tests for both
 
 @sect{Further Work}
   @p
@@ -124,10 +124,10 @@
     @li
       Publish it! Both @code{sbt publishLocal} and @code{sbt publishSigned} work on this module, for publishing either locally, Maven Central via Sonatype, or Bintray. Running the command bare should be sufficient to publish both the @code{js} or @code{jvm} projects, or you can also specify which one e.g. @code{jvm/publishLocal} to publish only one subproject.
     @li
-      Cross-cross build it! You can use @hl.scala{crossScalaVersions} in your @hl.scala{crossProject} to build a library that works across all of {Scala.js, Scala-JVM} X {2.10, 2.11}. Many existing libraries, such as @lnk("Scalatags", "https://github.com/lihaoyi/scalatags") or @lnk("uTest", "https://github.com/lihaoyi/utest") are published like that.
+      Cross-cross build it! You can use @hl.scala{crossScalaVersions} in your @hl.scala{crossProject} to build a library that works across all of {Scala.js, Scala-JVM} X {2.10, 2.11}. Many existing libraries, such as @lnk.github.ScalaTags or @lnk("uTest", "https://github.com/lihaoyi/utest") published like that.
 
   @p
-    Now that you've gotten your code cross-compiling to Scala.js/Scala-JVM, the sky's the limit in what you can do. In general, although a large amount of your Scala-JVM code @i{does} deal with files or networks or other Scala-JVM-speciic functionality, in most applications there is a large library of helpers which don't. These could easily be packaged up into a cross-platform library and shared with your front-end Scala.js (or even pure-Javascript!) code.
+    Now that you've gotten your code cross-compiling to Scala.js/Scala-JVM, the sky's the limit in what you can do. In general, although a large amount of your Scala-JVM code @i{does} deal with files or networks or other Scala-JVM-specific functionality, in most applications there is a large library of helpers which don't. These could easily be packaged up into a cross-platform library and shared with your frontend Scala.js (or even pure JavaScript!) code.
 
 @sect{Other Testing Libraries}
   @p

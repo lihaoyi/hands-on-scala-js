@@ -60,7 +60,7 @@ object lnk{
     val Scalate = lnk("Scalate", "https://github.com/scalate/scalate")
   }
   object github{
-    val Scalatags = lnk("Scalatags", "https://github.com/lihaoyi/scalatags")
+    val ScalaTags = lnk("ScalaTags", "https://github.com/lihaoyi/scalatags")
     val uPickle= lnk("uPickle", "https://github.com/lihaoyi/upickle")
     val scalaPickling = lnk("scala-pickling", "https://github.com/scala/pickling")
   }
