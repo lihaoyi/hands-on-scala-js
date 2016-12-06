@@ -17,9 +17,18 @@ object Weather1 extends{
                 .Implicits
                 .runNow
 
+    /**
+      * This is the API key for "Hands-on Scala.js".
+      * If you would like to integrate weather data into your
+      * own development, please register for a free API key at:
+      * http://www.openweathermap.org/appid
+      */
+    val weatherkey="4ef01dbbb326222af5ec69053f824bde"
+
     val url =
       "http://api.openweathermap.org/" +
-      "data/2.5/weather?q=Singapore"
+      "data/2.5/weather?q=Singapore&appid=" +
+      weatherkey
 
     Ajax.get(url).onSuccess{ case xhr =>
       target.appendChild(
