@@ -7,7 +7,7 @@ import scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
 import dom.html
 @JSExport
-object Weather1 extends{
+object Weather1 {
   @JSExport
   def main(target: html.Div) = {
     import dom.ext._

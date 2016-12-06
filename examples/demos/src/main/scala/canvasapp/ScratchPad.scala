@@ -7,7 +7,7 @@ import scalajs.js.annotation.JSExport
 import dom.html
 
 @JSExport
-object ScratchPad extends{
+object ScratchPad {
   @JSExport
   def main(canvas: html.Canvas) = {
     /*setup*/

@@ -5,7 +5,7 @@ import dom.html
 import scalajs.js.annotation.JSExport
 
 @JSExport
-object Splash extends{
+object Splash {
   @JSExport
   def main(canvas: html.Canvas) = {
 

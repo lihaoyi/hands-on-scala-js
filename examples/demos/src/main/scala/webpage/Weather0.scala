@@ -7,7 +7,7 @@ import scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
 import dom.html
 @JSExport
-object Weather0 extends{
+object Weather0 {
   @JSExport
   def main(target: html.Div) = {
     val xhr = new dom.XMLHttpRequest()

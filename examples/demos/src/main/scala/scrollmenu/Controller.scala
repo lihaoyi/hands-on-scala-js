@@ -11,7 +11,7 @@ import scalatags.JsDom.all._
 
 
 @JSExport
-object Controller{
+object Controller {
 
   def munge(name: String) = {
     name.replace(" ", "")
