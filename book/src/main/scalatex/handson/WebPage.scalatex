@@ -21,10 +21,10 @@
       @book.BookData.example(div, "webpage.HelloWorld0().main")
 
   @p
-    Remember that we're now requiring a @hl.scala{html.Div} instead of a @hl.scala{html.Canvas} to be passed in when the JavaScript calls @hl.js{webpage.HelloWorld0().main(...)}. If you're coming to this point from the previous chapter, you'll need to update the on-page JavaScript's @hl.js{document.getElementById} to pick a @hl.xml{<div>} rather than the @hl.xml{<canvas>} we were using in the previous chapter.
+    You can see by the parameter to @hl.scala{main} that we're now requiring a @hl.scala{html.Div} instead of a @hl.scala{html.Canvas} to be passed by the JavaScript calls to our code. If you're coming to this point from the previous chapter, you may have also noticed that we changed the package from @hl.scala{example} to @hl.scala{webpage} and the object name from @hl.scala{ScalaJSExample} to @hl.scala{HelloWorld0}.  Any time these change, you will also need to update the JavaScript code that starts you Scala code.  In this case, we need to update the on-page JavaScript in @code{index-dev.html} from @hl.js{example.ScalaJSExample().main(document.getElementById('canvas'));} to @hl.js{webpage.HelloWorld0().main(document.getElementById('canvas').parentNode);} which selects the @hl.xml{<div>} containing the @hl.xml{<canvas>} we had been using.
 
   @p
-    This approach works, as the above example shows, but has a couple of disadvantages:
+    While the above example works, writing the HTML as a string in our @code{.scala} has a couple of disadvantages:
 
   @ul
     @li
@@ -33,7 +33,7 @@
       It is insecure: @lnk("Cross-site Scripting", "http://en.wikipedia.org/wiki/Cross-site_scripting") is a real thing, and it is easy to forget to escape the values you are putting into your HTML strings. Above they're constants like @hl.scala{"dog"}, but if they're user-defined, you may not notice there is a problem until something like @hl.scala{"<script>...</script>"} sneaks through and your users' accounts & data is compromised.
 
   @p
-    There are more, but we won't go deep into the intricacies of these problems. Suffice to say it makes mistakes easy to make and hard to catch, and we have something better...
+    There are more, but we won't go deep into the intricacies of these problems. Suffice to say it makes mistakes easy to make and hard to catch, and we have something better.
 
 @sect{ScalaTags}
   @p
@@ -42,7 +42,7 @@
   @hl.ref(wd/'examples/'demos/"build.sbt", "scalatags", "")
 
   @p
-    With that, the above snippet of code re-written using ScalaTags looks as follows:
+    With that, the above snippet of code re-written using ScalaTags follows.  We have again changed the object name so you will need to update @code{index-dev.html} to call the code.
 
   @split
     @more
