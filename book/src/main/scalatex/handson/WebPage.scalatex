@@ -4,7 +4,7 @@
   Most web applications aren't neat little games which live on a single canvas: they are large, structured HTML pages, which involve displaying data (whether from the user or from the web) in multiple ways, while allowing the user to make changes to the data that can be saved back to whatever remote web service or database it came from.
 
 @p
-  At this point, you are already competent at using Scala.js to make basic, self-contained canvas applications. In this chapter, we will cover how to use Scala.js to build the sort of interactive-web-pages that make up the bulk of the modern-day internet. We'll cover how to use powerful libraries that turn front-end development from the typical fragile-mess into a structured, robust piece of software.
+  At this point, you are already competent at using Scala.js to make basic, self-contained canvas applications. In this chapter, we will cover how to use Scala.js to build the sort of interactive web pages that make up the bulk of the modern-day internet. We'll cover how to use powerful libraries that turn front end development from the typical fragile-mess into a structured, robust piece of software.
 
 @val webpage = wd/'examples/'demos/'src/'main/'scala/'webpage
 
@@ -114,7 +114,7 @@
   @hr
 
   @p
-    Hopefully this has given you a good overview of how to do things using Scala.js and ScalaTags. I won't go too deep into the various ways you can use ScalaTags: the @lnk("documentation", "https://github.com/lihaoyi/scalatags") should cover most of it. Now that you've gone through this experience, it's worth re-iterating a few things you've probably already noticed about ScalaTags
+    Hopefully this has given you a good overview of how to do things using Scala.js and ScalaTags. I won't go too deep into the various ways you can use ScalaTags: the @lnk("documentation", "https://github.com/lihaoyi/scalatags") should cover most of it. Now that you've gone through this experience, it's worth re-iterating a few things you've probably already noticed about ScalaTags.
 
   @ul
     @li
@@ -266,4 +266,4 @@
       Using @hl.scala{Ajax.get(...)} and working with the resultant : @hl.scala{Future} feels a lot cleaner than directly using the JavaScript API
 
   @p
-    You're at this point reasonably pro
+    At this point you are reasonably pro!

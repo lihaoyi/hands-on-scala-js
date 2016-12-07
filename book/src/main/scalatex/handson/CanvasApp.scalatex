@@ -101,7 +101,7 @@
     @hl.ref(canvasapp/"FlappyLine.scala", "/*setup*/", end="/*variables*/")
 
     @p
-      This section of the code is peripherally necessary, but not core to the implementation or logic of Flappy Box. We see the same @hl.scala{canvas}/@hl.scala{renderer} logic we've seen in all our examples, along with some logic to make the canvas a reasonable size, and some configuration of how we will render text to the canvas.
+      This section of the code is peripherally necessary, but not core to the implementation or logic of Flappy Box. We see the same @hl.scala{canvas}/@hl.scala{renderer} logic we've seen in all our examples, logic to make the canvas a reasonable size, and configuration of how text is rendered on the canvas.
 
     @p
       In general, code like this will usually end up being necessary in a Scala.js program: the JavaScript APIs that the browser provides to do things often ends up being somewhat roundabout and verbose. It's somewhat annoying to have to do for a small program such as this one, but in a larger application, the cost is both spread out over thousands of lines of code and also typically hidden away in helper functions, so the verbosity and non-idiomatic-scala-ness doesn't bother you much.
@@ -161,7 +161,7 @@
     @p
       We've by now written a good chunk of Scala.js code, and perhaps debugged some mysterious errors, and tried some new things. One thing you've probably noticed is the efficiency of the process: you make a change in your editor, the browser reloads itself, and life goes on. There is a compile cycle, but after a few runs the compiler warms up and the compilation cycle drops to less than a second.
     @p
-      Apart from the compilation/reload speed, you've probably noticed the benefit of tooling around Scala.js. Unlike JavaScript editors, your existing Scala IDEs like @lnk.misc.IntelliJ or @lnk.misc.Eclipse can give very useful help when you're working with Scala.js. Autocomplete, error-highlighting, jump-to-definition, and a myriad other modern conveniences that are missing when working in dynamically-typed languages are present when working in Scala.js. This makes the code much less mysterious: you're no longer trying to guess what methods a value has, or what a method returns: it's all laid out in front of you in plain sight.
+      Apart from the compilation/reload speed, you've probably noticed the benefit of tooling around Scala.js. Unlike JavaScript editors, your existing Scala IDEs like @lnk.misc.IntelliJ or @lnk.misc.Eclipse can give very useful help when you're working with Scala.js. Autocomplete, error-highlighting, jump-to-definition, and a myriad other modern conveniences that are missing when working in dynamically-typed languages are present when working in Scala.js. This makes the code much less mysterious. You are no longer trying to guess what methods a value has, or what a method returns: it's all laid out in front of you in plain sight.
 
   @sect{Full Scala}
     @p
