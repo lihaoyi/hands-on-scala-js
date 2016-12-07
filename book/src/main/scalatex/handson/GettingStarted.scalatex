@@ -120,10 +120,10 @@
   @hl.ref(example/"ScalaJSExample.scala", "val ctx", "var count")
 
   @p
-    Here we are retrieving a handle to the canvas we will draw on using @hl.scala{document.getElementById}, and from it we can get a @lnk.dom.CanvasRenderingContext2D which we actually use to draw on it.
+    Here we are retrieving a @lnk.dom.CanvasRenderingContext2D which we actually use to draw on the canvas.  The @hl.scala{canvas} parameter is passed from the calling JavaScript code.
 
   @p
-    We need to perform the @hl.scala{asInstanceOf} call because depending on what you pass to @hl.scala{getElementById} and @hl.scala{getContext}, you could be returned elements and contexts of different types. Hence we need to tell the compiler explicitly that we're expecting a @lnk.dom.html.Canvas and @lnk.dom.CanvasRenderingContext2D back from these methods for the strings we passed in.
+    We need to perform the @hl.scala{asInstanceOf} call because depending on what you pass to @hl.scala{getContext}, you could be returned elements and contexts of different types. Hence we need to tell the compiler explicitly that we're expecting a @lnk.dom.html.Canvas and @lnk.dom.CanvasRenderingContext2D back from these methods for the strings we passed in.
 
   @p
     Note how the @lnk.dom.html.Canvas comes from the @hl.scala{html} namespace, while the @lnk.dom.CanvasRenderingContext2D comes from the @hl.scala{dom} namespace. Traditionally, these types are imported via their qualified names: e.g. @hl.scala{html.Canvas} rather than just @hl.scala{Canvas}.
@@ -189,10 +189,6 @@
 
     @p
       The @hl.scala{example.ScalaJSExample().main()} call is what kicks off the Scala.js application and starts its execution. Scala.js follows Scala semantics in that @hl.scala{object}s are evaluated lazily, with no top-level code allowed. This is in contrast to JavaScript, where you can include top-level statements and object-literals in your code which execute immediately. In Scala.js, nothing happens when @code{../example-fastopt.js} is imported! We have to call the main-method first. In this case, we're passing the canvas object (attained using @hl.js{getElementById}) to it so it knows where to do its thing.
-
-
-  @p
-    @hl.scala{document.getElementById} is the exact same API that's used in normal JavaScript, as documented @lnk("here", "https://developer.mozilla.org/en-US/docs/Web/API/document.getElementById"). In fact, the entire @hl.scala{org.scalajs.dom} namespace (imported at the top of the file) comprises statically typed facades for the javascript APIs provided by the browser.
 
     @p
       Lastly, only @hl.scala("@JSExport")ed objects and methods can be called from JavaScript. Also, although this example only exports the @hl.scala{main} method which is called once, there is nothing stopping you from exporting any number of objects and methods and calling them whenever you need to. In this way, you can easily make a Scala.js "library" which is available to external JavaScript as an API.
