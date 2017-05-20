@@ -3,7 +3,7 @@
 @p
   Scala.js is implemented as a compiler plugin in the Scala compiler. Despite this, the overall process looks very different from that of a normal Scala application. This is because Scala.js optimizes for the size of the compiled executable, which is something that Scala-JVM does not usually do.
 
-@sect{Whole Program Optimizaton}
+@sect{Whole Program Optimization}
   @p
     At a first approximation, Scala.js achieves its tiny executables by using whole-program optimization. Scala-JVM, like Java, allows for separate compilation: this means that after compilation, you can combine your compiled code with code compiled separately, which can interact with the code you already compiled in an ad-hoc basis: code from both sides can call each others methods, instantiate each others classes, etc. without any limits.
 
@@ -17,7 +17,7 @@
     With Scala.js, we have decided to forgo reflection, and forgo separate compilation, in exchange for smaller executables. This is made easier by the fact that the pure-Scala ecosystem makes little use of reflection overall. Thus, at the right before shipping your Scala.js app to your users, the Scala.js optimizer gathers up all your Scala.js code, determines which things are used and which are not, and eliminates all the un-used classes/methods/variables. This allows us to achieve a much smaller code size than is possible with reflection/separate-compilation support. Furthermore, because we forgo these two things, we can perform much more aggressive inlining and other compile-time optimizations than is possible with Scala-JVM, further reducing code size and improving performance.
 
   @p
-    It's worth noting that such optimizations exist as an option on the JVM aswell: @lnk("Proguard", "http://proguard.sourceforge.net/") is a well known library for doing similar DCE/optimization for Java/Scala applications, and is extensively used in developing mobile applications which face similar "minimize-code-size" constraints that web-apps do. However, the bulk of Scala code which runs on the server does not use these tools.
+    It's worth noting that such optimizations exist as an option on the JVM as well: @lnk("Proguard", "http://proguard.sourceforge.net/") is a well known library for doing similar DCE/optimization for Java/Scala applications, and is extensively used in developing mobile applications which face similar "minimize-code-size" constraints that web-apps do. However, the bulk of Scala code which runs on the server does not use these tools.
 
 @sect{How Compilation Works}
   @p
@@ -32,7 +32,7 @@
       @b{Full Optimization}: @code{.sjsir} files to one smaller/faster @code{.js} file
 
   @p
-    @code{.scala} files are the source code you're familiar with. @code{.class} files are the JVM-targetted artifacts which aren't used for actually producing @code{.js} files, but are kept around for pretty much everything else: the compiler uses them for separate compilation and macros, and tools such as @lnk.misc.IntelliJ or @lnk.misc.Eclipse use these files to provide IDE support for Scala.js code. @code{.js} files are the output JavaScript, which we can execute in a web browser.
+    @code{.scala} files are the source code you're familiar with. @code{.class} files are the JVM-targeted artifacts which aren't used for actually producing @code{.js} files, but are kept around for pretty much everything else: the compiler uses them for separate compilation and macros, and tools such as @lnk.misc.IntelliJ or @lnk.misc.Eclipse use these files to provide IDE support for Scala.js code. @code{.js} files are the output JavaScript, which we can execute in a web browser.
   @p
     @code{.sjsir} files are worth calling out: the name stands for "ScalaJS Intermediate Representation", and these files contain compiled code half-way between Scala and JavaScript: most Scala features have by this point been replaced by their Java/JavaScript equivalents, but it still contains Types (which have all been inferred) that can aid in analysis. Many Scala.js specific optimizations take place on this IR.
 

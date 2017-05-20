@@ -214,7 +214,7 @@
     @p
       You can use more-or-less the whole Scala standard library in Scala.js, sans some more esoteric components like the parallel collections or the tools. Furthermore, we've ported some subset of the Java standard library that many common Scala libraries depends on, including most of @hl.scala{java.lang.*} and some of @hl.scala{java.util.*}.
     @p
-      There isn't a full list of standard library library APIs which are available from Scala.js, but it should be enough to give you a rough idea of what is supported. The full list of classes that have been ported to Scala.js is available under @sect.ref{Available Java APIs}
+      There isn't a full list of standard library APIs which are available from Scala.js, but it should be enough to give you a rough idea of what is supported. The full list of classes that have been ported to Scala.js is available under @sect.ref{Available Java APIs}
 
   @sect{Macros v.s. Reflection}
     @tableHead

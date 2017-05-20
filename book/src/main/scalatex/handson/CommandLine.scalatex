@@ -1,7 +1,7 @@
 @import book.BookData._
 
 @p
-  We've by this point done a bunch of work in the browser: we've made a small game that runs in the web browser on the HTML5 canvas, and we've made a number of small web-apps that interact with HTML and 3rd party web-services. However, there's a whole other side to the Scala.js ecosystem: the command line interace, or CLI.
+  We've by this point done a bunch of work in the browser: we've made a small game that runs in the web browser on the HTML5 canvas, and we've made a number of small web-apps that interact with HTML and 3rd party web-services. However, there's a whole other side to the Scala.js ecosystem: the command line interface, or CLI.
 
 @p
   Even though the goal of Scala.js is to get your code running in peoples' browsers, it still is useful to be familiar with the things that you can do in the command-line. It is much easier to write-code-print-results in the command line without having to set up a HTML page and opening a browser to test it, and this extends to things like unit test suites, which are almost exclusively run in the command-line using @code{sbt ~test} to keep re-running them when the code changes.
@@ -149,7 +149,7 @@
       > test
 
     @p
-      The @code{sbt test} command behaves very similarly to @code{sbt run}. It also runs on Rhino, Node.js or PhantomJS, dependending of the stage and the dependency on the DOM.
+      The @code{sbt test} command behaves very similarly to @code{sbt run}. It also runs on Rhino, Node.js or PhantomJS, depending of the stage and the dependency on the DOM.
     @p
       The difference is that instead of simply running your @code{main} method, @code{sbt test} runs whatever test-suite you have set-up, which will look through your @code{tests/} folder to find suites of tests it has to run, and aggregate the results formatted nicely for you to see. The exact operation of this depends on which testing library you're using.
     @p

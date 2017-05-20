@@ -116,7 +116,7 @@
       // res23: String = {"a": 1, "b": "gg"}
 
     @p
-      Or to @lnk("route messages to the appropiate methods", "https://github.com/lihaoyi/autowire") without boilerplate, and @i{without} using reflection!
+      Or to @lnk("route messages to the appropriate methods", "https://github.com/lihaoyi/autowire") without boilerplate, and @i{without} using reflection!
 
     @p
       The fact that you can satisfy these use cases with macros is non-obvious: in dynamic languages, macros only get an AST, which is basically opaque when you're only passing a single value to it. With Scala, you get the value @i{together with it's type}, which lets you inspect the type and generate the proper serialization/routing code that is impossible to do in a dynamic language with macros.
