@@ -99,7 +99,7 @@
         @example(div, "webpage.Search0().main")
 
     @p
-      And there you have it! A working search box. This is a relatively self-contained example: all the items its searching are available locally, no Ajax calls, and there's no fancy handling of the searched items. If we want to, for example, highlight the matched section of each fruit's name, we can modify the @hl.scala{def renderListings} call to do so:
+      And there you have it! A working search box. This is a relatively self-contained example: all the items it's searching are available locally, no Ajax calls, and there's no fancy handling of the searched items. If we want to, for example, highlight the matched section of each fruit's name, we can modify the @hl.scala{def renderListings} call to do so:
 
     @split
       @more
@@ -189,7 +189,7 @@
         @example(div(height:="400px", overflow:="scroll"), "webpage.Weather1().main")
 
     @p
-      A single call to @hl.scala{Ajax.get(...)}, with the URL, and we receive a @hl.scala{scala.concurrent.Future} that we can use to get access to the result when ready. Here we're just using it's @hl.scala{onSuccess}, but we could use it in a for-comprehension, with @lnk("Scala Async", "https://github.com/scala/async"), or however else we can use normal @hl.scala{Future}s
+      A single call to @hl.scala{Ajax.get(...)}, with the URL, and we receive a @hl.scala{scala.concurrent.Future} that we can use to get access to the result when ready. Here we're just using its @hl.scala{onSuccess}, but we could use it in a for-comprehension, with @lnk("Scala Async", "https://github.com/scala/async"), or however else we can use normal @hl.scala{Future}s
 
   @sect{Parsing the Data}
     @p

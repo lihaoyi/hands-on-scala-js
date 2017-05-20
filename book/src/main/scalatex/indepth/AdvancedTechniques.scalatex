@@ -177,7 +177,7 @@
       @hl.scala{formatResults} encapsulates the conversion of the final @hl.scala{(name, celsius)} data back into readable HTML.
 
     @p
-      Overall, these helper functions do nothing special, btu we're defining them first to avoid having to copy-&-paste code throughout the subsequent examples. Now that we've defined all the relevant scaffolding, let's walk through a few ways that we can implement the all-important @hl.scala{handle} method.
+      Overall, these helper functions do nothing special, but we're defining them first to avoid having to copy-&-paste code throughout the subsequent examples. Now that we've defined all the relevant scaffolding, let's walk through a few ways that we can implement the all-important @hl.scala{handle} method.
 
     @def exampleDiv = div(height:="200px")
 
@@ -263,7 +263,7 @@
           @hl.scala{canvas.onmouseup}
 
       @p
-        And each listener is in charge of deciding what to do when it is it's turn to fire. 
+        And each listener is in charge of deciding what to do when it is its turn to fire. 
 
       @p
         This code is pretty tricky and hard to follow. It's not immediately clear what it is doing. One thing you may notice is the presence of this @hl.scala{dragState} variable, which seems to add a lot to the confusion with branches all over the place. At first you may think you can simplify the code to do without it, but attempts to do so will reveal why it is necessary.
