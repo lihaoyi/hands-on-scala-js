@@ -131,7 +131,7 @@
   @p
     In general, @lnk("scala-js-dom", "http://scala-js.github.io/scala-js-dom/") provides @hl.scala{org.scalajs.dom.html} to access the HTML element types of the browser, an @hl.scala{org.scalajs.dom} to access other things. There are a number of other namespaces (@hl.scala{dom.svg}, @hl.scala{dom.idb}, etc.) accessible inside @hl.scala{org.scalajs.dom}: read the @lnk("scala-js-dom docs", "http://scala-js.github.io/scala-js-dom/") to learn more.
 
-  @hl.ref(example/"ScalaJSExample.scala", "def run", "dom.setInterval")
+  @hl.ref(example/"ScalaJSExample.scala", "def run", "dom.window.setInterval")
 
   @p
     This is the part of the Scala.js program which does the real work. It runs 10 iterations of a @lnk("small algorithm", "http://en.wikipedia.org/wiki/Sierpinski_triangle#Chaos_game") that generates a Sierpinski Triangle point-by-point. The steps, as described by the linked article, are roughly:
@@ -149,10 +149,10 @@
   @p
     In this example, the triangle is hard-coded to be 255 pixels high by 255 pixels wide, and some math is done to pick a color for each dot which will give the triangle a pretty gradient.
 
-  @hl.ref(example/"ScalaJSExample.scala", "dom.setInterval")
+  @hl.ref(example/"ScalaJSExample.scala", "dom.window.setInterval")
 
   @p
-    Now this is the call that actually does the useful work. All this method does is call @hl.scala{dom.setInterval}, which tells the browser to run the @hl.scala{run} method every 50 milliseconds. As mentioned earlier, the @hl.scala{dom.*} methods are simply facades to their native JavaScript equivalents, and @hl.scala{dom.setInterval} is @lnk("no different", "https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers.setInterval"). Note how you can pass a Scala lambda to @hl.scala{setInterval} to have it called by the browser, where in JavaScript you'd need to pass a JavaScript @hl.js{function(){...}}
+    Now this is the call that actually does the useful work. All this does is call @hl.scala{dom.window.setInterval}, which tells the browser to run the @hl.scala{run} method every 50 milliseconds. As mentioned earlier, the @hl.scala{dom.*} methods are simply facades to their native JavaScript equivalents, and @hl.scala{dom.window.setInterval} is @lnk("no different", "https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers.setInterval"). Note how you can pass a Scala lambda to @hl.scala{setInterval} to have it called by the browser, where in JavaScript you'd need to pass a JavaScript @hl.js{function(){...}}
 
 @sect{The Project Code}
 
