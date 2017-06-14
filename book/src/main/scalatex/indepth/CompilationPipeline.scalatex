@@ -33,6 +33,7 @@
 
   @p
     @code{.scala} files are the source code you're familiar with. @code{.class} files are the JVM-targeted artifacts which aren't used for actually producing @code{.js} files, but are kept around for pretty much everything else: the compiler uses them for separate compilation and macros, and tools such as @lnk.misc.IntelliJ or @lnk.misc.Eclipse use these files to provide IDE support for Scala.js code. @code{.js} files are the output JavaScript, which we can execute in a web browser.
+
   @p
     @code{.sjsir} files are worth calling out: the name stands for "ScalaJS Intermediate Representation", and these files contain compiled code half-way between Scala and JavaScript: most Scala features have by this point been replaced by their Java/JavaScript equivalents, but it still contains Types (which have all been inferred) that can aid in analysis. Many Scala.js specific optimizations take place on this IR.
 

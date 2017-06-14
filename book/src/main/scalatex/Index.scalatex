@@ -15,6 +15,7 @@ is a set of detailed expositions on various parts of the Scala.js platform. Noth
       @example(canvas, "Splash().main")
 
   @p
+
     @lnk("Scala.js", "http://www.scala-js.org/") is a compiler that compiles Scala source code to equivalent JavaScript code. Scala.js lets you write Scala code that you can run in a web browser or other environments, like Chrome plugins and Node.js, where JavaScript is supported. This book is an introduction to Scala.js, which aims to get you from knowing nothing about it to being relatively proficient.
 
   @p
