@@ -39,6 +39,7 @@
   @p
     @lnk.github.ScalaTags is a cross-platform Scala.js/Scala-JVM library that is designed to generate HTML. To use ScalaTags, you need to add it as a dependency to your Scala.js SBT project, in the @code{build.sbt} file:
 
+
   @hl.ref(wd/'examples/'demos/"build.sbt", "scalatags", "")
 
   @p
@@ -114,7 +115,7 @@
   @hr
 
   @p
-    Hopefully this has given you a good overview of how to do things using Scala.js and ScalaTags. I won't go too deep into the various ways you can use ScalaTags: the @lnk("documentation", "https://github.com/lihaoyi/scalatags") should cover most of it. Now that you've gone through this experience, it's worth re-iterating a few things you've probably already noticed about ScalaTags.
+    Hopefully this has given you a good overview of how to do things using Scala.js and ScalaTags. I won't go too deep into the various ways you can use ScalaTags: the @lnk("documentation", "https://github.com/lihaoyi/scalatags") should cover most of it. Now that you've gone through this experience, it's worth reiterating a few things you've probably already noticed about ScalaTags.
 
   @ul
     @li

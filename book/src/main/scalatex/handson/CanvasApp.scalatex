@@ -161,7 +161,9 @@
     @p
       We've by now written a good chunk of Scala.js code, and perhaps debugged some mysterious errors, and tried some new things. One thing you've probably noticed is the efficiency of the process: you make a change in your editor, the browser reloads itself, and life goes on. There is a compile cycle, but after a few runs the compiler warms up and the compilation cycle drops to less than a second.
     @p
+
       Apart from the compilation/reload speed, you've probably noticed the benefit of tooling around Scala.js. Unlike JavaScript editors, your existing Scala IDEs like @lnk.misc.IntelliJ or @lnk.misc.Eclipse can give very useful help when you're working with Scala.js. Autocomplete, error-highlighting, jump-to-definition, and a myriad other modern conveniences that are missing when working in dynamically-typed languages are present when working in Scala.js. This makes the code much less mysterious. You are no longer trying to guess what methods a value has, or what a method returns: it's all laid out in front of you in plain sight.
+
 
   @sect{Full Scala}
     @p

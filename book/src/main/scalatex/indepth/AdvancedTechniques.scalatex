@@ -243,7 +243,7 @@
 
     @sect{Traditional Asynchrony}
       @p
-        Let's look at a traditional implementation, using Scala.js but no special features. We'll just use the JavaScript @hl.scala{canvas.onmouseXXX} operations directly. 
+        Let's look at a traditional implementation, using Scala.js but without any special features. We'll just use the JavaScript @hl.scala{canvas.onmouseXXX} operations directly. 
 
       @split
         @more

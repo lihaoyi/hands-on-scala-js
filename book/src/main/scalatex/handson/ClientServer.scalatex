@@ -100,6 +100,7 @@
     @p
       In both the client code and the server code, we made use of the same ScalaTags HTML generation library. This is pretty neat: transferring rendering logic between client and server no longer means an annoying/messy rewrite! You can simply C&P the ScalaTags snippet over. That means it's easy if you want to e.g. shift the logic from one side to the other in order to optimize for performance or time-to-load or other things.
     @p
+
       One thing to take note of is that we're actually using subtly @i{different} implementations of ScalaTags on both sides: on the server, we're importing from @hl.scala{ScalaTags.Text}, while on the client we're using @hl.scala{ScalaTags.JsDom}. The @hl.scala{Text} back end renders directly to Strings, and is available on both Scala JVM and Scala.js. The @hl.scala{JsDom} back end, on the other hand, renders to @lnk.dom.html.Element-s which only exist on Scala.js. Thus while on the client you can do things like attach event listeners to the rendered @lnk.dom.html.Element objects, or checking their runtime @code{.value}, on the server you can't. And that's exactly what you want!
 
   @sect{Shared Code}

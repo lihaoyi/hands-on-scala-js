@@ -36,7 +36,9 @@
   @li
     Typo-safety due to its compiler which catches many silly errors before the code is run
   @li
-    In-editor support for autocompletion, error highlighting, refactoring, and intelligent navigation
+
+    Editor support for autocompletion, error highlighting, refactoring, and intelligent navigation
+
   @li
     Moderate sized compiled executables, in the 100-400kb range
   @li
@@ -134,7 +136,8 @@
       Shared code is one of the holy grails of web development. Traditionally the client-side code and server-side code has been written in separate languages: PHP or Perl or Python or Ruby or Java on the server, with only JavaScript on the client. This means that algorithms were often implemented twice, constants were copied and pasted, or awkward Ajax calls are made in an attempt to centralize the logic in one place (the server). With the advent of Node.js in the last few years, you can finally reuse the same code on the server as you can on the client, but with the cost of having all the previously client-only @sect.ref("JavaScript-the-language", "problems with JavaScript") now inflicted upon your server code base. Node.js expanded your range of options for writing shared client/server logic from "Write everything twice" to "Write everything twice, or write everything in JavaScript". More options is always good, but it's not clear which of the two choices is more painful!
 
     @p
-      Scala.js provides an alternative to this dilemma. With Scala.js, you can utilize the same libraries you use writing your Scala servers when writing your Scala web clients! On one end, you are sharing your templating language with @lnk.github.ScalaTags or sharing your serialization logic with @lnk.github.uPickle. At the other, you are sharing large, abstract libraries like @lnk("Scalaz", "https://github.com/japgolly/scalaz") or @lnk("Shapeless", "https://groups.google.com/forum/#!searchin/scala-js/shapeless/scala-js/5Sf2up0z3PU/9F9SYB0qHEcJ").
+
+      Scala.js provides an alternative to this dilemma. With Scala.js, you can utilize the same libraries you use writing your Scala servers when writing your Scala web clients! On one end, you are sharing your templating language with @lnk.github.ScalaTags or sharing your serialization logic with @lnk.github.uPickle. At the other end, you are sharing large, abstract libraries like @lnk("Scalaz", "https://github.com/japgolly/scalaz") or @lnk("Shapeless", "https://groups.google.com/forum/#!searchin/scala-js/shapeless/scala-js/5Sf2up0z3PU/9F9SYB0qHEcJ").
 
     @p
       Sharing code means several things:
