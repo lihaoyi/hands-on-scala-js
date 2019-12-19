@@ -34,7 +34,7 @@
 
 @ul
   @li
-    Typo-safety due to its compiler which catches many silly errors before the code is run
+    Type-safety due to its compiler which catches many silly errors before the code is run
   @li
 
     Editor support for autocompletion, error highlighting, refactoring, and intelligent navigation
