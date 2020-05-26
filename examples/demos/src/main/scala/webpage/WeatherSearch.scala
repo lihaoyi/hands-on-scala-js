@@ -41,10 +41,19 @@ object WeatherSearch extends{
     )
 
     def fetchWeather(query: String) = {
+
+      /**
+        * This is the API key for "Hands-on Scala.js".
+        * If you would like to integrate weather data into your
+        * own development, please register for a free API key at:
+        * http://www.openweathermap.org/appid
+        */
+      val weatherkey="4ef01dbbb326222af5ec69053f824bde"
+
       val searchUrl =
         "http://api.openweathermap.org/data/" +
         "2.5/find?type=like&mode=json&q=" +
-        query
+        query + "&appid=" + weatherkey
 
       for{
         xhr <- Ajax.get(searchUrl)

@@ -3,7 +3,7 @@ function WeatherJs(target) {
 
     xhr.open("GET",
         "http://api.openweathermap.org/data/" +
-        "2.5/weather?q=Singapore"
+        "2.5/weather?q=Singapore&appid=4ef01dbbb326222af5ec69053f824bde"
     );
 
     xhr.onload = function (e) {

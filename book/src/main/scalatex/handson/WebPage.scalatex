@@ -136,12 +136,12 @@
   @sect{Raw JavaScript}
     @split
       @more
-        @hl.ref(webpage/"Weather0.scala", "val xhr")
+        @hl.ref(webpage/"Weather0.scala", "val weatherkey")
 
       @less
         @example(div(height:="400px"), "webpage.Weather0().main")
     @p
-      The above snippet of code uses the raw JavaScript Ajax API in order to make a request to @lnk("openweathermap.org", "http://openweathermap.org/"), to get the weather data for the city of Singapore as a JSON blob. The part of the API that we'll be using is documented @lnk("here", "http://openweathermap.org/current"), and if you're interested you can read all about the various options that they provide. For now, we're unceremoniously dumping it in a @hl.scala{pre} so you can see the raw response data.
+      The above snippet of code uses the raw JavaScript Ajax API in Scala in order to make a request to @lnk("openweathermap.org", "http://openweathermap.org/"), to get the weather data for the city of Singapore as a JSON blob. The @hl.scala{val = weatherkey} above is the API key for "Hands-on Scala.js" if you would like to integrate weather data in your own development, please @lnk("register for a free API key", "http://www.openweathermap.org/appid"). The part of the API that we'll be using is documented @lnk("here", "http://openweathermap.org/current"), and if you're interested you can read all about the various options that they provide. For now, we're unceremoniously dumping it in a @hl.scala{pre} so you can see the raw response data.
 
     @p
       As you can see, using the raw JavaScript API to make the Ajax call looks almost identical to actually doing this in JavaScript, shown below:
@@ -174,7 +174,7 @@
     @p
       With Scala.js, we provide a simpler API that is more clearly functional. First, you need to import some things into scope:
 
-    @hl.ref(webpage/"Weather1.scala", "import dom", "val url =")
+    @hl.ref(webpage/"Weather1.scala", "import dom", "/**")
 
     @p
       The first import brings in Scala adapters to several DOM APIs, which allow you to use them more idiomatically from Scala. The second brings in an implicit @hl.scala{scala.concurrent.ExecutionContext} that we'll need to run our asynchronous operations.
