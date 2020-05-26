@@ -32,7 +32,7 @@ object BookData {
       val path = file.relativeTo(cloneRoot/root).toString.stripSuffix(".scala")
       val filename = path.replace('/', '.')
 
-      val docpath = s"https://docs.oracle.com/javase/7/docs/api/$path.html"
+      val docpath = s"https://docs.oracle.com/javase/8/docs/api/$path.html"
       filename -> docpath
     }
   }
