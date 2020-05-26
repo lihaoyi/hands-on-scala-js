@@ -1,5 +1,6 @@
+import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
-val app = crossProject.settings(
+val app = crossProject(JSPlatform, JVMPlatform).settings(
   unmanagedSourceDirectories in Compile +=
     baseDirectory.value  / "shared" / "main" / "scala",
   libraryDependencies ++= Seq(

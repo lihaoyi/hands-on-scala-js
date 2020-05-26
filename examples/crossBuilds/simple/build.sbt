@@ -1,5 +1,6 @@
+import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
-val library = crossProject.settings(
+val library = crossProject(JSPlatform, JVMPlatform).settings(
   libraryDependencies += "com.lihaoyi" %%% "utest" % "0.3.0",
   testFrameworks += new TestFramework("utest.runner.Framework")
 ).jsSettings(
