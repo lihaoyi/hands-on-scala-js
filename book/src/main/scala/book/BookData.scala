@@ -29,7 +29,7 @@ object BookData {
       if file.ext == "scala"
     } yield{
 
-      val path = (file - cloneRoot - root).toString.stripSuffix(".scala")
+      val path = file.relativeTo(cloneRoot/root).toString.stripSuffix(".scala")
       val filename = path.replace('/', '.')
 
       val docpath = s"https://docs.oracle.com/javase/7/docs/api/$path.html"
