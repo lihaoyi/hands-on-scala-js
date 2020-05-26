@@ -8,9 +8,10 @@ import scala.collection.mutable
 import scala.concurrent.Future
 import scalajs.js
 import scalatags.JsDom.all._
-import scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation._
 import scalajs.concurrent.JSExecutionContext.Implicits.runNow
-@JSExport
+
+@JSExportTopLevel("AdvancedFutures")
 object Futures {
   def main(container: html.Div,
             handle: (Seq[String], html.Div) => Unit) = {

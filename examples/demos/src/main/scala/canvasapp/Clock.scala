@@ -1,12 +1,12 @@
 package canvasapp
 
-
 import org.scalajs.dom
 import dom.html
 import scalajs.js
-import scalajs.js.annotation.JSExport
-@JSExport
-object Clock extends{
+import scala.scalajs.js.annotation._
+
+@JSExportTopLevel("CanvasAppClock")
+object Clock {
   @JSExport
   def main(canvas: html.Canvas) = {
     /*setup*/
@@ -33,7 +33,7 @@ object Clock extends{
     // format the number with size 2 and optional '0' prefix
     // so '1' becomes '01'
     def format(n: Int) = f"$n%02d"
-    
+
     def render() = {
       val date = new js.Date()
       renderer.clearRect(

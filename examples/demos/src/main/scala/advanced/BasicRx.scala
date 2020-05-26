@@ -2,11 +2,12 @@ package advanced
 
 import org.scalajs.dom
 import scalajs.js
-import scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation._
 import rx._
 import scalatags.JsDom.all._
 import dom.html
-@JSExport
+
+@JSExportTopLevel("AdvancedBasicRx")
 object BasicRx {
   @JSExport
   def main(container: html.Div) = {

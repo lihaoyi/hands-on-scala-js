@@ -2,10 +2,10 @@ package webpage
 
 import org.scalajs.dom
 import dom.html
-import scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation._
 import scalatags.JsDom.all._
 
-@JSExport
+@JSExportTopLevel("WebPageInputs")
 object Inputs extends{
   @JSExport
   def main(target: html.Div) = {

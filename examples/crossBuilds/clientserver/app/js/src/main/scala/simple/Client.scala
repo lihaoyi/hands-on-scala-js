@@ -5,10 +5,10 @@ import scalajs.concurrent.JSExecutionContext.Implicits.runNow
 import org.scalajs.dom
 import dom.html
 import dom.ext.Ajax
-import scalajs.js.annotation.JSExport
+import scalajs.js.annotation._
 
-@JSExport
-object Client extends{
+@JSExportTopLevel("SimpleClient")
+object Client {
   @JSExport
   def main(container: html.Div) = {
     val inputBox = input.render

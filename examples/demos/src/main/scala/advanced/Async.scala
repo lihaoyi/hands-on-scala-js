@@ -4,10 +4,10 @@ import org.scalajs.dom
 import dom.html
 import concurrent._
 import async.Async._
-import scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation._
 import scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-@JSExport
+@JSExportTopLevel("AdvancedAsync")
 object Async {
   def init(canvas: html.Canvas) = {
     val renderer = canvas.getContext("2d")

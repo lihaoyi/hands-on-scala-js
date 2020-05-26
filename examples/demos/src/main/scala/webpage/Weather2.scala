@@ -3,12 +3,12 @@ package webpage
 import org.scalajs.dom
 import org.scalajs.dom.{Node, Element}
 import scalajs.js
-import scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation._
 import scalatags.JsDom.all._
 import dom.html
 
-@JSExport
-object Weather2 extends{
+@JSExportTopLevel("WebPageWeather2")
+object Weather2 {
   @JSExport
   def main(target: html.Div) = {
     import dom.ext._

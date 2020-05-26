@@ -1,13 +1,12 @@
 package canvasapp
 
-
 import org.scalajs.dom
 import dom.html
-import scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation._
 import scala.util.Random
 
-@JSExport
-object FlappyLine extends{
+@JSExportTopLevel("CanvasAppFlappyLine")
+object FlappyLine {
   @JSExport
   def main(canvas: html.Canvas) = {
     /*setup*/

@@ -4,12 +4,12 @@ import org.scalajs.dom
 import dom.ext._
 import scalajs.concurrent.JSExecutionContext.Implicits.runNow
 import scalajs.js
-import scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation._
 import scalatags.JsDom.all._
 import dom.html
 
-@JSExport
-object WeatherSearch extends{
+@JSExportTopLevel("WebPageWeatherSearch")
+object WeatherSearch {
   @JSExport
   def main(target: html.Div) = {
 

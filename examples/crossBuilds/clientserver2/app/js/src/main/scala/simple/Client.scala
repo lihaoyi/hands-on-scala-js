@@ -2,7 +2,7 @@ package simple
 import scalatags.JsDom.all._
 import org.scalajs.dom
 import dom.html
-import scalajs.js.annotation.JSExport
+import scalajs.js.annotation._
 import scalajs.concurrent.JSExecutionContext.Implicits.runNow
 import autowire._
 
@@ -18,8 +18,8 @@ object Ajaxer extends autowire.Client[String, upickle.default.Reader, upickle.de
   def write[Result: upickle.default.Writer](r: Result) = upickle.default.write(r)
 }
 
-@JSExport
-object Client extends{
+@JSExportTopLevel("SimpleClient")
+object Client {
   @JSExport
   def main(container: html.Div) = {
     val inputBox = input.render

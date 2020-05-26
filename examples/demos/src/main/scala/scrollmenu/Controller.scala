@@ -5,12 +5,10 @@ import dom.html
 import org.scalajs.dom.ext._
 
 import scalajs.js
-import scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation._
 import scalatags.JsDom.all._
 
-
-
-@JSExport
+@JSExportTopLevel("ScrollMenuController")
 object Controller{
 
   def munge(name: String) = {

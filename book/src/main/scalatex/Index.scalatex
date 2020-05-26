@@ -12,7 +12,7 @@ is a set of detailed expositions on various parts of the Scala.js platform. Noth
       @hl.ref(wd/'examples/'demos/'src/'main/'scala/"Splash.scala", "var x")
 
     @less
-      @example(canvas, "Splash().main")
+      @example(canvas, "Splash.main")
 
   @p
 
