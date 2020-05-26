@@ -50,7 +50,7 @@ lazy val book = Project(
       println("Already Cloned")
     }
   },
-  (run in Compile) <<= (run in Compile).dependsOn(cloneRepos),
+  (fullClasspath in Runtime) := (fullClasspath in Runtime).dependsOn(cloneRepos).value,
   initialize := {
     System.setProperty("clone.root", target.value.getAbsolutePath + "/clones")
     System.setProperty("output.root", target.value.getAbsolutePath + "/output")
@@ -105,4 +105,3 @@ lazy val clientserver2 = project.in(file("examples/crossBuilds/clientserver2"))
 lazy val client2 = ProjectRef(file("examples/crossBuilds/clientserver2"), "client")
 
 lazy val server2 = ProjectRef(file("examples/crossBuilds/clientserver2"), "server")
-
