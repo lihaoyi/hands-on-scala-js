@@ -23,7 +23,7 @@ lazy val book = Project(
 ).settings(sharedSettings ++ scalatex.SbtPlugin.projectSettings:_*).settings(
   libraryDependencies ++= Seq(
 
-    "com.lihaoyi" %% "scalatex-site" % "0.3.9",
+    "com.lihaoyi" %% "scalatex-site" % "0.3.11",
     "com.lihaoyi" %% "scalatags" % "0.6.2",
     "com.lihaoyi" %% "upickle" % "0.2.7",
     "com.lihaoyi" %% "ammonite-ops" % "0.2.4"
@@ -53,7 +53,7 @@ lazy val book = Project(
       println("Already Cloned")
     }
   },
-  (fullClasspath in Runtime) := (fullClasspath in Runtime).dependsOn(cloneRepos).value,
+  (managedClasspath in Runtime) := (managedClasspath in Runtime).dependsOn(cloneRepos).value,
   initialize := {
     System.setProperty("clone.root", target.value.getAbsolutePath + "/clones")
     System.setProperty("output.root", target.value.getAbsolutePath + "/output")
