@@ -18,7 +18,7 @@ object Futures {
     val myInput = input(value:="London,Singapore,Berlin,New York").render
     val output = div.render
     myInput.onkeyup = (e: dom.KeyboardEvent) => {
-      if (e.keyCode == KeyCode.enter){
+      if (e.keyCode == KeyCode.Enter){
         handle(myInput.value.split(','), output)
       }
     }

@@ -7,7 +7,14 @@ import org.eclipse.jgit.transport.{UsernamePasswordCredentialsProvider, RefSpec}
 val cloneRepos = taskKey[Unit]("Clone stuff from github")
 
 inThisBuild(Def.settings(
-  scalaVersion := "2.11.12"
+  scalaVersion := "2.11.12",
+  scalacOptions ++= Seq(
+    "-deprecation",
+    "-feature",
+    "-encoding",
+    "utf-8",
+    "-Xfatal-warnings",
+  )
 ))
 
 val sharedSettings = Seq(

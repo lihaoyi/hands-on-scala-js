@@ -1,5 +1,6 @@
 package advanced
 
+import scala.language.implicitConversions
 import org.scalajs.dom
 import scalajs.js
 import scala.scalajs.js.annotation._

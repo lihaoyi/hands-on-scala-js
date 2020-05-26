@@ -11,7 +11,7 @@ import scalatex.site
 import scalatex.site.Highlighter
 
 object BookData {
-  val wd = cwd
+  val wd = pwd
   val cloneRoot = Path(System.getProperty("clone.root"))
   val lnk = book.lnk
   val pureTable = book.pureTable

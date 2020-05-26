@@ -50,9 +50,9 @@ object WeatherSearch {
         xhr <- Ajax.get(searchUrl)
         if query == box.value
       } js.JSON.parse(xhr.responseText).list match{
-        case jsonlist: js.Array[js.Dynamic] =>
+        case jsonlist: js.Array[_] =>
           output.innerHTML = ""
-          showResults(jsonlist, query)
+          showResults(jsonlist.asInstanceOf[js.Array[js.Dynamic]], query)
         case _ =>
           output.innerHTML = "No Results"
       }

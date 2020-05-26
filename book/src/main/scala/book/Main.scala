@@ -13,7 +13,7 @@ import scalatex.site.{Tree, Site}
 import ammonite.ops._
 
 object Main {
-  val wd = cwd
+  val wd = pwd
 
   def main(args: Array[String]): Unit = {
     val googleAnalytics =
