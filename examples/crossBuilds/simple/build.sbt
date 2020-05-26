@@ -1,5 +1,9 @@
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
+inThisBuild(Def.settings(
+  scalaVersion := "2.11.12"
+))
+
 val library = crossProject(JSPlatform, JVMPlatform).settings(
   libraryDependencies += "com.lihaoyi" %%% "utest" % "0.3.0",
   testFrameworks += new TestFramework("utest.runner.Framework")

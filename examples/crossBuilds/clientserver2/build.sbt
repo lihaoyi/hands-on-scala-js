@@ -1,5 +1,9 @@
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
+inThisBuild(Def.settings(
+  scalaVersion := "2.11.12"
+))
+
 val app = crossProject(JSPlatform, JVMPlatform).settings(
   unmanagedSourceDirectories in Compile +=
     baseDirectory.value  / "shared" / "main" / "scala",
@@ -7,8 +11,7 @@ val app = crossProject(JSPlatform, JVMPlatform).settings(
     "com.lihaoyi" %%% "scalatags" % "0.6.2",
     "com.lihaoyi" %%% "upickle" % "0.4.4",
     "com.lihaoyi" %%% "autowire" % "0.2.6"
-  ),
-  scalaVersion := "2.11.8"
+  )
 ).jsSettings(
   libraryDependencies ++= Seq(
     "org.scala-js" %%% "scalajs-dom" % "0.9.1"
