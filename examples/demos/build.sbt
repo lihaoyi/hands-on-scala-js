@@ -6,7 +6,7 @@ name := "Example"
 
 version := "0.1-SNAPSHOT"
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.8"
 
 libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.5" % "provided"
 

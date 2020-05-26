@@ -7,7 +7,7 @@ val app = crossProject.settings(
     "com.lihaoyi" %%% "upickle" % "0.4.4",
     "com.lihaoyi" %%% "autowire" % "0.2.6"
   ),
-  scalaVersion := "2.11.5"
+  scalaVersion := "2.11.8"
 ).jsSettings(
   libraryDependencies ++= Seq(
     "org.scala-js" %%% "scalajs-dom" % "0.9.1"
@@ -24,5 +24,3 @@ lazy val appJS = app.js
 lazy val appJVM = app.jvm.settings(
   (resources in Compile) += (fastOptJS in (appJS, Compile)).value.data
 )
-
-
