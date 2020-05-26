@@ -12,11 +12,10 @@ object Weather1 {
   @JSExport
   def main(target: html.Div) = {
     import dom.ext._
-    import scala.scalajs
-                .concurrent
-                .JSExecutionContext
+    import scala.concurrent
+                .ExecutionContext
                 .Implicits
-                .runNow
+                .global
 
     val url =
       "http://api.openweathermap.org/" +

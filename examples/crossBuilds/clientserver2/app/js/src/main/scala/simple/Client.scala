@@ -3,7 +3,7 @@ import scalatags.JsDom.all._
 import org.scalajs.dom
 import dom.html
 import scalajs.js.annotation._
-import scalajs.concurrent.JSExecutionContext.Implicits.runNow
+import scala.concurrent.ExecutionContext.Implicits.global
 import autowire._
 
 object Ajaxer extends autowire.Client[String, upickle.default.Reader, upickle.default.Writer]{

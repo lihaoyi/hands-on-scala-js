@@ -2,7 +2,7 @@ package webpage
 
 import org.scalajs.dom
 import dom.ext._
-import scalajs.concurrent.JSExecutionContext.Implicits.runNow
+import scala.concurrent.ExecutionContext.Implicits.global
 import scalajs.js
 import scala.scalajs.js.annotation._
 import scalatags.JsDom.all._

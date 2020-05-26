@@ -9,7 +9,7 @@ import scala.concurrent.Future
 import scalajs.js
 import scalatags.JsDom.all._
 import scala.scalajs.js.annotation._
-import scalajs.concurrent.JSExecutionContext.Implicits.runNow
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @JSExportTopLevel("AdvancedFutures")
 object Futures {

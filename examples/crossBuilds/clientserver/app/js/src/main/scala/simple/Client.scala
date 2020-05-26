@@ -1,7 +1,7 @@
 package simple
 
 import scalatags.JsDom.all._
-import scalajs.concurrent.JSExecutionContext.Implicits.runNow
+import scala.concurrent.ExecutionContext.Implicits.global
 import org.scalajs.dom
 import dom.html
 import dom.ext.Ajax
