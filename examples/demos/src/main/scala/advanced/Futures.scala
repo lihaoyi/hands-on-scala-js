@@ -31,9 +31,9 @@ object Futures {
     )
   }
   def urlFor(name: String) = {
-    "http://api.openweathermap.org/data/" +
-    "2.5/find?mode=json&q=" +
-    name
+    "https://api.openweathermap.org/data/" +
+    s"2.5/find?mode=json&q=$name" +
+    s"&APPID=${webpage.WeatherAPIKey.APIKey}"
   }
   def parseTemp(text: String) = {
     val data = js.JSON.parse(text)

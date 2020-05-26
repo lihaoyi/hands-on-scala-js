@@ -18,8 +18,9 @@ object Weather3 {
                 .global
 
     val url =
-      "http://api.openweathermap.org/" +
-        "data/2.5/weather?q=Singapore"
+      "https://api.openweathermap.org/" +
+      "data/2.5/weather?q=Singapore" +
+      s"&APPID=${WeatherAPIKey.APIKey}"
 
     Ajax.get(url).onSuccess{ case xhr =>
       if (xhr.status == 200) {

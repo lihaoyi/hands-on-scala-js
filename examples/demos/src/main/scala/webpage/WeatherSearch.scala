@@ -42,9 +42,10 @@ object WeatherSearch {
 
     def fetchWeather(query: String) = {
       val searchUrl =
-        "http://api.openweathermap.org/data/" +
+        "https://api.openweathermap.org/data/" +
         "2.5/find?type=like&mode=json&q=" +
-        query
+        query +
+        s"&APPID=${WeatherAPIKey.APIKey}"
 
       for{
         xhr <- Ajax.get(searchUrl)
