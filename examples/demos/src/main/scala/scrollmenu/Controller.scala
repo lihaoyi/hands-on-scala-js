@@ -7,6 +7,7 @@ import org.scalajs.dom.ext._
 import scalajs.js
 import scala.scalajs.js.annotation._
 import scalatags.JsDom.all._
+import upickle.default._
 
 @JSExportTopLevel("ScrollMenuController")
 object Controller{
@@ -18,7 +19,7 @@ object Controller{
   @JSExport
   def main(data: scala.scalajs.js.Any) = {
 
-    val structure = upickle.default.readJs[Tree[String]](upickle.json.readJs(data))
+    val structure = ujson.WebJson.transform[Tree[String]](data, reader[Tree[String]])
 
     val Seq(main, menu, layout, menuLink) = Seq(
       "main", "menu", "layout", "menuLink"

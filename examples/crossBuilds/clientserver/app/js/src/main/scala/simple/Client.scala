@@ -14,7 +14,7 @@ object Client {
     val inputBox = input.render
     val outputBox = ul.render
     def update() = Ajax.post("/ajax/list", inputBox.value).foreach{ xhr =>
-      val data = upickle.default.read[Seq[FileData]](xhr.responseText)
+      val data = upickle.default.read[Seq[FileData]](ujson.read(xhr.responseText))
       outputBox.innerHTML = ""
       for(FileData(name, size) <- data){
         outputBox.appendChild(

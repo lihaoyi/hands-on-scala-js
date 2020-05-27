@@ -22,7 +22,7 @@ object Weather2 {
       "data/2.5/weather?q=Singapore" +
       s"&APPID=${WeatherAPIKey.APIKey}"
 
-    Ajax.get(url).onSuccess{ case xhr =>
+    Ajax.get(url).foreach { xhr =>
       target.appendChild(
         pre(
           js.JSON.stringify(

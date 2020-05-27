@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
-import akka.stream.ActorMaterializer
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Properties
@@ -18,7 +17,6 @@ object Router extends autowire.Server[String, upickle.default.Reader, upickle.de
 object Server extends Api{
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem()
-    implicit val materializer = ActorMaterializer()
 
     val port = Properties.envOrElse("PORT", "8080").toInt
     val route = {

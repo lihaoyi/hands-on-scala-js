@@ -51,6 +51,6 @@ object Clock {
         canvas.height / 2
       )
     }
-    dom.window.setInterval(render _, 1000)
+    dom.window.setInterval(() => render(), 1000)
   }
 }

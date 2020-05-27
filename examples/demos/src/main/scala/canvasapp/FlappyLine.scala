@@ -99,7 +99,7 @@ object FlappyLine {
       else runLive()
     }
 
-    dom.window.setInterval(run _, 20)
+    dom.window.setInterval(() => run(), 20)
 
     canvas.onclick = (e: dom.MouseEvent) => {
       playerV -= 5

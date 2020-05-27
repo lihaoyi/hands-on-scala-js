@@ -1,25 +1,26 @@
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 inThisBuild(Def.settings(
-  scalaVersion := "2.11.12"
+  scalaVersion := "2.12.11"
 ))
 
 val app = crossProject(JSPlatform, JVMPlatform).settings(
   unmanagedSourceDirectories in Compile +=
     baseDirectory.value  / "shared" / "main" / "scala",
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %%% "scalatags" % "0.6.2",
-    "com.lihaoyi" %%% "upickle" % "0.4.4",
+    "com.lihaoyi" %%% "scalatags" % "0.9.1",
+    "com.lihaoyi" %%% "upickle" % "1.1.0",
     "com.lihaoyi" %%% "autowire" % "0.2.6"
   )
 ).jsSettings(
   libraryDependencies ++= Seq(
-    "org.scala-js" %%% "scalajs-dom" % "0.9.1"
+    "org.scala-js" %%% "scalajs-dom" % "1.0.0"
   )
 ).jvmSettings(
   libraryDependencies ++= Seq(
-    "com.typesafe.akka" %% "akka-http-experimental" % "2.4.11",
-    "com.typesafe.akka" %% "akka-actor" % "2.4.12",
+    "com.typesafe.akka" %% "akka-actor" % "2.6.5",
+    "com.typesafe.akka" %% "akka-stream" % "2.6.5",
+    "com.typesafe.akka" %% "akka-http" % "10.1.12",
     "org.webjars" % "bootstrap" % "3.2.0"
   )
 )

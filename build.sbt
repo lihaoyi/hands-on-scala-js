@@ -7,7 +7,7 @@ import org.eclipse.jgit.transport.{UsernamePasswordCredentialsProvider, RefSpec}
 val cloneRepos = taskKey[Unit]("Clone stuff from github")
 
 inThisBuild(Def.settings(
-  scalaVersion := "2.11.12",
+  scalaVersion := "2.12.11",
   scalacOptions ++= Seq(
     "-deprecation",
     "-feature",
@@ -18,8 +18,8 @@ inThisBuild(Def.settings(
 ))
 
 val sharedSettings = Seq(
-  libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
-  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
+  libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.9" % "provided",
+  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.9"),
   autoCompilerPlugins := true
 )
 

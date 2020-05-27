@@ -5,8 +5,13 @@ import dom.html
 import org.scalajs.dom.ext._
 import scalajs.js
 import scalatags.JsDom.all._
+import upickle.default._
 
 case class Tree[T](value: T, children: Vector[Tree[T]])
+
+object Tree {
+  implicit def rw[T: ReadWriter]: ReadWriter[Tree[T]] = macroRW
+}
 
 case class MenuNode(frag: html.Element, id: String, start: Int, end: Int)
 
