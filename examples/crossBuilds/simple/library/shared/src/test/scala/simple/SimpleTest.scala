@@ -4,9 +4,11 @@ package simple
 import utest._
 object SimpleTest extends TestSuite{
   val tests = TestSuite{
-    'format{
-      'nil - assert(Simple.formatTimes(Nil) == Nil)
-      'timeZero - {
+    test("format") {
+      test("nil") {
+        assert(Simple.formatTimes(Nil) == Nil)
+      }
+      test("timeZero") {
         val timestamps = Seq(0L, 1L << 32)
         val expected = Seq(
           "1970-01-01T00:00:00",
@@ -16,7 +18,7 @@ object SimpleTest extends TestSuite{
         assert(formatted == expected)
       }
     }
-    'zero{
+    test("zero") {
       0.0
     }
   }
