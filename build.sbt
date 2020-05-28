@@ -7,7 +7,7 @@ import org.eclipse.jgit.transport.{UsernamePasswordCredentialsProvider, RefSpec}
 val cloneRepos = taskKey[Unit]("Clone stuff from github")
 
 inThisBuild(Def.settings(
-  scalaVersion := "2.12.11",
+  scalaVersion := "2.13.2",
   scalacOptions ++= Seq(
     "-deprecation",
     "-feature",
@@ -17,20 +17,16 @@ inThisBuild(Def.settings(
   )
 ))
 
-val sharedSettings = Seq(
-  libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.9" % "provided",
-  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.9"),
-  autoCompilerPlugins := true
-)
-
-
 lazy val book = Project(
   id = "book",
   base = file("book")
-).settings(sharedSettings ++ scalatex.SbtPlugin.projectSettings:_*).settings(
+).settings(scalatex.SbtPlugin.projectSettings:_*).settings(
+  scalaVersion := "2.12.11",
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "scalatex-site" % "0.3.11",
+    "com.lihaoyi" %% "acyclic" % "0.1.9" % "provided",
   ),
+  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.9"),
   (resources in Compile) += (fullOptJS in (demos, Compile)).value.data,
 
   (unmanagedResourceDirectories in Compile) ++=

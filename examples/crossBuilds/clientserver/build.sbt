@@ -1,7 +1,7 @@
 /*build.sbt*/
 
 inThisBuild(Def.settings(
-  scalaVersion := "2.12.11"
+  scalaVersion := "2.13.2",
 ))
 
 val app = crossProject(JSPlatform, JVMPlatform).settings(

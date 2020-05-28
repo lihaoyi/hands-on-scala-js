@@ -19,7 +19,7 @@ object Futures {
     val output = div.render
     myInput.onkeyup = (e: dom.KeyboardEvent) => {
       if (e.keyCode == KeyCode.Enter){
-        handle(myInput.value.split(','), output)
+        handle(myInput.value.split(',').toSeq, output)
       }
     }
     container.appendChild(
@@ -55,7 +55,7 @@ object Futures {
   @JSExport
   def main0(container: html.Div) = {
     def handle0(names: Seq[String], output: html.Div) = {
-      val results = mutable.Buffer.empty[(String, Double)]
+      val results = mutable.ListBuffer.empty[(String, Double)]
       for(name <- names){
         val xhr = new XMLHttpRequest
         xhr.open("GET", urlFor(name))
@@ -63,7 +63,7 @@ object Futures {
           val temp = parseTemp(xhr.responseText)
           results.append((name, temp))
           if (results.length == names.length){
-            formatResults(output, results)
+            formatResults(output, results.toList)
           }
         }
         xhr.send()
@@ -74,7 +74,7 @@ object Futures {
   @JSExport
   def main1(container: html.Div) = {
     def handle1(names: Seq[String], output: html.Div) = {
-      val results = mutable.Buffer.empty[(String, Double)]
+      val results = mutable.ListBuffer.empty[(String, Double)]
       for{
         name <- names
         xhr <- Ajax.get(urlFor(name))
@@ -82,7 +82,7 @@ object Futures {
         val temp = parseTemp(xhr.responseText)
         results.append((name, temp))
         if (results.length == names.length){
-          formatResults(output, results)
+          formatResults(output, results.toList)
         }
       }
     }
