@@ -1,5 +1,3 @@
-import sbtcrossproject.CrossPlugin.autoImport.crossProject
-
 inThisBuild(Def.settings(
   scalaVersion := "2.12.11"
 ))
@@ -10,7 +8,7 @@ val app = crossProject(JSPlatform, JVMPlatform).settings(
   libraryDependencies ++= Seq(
     "com.lihaoyi" %%% "scalatags" % "0.9.1",
     "com.lihaoyi" %%% "upickle" % "1.1.0",
-    "com.lihaoyi" %%% "autowire" % "0.2.6"
+    "com.lihaoyi" %%% "autowire" % "0.3.2"
   )
 ).jsSettings(
   libraryDependencies ++= Seq(

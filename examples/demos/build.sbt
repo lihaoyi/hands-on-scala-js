@@ -1,4 +1,4 @@
-(emitSourceMaps in fullOptJS) := false
+Compile / fullOptJS / scalaJSLinkerConfig ~= { _.withSourceMap(false) }
 
 enablePlugins(ScalaJSPlugin)
 
@@ -16,6 +16,6 @@ libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.0.0"
 
 libraryDependencies += "com.lihaoyi" %%% "scalatags" % "0.9.1"
 
-libraryDependencies += "com.lihaoyi" %%% "scalarx" % "0.4.1"
+libraryDependencies += "com.lihaoyi" %%% "scalarx" % "0.4.3"
 
 libraryDependencies += "org.scala-lang.modules" %% "scala-async" % "0.9.7"

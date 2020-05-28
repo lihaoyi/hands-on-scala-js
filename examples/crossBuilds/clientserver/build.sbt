@@ -1,7 +1,5 @@
 /*build.sbt*/
 
-import sbtcrossproject.CrossPlugin.autoImport.crossProject
-
 inThisBuild(Def.settings(
   scalaVersion := "2.12.11"
 ))

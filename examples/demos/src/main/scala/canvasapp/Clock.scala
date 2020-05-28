@@ -32,7 +32,7 @@ object Clock {
 
     // format the number with size 2 and optional '0' prefix
     // so '1' becomes '01'
-    def format(n: Int) = f"$n%02d"
+    def format(n: Double) = f"${n.toInt}%02d"
 
     def render() = {
       val date = new js.Date()
