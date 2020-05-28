@@ -69,8 +69,7 @@ object Main {
       )
     }
 
-    s.renderTo(Path(System.getProperty("output.root")))
-
+    customRenderToWorkaroundSiteIssue(s, Path(System.getProperty("output.root")))
 
     val allNames = {
       def rec(n: Tree[String]): Seq[String] = {
@@ -94,6 +93,25 @@ object Main {
 
     // can be used to verify that no links are broken
     // lnk.usedLinks
+  }
+
+  // Work around https://github.com/lihaoyi/Scalatex/issues/72
+  private def customRenderToWorkaroundSiteIssue(s: Site, outputRoot: Path): Unit = {
+    def generateHtml(outputRoot: Path): Unit = {
+      for ((path, (pageHeaders, pageBody)) <- s.content){
+        val txt = html(
+          head(pageHeaders),
+          body(s.bodyFrag(pageBody))
+        ).render
+        val cb = java.nio.CharBuffer.wrap("<!DOCTYPE html>" + txt)
+        val bytes = scala.io.Codec.UTF8.encoder.encode(cb)
+        write.over(outputRoot/path,
+          bytes.array().slice(bytes.position(), bytes.limit()))
+      }
+    }
+
+    generateHtml(outputRoot)
+    s.bundleResources(outputRoot)
   }
 
 }
