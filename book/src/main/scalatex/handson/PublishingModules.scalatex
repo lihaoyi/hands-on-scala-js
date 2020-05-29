@@ -28,10 +28,10 @@
     @p
       From the bash shell in the project root. Let's take a look at the various files that make up this project. First, the @code{build.sbt} files:
 
-    @hl.ref(wd/'examples/'crossBuilds/'simple/'project/"build.sbt")
+    @hl.ref(wd/'examples/'crossBuilds/'simple/'project/"plugins.sbt")
 
     @p
-      The @code{project/build.sbt} file is uneventful: it simply includes the Scala.js SBT plugin. However, the @code{build.sbt} file is a bit more interesting:
+      The @code{project/plugins.sbt} file is uneventful: it simply includes the Scala.js SBT plugin. However, the @code{build.sbt} file is a bit more interesting:
 
     @hl.ref(wd/'examples/'crossBuilds/'simple/"build.sbt")
 
