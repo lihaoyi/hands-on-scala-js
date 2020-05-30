@@ -5,13 +5,15 @@
 
 @ul
   @li
-    @lnk("sbt", "http://www.scala-sbt.org/"): SBT is the most common build-tool in the Scala community, and is what we will use for building our Scala.js application. Their home page has a link to download and install it. (If you are already using @lnk("Lightbend Activator", "https://www.lightbend.com/activator/")—formerly known as Typesafe Activator—it is effectively sbt.)
+    @lnk.misc.sbt: sbt is the most common build tool in the Scala community (although others like @lnk.misc.Mill are growing in popularity as well), and is what we will use for building our Scala.js application. Their home page has a link to download and install it.
   @li
-    An editor for Scala: @lnk("IntelliJ Scala", "http://blog.jetbrains.com/scala/") and @lnk("Eclipse ScalaIDE", "http://scala-ide.org/") are the most popular choices and work on all platforms, though there are others.
+    @lnk.misc.Nodejs: a plaform to run JavaScript code on the command line, without browser. Scala.js uses Node.js to run your code by default.
   @li
-    @lnk("Git", "http://git-scm.com/"): This is a version-control system that we will use to download and manage our Scala.js projects.
+    An editor for Scala: @lnk("IntelliJ Scala", "https://blog.jetbrains.com/scala/") and @lnk("VSCode with Metals", "https://scalameta.org/metals/docs/editors/vscode.html") are the most popular choices and work on all platforms, though there are others.
   @li
-    A terminal: on OSX you have @lnk("Terminal.app", "http://guides.macrumors.com/Terminal") already installed, in Linux you have @lnk("Terminal", "https://help.ubuntu.com/community/UsingTheTerminal"), and on Windows you have @lnk("PowerShell", "http://en.wikipedia.org/wiki/Windows_PowerShell").
+    @lnk("Git", "https://git-scm.com/"): This is a version-control system that we will use to download and manage our Scala.js projects.
+  @li
+    A terminal: on OSX you have @lnk("Terminal.app", "https://guides.macrumors.com/Terminal") already installed, in Linux you have @lnk("Terminal", "https://help.ubuntu.com/community/UsingTheTerminal"), and on Windows you have @lnk("PowerShell", "https://en.wikipedia.org/wiki/Windows_PowerShell").
   @li
     Your favorite web browser: @lnk("Chrome", "https://www.google.com/chrome") and @lnk("Firefox", "https://www.mozilla.org/en-US/firefox") are the most popular.
 
@@ -22,45 +24,42 @@
   The quickest way to get started with Scala.js is to @code{git clone} @lnk("workbench-example-app", "https://github.com/lihaoyi/workbench-example-app"), go into the repository root, and run @code{sbt ~fastOptJS}
 
 @hl.sh
-  git clone https://github.com/lihaoyi/workbench-example-app
-  cd workbench-example-app
-  sbt ~fastOptJS
+  $ git clone https://github.com/lihaoyi/workbench-example-app
+  $ cd workbench-example-app
+  $ sbt
+  > ~fastOptJS
+
+@p
+  Note that the last command is executed within the sbt shell, which is launched by the @hl.sh("sbt") executable.
 
 @p
   This should result in a bunch of spam to the console, and may take a few minutes the first time as SBT resolves and downloads all necessary dependencies. A successful run looks like this
 
 @pre
-  haoyi-mbp:Workspace haoyi$ git clone https://github.com/lihaoyi/workbench-example-app
+  $ git clone https://github.com/lihaoyi/workbench-example-app
   Cloning into 'workbench-example-app'...
   remote: Counting objects: 876, done.
   remote: Total 876 (delta 0), reused 0 (delta 0)
   Receiving objects: 100% (876/876), 676.59 KiB | 317.00 KiB/s, done.
   Resolving deltas: 100% (308/308), done.
   Checking connectivity... done.
-  haoyi-mbp:Workspace haoyi$ cd workbench-example-app/
-  haoyi-mbp:workbench-example-app haoyi$ sbt ~fastOptJS
-  [info] Loading global plugins from /Users/haoyi/.sbt/0.13/plugins
-  [info] Updating {file:/Users/haoyi/.sbt/0.13/plugins/}global-plugins...
-  [info] Resolving org.fusesource.jansi#jansi;1.4 ...
-  [info] Done updating.
-  [info] Loading project definition from /Users/haoyi/Dropbox (Personal)/Workspace/workbench-example-app/project
-  [info] Updating {file:/Users/haoyi/Dropbox%20(Personal)/Workspace/workbench-example-app/project/}workbench-example-app-build...
-  [info] Resolving org.fusesource.jansi#jansi;1.4 ...
-  [info] Done updating.
-  [info] Set current project to Example (in build file:/Users/haoyi/Dropbox%20(Personal)/Workspace/workbench-example-app/)
-  [INFO] [10/26/2014 15:42:09.791] [SystemLol-akka.actor.default-dispatcher-2] [akka://SystemLol/user/IO-HTTP/listener-0] Bound to localhost/127.0.0.1:12345
-  [info] Updating {file:/Users/haoyi/Dropbox%20(Personal)/Workspace/workbench-example-app/}workbench-example-app...
-  [info] Resolving jline#jline;2.12 ...
-  [info] Done updating.
-  [info] Compiling 1 Scala source to /Users/haoyi/Dropbox (Personal)/Workspace/workbench-example-app/target/scala-2.11/classes...
-  [info] Fast optimizing /Users/haoyi/Dropbox (Personal)/Workspace/workbench-example-app/target/scala-2.11/example-fastopt.js
-  [info] workbench: Checking example-fastopt.js
-  [info] workbench: Refreshing http://localhost:12345/target/scala-2.11/example-fastopt.js
-  [success] Total time: 11 s, completed Oct 26, 2014 3:42:21 PM
-  1. Waiting for source changes... (press enter to interrupt)
+  $ cd workbench-example-app/
+  $ sbt
+  [info] Loading global plugins from .../.sbt/1.0/plugins
+  [info] Loading settings for project workbench-example-app-build from build.sbt,metals.sbt ...
+  [info] Loading project definition from .../workbench-example-app/project
+  [info] Loading settings for project workbench-example-app from build.sbt ...
+  [info] Set current project to Example (in build file:/.../workbench-example-app/)
+  [info] sbt server started at local:sbt-server-44fa36df5e68302f421e
+  sbt:Example> ~fastOptJS
+  [info] Compiling 1 Scala source to .../workbench-example-app/arget/scala-2.13/classes ...
+  [info] Fast optimizing .../workbench-example-app/target/scala-2.13/example-fastopt.js
+  [success] Total time: 4 s, completed 28 mai 2020 17:27:23
+  [info] 1. Monitoring source files for workbench-example-app/fastOptJS...
+  [info]    Press <enter> to interrupt or '?' for more options.
 
 @p
-  The line @code{Waiting for source changes...} is telling you that your Scala.js program is ready! Now, when you go to the web URL @code{http://localhost:12345/target/scala-2.11/classes/index-dev.html} in your browser, you should see the following:
+  The line @code{Monitoring source files...} is telling you that your Scala.js program is ready! Now, when you go to the web URL @code{http://localhost:12345/target/scala-2.13/classes/index-dev.html} in your browser, you should see the following:
 
   @img(src:="images/Hello World.png", maxWidth:="100%")
 
@@ -70,7 +69,7 @@
 @sect{Opening up the Project}
 
   @p
-    The next thing to do once you have the project built and running in your browser is to load it into your editor. Both IntelliJ and Eclipse should let you import the Scala.js project without any hassle. Opening it and navigating to @code{ScalaJSExample.scala} would look like this:
+    The next thing to do once you have the project built and running in your browser is to load it into your editor. Both IntelliJ and VS Code should let you import the Scala.js project without any hassle. Opening it and navigating to @code{ScalaJSExample.scala} would look like this:
 
   @img(src:="images/IntelliJ Hello.png", maxWidth:="100%")
 
@@ -92,7 +91,7 @@
   @img(src:="images/Hello World Console.png", maxWidth:="100%")
 
   @p
-    Apart from the SBT log output (which is handled by Workbench) any @hl.scala{println}s in your Scala.js code will also end up in the browser console (the @code{main} you see in the console is printed inside the Scala.js application, see if you can find it!) and so will the stack traces for any thrown exceptions.
+    Apart from the sbt log output (which is handled by Workbench) any @hl.scala{println}s in your Scala.js code will also end up in the browser console (the @code{main} you see in the console is printed inside the Scala.js application, see if you can find it!) and so will the stack traces for any thrown exceptions.
 
 @sect{The Application Code}
 
@@ -112,7 +111,7 @@
   @hl.ref(example/"ScalaJSExample.scala", "@JSExport", "val ctx")
 
   @p
-    This @hl.scala("@JSExport") annotation is used to tell Scala.js that you want this method to be visible and callable from JavaScript. By default, Scala.js does @sect.ref("Fast Optimization", "dead code elimination") and removes any methods or classes which are not used. This is done to keep the compiled executables a reasonable size, since most projects use only a small fraction of e.g. the standard library. @hl.scala("@JSExport") is used to tell Scala.js that the @hl.scala{ScalaJSExample} object and its @hl.scala{def main} method are entry points to the program. Even if they aren't called anywhere internally, they are called externally by JavaScript that the Scala.js compiler is not aware of, and should not be removed. In this case, we are going to call this method from JavaScript to start the Scala.js program.
+    The @hl.scala("@JSExportTopLevel") and @hl.scala("@JSExport") annotations are used to tell Scala.js that you want this object and its main method to be visible and callable from JavaScript. By default, Scala.js does not expose classes and methods to external JavaScript code. There are many reasons for that, but perhaps the most compelling is that it allows Scala.js to perform @sect.ref("Fast Optimization", "dead code elimination") and remove any methods or classes which are not used, among many other optimizations. This is done to keep the compiled executables at a reasonable size, since most projects use only a small fraction of e.g. the standard library. In addition, classes and methods are mangled in the generated code, so that they cannot clash with non-compiler-generated code by default. The export annotations not only tell Scala.js that the @hl.scala{ScalaJSExample} object and its @hl.scala{def main} method are entry points to the program, which must not be removed, but also to provide access to them under non-mangled names. In this case, we are going to call this method from JavaScript to start the Scala.js program.
 
   @p
     Apart from this annotation, @hl.scala{ScalaJSExample} is just a normal Scala @hl.scala{object}, and behaves like one in every way. Note that the main method in this case takes a @lnk.dom.html.Canvas: your exported methods can have any signature, with arbitrary arity or types for parameters or the return value. This is in contrast to the main method on the JVM which always takes an @hl.scala{Array[String]} and returns @hl.scala{Unit}. In fact, there's nothing special about this method at all! It's like any other exported method, we just happen to attribute it the "main" entry point. It is entirely possible to define multiple exported classes and methods, and build a "library" using Scala.js of methods that are intended for external JavaScript to use.
@@ -129,12 +128,12 @@
     Note how the @lnk.dom.html.Canvas comes from the @hl.scala{html} namespace, while the @lnk.dom.CanvasRenderingContext2D comes from the @hl.scala{dom} namespace. Traditionally, these types are imported via their qualified names: e.g. @hl.scala{html.Canvas} rather than just @hl.scala{Canvas}.
 
   @p
-    In general, @lnk("scala-js-dom", "http://scala-js.github.io/scala-js-dom/") provides @hl.scala{org.scalajs.dom.html} to access the HTML element types of the browser, an @hl.scala{org.scalajs.dom} to access other things. There are a number of other namespaces (@hl.scala{dom.svg}, @hl.scala{dom.idb}, etc.) accessible inside @hl.scala{org.scalajs.dom}: read the @lnk("scala-js-dom docs", "http://scala-js.github.io/scala-js-dom/") to learn more.
+    In general, @lnk("scala-js-dom", "https://scala-js.github.io/scala-js-dom/") provides @hl.scala{org.scalajs.dom.html} to access the HTML element types of the browser, an @hl.scala{org.scalajs.dom} to access other things. There are a number of other namespaces (@hl.scala{dom.svg}, @hl.scala{dom.idb}, etc.) accessible inside @hl.scala{org.scalajs.dom}: read the @lnk("scala-js-dom docs", "https://scala-js.github.io/scala-js-dom/") to learn more.
 
   @hl.ref(example/"ScalaJSExample.scala", "def run", "dom.window.setInterval")
 
   @p
-    This is the part of the Scala.js program which does the real work. It runs 10 iterations of a @lnk("small algorithm", "http://en.wikipedia.org/wiki/Sierpinski_triangle#Chaos_game") that generates a Sierpinski Triangle point-by-point. The steps, as described by the linked article, are roughly:
+    This is the part of the Scala.js program which does the real work. It runs 10 iterations of a @lnk("small algorithm", "https://en.wikipedia.org/wiki/Sierpinski_triangle#Chaos_game") that generates a Sierpinski Triangle point-by-point. The steps, as described by the linked article, are roughly:
 
   @ul
     @li
@@ -153,14 +152,14 @@
 
   @p
 
-    Now this is the call that actually does the useful work. All this method does is call @hl.scala{dom.window.setInterval}, which tells the browser to run the @hl.scala{run} method every 50 milliseconds. As mentioned earlier, the @hl.scala{dom.*} methods are simply facades to their native JavaScript equivalents, and @hl.scala{dom.window.setInterval} is @lnk("no different", "https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers.setInterval"). Note how you can pass a Scala lambda to @hl.scala{setInterval} to have it called by the browser, where in JavaScript you'd need to pass a JavaScript @hl.js{function(){...}}
+    Now this is the call that actually does the useful work. All this method does is call @hl.scala{dom.window.setInterval}, which tells the browser to run the @hl.scala{run} method every 50 milliseconds. As mentioned earlier, the @hl.scala{dom.*} methods are simply facades to their native JavaScript equivalents, and @hl.scala{dom.window.setInterval} is @lnk("no different", "https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers.setInterval").
 
 @sect{The Project Code}
 
   @p
     We've already taken a look at the application code for a simple, self-contained Scala.js application, but this application is not @i{entirely} self contained. It's wrapped in a small SBT project that sets up the necessary dependencies and infrastructure for this application to work.
 
-  @sect{project/build.sbt}
+  @sect{project/plugins.sbt}
     @hl.ref(cloneRoot/"workbench-example-app"/'project/"build.sbt")
 
     @p
@@ -186,7 +185,7 @@
       This is the HTML page which our toy app lives in, and the same page that we have so far been using to view the app in the browser. To anyone who has used HTML, most of it is probably familiar. Things of note are the @hl.xml{<script>} tags: @hl.scala{"../example-fastopt.js"} Is the executable blob spat out by the compiler, which we need to include in the HTML page for anything to happen. This is where the results of your compiled Scala code appear. @hl.scala{"workbench.js"} is the client for the Workbench plugin that connects to SBT, reloads the browser and forwards log messages to the browser console.
 
     @p
-      The @hl.scala{example.ScalaJSExample().main()} call is what kicks off the Scala.js application and starts its execution. Scala.js follows Scala semantics in that @hl.scala{object}s are evaluated lazily, with no top-level code allowed. This is in contrast to JavaScript, where you can include top-level statements and object-literals in your code which execute immediately. In Scala.js, nothing happens when @code{../example-fastopt.js} is imported! We have to call the main method first. In this case, we're passing the canvas object (attained using @hl.js{getElementById}) to it so it knows where to do its thing.
+      The @hl.scala{ScalaJSExample.main()} call is what kicks off the Scala.js application and starts its execution. While it is possible to configure Scala.js to run a main method automatically, in this example we chose to use exports instead, with an explicit call from JavaScript. In this case, we're passing the canvas object (attained using @hl.js{getElementById}) to it so it knows where to do its thing.
 
     @p
       @hl.scala{document.getElementById} is the exact same API that's used in normal JavaScript, as documented @lnk("here", "https://developer.mozilla.org/en-US/docs/Web/API/document.getElementById"). In fact, the entire @hl.scala{org.scalajs.dom} namespace (imported at the top of the file) comprises statically typed facades for the JavaScript APIs provided by the browser.
@@ -196,22 +195,21 @@
 
 @sect{Publishing}
   @p
-    The last thing that we'll do with our toy application is to publish it. If you look in the @code{target/scala-2.11} folder, you'll see the output of everything we've done so far:
+    The last thing that we'll do with our toy application is to publish it. If you look in the @code{target/scala-2.13} folder, you'll see the output of everything we've done so far:
 
   @hl.sh
-    target/scala-2.11
+    target/scala-2.13
     ├── classes
-    │   ├── JS_DEPENDENCIES
     │   ├── example
     │   │   ├── Point$.class
     │   │   ├── Point$.sjsir
     │   │   ├── Point.class
     │   │   ├── Point.sjsir
-    │   │   ├── ScalaJSExample$$anonfun$main$1.class
-    │   │   ├── ScalaJSExample$$anonfun$run$1.class
+    │   │   ├── ScalaJSExample$$anonfun$main$3.class
     │   │   ├── ScalaJSExample$.class
     │   │   ├── ScalaJSExample$.sjsir
-    │   │   └── ScalaJSExample.class
+    │   │   ├── ScalaJSExample.class
+    │   │   └── ScalaJSExample.sjsir
     │   ├── index-dev.html
     │   └── index-opt.html
     ├── example-fastopt.js
@@ -221,48 +219,59 @@
     All the @code{.class} and @code{.sjsir} files are the direct output of the Scala.js compiler, and aren't necessary to actually run the application. The only two files necessary are @code{index-dev.html} and @code{example-fastopt.js}. You may recognize @code{index-dev.html} as the file that we were navigating to in the browser earlier.
 
   @p
-    These two files can be extracted and published as-is: you can put them on @lnk("Github-Pages", "https://pages.github.com/"), @lnk("Amazon Web Services", "http://docs.aws.amazon.com/gettingstarted/latest/swh/website-hosting-intro.html"), or a hundred other places. However, one thing of note is the fact that the generated JavaScript file is quite large:
+    These two files can be extracted and published as-is: you can put them on @lnk("Github-Pages", "https://pages.github.com/"), @lnk("Amazon Web Services", "https://docs.aws.amazon.com/gettingstarted/latest/swh/website-hosting-intro.html"), or a hundred other places. However, one thing of note is the fact that the generated JavaScript file is quite large:
 
   @hl.sh
-    haoyi-mbp:temp haoyi$ du -h target/scala-2.11/example-fastopt.js
-    656K  target/scala-2.11/example-fastopt.js
+    $ du -h target/scala-2.13/example-fastopt.js
+    364K    target/scala-2.13/example-fastopt.js
 
   @p
-    656 Kilobytes for a hello world app! That is clearly too large. If you examine the contents of the file, you'll see that your code has been translated into something like this:
+    364 Kilobytes for a hello world app! That is clearly too large. If you examine the contents of the file, you'll see that your code has been translated into something like this:
 
   @hl.js
-    var v1 = i;
-    if (((count$1.elem$1 % 3000) === 0)) {
-      ScalaJS.m.Lexample_ScalaJSExample$().example$ScalaJSExample$$clear$1__Lorg_scalajs_dom_CanvasRenderingContext2D__V(ctx$1)
-    };
-    count$1.elem$1 = ((1 + count$1.elem$1) | 0);
-    var jsx$1 = ScalaJS.as.Lexample_Point(p$1.elem$1);
-    var this$4 = ScalaJS.m.s_util_Random$();
-    p$1.elem$1 = jsx$1.$$plus__Lexample_Point__Lexample_Point(ScalaJS.as.Lexample_Point(corners$1.apply__I__O(this$4.self$1.nextInt__I__I(3)))).$$div__I__Lexample_Point(2);
-    var height = (512.0 / ((255 + ScalaJS.as.Lexample_Point(p$1.elem$1).y$1) | 0));
-    var r = ((ScalaJS.as.Lexample_Point(p$1.elem$1).x$1 * height) | 0);
-    var g = ((((255 - ScalaJS.as.Lexample_Point(p$1.elem$1).x$1) | 0) * height) | 0);
+    let i = 0;
+    while (true) {
+      if ((((count$1.sr_IntRef__f_elem % 3000) | 0) === 0)) {
+        $p_Lexample_ScalaJSExample$__clear$1__Lorg_scalajs_dom_raw_CanvasRenderingContext2D__V($thiz, ctx$1)
+      };
+      count$1.sr_IntRef__f_elem = ((1 + count$1.sr_IntRef__f_elem) | 0);
+      const $$x1 = $as_Lexample_Point(p$1.sr_ObjectRef__f_elem);
+      const this$4 = $m_s_util_Random$();
+      p$1.sr_ObjectRef__f_elem = $$x1.$plus__Lexample_Point__Lexample_Point($as_Lexample_Point(corners$1.apply__I__O(this$4.s_util_Random__f_self.nextInt__I__I(3)))).$div__I__Lexample_Point(2);
+      const height = (512.0 / ((255 + $as_Lexample_Point(p$1.sr_ObjectRef__f_elem).Lexample_Point__f_y) | 0));
+      const r = $doubleToInt(($as_Lexample_Point(p$1.sr_ObjectRef__f_elem).Lexample_Point__f_x * height));
+      const g = $doubleToInt((((255 - $as_Lexample_Point(p$1.sr_ObjectRef__f_elem).Lexample_Point__f_x) | 0) * height));
+      ...
+      if ((i === 9)) {
+        break
+      };
+      i = ((1 + i) | 0)
+    }
 
   @p
-    As you can see, this code is still very verbose, with lots of unnecessarily long identifiers such as @hl.js{Lexample_ScalaJSExample$} in it. This is because we've only performed the @sect.ref{Fast Optimization} on this file, to try and keep the time taken to edit -> compile while developing reasonably short.
+    As you can see, this code is still very verbose, with lots of unnecessarily long identifiers such as @hl.js{$plus__Lexample_Point__Lexample_Point} in it. This is because we've only performed the @sect.ref{Fast Optimization} on this file, to try and keep the time taken to edit -> compile while developing reasonably short.
 
   @sect{Optimization}
     @p
       If we're planning on publishing the app for real, we can run the @sect.ref{Full Optimization}. This takes several seconds longer than the @sect.ref{Fast Optimization}, but results in a significantly smaller and leaner output file @code{example-opt.js}.
 
     @hl.sh
-      haoyi-mbp:temp haoyi$ du -h target/scala-2.11/example-opt.js
-      104K  target/scala-2.11/example-opt.js
+      $ du -h target/scala-2.13/example-opt.js
+      76K     target/scala-2.13/example-opt.js
 
     @p
-      104 Kilobytes! Better. Not great, though! In general, Scala.js does not produce tiny executables, although the output size of the compiled executables is dropping all the time. If you look inside that file, you'll see all of the long identifiers have been replaced by short ones by the @lnk("Google Closure Compiler", "https://developers.google.com/closure/compiler/").
+      76 Kilobytes! Better. Not great, though! In general, Scala.js does not produce tiny executables, although the output size of the compiled executables is dropping all the time. If you look inside that file, you'll see all of the long identifiers have been replaced by short ones by the @lnk("Google Closure Compiler", "https://developers.google.com/closure/compiler/").
 
     @hl.js("""
-      y=fb(gb((new F).Ya(["rgb(",", ",", ",")"])),(new F).Ya([(255-c.l.Db|0)*y|0,c.l.Db*y|0,c.l.Eb]));a.fillStyle=y;a.fillRect(c.l.Db,c.l.Eb,1,1);w=1+w|0}}}(a,b,c,e),50)}Xa.prototype.main=function(a){Ya(a)};Xa.prototype.a=new x({$g:0},!1,"example.ScalaJSExample$",B,{$g:1,b:1});var hb=void 0;function bb(){hb||(hb=(new Xa).c());return hb}ba.example=ba.example||{};ba.example.ScalaJSExample=bb;function Da(){this.Pb=null}Da.prototype=new A;
+      let t=0;for(;;){if(0===(e.ic%3E3|0)){var m=h;m.fillStyle="white";m.fillRect(0,0,255,255)}
+      e.ic=1+e.ic|0;const u=f.Ea;wb||(wb=new xb);m=g.k(yb());m=new pb(u.Fa+m.Fa|0,u.Ga+m.Ga|0);
+      f.Ea=new pb(m.Fa/2|0,m.Ga/2|0);m=512/(255+f.Ea.Ga|0);
+      h.fillStyle="rgb("+Ga((255-f.Ea.Fa|0)*m)+", "+Ga(f.Ea.Fa*m)+", "+f.Ea.Ga+")";
+      h.fillRect(f.Ea.Fa,f.Ea.Ga,1,1);if(9===t)break;t=1+t|0}
     """)
 
     @p
-      These files are basically unreadable, but nonetheless behave the same as the @code{-fastopt} versions. Try it out by opening the @code{index-opt.html} file in the @code{target/scala-2.11/classes} directory with your browser: you should see the thing as when opening @code{index-dev}, except it will be pulling in the fully-optmized version of your application.
+      These files are basically unreadable, but nonetheless behave the same as the @code{-fastopt} versions. Try it out by opening the @code{index-opt.html} file in the @code{target/scala-2.13/classes} directory with your browser: you should see the thing as when opening @code{index-dev}, except it will be pulling in the fully-optmized version of your application.
 
     @p
       This means you can develop and debug using @code{fastOptJS}, and only spend the extra time (and increased debugging difficulty) on the @code{fullOptJS} version just as you're going to publish it, with the assurance that although the code is much more compact, its behavior will not change.
@@ -273,14 +282,14 @@
 
     @ul
       @li
-        A large portion of this 104k is the Scala standard library, and so the size of the compiled blob does not grow that fast as your program grows. For example, while this ~50 line application is 104k, a @lnk("much larger ~2000 line application", "https://github.com/lihaoyi/roll") is only 288k.
+        A large portion of this 76k is the Scala standard library, and so the size of the compiled blob does not grow that fast as your program grows. For example, while this ~50 line application is 76k, the size of larger applications does not grow linearly with the source code.
       @li
-        This size is pre-@lnk("gzip", "http://en.wikipedia.org/wiki/Gzip"), and most webservers serve their contents compressed via gzip to reduce the download size. Gzip cuts the actual download size down to 28k, which is more acceptable.
+        This size is pre-@lnk("gzip", "https://en.wikipedia.org/wiki/Gzip"), and most webservers serve their contents compressed via gzip to reduce the download size. Gzip cuts the actual download size down to 22k, which is more acceptable.
       @li
-        You will likely have other portions of the page that are of similar size: e.g. @lnk("JQuery", "http://jquery.com/") is extremely popular, and weights in at a comparable 32kb minified and gzipped, while @lnk("React.js", "http://facebook.github.io/react/downloads.html") weighs in at a cool 150kb gzipped. Scala.js arguably provides more than either of these libraries.
+        You will likely have other portions of the page that are of similar size: e.g. @lnk("JQuery", "https://jquery.com/") is extremely popular, and weights in at a comparable 32kb minified and gzipped, while @lnk("React.js", "https://facebook.github.io/react/downloads.html") weighs in at a cool 150kb gzipped. Scala.js arguably provides more than either of these libraries.
 
     @p
-      Regardless, there is ongoing work to shrink the size of these executables. If you want to read more about this, check out the section on @sect.ref("The Compilation Pipeline") to learn about what Scala.JS currently does to crunch the executables down.
+      Regardless, the size of these executables can always be improved. If you want to read more about this, check out the section on @sect.ref("The Compilation Pipeline") to learn about what Scala.js currently does to crunch the executables down.
 
   @hr
 
@@ -317,7 +326,7 @@
 
   @ul
     @li
-      JavaScript includes APIs for @lnk("getting the size of the window", "http://stackoverflow.com/questions/1248081/get-the-browser-viewport-dimensions-with-javascript") and @lnk("changing the size of a canvas", "http://stackoverflow.com/questions/9251480/set-canvas-size-using-javascript"). These JavaScript APIs are available in Scala.js, and we've already used some of them in the course of this example. Try making the Canvas full-screen, and re-positioning the corners of the triangle to match.
+      JavaScript includes APIs for @lnk("getting the size of the window", "https://stackoverflow.com/questions/1248081/get-the-browser-viewport-dimensions-with-javascript") and @lnk("changing the size of a canvas", "https://stackoverflow.com/questions/9251480/set-canvas-size-using-javascript"). These JavaScript APIs are available in Scala.js, and we've already used some of them in the course of this example. Try making the Canvas full-screen, and re-positioning the corners of the triangle to match.
     @li
       The @lnk.dom.CanvasRenderingContext2D has a bunch of methods on it that can be used to draw things. Here we only draw 1x1 rectangles to put points on the canvas; try modifying the code to make it draw something else.
     @li

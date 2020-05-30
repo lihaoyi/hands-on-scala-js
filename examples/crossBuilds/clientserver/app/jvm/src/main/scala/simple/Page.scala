@@ -1,4 +1,5 @@
 package simple
+
 import scalatags.Text.all._
 
 object Page{

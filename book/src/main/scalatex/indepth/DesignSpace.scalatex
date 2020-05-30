@@ -6,112 +6,118 @@
 
 @sect{Why No Reflection?}
   @p
-    Scala.js prohibits reflection as it makes dead-code elimination difficult, and the compiler relies heavily on dead-code elimination to generate reasonably-sized executables. The chapter on @sect.ref("The Compilation Pipeline") goes into more detail of why, but a rough estimate of the effect of various optimizations on a small application is:
+    Scala.js prohibits reflection as it makes dead-code elimination basically impossible, and the compiler relies heavily on dead-code elimination to generate reasonably-sized executables. The chapter on @sect.ref("The Compilation Pipeline") goes into more detail of why, but a rough estimate of the effect of various optimizations on a small application is:
 
   @ul
     @li
-      @b{Full Output} - ~20MB
+      @b{Full Output} - ~10MB
     @li
-      @b{Naive Dead-Code-Elimination} - ~800KB
+      @b{Dead Code Elimination only} - ~750KB
     @li
-      @b{Inlining Dead-Code-Elimination} - ~600KB
+      @b{Dead Code Elimination and optimizations} - ~600KB
     @li
-      @b{Minified by Google Closure Compiler} - ~200KB
+      @b{Minified by Google Closure Compiler} - ~120KB
 
   @p
-    The default output size of 20MB makes the executables difficult to work with. Even though browsers can deal with 20MB JavaScript blobs, it takes the browser several seconds to even load it, and up to a minute after that for the JIT to optimize the whole thing.
+    The default output size of 10MB makes the executables difficult to work with. Even though browsers can deal with 10MB JavaScript blobs, it can take the browser several seconds to even load it.
 
   @sect{Dead Code Elimination}
     @p
       To illustrate why reflection makes things difficult, consider a tiny application:
 
     @hl.scala
-      @@JSExport
-      object App extends js.JSApp{
-        @@JSExport
-        def main() = {
+      object App {
+        def main(args: Array[String]): Unit = {
           println(foo())
         }
-        def foo() = 10
-        def bar = "i am a cow"
+        def foo(): Int = 10
+        def bar: String = "i am a cow"
       }
-      object Dead{
-        def complexFunction() = ...
+      object Dead {
+        def complexFunction(): Int = ...
       }
 
     @p
-      When the @sect.ref("Fast Optimization", "Scala.js optimizer"),  looks at this application, it is able to deduce certain things immediately:
+      which uses a main entry point, enabled with the sbt setting
+
+    @hl.scala
+      scalaJSUseMainModuleInitializer := true
+
+    @p
+      When the @sect.ref("Fast Optimization", "Scala.js optimizer") looks at this application, it is able to deduce certain things immediately:
 
     @ul
       @li
-        @hl.scala{App} and @hl.scala{App.main} are exported via @hl.scala{@@JSExport}, and thus can't be considered dead code.
+        @hl.scala{App.main} is the main entry point of the application, and thus must be considered reachable.
       @li
-        @hl.scala{App.foo} is called from @hl.scala{App.main}, and so has to be kept around
+        @hl.scala{App.foo} is called from @hl.scala{App.main}, and so it is reachable.
       @li
-        @hl.scala{App.bar} is never called from @hl.scala{App.main} or @hl.scala{App.foo}, and so can be eliminated
+        @hl.scala{App.bar} is never called from @hl.scala{App.main} or @hl.scala{App.foo}, and so can be eliminated.
       @li
         @hl.scala{Dead}, including @hl.scala{Dead.complexFunction}, are not called from any live code, and can be eliminated.
 
     @p
-      The actual process is a bit more involved than this, but this is a first-approximation of how the dead-code-elimination works: you start with a small set of live code (e.g. @hl.scala{@@JSExport}ed things), search out to find the things which are recursively reachable from that set, and eliminate all the rest. This means that the Scala.js compiler can eliminate, e.g., parts of the Scala standard library that you are not using. The standard library is not small, and makes up the bulk of the 20MB of the uncompressed blob.
+      The actual process is a bit more involved than this, but this is a first approximation of how dead code elimination works: you start with a small set of live code (e.g. the @hl.scala{main} method and @hl.scala{@@JSExport}ed things), search out to find the things which are recursively reachable from that set, and eliminate all the rest. This means that the Scala.js compiler can eliminate, e.g., parts of the Scala standard library that you are not using. The standard library is not small, and makes up the bulk of the 10MB of the uncompressed blob.
 
   @sect{Whither Reflection?}
     @p
       To imagine why reflection makes this difficult, imagine a slightly modified program which includes some reflective calls in @hl.scala{App.main}
 
     @hl.scala
-      @@JSExport
-      object App extends js.JSApp{
-        @@JSExport
-        def main() = {
+      object App {
+        def main(args: Array[String]): Unit = {
           Class.forName(userInput()).getMethod(userInput()).invoke()
         }
-        def foo() = 10
-        def bar = "i am a cow"
+        def foo(): Int = 10
+        def bar: String = "i am a cow"
       }
-      object Dead{
-        def complexFunction() = ...
+      object Dead {
+        def complexFunction(): Int = ...
       }
 
     @p
       Here, we're assuming @hl.scala{userInput()} is some method which returns a @hl.scala{String} that was input by the user or otherwise somehow decided at runtime.
     @p
-      We can start the same process: @hl.scala{App.main} is live since we @hl.scala{@@JSExport}ed it, but what objects or methods are reachable from @hl.scala{App.main}? The answer is: it depends on the values of @hl.scala{userInput()}, which we don't know. And hence we don't know which classes or methods are reachable! Depending on what @hl.scala{userInput()} returns, any or all methods and classes could be used by @hl.scala{App.main()}.
+      We can start the same process: the entry point @hl.scala{App.main} is reachable, but what objects or methods are reachable from @hl.scala{App.main}? The answer is: it depends on the values of @hl.scala{userInput()}, which we don't know. And hence we don't know which classes or methods are reachable! Depending on what @hl.scala{userInput()} returns, any or all methods and classes could be used by @hl.scala{App.main()}.
     @p
       This leaves us a few options:
 
-    @ul
+    @ol
       @li
-        Keep every method or class around at runtime. This severely hampers the compiler's ability to optimize, and results in massive 20MB executables.
-      @li
-        Ignore reflection, and go ahead and eliminate/optimize things assuming reflection did not exist.
+        Keep every method or class around at runtime. This severely hampers the compiler's ability to optimize, and results in massive 10MB executables.
       @li
         Allow the user to annotate methods/classes that should be kept, and eliminate the rest.
+      @li
+        Forbid all run-time reflection, and go ahead and eliminate/optimize things knowing that reflection does not exist.
 
     @p
-      All three are possible options: Scala.js started off with #1. #3 is the approach used by @lnk("Proguard", "http://proguard.sourceforge.net/manual/examples.html#annotated"), which lets you annotate things e.g. @hl.scala{@@KeepApplication} to preserve things for reflection and preventing Proguard from eliminating them as dead code.
+      All three are possible options: Scala.js started off with #1. #2 is the approach used by @lnk("Proguard", "https://www.guardsquare.com/en/products/proguard/manual/examples#annotated"), which lets you annotate things with e.g. @hl.scala{@@KeepApplication} to preserve things for reflection and preventing Proguard from eliminating them as dead code.
 
     @p
-      In the end, Scala.js chose #2. This is helped by the fact that overall, Scala code tends not to use reflection as heavily as Java, or dynamic languages which use it heavily. Scala uses techniques such as @lnk("lambdas", "http://docs.scala-lang.org/tutorials/tour/anonymous-function-syntax.html") or @lnk("implicits", "http://docs.scala-lang.org/tutorials/tour/implicit-parameters.html") to satisfy many use cases which Java has traditionally used reflection for, while friendly to the optimizer.
+      In the end, Scala.js chose #3. This is helped by the fact that overall, Scala code tends not to use reflection as heavily as Java, or dynamic languages which use it heavily. Scala uses techniques such as @lnk("lambdas", "https://docs.scala-lang.org/overviews/scala-book/anonymous-functions.html") or @lnk("implicits", "https://docs.scala-lang.org/tour/implicit-parameters.html") to satisfy many use cases which Java has traditionally used reflection for, while friendly to the optimizer.
 
     @p
-      There are a range of use-cases for reflection where you want to inspect an object's structure or methods, where lambdas or implicits don't help. People use reflection to @lnk("serialize objects", "http://jackson.codehaus.org/DataBindingDeepDive"), or for @lnk("routing messages to methods", "https://access.redhat.com/documentation/en-US/Fuse_ESB_Enterprise/7.1/html/Implementing_Enterprise_Integration_Patterns/files/BasicPrinciples-BeanIntegration.html"). However, both these cases can be satisfied by...
+      There are a range of use cases for reflection where you want to inspect an object's structure or methods, where lambdas or implicits don't help. People use reflection to @lnk("serialize objects", "https://github.com/FasterXML/jackson-databind"), or for @lnk("routing messages to methods", "https://docs.huihoo.com/fuse/esb/4.4/camel_eip/BasicPrinciples-ScheduledRoute-Simple.html"). However, both these cases can be satisfied by...
 
   @sect{Macros}
 
     @p
-      The Scala programming language, since the 2.10.x series, has support for @lnk("Macros", "http://docs.scala-lang.org/overviews/macros/overview.html") in the language. Although experimental, these are heavily used in many projects such as Play and Slick and Akka, and allow a developer to perform compile-time computations and generate code where-ever the macros are used.
+      The Scala programming language, since the 2.10.x series, has support for @lnk("Macros", "https://docs.scala-lang.org/overviews/macros/overview.html") in the language. Although officially experimental, these are heavily used in many projects such as Play, Slick and Akka, and allow a developer to perform compile-time computations and generate code wherever the macros are used.
 
     @p
-      People typically think of macros as AST-transformers: you pass in an AST and get a modified AST out. However, in Scala, these ASTs are strongly-typed, and the macro is able to inspect the types involved in generating the output AST. This leads to a lot of @lnk("interesting techniques", "http://docs.scala-lang.org/overviews/macros/implicits.html") around macros where you synthesize ASTs based on the type (explicit or inferred) of the macro callsite, something that is impossible in dynamic languages.
+      People typically think of macros as AST transformers: you pass in an AST and get a modified AST out. However, in Scala, these ASTs are strongly-typed, and the macro is able to inspect the types involved in generating the output AST. This leads to a lot of @lnk("interesting techniques", "https://docs.scala-lang.org/overviews/macros/implicits.html") around macros where you synthesize ASTs based on the type (explicit or inferred) of the macro callsite, something that is impossible in dynamic languages.
 
     @p
       Practically, this means that you can use macros to do things such as inspecting the methods, fields and other type-level properties of a typed value. This allows us to do things like @lnk("serialize objects with no boilerplate", "https://github.com/lihaoyi/upickle"):
 
     @hl.scala
-      import upickle._
+      import upickle.default._
 
       case class Thing(a: Int, b: String)
+      object Thing {
+        implicit val rw: ReadWriter[Thing] = macroRW
+      }
+
       write(Thing(1, "gg"))
       // res23: String = {"a": 1, "b": "gg"}
 
@@ -126,82 +132,64 @@
 
 @sect{Why does error behavior differ?}
   @p
-    Scala.js deviates from the semantics of Scala-JVM in several ways. Many of these ways revolve around the edge-conditions of a program: what happens when something goes wrong? An array index is out of bounds? An integer is divided-by-zero? These differences cause some amount of annoyance when debugging, since when you mess up an array index, you expect an exception, not silently-invalid-data!
+    Scala.js deviates from the semantics of Scala-JVM in several ways. Many of these ways revolve around the edge-conditions of a program: what happens when something goes wrong? An out of bounds array index? An invalid cast? A null pointer? These differences can cause some amount of annoyance when debugging, since when you mess up an array index, you expect an exception, not silently-invalid-data!
 
   @p
-    In most of these cases, it was a trade-off between performance and correctness. These are situations where the default semantics of Scala deviate from that of JavaScript, and Scala.js would have to perform extra work to emulate the desired behavior. For example, compare the division behavior of the JVM and JavaScript.
-  @sect{Divide-by-zero: a case study}
+    In most of these cases, it was a trade-off between performance and correctness. These are situations where the default semantics of Scala deviate from that of JavaScript, and Scala.js would have to perform extra work to emulate the desired behavior. For example, compare the array access behavior of the JVM and JavaScript.
+  @sect{Array index out of bounds: a case study}
     @hl.scala
       /*JVM*/
-      15 / 4              // 3
+      val array = Array(2, 3, 5, 7, 11)
+      array(3)            // 7
+      array(10)           // ArrayIndexOutOfBoundsException
     @hl.js
       /*JS*/
-      15 / 4              // 3.25
+      const array = [2, 3, 5, 7, 11];
+      array[3]            // 7
+      array[10]           // undefined
     @p
-      On the JVM, integer division is a primitive, and dividing @hl.scala{15 / 4} gives @hl.scala{3}. However, in JavaScript, it gives @hl.js{3.25}, since all numbers of double-precision floating points.
-
+      On the JVM, trying to access an out-of-bounds index results in an @hl.scala{ArrayIndexOutOfBoundsException} being thrown. In JavaScript, however, that simply returns @hl.js{undefined}.
     @p
-      Scala.js works around this in the general case by adding a @hl.js{| 0} to the translation, e.g.
-
+      So that would be the behavior of Scala.js if we did nothing about it. One may ask: can we fix it? And the answer is, we can:
     @hl.scala
       /*JVM*/
-      15 / 4              // 3
+      array(3)            // 7
+      array(10)           // ArrayIndexOutOfBoundsException
     @hl.js
       /*JS*/
-      (15 / 4) | 0        // 3
-
-    @p
-      This gives the correct result for most numbers, and is reasonably efficient (actually, it tends to be @i{more} efficient on modern VMs). However, what about dividing-by-zero?
-
-    @hl.scala
-      /*JVM*/
-      15 / 0              // ArithmeticException
-    @hl.js
-      /*JS*/
-      15 / 0              // Infinity
-      (15 / 0) | 0        // 0
-
-    @p
-      On the JVM, the JVM is kind enough to throw an exception for you. However, in JavaScript, the integer simply wraps around to @hl.js{Infinity}, which then gets truncated down to zero.
-    @p
-      So that's the current behavior of integers in Scala.js. One may ask: can we fix it? And the answer is, we can:
-    @hl.scala
-      /*JVM*/
-      1 / 0               // ArithmeticException
-    @hl.js
-      /*JS*/
-      function intDivide(x, y){
-        var z = x / y
-        if (z == Infinity) throw new ArithmeticException("Divide by Zero")
-        else return z
+      function arrayGet(array, idx) {
+        if (idx < 0 || idx >= array.length)
+          throw new ArrayIndexOutOfBoundsException("" + idx);
+        return array[idx];
       }
-      intDivide(1, 0)     // ArithmeticException
+      arrayGet(array, 3)  // 7
+      arrayGet(array, 10) // ArrayIndexOutOfBoundsException
     @p
-      This translation fixes the problem, and enforces that the @hl.scala{ArithmeticException} is thrown at the correct time. However, this approach causes some overhead: what was previously two primitive operations is now a function call, a local variable assignment, and a conditional. That is a lot more expensive than two primitive operations!
+      This translation fixes the problem, and enforces that the @hl.scala{ArrayIndexOutOfBoundsException} is thrown at the correct time. However, this approach causes some overhead: what was previously a primitive operation is now a function call with a conditional. That is a lot more expensive than a primitive operation!
 
   @sect{The Performance/Correctness Tradeoff}
     @p
-      In the end, a lot of the semantic differences listed here come down to the same tradeoff: we could make the code behave more-like-Scala, but at a cost of adding overhead via function calls and other checks. Furthermore, the cost is paid regardless of whether the "exceptional case" is triggered or not: in the example above, every division in the program pays the cost!
+      In the end, a lot of the semantic differences listed here come down to the same tradeoff: we could make the code behave more-like-Scala, but at a cost of adding overhead via function calls and other checks. Furthermore, the cost is paid regardless of whether the "exceptional case" is triggered or not: in the example above, every array access in the program pays the cost!
     @p
-      The decision to not support these exceptional cases comes down to a value judgement: how often do people actually depend on an exception being thrown as part of their program semantics, e.g. by catching it and performing actions? And how often are they just a way of indicating bugs? It turns out that very few @hl.scala{ArithmeticException}s, @hl.scala{ArrayIndexOutOfBoundsException}s, or similar are actually a necessary part of the program! They exist during debugging, but after that, these code paths are never relied upon "in production".
+      The decision not to support these exceptional cases comes down to a value judgement: how often do people actually depend on an exception being thrown as part of their program semantics, e.g. by catching it and performing actions? And how often are they just a way of indicating bugs? It turns out that very few @hl.scala{ClassCastException}s, @hl.scala{ArrayIndexOutOfBoundsException}s, or similar are actually a necessary part of the program! They exist during debugging, but after that, these code paths are never relied upon "in production".
     @p
-      Thus Scala.js goes for a compromise: in the Fast Optimization mode, we run the code with all these checks in place (this is work in progress; currently only @code{asInstanceOf}s are thus checked), so as to catch cases where these errors occur close-to-the-source and make it easy for you to debug them. In Full Optimization mode, on the other hand, we remove these checks, assuming you've already ran through these cases and found any bugs during development.
+      Thus Scala.js goes for a compromise: in the Fast Optimization mode, we run the code with most of these checks in place (currently, only @code{asInstanceOf}s and array access are thus checked, since experience told us that they often show up when debugging Scala programs), so as to catch cases where these errors occur close-to-the-source and make it easy for you to debug them. In Full Optimization mode, on the other hand, we remove these checks, assuming you've already ran through these cases and found any bugs during development. In order to make sure that the code does not rely on the ability to catch the exceptions in Fast Optimization mode, we do not throw the real exception, like @hl.scala{ArrayIndexOutOfBoundsException}, but a special fatal exception @hl.scala{UndefinedBehaviorError} instead.
     @p
-      This is a common pattern in situations where there's a tradeoff between debuggability and speed. In Scala.js' case, it allows us to get good debuggability in development, as well as good performance in production. There's some loss in debuggability in development, sacrificed in exchange for greater performance.
+      This is a common pattern in situations where there's a tradeoff between debuggability and speed. In Scala.js' case, it allows us to get good debuggability in development, as well as good performance in production.
 
 @sect{Small Executables}
   Why do we care so much about how big our executables are in Scala.js? Why don't we care about how big they are on Scala-JVM? This is mostly due to three reasons:
 
   @ul
     @li
-      When cross-compiling Scala to JavaScript, the end-result tends to be much more verbose than when cross-compiled to Java bytecode.
+      When compiling Scala to JavaScript, the end result tends to be much more verbose than when compiled to Java bytecode.
     @li
-      Scala.js typically is run in web browsers, which typically do not work well with large executables compared to e.g. the JVM
+      Scala.js typically is run in web browsers, which typically do not work well with large executables compared to e.g. the JVM.
     @li
-      Scala.js often is delivered to many users over the network, and long download times force users to wait, degrading the user experience
+      Scala.js often is delivered to many users over the network, and long download times force users to wait, degrading the user experience.
 
   @p
-    These factors combined means that Scala.js has to put in extra effort to optimize the code to reduce it's size at compile-time.
+    These factors combined means that Scala.js has to put in extra effort to optimize the code to reduce its size at compile-time.
 
   @sect{Raw Verbosity}
     @p
@@ -209,15 +197,15 @@
     @p
       What does these mean, concretely? This means that a symbol marking something, e.g. the start of a function, is often a single byte in Java bytecode. Even more, it may not have any delimiter at all, instead the meaning of the binary data being inferred from its position in the file! On the other hand, in JavaScript, declaring a function takes a long-and-verbose @hl.js{function} keyword, which together with peripheral punctuation (@code{.}, @code{ = }, etc.) often adds up to tens of bytes to express a single idea.
     @p
-      What does this mean concretely? This means that expressing the same meaning in JavaScript usually takes more "raw code" than expressing the same meaning in Java bytecode. Even though Java bytecode is relatively verbose for a binary format, it still is significantly more concise the JavaScript, and it shows: the Scala standard library weighs in at a cool 6MB on Scala-JVM, while it weighs 20MB on Scala.js.
+      What does this mean concretely? This means that expressing the same meaning in JavaScript usually takes more "raw code" than in Java bytecode. Even though Java bytecode is relatively verbose for a binary format, it still is significantly more concise the JavaScript, and it shows: the Scala standard library weighs in at a cool 6MB on Scala-JVM, while it weighs 10MB on Scala.js.
     @p
       All things being equal, this would mean that Scala.js would have to work harder to keep down code-size than Scala-JVM would have to. Alas, not all other things are equal.
 
   @sect{Browsers Performance}
     @p
-      Without any optimization, a naive compilation to Scala.js results in an executable (Including the standard library) weighing around 20mb. On the surface, this isn't a problem: runtimes like the JVM have no issue with loading 20MB of Java bytecode to execute; many large desktop applications weigh in the 100s of megabytes while still loading and executing fine.
+      Without any optimization, a naive compilation to Scala.js results in an executable (including the standard library) weighing around 10MB. On the surface, this isn't a problem: runtimes like the JVM have no issue with loading 10MB of Java bytecode to execute; many large desktop applications weigh in the 100s of megabytes while still loading and executing fine.
     @p
-      However, the web browser isn't a native execution environment; loading 20MB of JavaScript is sufficient to heavily tax even the most modern web browsers such as Chrome and Firefox. Even though most of the code comprises class and method definitions that never have their contents executed, loading such a heavy load into e.g. Chrome makes it freeze for 5-10 seconds initially. Even after that, even after the code has all been parsed and isn't been actively executed, having all this JavaScript makes the browser sluggish for up to a minute before the JIT compiler can speed things up.
+      However, the web browser isn't a native execution environment; loading 10MB of JavaScript is sufficient to heavily tax even the most modern web browsers such as Chrome and Firefox. Even though most of the code comprises class and method definitions that never have their contents executed, loading such a heavy load into e.g. Chrome makes it freeze for several seconds initially. Even after that, even after the code has all been parsed and isn't been actively executed, having all this JavaScript makes the browser sluggish for up to a minute before the JIT compiler can speed things up.
     @p
       Overall, this means that you probably do not want to work with un-optimized Scala.js executables. Even for development, the slow load times and initial sluggishness make testing the results of your hard-work in the browser a frustrating experience. But that's not all...
 
@@ -238,4 +226,4 @@
   @hr
 
   @p
-    Thus, while on Scala-JVM you typically have executables that (including dependencies) end up weighing 10s to 100s of megabytes, Scala.js has a much tighter budget. A hello world Scala.js application weighs in at around 100KB, and as you write more code and use more libraries (and parts of the standard library) this number rises to the 100s of kilobytes. This isn't tiny, especially compared to the many small JavaScript libraries out there, but it definitely is much smaller than what you'd be used to on the JVM.
+    Thus, while on Scala-JVM you typically have executables that (including dependencies) end up weighing 10s to 100s of megabytes, Scala.js has a much tighter budget. A hello world Scala.js application weighs in at around 7KB, and as you write more code and use more libraries (and parts of the standard library) this number rises to the 100s of kilobytes. This isn't tiny, especially compared to the many small JavaScript libraries out there, but it definitely is much smaller than what you'd be used to on the JVM.

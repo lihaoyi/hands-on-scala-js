@@ -1,9 +1,11 @@
 // library/js/src/main/scala/simple/Platform.scala
 package simple
-import scalajs.js
 
-object Platform{
-  def format(ts: Long) = {
-    new js.Date(ts.toDouble).toISOString()
+import scala.scalajs.js
+
+private[simple] object Platform {
+  def format(ts: Long): String = {
+    new js.Date(ts.toDouble)
+      .toISOString()
   }
 }

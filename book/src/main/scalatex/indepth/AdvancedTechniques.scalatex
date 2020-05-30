@@ -1,6 +1,6 @@
 @import book.BookData._
 @p
-  @sect.ref{Getting Started} walks you through how to set up some basic Scala.js applications, but that only scratches the surface of the things you can do with Scala.js. Apart from being able to use the same techniques you're used to in Scala-JVM in the browser, Scala.js opens up a whole range of possibilities and novel techniques that are not found in typical Scala-JVM applications.
+  The @sect.ref{Getting Started} section walked you through how to set up some basic Scala.js applications, but that only scratches the surface of the things you can do with Scala.js. Apart from being able to use the same techniques you're used to in Scala-JVM in the browser, Scala.js opens up a whole range of possibilities and novel techniques that are not found in typical Scala-JVM applications.
 
 @p
   Although these techniques may technically be possible on the JVM, very few Scala-JVM applications are built in a way that can take advantage of them. Most Scala-JVM code runs on back-end servers which have a completely different structure from the client-side apps that Scala.js allows.
@@ -20,13 +20,13 @@
 
 @sect{Functional-Reactive UIs}
   @p
-    @lnk("Functional-reactive Programming", "http://en.wikipedia.org/wiki/Functional_reactive_programming") (FRP) is a field with encompasses several things:
+    @lnk("Functional-reactive Programming", "https://en.wikipedia.org/wiki/Functional_reactive_programming") (FRP) is a field with encompasses several things:
 
   @ul
     @li
-      @b{Discrete}: Handling of first-class event-streams like in @lnk("RxJS", "https://github.com/Reactive-Extensions/RxJS")
+      @b{Discrete}: Handling of first-class event-streams like in @lnk("RxJS", "https://github.com/reactivex/rxjs")
     @li
-      @b{Continuous}: Handling of first-class signals, like in @lnk("Elm", "http://elm-lang.org/learn/What-is-FRP.elm")
+      @b{Continuous}: Handling of first-class signals, like in @lnk("early Elm", "https://elm-lang.org/docs/advanced-topics")
 
   @sect{Why FRP}
     @p
@@ -56,7 +56,7 @@
       @li
         @b{Rx}s: Smart values which are set as some computation of other @b{Rx}s or @b{Var}s, which recompute automatically when their dependencies change, and notify their dependents
       @li
-        @b{Obs}s: Observers on either an @b{Rx} or a @b{Var}, which performs some action when it changes
+        @b{Trigger}s: Trigger side effects when an @b{Rx} or a @b{Var} changes
 
     @p
       @hl.scala{Var}s and @hl.scala{Rx}s roughly correspond to the idea of a @hl.scala{Signal} described earlier. The documentation for Scala.Rx goes into this in much more detail, so if you're curious you should read it. This section will jump straight into how to use Scala.Rx with Scala.js.
@@ -75,7 +75,7 @@
     @hl.ref(advanced/"BasicRx.scala", "implicit def")
 
     @p
-      ScalaTags requires that anything you want to embed in a ScalaTags fragment be implicitly convertible to @hl.scala{Frag}; here we are providing one for any Scala.Rx @hl.scala{Rx[T]}s, as long as the @hl.scala{T} provided is itself convertible to a @hl.scala{Frag}. We call @hl.scala{r().render} to extract the "current" value of the @hl.scala{Rx}, and then set up an @hl.scala{Obs} that watches the @hl.scala{Rx}, replacing the previous value with the current one every time its value changes.
+      ScalaTags requires that anything you want to embed in a ScalaTags fragment be implicitly convertible to @hl.scala{Frag}; here we are providing one for any Scala.Rx @hl.scala{Rx[T]}s, as long as the @hl.scala{T} provided is itself convertible to a @hl.scala{Frag}. We first render the current value of the fragment as a DOM node with @hl.scala{r.now.render}. We will return that first node as a @hl.scala{Frag} to the caller. In addition, we set up a trigger for @hl.scala{r} with @hl.scala("r.triggerLater { value => ... }") which will replace the previous DOM node with a new node @hl.scala{value.render} every time @hl.scala{r} changes.
 
     @p
       Now that the set-up is out of the way, let's consider a simple HTML widget that lets you enter text in a @hl.xml{<textarea>}, and keeps track of the number of words, characters, and counts how long each word is.
@@ -94,7 +94,7 @@
       Next, we construct our ScalaTags fragment: a @hl.scala{textarea} tag with a listener that updates @hl.scala{txt}, and a @hl.scala{div} containing the @hl.scala{textarea} and a list containing the bound values of our @hl.scala{Rx}s.
 
     @p
-      That's all we need to end up with a live-updating widget, which re-renders the necessary bits of the page when the contents of the text box changes! Note how the code basically flows top-to-bottom, like a batch-rendering program, but at the end of it we get a live widget. The code is much simpler than a similar widget built up using jQuery or Backbone.
+      That's all we need to end up with a live-updating widget, which re-renders the necessary bits of the page when the contents of the text box changes! Note how the code basically flows top-to-bottom, like a batch-rendering program, but at the end of it we get a live widget. The code is much simpler than a similar widget built up using jQuery or React.
 
     @p
       Furthermore, there is no chance for the parts of the DOM which are "live" to fall out of sync. There is no visible logic that handles the individual re-calulations and re-renders: that is all done by Scala.Rx and by our @hl.scala{rxFrag} implicit. Because we do not need to write code for each site to keep each individual @hl.scala{Rx} and each DOM fragment in sync, that means there is no chance of the developer screwing it up and resulting in an out-of-sync page.
@@ -137,7 +137,7 @@
 
   @sect{Futures & Promises}
     @p
-      A Future represents an in-progress computation that may or may not have completed. It may encapsulate a web request, or an RPC, or a task happening on another thread. They are not a novel concept, and Scala provides a good in-built implementation of Futures that works well with Scala.js.
+      A Future represents an in-progress computation that may or may not have completed. It may encapsulate a web request, or an RPC, or a task happening on another thread. They are not a novel concept, and Scala provides a good built-in implementation of Futures that works well with Scala.js.
 
     @p
       To motivate this, let's consider a simple example application that:
@@ -171,7 +171,7 @@
     @p
       @hl.scala{parseTemp} encapsulates the messy result-extraction logic that we need to get the data we want (current temperature, in celsius) out of the structured JSON return blob.
 
-    @hl.ref(advanced/"Futures.scala", "def formatResults", "def main")
+    @hl.ref(advanced/"Futures.scala", "def formatResults", "@JSExport")
 
     @p
       @hl.scala{formatResults} encapsulates the conversion of the final @hl.scala{(name, celsius)} data back into readable HTML.
@@ -207,9 +207,9 @@
       @hl.ref(advanced/"Futures.scala", "def handle2", "main")
 
       @p
-        Since we're using Scala's @hl.scala{Future}s, we aren't limited to just map/foreach-ing over them. @hl.scala{scala.concurrent.Future} provides a @lnk("rich api", "http://www.scala-lang.org/files/archive/nightly/docs/library/scala/concurrent/Future.html") that can be used to deal with common tasks like working with lists of futures in parallel, or aggregating the result of futures together.
+        Since we're using Scala's @hl.scala{Future}s, we aren't limited to just map/foreach-ing over them. @hl.scala{scala.concurrent.Future} provides a @lnk("rich api", "https://www.scala-lang.org/api/current/scala/concurrent/Future.html") that can be used to deal with common tasks like working with lists of futures in parallel, or aggregating the result of futures together.
       @p
-        Here, instead of manually counting until all the @hl.scala{Future}s are complete, we instead create the Futures which will contain what we want (name and temperature) and store them in a list. Then we can use the @hl.scala{Future.sequence} function to invert the @hl.scala{Seq[Future[T]]} into a @hl.scala{Future[Seq[T]]}, a single Future that will provide all the results in a single list when every Future is complete. We can then simply foreach- over the single Future to get the data we need to feed to @hl.scala{formatResults}/@hl.scala{appendChild}.
+        Here, instead of manually counting until all the @hl.scala{Future}s are complete, we instead create the Futures which will contain what we want (name and temperature) and store them in a list. Then we can use the @hl.scala{Future.sequence} function to invert the @hl.scala{Seq[Future[T]]} into a @hl.scala{Future[Seq[T]]}, a single Future that will provide all the results in a single list when every Future is complete. We can then simply @hl.scala{foreach} over the single Future to get the data we need to feed to @hl.scala{formatResults}/@hl.scala{appendChild}.
 
       @p
         This approach is significantly neater than the previous two examples: we no longer have any mutation going on, and the logic is expressed in a very high-level, simple manner. "Make a bunch of Futures, join them, use the result" is much less error-prone than the imperative result-aggregation-and-counting logic used in the previous examples.

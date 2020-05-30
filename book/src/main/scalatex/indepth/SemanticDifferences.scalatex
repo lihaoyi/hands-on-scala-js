@@ -4,19 +4,19 @@
 
 @sect{Language Differences}
 
+  Most of the content of this section is copied verbatim from @lnk("the Scala.js semantics documentation", "https://www.scala-js.org/doc/semantics.html"), which may contain more up-to-date information.
+
   @sect{Primitive data types}
     @p
-      All primitive data types work exactly as on the JVM, with the three following
-      exceptions.
+      All nine primitive data types of Scala, i.e., @hl.scala{Boolean}, @hl.scala{Char}, @hl.scala{Byte}, @hl.scala{Short}, @hl.scala{Int}, @hl.scala{Long}, @hl.scala{Float}, @hl.scala{Double} and @hl.scala{Unit}, work exactly as on the JVM, with the following four exceptions.
 
     @sect{Floats can behave as Doubles by default}
       @p
-        Scala.js underspecifies the behavior of @code{Float}s by default. Any @code{Float} value can be stored as a @code{Double} instead, and any operation on @code{Float}s can be computed with double precision. The choice of whether or not to behave as such, when and where, is left to the
-        implementation.
+        Scala.js underspecifies the behavior of @code{Float}s by default. Any @code{Float} value can be stored as a @code{Double} instead, and any operation on @code{Float}s can be computed with double precision. The choice of whether or not to behave as such, when and where, is left to the implementation.
       @p
         If exact single precision operations are important to your application, you can enable strict-floats semantics in Scala.js, with the following sbt setting:
       @hl.scala
-        scalaJSSemantics ~= { _.withStrictFloats(true) }
+        scalaJSLinkerConfig ~= { _.withSemantics(_.withStrictFloats(true)) }
       @p
         Note that this can have a major impact on performance of your application on JS interpreters that do not support @lnk("the Math.fround function", "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/fround").
 
@@ -82,6 +82,16 @@
       @p
         otherwise.
 
+    @sect{getClass}
+      @p
+        In Scala/JVM as well as Scala.js, when assigning a primitive value to an @hl.scala{Any} (or a generic type), and asking for its @hl.scala{getClass()}, Scala returns the boxed class of the value’s type, rather than the primitive value. For example, @hl.scala{(true: Any).getClass()} returns @hl.scala{classOf[java.lang.Boolean]}, not @hl.scala{classOf[scala.Boolean]}.
+
+      @p
+        In Scala.js, for numeric types, and for the same reason that instance tests are based on values, the result will be the smallest boxed class that can store the value. Hence, @hl.scala{(5: Any).getClass()} will return @hl.scala{classOf[java.lang.Byte]}, while @hl.scala{(50000: Any).getClass()} will return @hl.scala{classOf[java.lang.Integer]}.
+
+      @p
+        Moreover, for @hl.scala{()} (unit), the result will be @hl.scala{classOf[java.lang.Void]} instead of @hl.scala{classOf[scala.runtime.BoxedUnit]} like the JVM. @hl.scala{scala.runtime.BoxedUnit} is an implementation detail of Scala on the JVM, which Scala.js does not emulate. Instead, it uses the more sensible @hl.scala{java.lang.Void}, as @hl.scala{Void} is the boxed class corresponding to the void primitive type, which is @hl.scala{scala.Unit}. This means that while @hl.scala{java.lang.Void} is not instantiable on the JVM, in Scala.js it has a singleton instance, namely @hl.scala{()}. This also manifests itself in @hl.scala{Array[Unit]} which is effectively @hl.scala{Array[java.lang.Void]} at run-time, instead of @hl.scala{Array[scala.runtime.BoxedUnit]}.
+
   @sect{Undefined behaviors}
     @p
       The JVM is a very well specified environment, which even specifies how some bugs are reported as exceptions. Some examples are:
@@ -93,15 +103,15 @@
       @li
         @code{ClassCastException}
       @li
-        @code{ArithmeticException} (such as integer division by 0)
+        @code{ArrayStoreException}
       @li
         @code{StackOverflowError} and other @code{VirtualMachineError}s
     @p
       Because Scala.js does not receive VM support to detect such erroneous conditions, checking them is typically too expensive.
     @p
-      Therefore, all of these are considered @lnk("undefined behavior", "http://en.wikipedia.org/wiki/Undefined_behavior").
+      Therefore, all of these are considered @lnk("undefined behavior", "https://en.wikipedia.org/wiki/Undefined_behavior").
     @p
-      Some of these, however, can be configured to be compliant with sbt settings. Currently, only @code{ClassCastException}s (thrown by invalid @code{asInstanceOf} calls) are configurable, but the list will probably expand in future versions.
+      Some of these, however, can be configured to be compliant with sbt settings. Currently, only @code{ClassCastException}s (thrown by invalid @code{asInstanceOf} calls) and @code{ArrayIndexOutOfBoundsException}s (thrown by array indexing) are configurable, but the list will probably expand in future versions.
     @p
       Every configurable undefined behavior has 3 possible modes:
     @ul
@@ -110,7 +120,7 @@
       @li
         @b{Unchecked}: completely unchecked and undefined
       @li
-        @b{Fatal}: checked, but throws @lnk("UndefinedBehaviorError", "http://www.scala-js.org/api/scalajs-library/0.6.0/#scala.scalajs.runtime.UndefinedBehaviorError")s instead of the specified exception.
+        @b{Fatal}: checked, but throws @hl.scala{UndefinedBehaviorError}s instead of the specified exception.
     @p
       By default, undefined behaviors are in Fatal mode for fastOptJS and in Unchecked mode for fullOptJS. This is so that bugs can be detected more easily during development, with predictable exceptions and stack traces. In production code (fullOptJS), the checks are removed for maximum efficiency.
     @p
@@ -118,8 +128,8 @@
     @p
       If you need a particular kind of exception to be thrown in compliance with the JVM semantics, you can do so with an sbt setting. For example, this setting enables compliant @code{asInstanceOf}s:
     @hl.scala
-      scalaJSSemantics ~= { _.withAsInstanceOfs(
-        org.scalajs.core.tools.sem.CheckedBehavior.Compliant) }
+      scalaJSLinkerConfig ~= { _.withSemantics(_.withAsInstanceOfs(
+        org.scalajs.linker.interface.CheckedBehavior.Compliant)) }
     @p
       Note that this will have (potentially major) performance impacts.
     @p
@@ -127,71 +137,28 @@
 
   @sect{Reflection}
     @p
-      Java reflection and, a fortiori, Scala reflection, are not supported. There is limited support for @code{java.lang.Class}, e.g., @code{obj.getClass.getName} will work for any Scala.js object (not for objects that come from JavaScript interop). Reflection makes it difficult to perform the optimizations that Scala.js heavily relies on. For a more detailed discussion on this topic, take a look at the section @sect.ref{Why No Reflection?}.
-
-  @sect{Regular expressions}
+      Java reflection and, a fortiori, Scala reflection, are not supported. There is limited support for @code{java.lang.Class}, e.g., @code{obj.getClass.getName} will work for any Scala.js object (not for objects that come from JavaScript interop).
     @p
-      @lnk("JavaScript regular expressions", "http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Guide:Regular_Expressions") are slightly different from @lnk("Java regular expressions", "http://docs.oracle.com/javase/6/docs/api/java/util/regex/Pattern.html"). The support for regular expressions in Scala.js is implemented on top of JavaScript regexes.
+      In addition, a specific API @lnk("scala.scalajs.reflect.Reflect", "https://www.scala-js.org/api/scalajs-library/latest/scala/scalajs/reflect/Reflect$.html") allows to reflective instantiate classes with a specific annotation. This is mostly useful for testing frameworks to load the test classes.
     @p
-      This sometimes has an impact on functions in the Scala library that use regular expressions themselves. A list of known functions that are
-      affected is given here:
-    @ul
-      @li
-        @code{StringLike.split(x: Array[Char])}
-
-  @sect{Symbols}
-    @p
-      @code{scala.Symbol} is supported, but is a potential source of memory leaks in applications that make heavy use of symbols. The main reason is that
-      JavaScript does not support weak references, causing all symbols created by Scala.js to remain in memory throughout the lifetime of the application.
-
-  @sect{Enumerations}
-    @p
-      The methods @code{Value()} and @code{Value(i: Int)} on @code{scala.Enumeration} use reflection to retrieve a string representation of the member name and are therefore -- in principle -- unsupported. However, since Enumerations are an integral part of the Scala library, Scala.js adds limited support for these two methods:
-    @p
-      Calls to either of these two methods of the forms:
-    @hl.scala
-      val <ident> = Value
-      val <ident> = Value(<num>)
-    @p
-      are statically rewritten to (a slightly more complicated version of):
-    @hl.scala
-      val <ident> = Value("<ident>")
-      val <ident> = Value(<num>, "<ident>")
-    @p
-      Note that this also includes calls like
-    @hl.scala
-      val A, B, C, D = Value
-    @p
-      since they are desugared into separate @code{val} definitions.
-    @p
-      Calls to either of these two methods which could not be rewritten, or calls to constructors of the protected <code>Val</code> class without an explicit name as parameter, will issue a warning.
-    @p
-      Note that the name rewriting honors the @code{nextName} iterator. Therefore, the full rewrite is:
-    @hl.scala
-      val <ident> = Value(
-        if (nextName != null && nextName.hasNext)
-          nextName.next()
-        else
-          "<ident>"
-      )
-    @p
-      We believe that this covers most use cases of @code{scala.Enumeration}. Please let us know if another (generalized) rewrite would make your life easier.
+      Reflection makes it difficult to perform the optimizations that Scala.js heavily relies on. For a more detailed discussion on this topic, take a look at the section @sect.ref{Why No Reflection?}.
 
 @sect{Library Differences}
   @val myTable = Seq(
     ("Most of java.lang.*", "java.lang.Thread, java.lang.Runtime, ..."),
     ("Almost all of scala.*", "scala.collection.parallel, scala.tools.nsc"),
-    ("Some of java.util.*", "org.omg.CORBA, sun.misc.*"),
+    ("Some of java.util.*", "sun.misc.*"),
+    ("Some of java.io.*, java.nio.* without actual I/O", "Actual I/O like files, sockets, etc."),
     ("Macros: uPickle, Scala-Async, Scalaxy, etc", "Reflection: Scala-Pickling, Scala-Reflect"),
-    ("Shapeless, Scalaz, ScalaTags, uTest", "Scalatest, Scalate"),
-    ("XMLHttpRequest, Websockets. Localstorage", "Netty, Akka, Spray, File IO, JNI"),
+    ("Cats, scalaz, ZIO, Monix, ScalaTest, etc.", "Full Akka, better-files"),
+    ("XMLHttpRequest, Websockets, Localstorage", "Netty, akka-http, JNI"),
     ("HTML DOM, Canvas, WebGL", "AWT, Swing, SWT, OpenGL"),
-    ("Chipmunk.js, Hand.js, React.js, jQuery", "Guice, JUnit, Apache-Commons, log4j"),
-    ("IntelliJ, Eclipse, SBT, Chrome console, Firebug", "Scala REPL, Yourkit, VisualVM, JProfiler")
+    ("Chipmunk.js, Hand.js, React.js, jQuery", "Guice, Apache-Commons, log4j"),
+    ("IntelliJ, VS Code, sbt, Chrome console, Firebug", "Scala REPL, Yourkit, VisualVM, JProfiler")
   )
 
   @p
-    Scala.js differs from Scala-JVM not just in the corner-cases of the language, but also in the libraries available. Scala-JVM has access to JVM APIs and the wealth of the Java libraries, while Scala.js has access to JavaScript APIs and JavaScript libraries. It's also possible to write pure-Scala libraries that run on both Scala.js and Scala-JVM, as detailed @a("here").
+    Scala.js differs from Scala-JVM not just in the corner cases of the language, but also in the libraries available. Scala-JVM has access to JVM APIs and the wealth of the Java libraries, while Scala.js has access to JavaScript APIs and JavaScript libraries. It's also possible to write pure-Scala libraries that run on both Scala.js and Scala-JVM, as detailed @a("here").
   @p
     This table gives a quick overview of the sorts of libraries you can and can't use when working on Scala.js:
 
@@ -207,18 +174,66 @@
 
   @sect{Standard Library}
     @tableHead
-      @for(tuple <- myTable.slice(0, 3))
+      @for(tuple <- myTable.slice(0, 4))
         @tr
           @td{@tuple._1}@td{@tuple._2}
 
     @p
-      You can use more-or-less the whole Scala standard library in Scala.js, sans some more esoteric components like the parallel collections or the tools. Furthermore, we've ported some subset of the Java standard library that many common Scala libraries depends on, including most of @hl.scala{java.lang.*} and some of @hl.scala{java.util.*}.
+      You can use more-or-less the whole Scala standard library in Scala.js, sans some more esoteric components like the parallel collections or the tools. Furthermore, we've ported some subset of the Java standard library that many common Scala libraries depend on, including most of @hl.scala{java.lang.*} and some of @hl.scala{java.util.*}, @hl.scala{java.io.*} and @hl.scala{java.nio.*} (without the things that perform actual I/O operations).
     @p
-      There isn't a full list of standard library APIs which are available from Scala.js, but it should be enough to give you a rough idea of what is supported. The full list of classes that have been ported to Scala.js is available under @sect.ref{Available Java APIs}
+      There isn't a full list of standard library APIs which are available from Scala.js, but it should be enough to give you a rough idea of what is supported. The full list of JDK classes that have been ported to Scala.js is available under @sect.ref{Available Java APIs}.
+    @p
+      In addition to the things that are not implemented at all, and which won't link, there are a few components from the standard libraries that, for historical reasons or great necessity, are implemented but with slightly different run-time behaviors.
+
+    @sect{Regular expressions}
+      @p
+        @lnk("JavaScript regular expressions", "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions") are slightly different from @lnk("Java regular expressions", "https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html"). The support for regular expressions in Scala.js is implemented on top of JavaScript regexes.
+      @p
+        This sometimes has an impact on functions in the Scala library that use regular expressions themselves. A list of known functions that are
+        affected is given here:
+      @ul
+        @li
+          @code{StringLike.split(x: Array[Char])}
+
+    @sect{scala.Symbol}
+      @p
+        @code{scala.Symbol} is supported, but is a potential source of memory leaks in applications that make heavy use of symbols. The main reason is that
+        JavaScript does not support weak references, causing all symbols created by Scala.js to remain in memory throughout the lifetime of the application.
+
+    @sect{scala.Enumeration}
+      @p
+        The methods @hl.scala{Value()} and @hl.scala{Value(i: Int)} on @hl.scala{scala.Enumeration} use reflection to retrieve a string representation of the member name and are therefore -- in principle -- unsupported. However, since Enumerations are an integral part of the Scala library, Scala.js adds limited support for these two methods:
+      @p
+        Calls to either of these two methods of the forms:
+      @hl.scala
+        val <ident> = Value
+        val <ident> = Value(<num>)
+      @p
+        are statically rewritten to (a slightly more complicated version of):
+      @hl.scala
+        val <ident> = Value("<ident>")
+        val <ident> = Value(<num>, "<ident>")
+      @p
+        Note that this also includes calls like
+      @hl.scala
+        val A, B, C, D = Value
+      @p
+        since they are desugared into separate @hl.scala{val} definitions.
+      @p
+        Calls to either of these two methods which could not be rewritten, or calls to constructors of the protected @hl.scala{Val} class without an explicit name as parameter, will issue a warning.
+      @p
+        Note that the name rewriting honors the @hl.scala{nextName} iterator. Therefore, the full rewrite is:
+      @hl.scala
+        val <ident> = Value(
+          if (nextName != null && nextName.hasNext)
+            nextName.next()
+          else
+            "<ident>"
+        )
 
   @sect{Macros v.s. Reflection}
     @tableHead
-      @for(tuple <- myTable.slice(3, 4))
+      @for(tuple <- myTable.slice(4, 5))
         @tr
           @td{@tuple._1}@td{@tuple._2}
 
@@ -230,17 +245,17 @@
 
   @sect{Pure-Scala v.s. Java Libraries}
     @tableHead
-      @for(tuple <- myTable.slice(4, 5))
+      @for(tuple <- myTable.slice(5, 6))
         @tr
           @td{@tuple._1}@td{@tuple._2}
     @p
       Scala.js has access to any pure-Scala libraries that you have cross-compiled to Scala.js, and cross-compiling a pure-Scala library with no dependencies is straightforward. Many of them, such as the ones listed above, have already been cross-compiled and can be used via their maven coordinates.
     @p
-      You cannot use any libraries which have a Java dependency. This means libraries like @lnk.misc.ScalaTest or @lnk.misc.Scalate, which depend on a number of external Java libraries or source files, cannot be used from Scala.js. You can only use libraries which have no dependency on Java libraries or sources.
+      You cannot use any libraries which have a Java dependency. This means libraries like Akka or Play, which depend on a number of external Java libraries or source files, cannot be used from Scala.js. You can only use libraries which have no dependency on Java libraries or sources.
 
   @sect{JavaScript APIs v.s. JVM APIs}
     @tableHead
-      @for(tuple <- myTable.slice(5, 7))
+      @for(tuple <- myTable.slice(6, 9))
         @tr
           @td{@tuple._1}@td{@tuple._2}
 
@@ -249,19 +264,17 @@
     @p
       In exchange for this, Scala.js provides you access to Browser APIs that do related things. Although you can't set up a HTTP server to take in-bound requests, you can make out-bound requests using @lnk.dom.XMLHttpRequest to other servers. You can't write to the filesystem or databases directly, but you can write to the @hl.scala{dom.localStorage} provided by the browser. You can't use Swing or AWT or WebGL but instead work with the DOM and Canvas and WebGL.
     @p
-      Naturally, none of these are an exact replacement, as the browser environment is fundamentally different from that of a desktop application running on the JVM. Nonetheless, there are many analogues, and if so desired you can write code to abstract away these differences and run on both Scala.js and Scala-JVM
-
+      Naturally, none of these are an exact replacement, as the browser environment is fundamentally different from that of a desktop application running on the JVM. Nonetheless, there are many analogues, and if so desired you can write code to abstract away these differences and run on both Scala.js and Scala-JVM.
 
   @sect{Scala/Browser tooling v.s. Java tooling}
     @tableHead
-      @for(tuple <- myTable.slice(7, 8))
+      @for(tuple <- myTable.slice(9, 10))
         @tr
           @td{@tuple._1}@td{@tuple._2}
-
 
     @p
       Lastly, there is the matter of tools. Naturally, all the Scala tools which depend on the JVM are out. This means things like the @lnk("Yourkit", "http://www.yourkit.com/"), @lnk("VisualVM", "http://visualvm.java.net/") and @lnk("JProfiler", "https://www.ej-technologies.com/products/jprofiler/overview.html") profilers, as well as things like the Scala command-line REPL which relies on classloaders and other such things to run on the JVM
     @p
-      On the other hand, you do get to keep and continue using many tools which are build for Scala but JVM-agnostic. For example, IDEs such a @lnk.misc.IntelliJ and @lnk.misc.Eclipse work great with Scala.js; from their point of view, it's just Scala, and things like code-navigation, refactoring and error-highlighting all work out of the box. SBT works with Scala.js too, and you see the same compile-erorrs in the command-line as you would in vanilla Scala, and even things like incremental compilation work unchanged.
+      On the other hand, you do get to keep and continue using many tools which are build for Scala but JVM-agnostic. For example, IDEs such a @lnk.misc.IntelliJ and @lnk.misc.VSCode work great with Scala.js; from their point of view, it's just Scala, and things like code-navigation, refactoring and error-highlighting all work out of the box. sbt works with Scala.js too, and you see the same compile-erorrs in the command-line as you would in vanilla Scala, and even things like incremental compilation work unchanged.
     @p
       Lastly, you gain access to browser tools that don't work with normal Scala: you can use the Chrome or Firefox consoles to poke at your Scala.js application from the command line, or their profilers/debuggers. With source maps set up, you can even step-through debug your Scala.js application directly in Chrome.

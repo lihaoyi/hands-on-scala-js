@@ -26,19 +26,22 @@
 
 @sect{A Client-Server Setup}
   @p
-    Getting started with client-server integration, let's go with the simplest configuration possible: a Spray server and a Scala.js client. Most of the other web frameworks (@lnk.misc.Play, @lnk.misc.Scalatra, etc.) will have more complex configurations, but the basic mechanism of wiring up Scala.js to your web framework will be the same. Just like our project in @sect.ref{Cross Publishing Libraries}, our project will look like this:
+    Getting started with client-server integration, let's go with the simplest configuration possible: an akka-http server and a Scala.js client. Most of the other web frameworks (@lnk.misc.Play, @lnk.misc.Scalatra, etc.) will have more complex configurations, but the basic mechanism of wiring up Scala.js to your web framework will be the same. Just like our project in @sect.ref{Cross Publishing Libraries}, our project will look like this:
 
   @hl.sh
     $ tree
     .
     ├── build.sbt
-    ├── project/build.sbt
+    ├── project
+    │   ├── build.properties
+    │   └── plugins.sbt
     └── app
         ├── shared/src/main/scala/simple/FileData.scala
-        ├── js/src/main/scala/simple/Client.scala
-        └── jvm/src/main/scala/simple/
-                                ├── Page.scala
-                                └── Server.scala
+        ├── js/src/main/scala/simple
+        │   └── Client.scala
+        └── jvm/src/main/scala/simple
+            ├── Page.scala
+            └── Server.scala
 
   @p
     First, let's do the wiring in @code{build.sbt}:
@@ -46,19 +49,19 @@
   @hl.ref(wd/'examples/'crossBuilds/'clientserver/"build.sbt")
 
   @p
-    Again, we are using @hl.scala{crossProject} to define our @code{js/} and @code{jvm/} subprojects. Both projects share a number of settings: the settings to add @lnk.github.ScalaTags and @lnk.github.uPickle to the build. Note that those two dependencies use the triple @code{%%%} instead of the double @code{%%} to declare: this means that for each dependency, we will pull in the Scala JVM or Scala.js version depending on whether it's being used in a Scala.js project. Note also the @hl.scala{packageArchetype.java_application} setting, which isn't strictly necessary depending on what you want to do with the application, but this example needs it as part of the deployment to Heroku.
+    Again, we are using @hl.scala{crossProject} to define our @code{js/} and @code{jvm/} subprojects. Both projects share the dependencies on @lnk.github.ScalaTags and @lnk.github.uPickle. Note that those two dependencies use the triple @code{%%%} instead of the double @code{%%} to declare, which means that for each dependency, we will pull in the Scala JVM or Scala.js version depending on whether it's being used in a Scala.js project. Other dependencies are specific to the client or the server.
 
   @p
-    The @code{js/} subproject is uneventful, with a dependency on the by-now-familiar @code{scalajs-dom} library. The @code{jvm/} project, on the other hand, is interesting: it contains the dependencies required for us to set up out Spray server, and one additional thing: we add the output of @code{fastOptJS} from the client to the @code{resources} on the server. This will allow the @code{server} to serve the compiled JavaScript from our @code{client} project from its resources.
+    The @code{js/} subproject is uneventful, with a dependency on the by-now-familiar @code{scalajs-dom} library. The @code{jvm/} project, on the other hand, is interesting: it contains the dependencies required for us to set up our akka-http server, and one additional thing: we add the output of @code{fastOptJS} from the client to the @code{resources} on the server. This will allow the @code{server} to serve the compiled JavaScript from our @code{client} project from its resources.
 
   @p
-    Next, let's kick off the Spray server in our Scala JVM main method:
+    Next, let's kick off the akka-http server in our Scala JVM main method:
 
 
   @hl.ref(server/"Server.scala")
 
   @p
-    This is a not very interesting @lnk("spray-routing", "http://spray.io/documentation/1.2.2/spray-routing/") application: we set up a server on @code{localhost:8080}, have the root URL serve the main page on GET, and have other GET URLs serve resources. This includes the @code{js-fastopt.js} file that is now in our resources because of our @code{build.sbt} config earlier! We also add a POST route to allow the client ask the server to list files various directories.
+    This is a not very interesting application of @lnk("the akka-http routing DSL", "https://doc.akka.io/docs/akka-http/10.1.2/routing-dsl/overview.html"): we set up a server on @code{localhost:8080}, have the root URL serve the main page on GET, and have other GET URLs serve resources. This includes the @code{app-fastopt.js} file that is now in our resources because of our @code{build.sbt} config earlier! We also add a POST route to allow the client ask the server to list files various directories.
 
   @p
     The HTML template @hl.scala{Page.skeleton} is not shown above; I put it in a separate file for neatness:
@@ -68,7 +71,7 @@
   @p
     This is a typical @lnk.github.ScalaTags HTML snippet. Note that since we're serving it directly from the server in Scala code, we do not need to leave a @code{.html} file somewhere on the file system! We can declare all HTML, including the skeleton of the page, in ScalaTags. Otherwise it's the same as what we saw in earlier chapters: A simple HTML page which includes a script tag to run our Scala.js application.
   @p
-    Lastly, we'll set up the Scala.js main method, which we are calling in the @hl.xml{<script>} tag above to kick off the client-side application.
+    Lastly, we'll set up the Scala.js main method, which we are calling in the @hl.js{onload} event above to kick off the client-side application.
 
   @hl.ref(client/"Client.scala")
 
@@ -76,8 +79,7 @@
     Again this is a simple Scala.js application, not unlike what we saw in earlier chapters. However, there is one difference: earlier, we made our Ajax calls to @code{api.openweathermap.org/...}. Here, we're making it to @code{/ajax}: the same server the page is served from!
 
   @p
-    You may have noticed in both client and server, we have made reference to a mysterious @hl.scala{FileData} type which holds the name and size of each file. @hl.scala{FileData} is defined in the @code{shared/} folder, so it can be accessed from both Scala JVM and Scala.js:
-
+    You may have noticed in both client and server, we have made reference to a mysterious @hl.scala{FileData} type which holds the name and size of each file. @hl.scala{FileData} is defined in the @code{shared/} folder, so it can be accessed from both Scala JVM and Scala.js, as well as a serializer definition for @lnk.github.uPickle:
 
   @hl.ref(wd/'examples/'crossBuilds/'clientserver/'app/'shared/'src/'main/'scala/'simple/"FileData.scala")
 
@@ -114,11 +116,11 @@
       The Ajax/RPC layer is one of the more fragile parts of web applications. Often, you have your various Ajax endpoints written once on the server, have a set of routes written to connect those Ajax endpoints to URLs, and client code (traditionally JavaScript) made calls to those URLs with "raw" data: basically whatever you wanted, packed in an ad hoc mix of CSV and JSON and raw-strings.
 
     @p
-      This has always been annoying boilerplate, and Scala.js removes it. With @lnk.github.uPickle, you can simply call @hl.scala{upickle.write(...)} and @hl.scala{upickle.read[T](...)} to convert your collections, primitives or case-classes to and from JSON. This means you do not need to constantly re-invent different ways of making Ajax calls: you can just fling the data right across the network from client to server and back again.
+      This has always been annoying boilerplate, and Scala.js removes it. With @lnk.github.uPickle, you can simply call @hl.scala{upickle.default.write(...)} and @hl.scala{upickle.default.read[T](...)} to convert your collections, primitives or case-classes to and from JSON. This means you do not need to constantly re-invent different ways of making Ajax calls: you can just fling the data right across the network from client to server and back again.
 
 @sect{What's Left?}
   @p
-    We've built a small client-server web application with a Scala.js web-client that makes Ajax calls to a Scala JVM web-server running on Spray. We performed these Ajax calls using uPickle to serialize the data back and forth, so serializing the arguments and return-value was boilerplate-free and correct.
+    We've built a small client-server web application with a Scala.js web-client that makes Ajax calls to a Scala JVM web-server running on akka-http. We performed these Ajax calls using uPickle to serialize the data back and forth, so serializing the arguments and return-value was boilerplate-free and correct.
 
   @p
     However, there is still some amount of duplication in the code. In particular, the definition of the endpoint name "list" is duplicated 4 times:
@@ -172,7 +174,7 @@
       @li
         An @hl.scala{autowire.Client} on the Client, set up to take a serialized request and send it across the network to the server.
       @li
-        An interface (A Scala @hl.scala{trait}) which defines the interface between these two
+        An interface (a Scala @hl.scala{trait}) which defines the interface between these two
 
     @p
       Let's start with our client-server interface definition
@@ -241,11 +243,11 @@
       Overall, this set up requires some boilerplate to define the @hl.scala{Ajaxer} and @hl.scala{Router} objects, as well as the @hl.scala{Api} trait. However, these can be defined just once and used over and over; while it might be wasteful/unnecessary for making a single Ajax call, the cost is much less amortized over a number of Ajax calls. In a non-trivial web application with dozens of routes being called all over the place, spending a dozen lines setting up things up-front isn't a huge cost.
 
     @p
-      What have we gotten in exchange? It turns out that by using Autowire, we have eliminated the three failure modes described earlier, that could:
+      What have we gotten in exchange? It turns out that by using Autowire, we have eliminated the three failure modes described earlier:
 
     @ul
       @li
-        It is impossible for the route and the endpoint method-name to diverge accidentally: if the endpoint is called @hl.scala{list}, the requests will go through the @code{/list} URL. No room for discussion, or to make a mistake
+        It is impossible for the route and the endpoint method-name to diverge accidentally: if the endpoint is called @hl.scala{list}, the requests will go through the @code{/list} URL. No room for discussion, or to make a mistake.
       @li
         You cannot accidentally rename the route on the server without changing the client, or vice versa. Attempts to do so will cause a compilation error and even your IDE should highlight it as red. Try it out!
 
@@ -258,7 +260,7 @@
 @hr
 
 @p
-  Hopefully this chapter has given you a glimpse of how a basic client-server application works using Scala.js. Although it is specific to a Spray server, there isn't any reason why you couldn't set up an equivalent thing for your Play, Scalatra or whichever other web framework that you're using.
+  Hopefully this chapter has given you a glimpse of how a basic client-server application works using Scala.js. Although it is specific to an akka-http server, there isn't any reason why you couldn't set up an equivalent thing for your Play, Scalatra or whichever other web framework that you're using.
 
 @p
   It's probably worth taking a moment to play around with the existing client-server system you have set up. Ideas for improvement include:
@@ -269,4 +271,4 @@
   @li
     How about setting up the build.sbt so it serves the fully-optimized Scala.js blob, @code{client-opt.js}? This is probably what you want before deployment into production, and the same technique as we used to serve the fast-optimized version applies here too.
   @li
-    What if you wanted to use another server rather than Spray? How about trying to set up a Play or Scalatra server to serve our Scala.js application code?
+    What if you wanted to use another server rather than akka-http? How about trying to set up a Play or Scalatra server to serve our Scala.js application code?

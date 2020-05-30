@@ -6,6 +6,7 @@ import scalajs.js
 import scala.scalajs.js.annotation._
 import scalatags.JsDom.all._
 import dom.html
+import WeatherAPIKey.APIKey
 
 @JSExportTopLevel("WebPageWeather3")
 object Weather3 {
@@ -20,7 +21,7 @@ object Weather3 {
     val url =
       "https://api.openweathermap.org/" +
       "data/2.5/weather?q=Singapore" +
-      s"&APPID=${WeatherAPIKey.APIKey}"
+      s"&APPID=$APIKey"
 
     Ajax.get(url).foreach { xhr =>
       if (xhr.status == 200) {

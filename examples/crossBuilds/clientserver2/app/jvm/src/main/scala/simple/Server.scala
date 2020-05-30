@@ -8,10 +8,11 @@ import akka.http.scaladsl.server.Directives._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Properties
 
+import upickle.default._
 
-object Router extends autowire.Server[String, upickle.default.Reader, upickle.default.Writer]{
-  def read[Result: upickle.default.Reader](p: String) = upickle.default.read[Result](p)
-  def write[Result: upickle.default.Writer](r: Result) = upickle.default.write(r)
+object Router extends autowire.Server[String, Reader, Writer]{
+  def read[Result: Reader](p: String): Result = upickle.default.read[Result](p)
+  def write[Result: Writer](r: Result): String = upickle.default.write(r)
 }
 
 object Server extends Api{

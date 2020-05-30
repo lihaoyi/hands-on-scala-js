@@ -9,7 +9,7 @@ import scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 @JSExportTopLevel("AdvancedAsync")
 object Async {
-  def init(canvas: html.Canvas) = {
+  def init(canvas: html.Canvas): dom.CanvasRenderingContext2D = {
     val renderer = canvas.getContext("2d")
       .asInstanceOf[dom.CanvasRenderingContext2D]
 
@@ -22,8 +22,9 @@ object Async {
     renderer.fillStyle = "cyan"
     renderer
   }
+
   @JSExport
-  def main(canvas: html.Canvas) = {
+  def main(canvas: html.Canvas): Unit = {
     val renderer = init(canvas)
     // async
     def rect = canvas.getBoundingClientRect()
@@ -61,8 +62,9 @@ object Async {
       }
     }
   }
+
   @JSExport
-  def main0(canvas: html.Canvas) = {
+  def main0(canvas: html.Canvas): Unit = {
     val renderer = init(canvas)
     // traditional
     def rect = canvas.getBoundingClientRect()

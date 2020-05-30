@@ -6,6 +6,7 @@ import scalajs.js
 import scala.scalajs.js.annotation._
 import scalatags.JsDom.all._
 import dom.html
+import WeatherAPIKey.APIKey
 
 @JSExportTopLevel("WebPageWeather0")
 object Weather0 {
@@ -15,7 +16,7 @@ object Weather0 {
     xhr.open("GET",
       "https://api.openweathermap.org/" +
       "data/2.5/weather?q=Singapore" +
-      s"&APPID=${WeatherAPIKey.APIKey}"
+      s"&APPID=$APIKey"
     )
     xhr.onload = (e: dom.Event) => {
       if (xhr.status == 200) {

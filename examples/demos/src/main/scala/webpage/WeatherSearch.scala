@@ -7,6 +7,7 @@ import scalajs.js
 import scala.scalajs.js.annotation._
 import scalatags.JsDom.all._
 import dom.html
+import WeatherAPIKey.APIKey
 
 @JSExportTopLevel("WebPageWeatherSearch")
 object WeatherSearch {
@@ -43,9 +44,8 @@ object WeatherSearch {
     def fetchWeather(query: String) = {
       val searchUrl =
         "https://api.openweathermap.org/data/" +
-        "2.5/find?type=like&mode=json&q=" +
-        query +
-        s"&APPID=${WeatherAPIKey.APIKey}"
+        s"2.5/find?type=like&mode=json&q=$query" +
+        s"&APPID=$APIKey"
 
       for{
         xhr <- Ajax.get(searchUrl)

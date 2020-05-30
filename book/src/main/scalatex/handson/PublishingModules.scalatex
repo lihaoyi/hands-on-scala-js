@@ -3,7 +3,7 @@
   We've spent several chapters exploring the experience of making web apps using Scala.js, but any large application (web or not!) likely relies on a host of libraries in order to implement large chunks of its functionality. Ideally these libraries would be reusable, and can be shared among different projects, teams or even companies.
 
 @p
-  Not all code is developed in the browser. Maybe you want to run simple snippets of Scala.js which don't interact with the browser at all, and having to keep a browser open is an overkill. Maybe you want to write unit tests for your browser-destined code, so you can verify that it works without firing up Chrome. Maybe it's not a simple script but a redistributable library, and you want to run the same commandline unit tests on both Scala.js and Scala-JVM to verify that the behavior is identical. This chapter will go through all these cases.
+  Not all code is developed in the browser. Maybe you want to run simple snippets of Scala.js which don't interact with the browser at all, and having to keep a browser open is an overkill. Maybe you want to write unit tests for your browser-destined code, so you can verify that it works without firing up Chrome. Maybe it's not a simple script but a redistributable library, and you want to run the same command line unit tests on both Scala.js and Scala-JVM to verify that the behavior is identical. This chapter will go through all these cases.
 
 
 @sect{A Simple Cross-Built Library}
@@ -15,14 +15,16 @@
     $ tree
     .
     ├── build.sbt
-    ├── project/build.sbt
+    ├── project
+    │   ├── build.properties
+    │   └── plugins.sbt
     └── library
         ├── js/src/main/scala/simple/Platform.scala
         ├── jvm/src/main/scala/simple/Platform.scala
         └── shared/src/main/scala/simple/Simple.scala
 
   @p
-    As you can see, we have three main places where code lives: @code{js/} is where Scala-JS specific code lives, @code{jvm/} for Scala-JVM specific code, and @code{shared/} for code that is common between both platforms. Depending on your project, you may have more or less code in the @code{shared/} folder: a mostly-the-same cross-compiled module may have most or all its code in @code{shared/} while a @sect.ref("Integrating Client-Server", "client-server web application") would have lots of client/server js/jvm-specific code.
+    As you can see, we have three main places where code lives: @code{js/} is where Scala.js-specific code lives, @code{jvm/} for Scala-JVM-specific code, and @code{shared/} for code that is common between both platforms. Depending on your project, you may have more or less code in the @code{shared/} folder: a mostly-the-same cross-compiled module may have most or all of its code in @code{shared/} while a @sect.ref("Integrating Client-Server", "client-server web application") would have lots of client/server js/jvm-specific code.
 
   @sect{Build Configuration}
     @p
@@ -31,12 +33,12 @@
     @hl.ref(wd/'examples/'crossBuilds/'simple/'project/"plugins.sbt")
 
     @p
-      The @code{project/plugins.sbt} file is uneventful: it simply includes the Scala.js SBT plugin. However, the @code{build.sbt} file is a bit more interesting:
+      In addition to the Scala.js sbt plugin, the @code{project/plugins.sbt} file now also includes @code{sbt-scalajs-crossproject}. That plugin will give us the @hl.scala{crossProject} feature, which is used in the @code{build.sbt} file below:
 
     @hl.ref(wd/'examples/'crossBuilds/'simple/"build.sbt")
 
     @p
-      Unlike the equivalent @code{build.sbt} files you saw in earlier chapters, this does not simply enable the @hl.scala{ScalaJSPlugin} to the root project. Rather, it uses the @hl.scala{crossProject} function provided by the Scala.js plugin to set up two projects: one in the @code{app/js/} folder and one in the @code{jvm/} folder. We also have places to put settings related to either the JS side, the JVM side, or both. In this case, we add a dependency on @lnk("uTest", "https://github.com/lihaoyi/utest"), which we will use as the test framework for our library. Note how we use triple @hl.scala{%%%} to indicate that we're using the platform-specific version of uTest, such that the Scala.js or Scala-JVM version will be properly pulled in when compiling for each platform.
+      Unlike the @code{build.sbt} files you saw in earlier chapters, this does not simply enable the @hl.scala{ScalaJSPlugin} to the root project. Rather, it uses the @hl.scala{crossProject} function provided by @code{sbt-scalajs-crossproject} to set up two projects: one in the @code{library/js/} folder and one in the @code{library/jvm/} folder. We also have places to put settings related to either the JS side, the JVM side, or both. In this case, we add a dependency on @lnk("uTest", "https://github.com/lihaoyi/utest"), which we will use as the testing framework for our library. Note how we use triple @hl.scala{%%%} to indicate that we're using the platform-specific version of uTest, such that the Scala.js or Scala-JVM version will be properly pulled in when compiling for each platform.
 
   @sect{Source Files}
     @val simple = wd/'examples/'crossBuilds/'simple
@@ -59,60 +61,45 @@
         @hl.ref(simple/'library/'jvm/'src/'main/'scala/'simple/"Platform.scala")
 
     @p
-      In the @code{js/} version, we are using the JavaScript @hl.js{Date} object to take the millis and do what we want. In the @code{jvm/} version, we instead use @hl.scala{java.text.SimpleDateFormat} with a custom formatter (The syntax is defined @lnk("here", "http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html")).
+      In the @code{js/} version, we are using the JavaScript @hl.js{Date} object to take the millis and do what we want. In the @code{jvm/} version, we instead use @hl.scala{java.text.SimpleDateFormat} with a custom formatter (The syntax is defined @lnk("here", "https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html")).
 
     @p
-      Again, you can put as much platform-specific logic in these files as you want, to account for differences in the available APIs. Maybe you want to use @lnk.dom.JSONparse for parsing JSON blobs in @code{js/}, but @lnk("Jackson", "http://jackson.codehaus.org/") or @lnk("GSON", "https://code.google.com/p/google-gson/") for parsing them in @code{jvm/}.
+      Again, you can put as much platform-specific logic in these files as you want, to account for differences in the available APIs. Maybe you want to use @lnk.dom.JSONparse for parsing JSON blobs in @code{js/}, but @lnk("Jackson", "https://github.com/FasterXML/jackson") or @lnk("GSON", "https://github.com/google/gson") for parsing them in @code{jvm/}.
 
   @sect{Running the Module}
     @hl.sh
-      > ;libraryJS/test ;libraryJVM/test
-      [info] Compiling 1 Scala source to library/js/target/scala-2.10/test-classes...
-      [info] ---------------------------Results---------------------------
-      [info] simple.SimpleTest		Success
-      [info]     format		Success
-      [info]         nil		Success
-      [info]         timeZero		Success
-      [info]     zero		Success
-      [info]         0
-      [info]
-      [info] Tests: 5
-      [info] Passed: 5
-      [info] Failed: 0
-      [success] Total time: 12 s, completed Feb 4, 2015 8:44:49 AM
-      [info] Compiling 1 Scala source to library/jvm/target/scala-2.10/test-classes...
-      [info] 1/5     simple.SimpleTest.format.nil		Success
-      [info] 2/5     simple.SimpleTest.format.timeZero		Success
-      [info] 3/5     simple.SimpleTest.format		Success
-      [info] 4/5     simple.SimpleTest.zero		Success
-      [info] 0.0
-      [info] 5/5     simple.SimpleTest		Success
-      [info] ---------------------------Results---------------------------
-      [info] simple.SimpleTest		Success
-      [info]     format		Success
-      [info]         nil		Success
-      [info]         timeZero		Success
-      [info]     zero		Success
-      [info]         0.0
-      [info]
-      [info] Tests: 5
-      [info] Passed: 5
-      [info] Failed: 0
-      [success] Total time: 2 s, completed Feb 4, 2015 8:44:51 AM
+      sbt:simple> libraryJS/test; libraryJVM/test
+      [info] Compiling 2 Scala sources to .../library/js/target/scala-2.13/classes ...
+      [info] Compiling 1 Scala source to .../library/js/target/scala-2.13/test-classes ...
+      [info] Fast optimizing .../library/js/target/scala-2.13/library-test-fastopt.js
+      -------------------------------- Running Tests --------------------------------
+      + simple.SimpleTest.format.nil 2ms
+      + simple.SimpleTest.format.timeZero 0ms
+      + simple.SimpleTest.zero 0ms  0
+      [info] Tests: 3, Passed: 3, Failed: 0
+      [success] Total time: 6 s, completed 29 mai 2020 11:45:35
+      [info] Compiling 2 Scala sources to .../library/jvm/target/scala-2.13/classes ...
+      [info] Compiling 1 Scala source to .../library/jvm/target/scala-2.13/test-classes ...
+      -------------------------------- Running Tests --------------------------------
+      + simple.SimpleTest.format.nil 10ms
+      + simple.SimpleTest.format.timeZero 1ms
+      + simple.SimpleTest.zero 0ms  0.0
+      [info] Tests: 3, Passed: 3, Failed: 0
+      [success] Total time: 1 s, completed 29 mai 2020 11:45:36
 
     @p
       As you can see, both runs printed the same results, modulo three things:
 
     @ul
       @li
-        The @code{"Compiling 1 Scala source to..."} line, which tells us that both JS and JVM versions are being compiled.
+        The @code{"Compiling Scala sources to..."} lines, which tell us that both JS and JVM versions are being compiled.
       @li
-        The time taken: the second run is instant while the first takes eleven seconds! This is because by default we run on @lnk.misc.Rhino, which is a simple interpreter hundreds of times slower than running code natively on the JVM.
+        The time taken: the second run is virtually instant while the first one takes 6 seconds! This is because of the additional time required to fast-optimize the JavaScript file. However, this only happens on the first run within the same sbt session. If we modify one file and rerun the tests, the time for @code{libraryJS/test} drops to 1 second as well, thanks to a lot of caching and incremental processing.
       @li
-        In Scala-JVM the double 1.0 is printed as @code{1.0}, while in Scala.js it's printed as @code{1}. This is one of a small number of differences between Scala.js and Scala-JVM, and verifies that we are indeed running on both platforms!
+        In Scala-JVM the double 0.0 is printed as @code{0.0}, while in Scala.js it's printed as @code{0}. This is one of a small number of differences between Scala.js and Scala-JVM, and verifies that we are indeed running on both platforms!
 
     @p
-      Apart from running each sub project manually as we did above, you can also simply hit @code{test} and SBT will run tests for both
+      Apart from running each sub project manually as we did above, you can also simply hit @code{test} and sbt will run tests for both.
 
 @sect{Further Work}
   @p
@@ -120,11 +107,11 @@
 
   @ul
     @li
-      Flesh it out! Currently this module only does a single, trivial thing. If you've done any web development before, I'm sure you can find some code snippet, function or algorithm that you'd like to share between client and server. Try implementing it in the @code{shared/} folder to be usable in both Scala.js and Scala-JVM
+      Flesh it out! Currently this module only does a single, trivial thing. If you've done any web development before, I'm sure you can find some code snippet, function or algorithm that you'd like to share between client and server. Try implementing it in the @code{shared/} folder to be usable in both Scala.js and Scala-JVM.
     @li
       Publish it! Both @code{sbt publishLocal} and @code{sbt publishSigned} work on this module, for publishing either locally, Maven Central via Sonatype, or Bintray. Running the command bare should be sufficient to publish both the @code{js} or @code{jvm} projects, or you can also specify which one e.g. @code{jvm/publishLocal} to publish only one subproject.
     @li
-      Cross-cross build it! You can use @hl.scala{crossScalaVersions} in your @hl.scala{crossProject} to build a library that works across all of {Scala.js, Scala-JVM} X {2.10, 2.11}. Many existing libraries, such as @lnk.github.ScalaTags or @lnk("uTest", "https://github.com/lihaoyi/utest") published like that.
+      Cross-cross build it! You can use @hl.scala{crossScalaVersions} in your @hl.scala{crossProject} to build a library that works across all of {Scala.js, Scala-JVM} X {2.12, 2.13}. Many existing libraries, such as @lnk.github.ScalaTags or @lnk("uTest", "https://github.com/lihaoyi/utest") published like that.
 
   @p
     Now that you've gotten your code cross-compiling to Scala.js/Scala-JVM, the sky's the limit in what you can do. In general, although a large amount of your Scala-JVM code @i{does} deal with files or networks or other Scala-JVM-specific functionality, in most applications there is a large library of helpers which don't. These could easily be packaged up into a cross-platform library and shared with your frontend Scala.js (or even pure JavaScript!) code.
@@ -135,16 +122,15 @@
 
   @ul
     @li
+      @lnk("Scalatest", "https://www.scalatest.org/")
+    @li
       @lnk("Minitest", "https://github.com/monifu/minitest")
     @li
-      @lnk("zCheck", "https://github.com/InTheNow/zcheck")
+      @lnk("ScalaCheck", "https://www.scalacheck.org/")
     @li
-      @lnk("oTest", "https://github.com/cgta/otest")
+      @lnk("Specs2", "https://etorreborre.github.io/specs2/")
     @li
-      @lnk("Greenlight", "https://github.com/greencatsoft/greenlight")
+      and others.
 
   @p
-    These (and others) are built and maintained by members of the community, so if one of them does not fit your tastes, it is worth trying the others.
-
-  @p
-    Note that you cannot use @lnk("Scalatest", "http://www.scalatest.org/") or @lnk("Specs2", "http://etorreborre.github.io/specs2") in Scala.js. Despite the popularity of those libraries, they depend on too many Java-specific details of Scala-JVM to be easily ported to Scala.js. Thus you'll have to use one of the (relatively new) libraries which supports Scala.js, such as uTest or those above.
+    Basically, all popular testing frameworks for Scala also support Scala.js.

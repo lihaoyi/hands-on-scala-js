@@ -5,8 +5,8 @@
 @split
   @half
     @hl.scala
-      object Main extends js.JSApp{
-        def main() = {
+      object Main {
+        def main(args: Array[String]): Unit = {
           var x = 0
           while(x < 10) x += 3
           println(x)
@@ -16,16 +16,16 @@
 
   @half
     @hl.js
-      ScalaJS.c.LMain$.prototype.main__V = (function() {
-        var x = 0;
-        while ((x < 10)) {
-          x = ((x + 3) | 0)
+      class $c_Ltest_Main$ extends $c_O {
+        main__AT__V(args) {
+          let x = 0;
+          while ((x < 10)) {
+            x = ((3 + x) | 0)
+          };
+          $m_Ltest_Printer$().println__O__V(x)
+          // 12
         };
-        ScalaJS.m.s_Predef$()
-                 .println__O__V(x)
-        // 12
-      });
-
+      }
 @p
   As you can see, both of the above programs do identical things: they'll count the variable @hl.scala{x} from @hl.scala{0}, @hl.scala{3}, @hl.scala{9}, and @hl.scala{12} before finally printing it out. It's just that the first is written in Scala and the second is in JavaScript.
 
@@ -36,11 +36,9 @@
   @li
     Typo-safety due to its compiler which catches many silly errors before the code is run
   @li
-
     Editor support for autocompletion, error highlighting, refactoring, and intelligent navigation
-
   @li
-    Moderate sized compiled executables, in the 100-400kb range
+    Moderate sized compiled executables, starting in the dozens of KB
   @li
     Source-maps for ease of debugging
 

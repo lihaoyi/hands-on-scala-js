@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Properties
 
 object Server{
@@ -36,7 +35,7 @@ object Server{
     }
     Http().bindAndHandle(route, "0.0.0.0", port = port)
   }
-  def list(path: String) = {
+  def list(path: String): Seq[FileData] = {
     val (dir, last) = path.splitAt(path.lastIndexOf("/") + 1)
     val files =
       Option(new java.io.File("./" + dir).listFiles())

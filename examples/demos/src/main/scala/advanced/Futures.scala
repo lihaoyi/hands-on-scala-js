@@ -10,11 +10,12 @@ import scalajs.js
 import scalatags.JsDom.all._
 import scala.scalajs.js.annotation._
 import scala.concurrent.ExecutionContext.Implicits.global
+import webpage.WeatherAPIKey.APIKey
 
 @JSExportTopLevel("AdvancedFutures")
 object Futures {
   def main(container: html.Div,
-            handle: (Seq[String], html.Div) => Unit) = {
+           handle: (Seq[String], html.Div) => Unit): Unit = {
     val myInput = input(value:="London,Singapore,Berlin,New York").render
     val output = div.render
     myInput.onkeyup = (e: dom.KeyboardEvent) => {
@@ -30,21 +31,25 @@ object Futures {
       ).render
     )
   }
-  def urlFor(name: String) = {
+
+  def urlFor(name: String): String = {
     "https://api.openweathermap.org/data/" +
     s"2.5/find?mode=json&q=$name" +
-    s"&APPID=${webpage.WeatherAPIKey.APIKey}"
+    s"&APPID=$APIKey"
   }
-  def parseTemp(text: String) = {
+
+  def parseTemp(text: String): Double = {
     val data = js.JSON.parse(text)
     val kelvins = data.list
                       .pop()
                       .main
                       .temp
                       .asInstanceOf[Double]
-    kelvins - 272.15
+    kelvins - 273.15
   }
-  def formatResults(output: html.Element, results: Seq[(String, Double)]) = {
+
+  def formatResults(output: html.Element,
+                    results: Seq[(String, Double)]): dom.Node = {
     output.innerHTML = ""
     output.appendChild(ul(
       for((name, temp) <- results) yield li(
@@ -52,9 +57,10 @@ object Futures {
       )
     ).render)
   }
+
   @JSExport
-  def main0(container: html.Div) = {
-    def handle0(names: Seq[String], output: html.Div) = {
+  def main0(container: html.Div): Unit = {
+    def handle0(names: Seq[String], output: html.Div): Unit = {
       val results = mutable.ListBuffer.empty[(String, Double)]
       for(name <- names){
         val xhr = new XMLHttpRequest
@@ -71,9 +77,10 @@ object Futures {
     }
     main(container, handle0)
   }
+
   @JSExport
-  def main1(container: html.Div) = {
-    def handle1(names: Seq[String], output: html.Div) = {
+  def main1(container: html.Div): Unit = {
+    def handle1(names: Seq[String], output: html.Div): Unit = {
       val results = mutable.ListBuffer.empty[(String, Double)]
       for{
         name <- names
@@ -88,9 +95,10 @@ object Futures {
     }
     main(container, handle1)
   }
+
   @JSExport
-  def main2(container: html.Div) = {
-    def handle2(names: Seq[String], output: html.Div) = {
+  def main2(container: html.Div): Unit = {
+    def handle2(names: Seq[String], output: html.Div): Unit = {
       val futures = for(name <- names) yield{
         Ajax.get(urlFor(name)).map( xhr =>
           (name, parseTemp(xhr.responseText))
@@ -104,6 +112,4 @@ object Futures {
 
     main(container, handle2)
   }
-
-
 }
