@@ -92,19 +92,4 @@ lazy val book = Project(
   }
 )
 
-
 lazy val demos = project.in(file("examples/demos"))
-
-lazy val simple = project.in(file("examples/crossBuilds/simple"))
-
-lazy val clientserver = project.in(file("examples/crossBuilds/clientserver"))
-
-lazy val client = ProjectRef(file("examples/crossBuilds/clientserver"), "client")
-
-lazy val server = ProjectRef(file("examples/crossBuilds/clientserver"), "server")
-
-lazy val clientserver2 = project.in(file("examples/crossBuilds/clientserver2"))
-
-lazy val client2 = ProjectRef(file("examples/crossBuilds/clientserver2"), "client")
-
-lazy val server2 = ProjectRef(file("examples/crossBuilds/clientserver2"), "server")

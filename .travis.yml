@@ -4,6 +4,9 @@ scala: 2.11.12
 jdk: openjdk8
 
 script:
+  - (cd examples/crossBuilds/simple; sbt test)
+  - (cd examples/crossBuilds/clientserver; sbt appJVM/fullClasspath)
+  - (cd examples/crossBuilds/clientserver2; sbt appJVM/fullClasspath)
   - sbt book/run
 
 cache:
