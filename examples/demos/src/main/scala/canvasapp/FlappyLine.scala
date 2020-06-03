@@ -1,13 +1,12 @@
 package canvasapp
 
-
 import org.scalajs.dom
 import dom.html
-import scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation._
 import scala.util.Random
 
-@JSExport
-object FlappyLine extends{
+@JSExportTopLevel("CanvasAppFlappyLine")
+object FlappyLine {
   @JSExport
   def main(canvas: html.Canvas) = {
     /*setup*/
@@ -100,7 +99,7 @@ object FlappyLine extends{
       else runLive()
     }
 
-    dom.window.setInterval(run _, 20)
+    dom.window.setInterval(() => run(), 20)
 
     canvas.onclick = (e: dom.MouseEvent) => {
       playerV -= 5

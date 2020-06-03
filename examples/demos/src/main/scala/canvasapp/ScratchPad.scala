@@ -1,13 +1,12 @@
 package canvasapp
 
-
 import org.scalajs.dom
-
-import scalajs.js.annotation.JSExport
 import dom.html
 
-@JSExport
-object ScratchPad extends{
+import scala.scalajs.js.annotation._
+
+@JSExportTopLevel("CanvasAppScratchPad")
+object ScratchPad {
   @JSExport
   def main(canvas: html.Canvas) = {
     /*setup*/

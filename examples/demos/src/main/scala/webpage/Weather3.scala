@@ -3,26 +3,27 @@ package webpage
 import org.scalajs.dom
 import org.scalajs.dom.{Node, Element}
 import scalajs.js
-import scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation._
 import scalatags.JsDom.all._
 import dom.html
+import WeatherAPIKey.APIKey
 
-@JSExport
-object Weather3 extends{
+@JSExportTopLevel("WebPageWeather3")
+object Weather3 {
   @JSExport
   def main(target: html.Div) = {
     import dom.ext._
-    import scala.scalajs
-    .concurrent
-    .JSExecutionContext
-    .Implicits
-    .runNow
+    import scala.concurrent
+                .ExecutionContext
+                .Implicits
+                .global
 
     val url =
-      "http://api.openweathermap.org/" +
-        "data/2.5/weather?q=Singapore"
+      "https://api.openweathermap.org/" +
+      "data/2.5/weather?q=Singapore" +
+      s"&APPID=$APIKey"
 
-    Ajax.get(url).onSuccess{ case xhr =>
+    Ajax.get(url).foreach { xhr =>
       if (xhr.status == 200) {
         val json = js.JSON.parse(
           xhr.responseText

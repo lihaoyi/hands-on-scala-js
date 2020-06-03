@@ -7,10 +7,10 @@
   Even though the goal of Scala.js is to get your code running in peoples' browsers, it still is useful to be familiar with the things that you can do in the command-line. It is much easier to write-code-print-results in the command line without having to set up a HTML page and opening a browser to test it, and this extends to things like unit test suites, which are almost exclusively run in the command-line using @code{sbt ~test} to keep re-running them when the code changes.
 
 @p
-  The Scala.js command line is where you go to do things to your Scala.js code. Although Scala.js comes with @lnk("standalone executables", "http://www.scala-js.org/downloads.html") that can be used from any shell (sh, bash, zsh, etc.) the primary supported way of setting up, compiling and testing your Scala.js applications is through @lnk("SBT", "http://www.scala-sbt.org/"): Scala's primary build tool.
+  The Scala.js command line is where you go to do things to your Scala.js code. Although Scala.js comes with @lnk("standalone executables", "http://www.scala-js.org/downloads.html") that can be used from any shell (sh, bash, zsh, etc.) the primary supported way of setting up, compiling and testing your Scala.js applications is through @lnk.misc.sbt: Scala's primary build tool.
 
 @p
-  You've already used fragments of the Scala.js CLI in earlier chapters of this book: @code{~fastOptJS} is what you used for development, @code{fullOptJS} for publishing. Apart from these, Scala.js allows you to execute code via @lnk.misc.Rhino/@lnk.misc.Nodejs/@lnk.misc.PhantomJS from the command-line, as well as running test-suites under the same conditions. This chapter will go deeper into the various things you can do with the Scala.js command line:
+  You've already used fragments of the Scala.js CLI in earlier chapters of this book: @code{~fastOptJS} is what you used for development, @code{fullOptJS} for publishing. Apart from these, Scala.js allows you to execute code via @lnk.misc.Nodejs/@lnk.misc.jsdom/@lnk.misc.Selenium from the command-line, as well as running test-suites under the same conditions. This chapter will go deeper into the various things you can do with the Scala.js command line:
 
 @ul
   @li
@@ -22,14 +22,15 @@
   @li
     @code{fullOptJS}: aggregating our Scala.js IR and converting it to a smaller, faster @code{.js} executable.
   @li
-    @code{run}: run your compiled Scala.js code as JavaScript in Rhino, Node.js or Phantom.js
+    @code{run}: run your compiled Scala.js code as JavaScript in Node.js, jsdom or Selenium
   @li
-    @code{test}: run your compiled Scala.js code as a test suite in Rhino, Node.js or Phantom.js
+    @code{test}: run your compiled Scala.js code as a test suite in Node.js, jsdom or Selenium
 
 @p
-  Now, let's open up your SBT console in your Scala.js app
+  Now, let's open up your sbt console in your Scala.js app
 
 @hl.sh
+  $ sbt
   >
 
 @p
@@ -53,11 +54,11 @@
           ├── Point$.sjsir
           ├── Point.class
           ├── Point.sjsir
-          ├── ScalaJSExample$$anonfun$main$1.class
-          ├── ScalaJSExample$$anonfun$run$1.class
+          ├── ScalaJSExample$$anonfun$main$3.class
           ├── ScalaJSExample$.class
           ├── ScalaJSExample$.sjsir
-          └── ScalaJSExample.class
+          ├── ScalaJSExample.class
+          └── ScalaJSExample.sjsir
 
     @p
       However, unlike on Scala-JVM, you cannot directly run the @code{.sjsir} files spat out by the Scala.js compiler. These files are an Intermediate Representation, which needs to go through the next step in the compilation pipeline before being turned into JavaScript.
@@ -66,17 +67,17 @@
     @hl.sh
       > package
     @p
-      Also like on Scala-JVM, Scala.js also supports the @code{package} command. This command generates a @code{.jar} like it does in Scala-JVM, except this version appends this weird @code{_sjs0.6} suffix.
+      Also like on Scala-JVM, Scala.js also supports the @code{package} command. This command generates a @code{.jar} like it does in Scala-JVM, except this version appends this weird @code{_sjs1} suffix.
 
     @hl.sh
-      target/scala-2.11/
-      └── example_sjs0.6_2.11-0.1-SNAPSHOT.jar
+      target/scala-2.13/
+      └── example_sjs1_2.13-0.1-SNAPSHOT.jar
 
     @p
-      The purpose of this suffix is to link the compiled @code{.jar} file to the version of Scala.js used to compile it. This allows you to make sure that you don't accidentally depend on a version of a jar that is incompatible with your current version.
+      The purpose of this suffix is to link the compiled @code{.jar} file to the version of Scala.js used to compile it. This allows you to make sure that you don't accidentally depend on a version of a jar that is incompatible with your current version, such as one compiled with Scala.js 0.6.x.
 
     @p
-      Again, unlike Scala-JVM, these @code{.jar} files are not directly executable: the @code{.sjsir} files need further processing to turn into runnable JavaScript. Instead, their sole purpose is to hold bundles of @code{.sjsir} files to be published and depended-upon: they can be @code{publishLocal}ed to be used by other projects on your computer, or @code{publishSigned}ed to @lnk("Maven Central", "http://search.maven.org/"), just like any Scala-JVM project.
+      Again, unlike Scala-JVM, these @code{.jar} files are not directly executable: the @code{.sjsir} files need further processing to turn into runnable JavaScript. Instead, their sole purpose is to hold bundles of @code{.sjsir} files to be published and depended upon: they can be @code{publishLocal}ed to be used by other projects on your computer, or @code{publishSigned}ed to @lnk("Maven Central", "https://search.maven.org/"), just like any Scala-JVM project.
 
   @sect{The fastOptJS Command}
     @hl.sh
@@ -99,19 +100,26 @@
     @hl.sh
       > run
     @p
-      Here's something you haven't seen before: the @code{run} command gives you the ability to run a Scala.js program from the command line. This prints its output to standard output (i.e. the terminal). Like Scala-JVM, you need a @code{main} method to run, or kick off, your program. Unlike Scala-JVM, the main method is marked on an @hl.scala{object} which @hl.scala{extends scala.scalajs.js.JSApp}, e.g.
+      Here's something you haven't seen before: the @code{run} command gives you the ability to run a Scala.js program from the command line. This prints its output to standard output (i.e. the terminal). Like Scala-JVM, you need a @hl.scala{def main(args: Array[String]): Unit} method to run, or kick off, your program. For example:
 
     @hl.scala
       // src/main/scala/RunMe.scala
-      object RunMe extends scala.scalajs.js.JSApp{
-        def main(): Unit = {
+      object RunMe {
+        def main(args: Array[String]): Unit = {
           println("Hello World!")
           println("In Scala.js, (1.0).toString is ${(1.0).toString}!")
         }
       }
 
     @p
-      Running @code{sbt run} with the above Scala.js code will print out
+      In addition, and unlike Scala-JVM, you need the following setting in the `build.sbt` of the project:
+
+    @hl.scala
+      // in build.sbt
+      scalaJSUseMainModuleInitializer := true
+
+    @p
+      Running the sbt command @code{run} with the above Scala.js code will print out
 
     @hl.sh
       Hello World!
@@ -124,59 +132,48 @@
       One thing you may be wondering is: when you run a Scala.js program in the terminal, how does it execute the output JavaScript? What about the DOM? and Ajax calls? Can it access the filesystem? The answer to all these questions is "it depends": it turns out there are multiple ways you can run Scala.js from the command-line, dictated by the @i{stage} and the @i{environment}.
 
     @p
-      By default, runs are done in the @code{PreLinkStage}, which uses the Rhino environment. With the sbt setting @hl.scala{jsDependencies += RuntimeDOM}, the Scala.js runner will automatically set up @b{env.js} in Rhino so that you have access to an emulation of the DOM API.
+      By default, runs are done in the @code{FastOptStage} (with fast optimizations) and in the @lnk.misc.Nodejs environment. Other JavaScript environments, such as @lnk.misc.jsdom or @lnk.misc.Selenium, can be selected with the @code{jsEnv} setting. For example, to enable jsdom and get support for a DOM, follow the instructions of @lnk.misc.jsdomJSEnv.
 
     @p
-      You can enable a different stage, @code{FastOptStage} or @code{FullOptStage}, with the following sbt command:
-
-    @hl.sh
-      > set scalaJSStage in Global := FastOptStage
-
-    @p
-      In @code{FastOptStage} and @code{FullOptStage}, the environment can be one of @b{Node.js} or @b{PhantomJS}. These JavaScript VMs must be installed separately.
-
-    @ul
-      @li
-        By default, Node.js is used.
-      @li
-        With the sbt setting @hl.scala{jsDependencies += RuntimeDOM}, PhantomJS is used instead, so that a headless DOM is available.
-
-    @p
-      Typically, the best way to get started is using Rhino, since it's setup-free, and setting up Node.js or PhantomJS later as necessary. The next two sections elaborate on the differences between these ways of running your code. Check out the later sections on @sect.ref{Headless Runtimes} and @sect.ref{Stages} to learn more about the other settings and why you would want to use them.
+      The next two sections elaborate on the differences between these ways of running your code. Check out the later sections on @sect.ref{Headless Runtimes} and @sect.ref{Stages} to learn more about the other settings and why you would want to use them.
 
   @sect{The test Command}
     @hl.sh
       > test
 
     @p
-      The @code{sbt test} command behaves very similarly to @code{sbt run}. It also runs on Rhino, Node.js or PhantomJS, depending of the stage and the dependency on the DOM.
+      The @code{sbt test} command behaves very similarly to @code{sbt run}. It also runs on Node.js or any other JavaScript environment, depending on your settings.
     @p
-      The difference is that instead of simply running your @code{main} method, @code{sbt test} runs whatever test-suite you have set-up, which will look through your @code{tests/} folder to find suites of tests it has to run, and aggregate the results formatted nicely for you to see. The exact operation of this depends on which testing library you're using.
+      The difference is that instead of simply running your @code{main} method, @code{sbt test} runs whatever test suite you have set-up, which will look through your @code{tests/} folder to find suites of tests it has to run, and aggregate the results formatted nicely for you to see. The exact operation of this depends on which testing library you're using.
     @p
       We won't spend much time talking about @code{sbt test} here. Not because it's not important: it most certainly is! Rather, we will be spending a good amount of time setting up tests in @sect.ref("Cross Publishing Libraries", "the next chapter"), so feel free to jump ahead if you want to see an example usage of @code{sbt test}.
 
 @sect{Headless Runtimes}
   @ul
     @li
-      @lnk.misc.Rhino is the default way of running Scala.js applications. The upside of using Rhino is that it is pure-Java, and doesn't need any additional binaries or installation. The downside of using Rhino is that it is slow: maybe a hundred times slower than the alternatives, making it not suitable for running long-running, compute-intensive programs.
+      @lnk.misc.Nodejs is the default way of running Scala.js applications on the command line, since it is the de facto software to run JavaScript code outside of Web browsers. Based on Google's V8 JavaScript engine, its performance matches that of modern browsers. Node.js does not have DOM or browser-related functionality.
     @li
-      @lnk.misc.Nodejs, a relatively new JavaScript runtime based on Google's V8 JavaScript engine, Node.js lets you run your Scala.js application from the command line much faster than in Rhino, with performance that matches that of modern browsers. However, you need to separately @lnk("install Node.js", "http://nodejs.org/download/") in order to use it. Node.js does not have DOM or browser-related functionality. You need to set the stage with @code{set scalaJSStage in Global := FastOptStage} to run using Node.js.
+      @lnk.misc.jsdom is a Node.js library that can execute code in a sandboxed environment featuring an implementation of the DOM. This is very useful to run code that requires DOM manipulations without spawning a full browser. You can configure Scala.js to run and test in that sandboxed environment with @lnk.misc.jsdomJSEnv.
     @li
-      @lnk.misc.PhantomJS is a headless Webkit browser. This means that unlike Node.js, PhantomJS provides you with a full DOM and all its APIs to use in your tests, if you wish to e.g. test interactions with the HTML of the web page. On the other hand, it is somewhat slower than Node.js, though still much faster than Rhino. Like Node.js, it needs to be installed separately. You need to set the stage with @code{set scalaJSStage in Global := FastOptStage}, as well as setting the @hl.scala{jsDependencies += RuntimeDOM} flag in your SBT configuration, to use PhantomJS.
+      @lnk.misc.Selenium is a programmatic driver for real, headless browsers. Unlike jsdom, Selenium provides you with a full DOM in a real browser. You can use it in Scala.js with @lnk.misc.SeleniumJSEnv.
+    @li
+      Obsolete: @lnk.misc.PhantomJS is a headless browser based on WebKit, the JavaScript engine of Safari. PhantomJS has been discontinued by its maintainers in 2018. For backward compatibility reasons, a legacy environment @lnk.misc.PhantomJSJSEnv is still provided to use it in Scala.js, but its use is not recommended anymore.
   @p
-    These are your three options to run your Scala.js code via the command-line. Generally, it's easiest to get started with Rhino since it's the default and requires no setup, though you will quickly find it worthwhile to setup Node.js or PhantomJS to speed up your runs and tests.
+    Node.js, jsdom and Selenium are your three main options to run your Scala.js code via the command-line. Third-party projects can provide additional JavaScript environments to use with Scala.js, if the above three do not cover your use cases.
 
 @sect{Stages}
   @p
-    Let us recap the three different stages of execution, and what they mean.
+    By default, runs and tests are done in the @code{FastOptStage}, which means that they use the JavaScript files produced by @code{fastOptJS} (with fast optimizations). This is usually what you want in your development cycle, since fast optimizations hit a sweet spot between the time taken to generate the JavaScript file and its performance, in addition to providing better debugging tools (full names, checks for @sect.ref("Undefined behaviors", "undefined behaviors"), etc.).
 
-  @ul
-    @li
-      @code{PreLinkStage} (the default): this does not perform any optimization of the output Scala.js files, and does lazy-loading to minimize the amount of files being loading into the interpreter. This is necessary for Rhino because it can't handle large blobs of JavaScript, but doesn't map to any compilation mode you'd use for the browser.
-    @li
-      @code{FastOptStage}: this performs the same compilation and optimization as @code{sbt fastOptJS}, as described under Fast Optimizations. It then takes the entire output executable (which probably weighs around 1mb) and hands it to Node.js or PhantomJS, which then run it.
-    @li
-      @code{FullOptStage}: this performs the same compilation and optimization as @code{sbt fullOptJS}, as described under Full Optimizations. This takes longer to run than the @code{FastOptStage}, and results in a smaller/faster executable. Practically speaking, this size/speed advantage does not matter from the command line, but @code{FullOptStage} is still useful to verify that the behavior does not change (it shouldn't!) under the aggressive full optimization. This is typically used in continuous integration builds, but rarely manually.
+  @p
+    You can enable full optimizations, @code{FullOptStage}, with the following sbt command:
+
+  @hl.sh
+    > set Global/scalaJSStage := FullOptStage
+    > run
+
+  @p
+    Changing the stage to @code{FullOptStage} will cause @code{run} and @code{test} commands to use the JavaScript files produced by @code{fullOptJS}, featuring full optimizations. This is slower, but is still useful to verify that the behavior does not change (it shouldn't!) under the aggressive full optimization. This is typically used in continuous integration builds, but rarely manually.
 
 @hr
 

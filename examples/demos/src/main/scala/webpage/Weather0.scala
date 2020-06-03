@@ -3,17 +3,20 @@ package webpage
 import org.scalajs.dom
 import org.scalajs.dom.{Node, Element}
 import scalajs.js
-import scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation._
 import scalatags.JsDom.all._
 import dom.html
-@JSExport
-object Weather0 extends{
+import WeatherAPIKey.APIKey
+
+@JSExportTopLevel("WebPageWeather0")
+object Weather0 {
   @JSExport
   def main(target: html.Div) = {
     val xhr = new dom.XMLHttpRequest()
     xhr.open("GET",
-      "http://api.openweathermap.org/" +
-      "data/2.5/weather?q=Singapore"
+      "https://api.openweathermap.org/" +
+      "data/2.5/weather?q=Singapore" +
+      s"&APPID=$APIKey"
     )
     xhr.onload = (e: dom.Event) => {
       if (xhr.status == 200) {

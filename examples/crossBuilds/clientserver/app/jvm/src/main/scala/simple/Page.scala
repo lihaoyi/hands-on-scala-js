@@ -1,9 +1,10 @@
 package simple
+
 import scalatags.Text.all._
 
 object Page{
   val boot =
-    "simple.Client().main(document.getElementById('contents'))"
+    "SimpleClient.main(document.getElementById('contents'))"
   val skeleton =
     html(
       head(

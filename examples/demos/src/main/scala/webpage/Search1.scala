@@ -1,11 +1,12 @@
 package webpage
 
 import org.scalajs.dom
-import scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation._
 import scalatags.JsDom.all._
 import dom.html
-@JSExport
-object Search1 extends{
+
+@JSExportTopLevel("WebPageSearch1")
+object Search1 {
   @JSExport
   def main(target: html.Div) = {
     val listings = Seq(

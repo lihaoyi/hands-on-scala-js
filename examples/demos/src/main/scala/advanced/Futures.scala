@@ -8,17 +8,19 @@ import scala.collection.mutable
 import scala.concurrent.Future
 import scalajs.js
 import scalatags.JsDom.all._
-import scalajs.js.annotation.JSExport
-import scalajs.concurrent.JSExecutionContext.Implicits.runNow
-@JSExport
+import scala.scalajs.js.annotation._
+import scala.concurrent.ExecutionContext.Implicits.global
+import webpage.WeatherAPIKey.APIKey
+
+@JSExportTopLevel("AdvancedFutures")
 object Futures {
   def main(container: html.Div,
-            handle: (Seq[String], html.Div) => Unit) = {
+           handle: (Seq[String], html.Div) => Unit): Unit = {
     val myInput = input(value:="London,Singapore,Berlin,New York").render
     val output = div.render
     myInput.onkeyup = (e: dom.KeyboardEvent) => {
-      if (e.keyCode == KeyCode.enter){
-        handle(myInput.value.split(','), output)
+      if (e.keyCode == KeyCode.Enter){
+        handle(myInput.value.split(',').toSeq, output)
       }
     }
     container.appendChild(
@@ -29,21 +31,25 @@ object Futures {
       ).render
     )
   }
-  def urlFor(name: String) = {
-    "http://api.openweathermap.org/data/" +
-    "2.5/find?mode=json&q=" +
-    name
+
+  def urlFor(name: String): String = {
+    "https://api.openweathermap.org/data/" +
+    s"2.5/find?mode=json&q=$name" +
+    s"&APPID=$APIKey"
   }
-  def parseTemp(text: String) = {
+
+  def parseTemp(text: String): Double = {
     val data = js.JSON.parse(text)
     val kelvins = data.list
                       .pop()
                       .main
                       .temp
                       .asInstanceOf[Double]
-    kelvins - 272.15
+    kelvins - 273.15
   }
-  def formatResults(output: html.Element, results: Seq[(String, Double)]) = {
+
+  def formatResults(output: html.Element,
+                    results: Seq[(String, Double)]): dom.Node = {
     output.innerHTML = ""
     output.appendChild(ul(
       for((name, temp) <- results) yield li(
@@ -51,10 +57,11 @@ object Futures {
       )
     ).render)
   }
+
   @JSExport
-  def main0(container: html.Div) = {
-    def handle0(names: Seq[String], output: html.Div) = {
-      val results = mutable.Buffer.empty[(String, Double)]
+  def main0(container: html.Div): Unit = {
+    def handle0(names: Seq[String], output: html.Div): Unit = {
+      val results = mutable.ListBuffer.empty[(String, Double)]
       for(name <- names){
         val xhr = new XMLHttpRequest
         xhr.open("GET", urlFor(name))
@@ -62,7 +69,7 @@ object Futures {
           val temp = parseTemp(xhr.responseText)
           results.append((name, temp))
           if (results.length == names.length){
-            formatResults(output, results)
+            formatResults(output, results.toList)
           }
         }
         xhr.send()
@@ -70,10 +77,11 @@ object Futures {
     }
     main(container, handle0)
   }
+
   @JSExport
-  def main1(container: html.Div) = {
-    def handle1(names: Seq[String], output: html.Div) = {
-      val results = mutable.Buffer.empty[(String, Double)]
+  def main1(container: html.Div): Unit = {
+    def handle1(names: Seq[String], output: html.Div): Unit = {
+      val results = mutable.ListBuffer.empty[(String, Double)]
       for{
         name <- names
         xhr <- Ajax.get(urlFor(name))
@@ -81,15 +89,16 @@ object Futures {
         val temp = parseTemp(xhr.responseText)
         results.append((name, temp))
         if (results.length == names.length){
-          formatResults(output, results)
+          formatResults(output, results.toList)
         }
       }
     }
     main(container, handle1)
   }
+
   @JSExport
-  def main2(container: html.Div) = {
-    def handle2(names: Seq[String], output: html.Div) = {
+  def main2(container: html.Div): Unit = {
+    def handle2(names: Seq[String], output: html.Div): Unit = {
       val futures = for(name <- names) yield{
         Ajax.get(urlFor(name)).map( xhr =>
           (name, parseTemp(xhr.responseText))
@@ -103,6 +112,4 @@ object Futures {
 
     main(container, handle2)
   }
-
-
 }

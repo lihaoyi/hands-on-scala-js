@@ -2,14 +2,15 @@ package webpage
 
 import org.scalajs.dom
 import dom.ext._
-import scalajs.concurrent.JSExecutionContext.Implicits.runNow
+import scala.concurrent.ExecutionContext.Implicits.global
 import scalajs.js
-import scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation._
 import scalatags.JsDom.all._
 import dom.html
+import WeatherAPIKey.APIKey
 
-@JSExport
-object WeatherSearch extends{
+@JSExportTopLevel("WebPageWeatherSearch")
+object WeatherSearch {
   @JSExport
   def main(target: html.Div) = {
 
@@ -42,17 +43,17 @@ object WeatherSearch extends{
 
     def fetchWeather(query: String) = {
       val searchUrl =
-        "http://api.openweathermap.org/data/" +
-        "2.5/find?type=like&mode=json&q=" +
-        query
+        "https://api.openweathermap.org/data/" +
+        s"2.5/find?type=like&mode=json&q=$query" +
+        s"&APPID=$APIKey"
 
       for{
         xhr <- Ajax.get(searchUrl)
         if query == box.value
       } js.JSON.parse(xhr.responseText).list match{
-        case jsonlist: js.Array[js.Dynamic] =>
+        case jsonlist: js.Array[_] =>
           output.innerHTML = ""
-          showResults(jsonlist, query)
+          showResults(jsonlist.asInstanceOf[js.Array[js.Dynamic]], query)
         case _ =>
           output.innerHTML = "No Results"
       }

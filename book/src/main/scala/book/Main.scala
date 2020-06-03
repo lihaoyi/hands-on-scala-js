@@ -13,7 +13,7 @@ import scalatex.site.{Tree, Site}
 import ammonite.ops._
 
 object Main {
-  val wd = cwd
+  val wd = pwd
 
   def main(args: Array[String]): Unit = {
     val googleAnalytics =
@@ -30,45 +30,46 @@ object Main {
 
 
     val s = new Site {
-      def content = Map("index.html" -> scalatex.Index())
+      def content: Map[String, Page] =
+        Map("index.html" -> ((defaultHeader, scalatex.Index())))
 
-      override def autoResources =
+      override def autoResources: Seq[ResourcePath] =
         super.autoResources ++
         BookData.hl.autoResources ++
-        site.Sidebar.autoResources ++ Seq(
-        root/"META-INF"/'resources/'webjars/'pure/"0.5.0"/"grids-responsive-min.css",
-        root/'css/"side-menu.css",
-        root/"example-opt.js",
-        root/'webpage/"weather.js",
-        root/"favicon.svg",
-        root/"favicon.png"
+        site.Sidebar.autoResources ++ Seq[ResourcePath](
+        webjars/'pure/"0.6.0"/"grids-responsive-min.css",
+        resource/'css/"side-menu.css",
+        resource/"example-opt.js",
+        resource/'webpage/"weather.js",
+        resource/"favicon.svg",
+        resource/"favicon.png"
       )
 
-      override def manualResources = super.manualResources ++ Seq(
-        root/'images/"javascript-the-good-parts-the-definitive-guide.jpg",
-        root/'images/"Hello World.png",
-        root/'images/"Hello World White.png",
-        root/'images/"Hello World Console.png",
-        root/'images/"IntelliJ Hello.png",
-        root/'images/"Dropdown.png",
-        root/'images/"Scalatags Downloads.png"
+      override def manualResources: Seq[ResourcePath] =
+        super.manualResources ++ Seq(
+        resource/'images/"javascript-the-good-parts-the-definitive-guide.jpg",
+        resource/'images/"Hello World.png",
+        resource/'images/"Hello World White.png",
+        resource/'images/"Hello World Console.png",
+        resource/'images/"IntelliJ Hello.png",
+        resource/'images/"Dropdown.png",
+        resource/'images/"Scalatags Downloads.png"
       )
-      override def headFrags = super.headFrags ++ Seq(
+      override def defaultHeader: Seq[Frag] = super.defaultHeader ++ Seq(
         meta(charset:="utf-8"),
         meta(name:="viewport", attrs.content:="width=device-width, initial-scale=1.0"),
         link(rel:="shortcut icon", `type`:="image/png", href:="favicon.png"),
         tags2.title("Hands-on Scala.js"),
         script(raw(googleAnalytics))
       )
-      override def bodyFrag(frag: Frag) = body(
+      override def bodyFrag(frag: Frag): Frag = body(
         super.bodyFrag(frag),
         site.Sidebar.snippet(BookData.sect.structure.children),
         scalatex.site.Highlighter.snippet
       )
     }
 
-    s.renderTo(Path(System.getProperty("output.root")))
-
+    customRenderToWorkaroundSiteIssue(s, Path(System.getProperty("output.root")))
 
     val allNames = {
       def rec(n: Tree[String]): Seq[String] = {
@@ -92,6 +93,25 @@ object Main {
 
     // can be used to verify that no links are broken
     // lnk.usedLinks
+  }
+
+  // Work around https://github.com/lihaoyi/Scalatex/issues/72
+  private def customRenderToWorkaroundSiteIssue(s: Site, outputRoot: Path): Unit = {
+    def generateHtml(outputRoot: Path): Unit = {
+      for ((path, (pageHeaders, pageBody)) <- s.content){
+        val txt = html(
+          head(pageHeaders),
+          body(s.bodyFrag(pageBody))
+        ).render
+        val cb = java.nio.CharBuffer.wrap("<!DOCTYPE html>" + txt)
+        val bytes = scala.io.Codec.UTF8.encoder.encode(cb)
+        write.over(outputRoot/path,
+          bytes.array().slice(bytes.position(), bytes.limit()))
+      }
+    }
+
+    generateHtml(outputRoot)
+    s.bundleResources(outputRoot)
   }
 
 }

@@ -1,9 +1,12 @@
 sudo: false
 language: scala
-scala: 2.11.8
+scala: 2.13.2
 jdk: openjdk8
 
 script:
+  - (cd examples/crossBuilds/simple; sbt test)
+  - (cd examples/crossBuilds/clientserver; sbt appJVM/fullClasspath)
+  - (cd examples/crossBuilds/clientserver2; sbt appJVM/fullClasspath)
   - sbt book/run
 
 cache:
@@ -12,5 +15,6 @@ cache:
     - $HOME/.sbt
     - $HOME/.coursier/cache
 before_cache:
+  - rm -fv $HOME/.ivy2/.sbt.ivy.lock
   - find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
   - find $HOME/.sbt -name "*.lock" -print -delete

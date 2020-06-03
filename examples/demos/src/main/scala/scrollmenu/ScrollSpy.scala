@@ -5,8 +5,13 @@ import dom.html
 import org.scalajs.dom.ext._
 import scalajs.js
 import scalatags.JsDom.all._
+import upickle.default._
 
 case class Tree[T](value: T, children: Vector[Tree[T]])
+
+object Tree {
+  implicit def rw[T: ReadWriter]: ReadWriter[Tree[T]] = macroRW
+}
 
 case class MenuNode(frag: html.Element, id: String, start: Int, end: Int)
 
@@ -84,7 +89,7 @@ class ScrollSpy(structure: Tree[String],
       .children(1)
       .asInstanceOf[html.Element]
       .style
-      .maxHeight = (mn.end - mn.start + 1) * 44 + "px"
+      .maxHeight = s"${(mn.end - mn.start + 1) * 44}px"
   }
   private[this] var scrolling = false
   private[this] var scrollTop = -1
@@ -128,7 +133,7 @@ class ScrollSpy(structure: Tree[String],
         }
         val size = walkTree(rest) + children.length
         mn.frag.children(1).asInstanceOf[html.Element].style.maxHeight =
-          if (!open) size * 44 + "px" else "none"
+          if (!open) s"${size * 44}px" else "none"
         size
     }
 

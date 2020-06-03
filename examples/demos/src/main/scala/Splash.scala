@@ -2,10 +2,10 @@ import java.lang.Math._
 
 import org.scalajs.dom
 import dom.html
-import scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation._
 
-@JSExport
-object Splash extends{
+@JSExportTopLevel("Splash")
+object Splash {
   @JSExport
   def main(canvas: html.Canvas) = {
 

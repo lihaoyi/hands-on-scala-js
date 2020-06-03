@@ -18,10 +18,10 @@
       @hl.ref(webpage/"HelloWorld0.scala")
 
     @less
-      @book.BookData.example(div, "webpage.HelloWorld0().main")
+      @book.BookData.example(div, "WebPageHelloWorld0.main")
 
   @p
-    Remember that we're now requiring a @hl.scala{html.Div} instead of a @hl.scala{html.Canvas} to be passed in when the JavaScript calls @hl.js{webpage.HelloWorld0().main(...)}. If you're coming to this point from the previous chapter, you'll need to update the on-page JavaScript's @hl.js{document.getElementById} to pick a @hl.xml{<div>} rather than the @hl.xml{<canvas>} we were using in the previous chapter.
+    Remember that we're now requiring a @hl.scala{html.Div} instead of a @hl.scala{html.Canvas} to be passed in when the JavaScript calls @hl.js{WebPageHelloWorld0.main(...)}. If you're coming to this point from the previous chapter, you'll need to update the on-page JavaScript's @hl.js{document.getElementById} to pick a @hl.xml{<div>} rather than the @hl.xml{<canvas>} we were using in the previous chapter.
 
   @p
     This approach works, as the above example shows, but has a couple of disadvantages:
@@ -30,14 +30,14 @@
     @li
       It is untyped: it is easy to accidentally mistype something, and result in malformed HTML. A typo such as @hl.xml{<dvi>} would go un-noticed at build-time. Depending on where the typo happens, it could go un-noticed until the application is deployed, causing subtle bugs that only get resolved much later.
     @li
-      It is insecure: @lnk("Cross-site Scripting", "http://en.wikipedia.org/wiki/Cross-site_scripting") is a real thing, and it is easy to forget to escape the values you are putting into your HTML strings. Above they're constants like @hl.scala{"dog"}, but if they're user-defined, you may not notice there is a problem until something like @hl.scala{"<script>...</script>"} sneaks through and your users' accounts & data is compromised.
+      It is insecure: @lnk("Cross-site Scripting", "https://en.wikipedia.org/wiki/Cross-site_scripting") is a real thing, and it is easy to forget to escape the values you are putting into your HTML strings. Above they're constants like @hl.scala{"dog"}, but if they're user-defined, you may not notice there is a problem until something like @hl.scala{"<script>...</script>"} sneaks through and your users' accounts & data is compromised.
 
   @p
     There are more, but we won't go deep into the intricacies of these problems. Suffice to say it makes mistakes easy to make and hard to catch, and we have something better...
 
 @sect{ScalaTags}
   @p
-    @lnk.github.ScalaTags is a cross-platform Scala.js/Scala-JVM library that is designed to generate HTML. To use ScalaTags, you need to add it as a dependency to your Scala.js SBT project, in the @code{build.sbt} file:
+    @lnk.github.ScalaTags is a cross-platform Scala.js/Scala-JVM library that is designed to generate HTML. To use ScalaTags, you need to add it as a dependency to your Scala.js sbt project, in the @code{build.sbt} file:
 
 
   @hl.ref(wd/'examples/'demos/"build.sbt", "scalatags", "")
@@ -50,7 +50,7 @@
       @hl.ref(webpage/"HelloWorld1.scala")
 
     @less
-      @book.BookData.example(div, "webpage.HelloWorld1().main")
+      @book.BookData.example(div, "WebPageHelloWorld1.main")
 
   @p
     ScalaTags has some nice advantages over plain HTML: it's type-safe, so typos like @hl.scala{dvi} get caught at compile-time. It's also secure, such that you don't need to worry about script-tags in strings or similar. The @lnk("ScalaTags Readme", "https://github.com/lihaoyi/scalatags#scalatags") elaborates on these points and other advantages. As you can see, it takes just 1 import at the top of the file to bring it in scope, and then you can use all of ScalaTags' functionality.
@@ -64,7 +64,7 @@
         @hl.ref(webpage/"Inputs.scala", "val box")
 
       @less
-        @example(div(height:="150px"), "webpage.Inputs().main")
+        @example(div(height:="200px"), "WebPageInputs.main")
 
     @p
       In ScalaTags, you build up fragments of type @hl.scala{Frag} using functions like @hl.scala{div}, @hl.scala{h1}, etc., and call @hl.scala{.render} on it to turn it into a real @lnk.dom.Element. Different fragments render to different things: e.g. @hl.scala{input.render} gives you a @lnk.dom.html.Input, @hl.scala{span.render} gives you a @lnk.dom.html.Span. You can then access the properties of these elements: adding callbacks, checking their value, anything you want.
@@ -97,7 +97,7 @@
         @hl.ref(webpage/"Search0.scala", "val output")
 
       @less
-        @example(div, "webpage.Search0().main")
+        @example(div, "WebPageSearch0.main")
 
     @p
       And there you have it! A working search box. This is a relatively self-contained example: all the items it's searching are available locally, no Ajax calls, and there's no fancy handling of the searched items. If we want to, for example, highlight the matched section of each fruit's name, we can modify the @hl.scala{def renderListings} call to do so:
@@ -107,7 +107,7 @@
         @hl.ref(webpage/"Search1.scala", "def renderListings", "lazy val")
 
       @less
-        @example(div, "webpage.Search1().main")
+        @example(div, "WebPageSearch1.main")
 
     @p
       Here, instead of sticking the name of the matched fruits directly into the @hl.scala{li}, we instead first split off the part which matches the query, and then highlght the first section yellow. Easy!
@@ -139,7 +139,7 @@
         @hl.ref(webpage/"Weather0.scala", "val xhr")
 
       @less
-        @example(div(height:="400px"), "webpage.Weather0().main")
+        @example(div(height:="400px"), "WebPageWeather0.main")
     @p
       The above snippet of code uses the raw JavaScript Ajax API in order to make a request to @lnk("openweathermap.org", "http://openweathermap.org/"), to get the weather data for the city of Singapore as a JSON blob. The part of the API that we'll be using is documented @lnk("here", "http://openweathermap.org/current"), and if you're interested you can read all about the various options that they provide. For now, we're unceremoniously dumping it in a @hl.scala{pre} so you can see the raw response data.
 
@@ -148,7 +148,7 @@
 
     @split
       @more
-        @hl.ref(wd/'examples/'demos/'src/'main/'resources/'webpage/"weather.js", "var xhr")
+        @hl.ref(wd/'examples/'demos/'src/'main/'resources/'webpage/"weather.js", "const xhr")
 
       @less
         @example(div, "WeatherJs")
@@ -158,9 +158,11 @@
 
     @ul
       @li
-        @hl.scala{val}s for immutable data v.s. mutable @hl.js{var}s.
+        @hl.scala{val}s for immutable data instead of @hl.js{const}s.
       @li
-        @hl.scala("=>") v.s. @hl.js{function} to define the callback.
+        @hl.scala{s"&APPID=$APIKey"} v.s. @hl.js("`&APPID=${APIKey}`") for string interpolation (template strings).
+      @li
+        An explicit type for the parameter @hl.scala{e} of the @hl.scala("=>") function.
       @li
         ScalaTags' @hl.scala{pre} v.s. @hl.js{document.createElement("pre")}
 
@@ -174,7 +176,7 @@
     @p
       With Scala.js, we provide a simpler API that is more clearly functional. First, you need to import some things into scope:
 
-    @hl.ref(webpage/"Weather1.scala", "import dom", "val url =")
+    @hl.ref(webpage/"Weather1.scala", "import dom.ext", "val url =")
 
     @p
       The first import brings in Scala adapters to several DOM APIs, which allow you to use them more idiomatically from Scala. The second brings in an implicit @hl.scala{scala.concurrent.ExecutionContext} that we'll need to run our asynchronous operations.
@@ -187,10 +189,10 @@
         @hl.ref(webpage/"Weather1.scala", "val url")
 
       @less
-        @example(div(height:="400px", overflow:="scroll"), "webpage.Weather1().main")
+        @example(div(height:="400px", overflow:="scroll"), "WebPageWeather1.main")
 
     @p
-      A single call to @hl.scala{Ajax.get(...)}, with the URL, and we receive a @hl.scala{scala.concurrent.Future} that we can use to get access to the result when ready. Here we're just using its @hl.scala{onSuccess}, but we could use it in a for-comprehension, with @lnk("Scala Async", "https://github.com/scala/async"), or however else we can use normal @hl.scala{Future}s
+      A single call to @hl.scala{Ajax.get(...)}, with the URL, and we receive a @hl.scala{scala.concurrent.Future} that we can use to get access to the result when ready. Here we're just using its @hl.scala{foreach}, but we could use it in a for-comprehension, with @lnk("Scala Async", "https://github.com/scala/async"), or however else we can use normal @hl.scala{Future}s
 
   @sect{Parsing the Data}
     @p
@@ -204,7 +206,7 @@
         @hl.ref(webpage/"Weather2.scala", "Ajax.get")
 
       @less
-        @example(div(height:="400px"), "webpage.Weather2().main")
+        @example(div(height:="400px"), "WebPageWeather2.main")
 
     @p
       We do this by taking @hl.scala{xhr.responseText} and putting it through both @hl.scala{JSON.parse} and @hl.scala{JSON.stringify}, passing in a @hl.scala{space} argument to tell @hl.scala{JSON.stringify} to spread it out nicely.
@@ -217,17 +219,17 @@
         @hl.ref(webpage/"Weather3.scala", "Ajax.get")
 
       @less
-        @example(div(height:="400px", overflow:="scroll"), "webpage.Weather3().main")
+        @example(div(height:="400px", overflow:="scroll"), "WebPageWeather3.main")
 
     @p
       First we parse the incoming response, extract a bunch of values from it, and then stick it in a ScalaTags fragment for us to see. Note how we can use the names of the attributes e.g. @hl.scala{json.name} even though @hl.scala{name} is a dynamic property which you can't be sure exists: this is because @hl.scala{json} is of type @hl.scala{js.Dynamic}, which allows us to refer to arbitrary parameters and methods on the underlying object without type-checking.
 
     @p
-      Calls on @hl.scala{js.Dynamic} resolve directly to javascript property/method references, and will fail at run-time with an exception if used wrongly. This is also why we need to call @hl.scala{.toString} or @hl.scala{.asInstanceOf}on the values before use: without these casts, the compiler can't be sure what kind of value is underneath the @hl.scala{js.Dynamic} type, and so we have to provide it the guarantee that it is what it needs.
+      Calls on @hl.scala{js.Dynamic} resolve directly to javascript property/method references, and will fail at run-time with an exception if used wrongly. This is also why we need to call @hl.scala{.toString} or @hl.scala{.asInstanceOf} on the values before use: without these casts, the compiler can't be sure what kind of value is underneath the @hl.scala{js.Dynamic} type, and so we have to provide it the guarantee that it is what it needs.
 
 @sect{Tying it together: Weather Search}
   @p
-    At this point we've made a small app that allows us to search from a pre-populated list of words, as well as a small app that lets us query a remote web service to find the weather in Singapore. The natural thing to do is to put these things together to make a app that will let us search from a list of countries and query the weather in any country we desire. Let's start!
+    At this point we've made a small app that allows us to search from a pre-populated list of words, as well as a small app that lets us query a remote web service to find the weather in Singapore. The natural thing to do is to put these things together to make an app that will let us search from a list of countries and query the weather in any country we desire. Let's start!
 
   @hl.ref(webpage/"WeatherSearch.scala", "lazy val box", "def fetchWeather")
 
@@ -247,7 +249,7 @@
   @p
     Here is the meat and potatoes of this program: every time it gets called with an array of weather-data, we iterate over the cities in that array. It then does a similar sort of data-extraction that we did earlier, putting the results into the @hl.scala{output} div we defined above, including highlighting.
 
-  @example(div, "webpage.WeatherSearch().main")
+  @example(div, "WebPageWeatherSearch.main")
 
   @p
     And that's the working example! Try searching for cities like "Singapore" or "New York" or "San Francisco" and watch as the search narrows as you enter more characters into the text box. Note that the OpenWeatherMap API limits ambiguous searches to about a dozen results, so if a city doesn't turn up in a partial-search, try entering more characters to narrow it down.

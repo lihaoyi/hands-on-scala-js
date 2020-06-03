@@ -6,25 +6,27 @@ import org.eclipse.jgit.transport.{UsernamePasswordCredentialsProvider, RefSpec}
 
 val cloneRepos = taskKey[Unit]("Clone stuff from github")
 
-val sharedSettings = Seq(
-  scalaVersion := "2.11.8",
-  libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
-  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
-  autoCompilerPlugins := true
-)
-
+inThisBuild(Def.settings(
+  scalaVersion := "2.13.2",
+  scalacOptions ++= Seq(
+    "-deprecation",
+    "-feature",
+    "-encoding",
+    "utf-8",
+    "-Xfatal-warnings",
+  )
+))
 
 lazy val book = Project(
   id = "book",
   base = file("book")
-).settings(sharedSettings ++ scalatex.SbtPlugin.projectSettings:_*).settings(
+).settings(scalatex.SbtPlugin.projectSettings:_*).settings(
+  scalaVersion := "2.12.11",
   libraryDependencies ++= Seq(
-
-    "com.lihaoyi" %% "scalatex-site" % "0.2.1",
-    "com.lihaoyi" %% "scalatags" % "0.5.1",
-    "com.lihaoyi" %% "upickle" % "0.2.7",
-    "com.lihaoyi" %% "ammonite-ops" % "0.2.4"
+    "com.lihaoyi" %% "scalatex-site" % "0.3.11",
+    "com.lihaoyi" %% "acyclic" % "0.1.9" % "provided",
   ),
+  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.9"),
   (resources in Compile) += (fullOptJS in (demos, Compile)).value.data,
 
   (unmanagedResourceDirectories in Compile) ++=
@@ -50,7 +52,7 @@ lazy val book = Project(
       println("Already Cloned")
     }
   },
-  (run in Compile) <<= (run in Compile).dependsOn(cloneRepos),
+  (managedClasspath in Runtime) := (managedClasspath in Runtime).dependsOn(cloneRepos).value,
   initialize := {
     System.setProperty("clone.root", target.value.getAbsolutePath + "/clones")
     System.setProperty("output.root", target.value.getAbsolutePath + "/output")
@@ -89,20 +91,4 @@ lazy val book = Project(
   }
 )
 
-
 lazy val demos = project.in(file("examples/demos"))
-
-lazy val simple = project.in(file("examples/crossBuilds/simple"))
-
-lazy val clientserver = project.in(file("examples/crossBuilds/clientserver"))
-
-lazy val client = ProjectRef(file("examples/crossBuilds/clientserver"), "client")
-
-lazy val server = ProjectRef(file("examples/crossBuilds/clientserver"), "server")
-
-lazy val clientserver2 = project.in(file("examples/crossBuilds/clientserver2"))
-
-lazy val client2 = ProjectRef(file("examples/crossBuilds/clientserver2"), "client")
-
-lazy val server2 = ProjectRef(file("examples/crossBuilds/clientserver2"), "server")
-

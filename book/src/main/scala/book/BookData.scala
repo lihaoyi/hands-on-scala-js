@@ -11,7 +11,7 @@ import scalatex.site
 import scalatex.site.Highlighter
 
 object BookData {
-  val wd = cwd
+  val wd = pwd
   val cloneRoot = Path(System.getProperty("clone.root"))
   val lnk = book.lnk
   val pureTable = book.pureTable
@@ -29,10 +29,10 @@ object BookData {
       if file.ext == "scala"
     } yield{
 
-      val path = (file - cloneRoot - root).toString.stripSuffix(".scala")
+      val path = file.relativeTo(cloneRoot/root).toString.stripSuffix(".scala")
       val filename = path.replace('/', '.')
 
-      val docpath = s"https://docs.oracle.com/javase/7/docs/api/$path.html"
+      val docpath = s"https://docs.oracle.com/javase/8/docs/api/$path.html"
       filename -> docpath
     }
   }
