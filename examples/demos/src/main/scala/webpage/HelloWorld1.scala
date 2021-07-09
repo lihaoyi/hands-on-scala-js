@@ -4,7 +4,7 @@ import dom.html
 import scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
 @JSExport
-object HelloWorld1 extends{
+object HelloWorld1 {
   @JSExport
   def main(target: html.Div) = {
     val (animalA, animalB) = ("fox", "dog")

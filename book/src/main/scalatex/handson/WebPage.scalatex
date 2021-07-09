@@ -21,10 +21,10 @@
       @book.BookData.example(div, "webpage.HelloWorld0().main")
 
   @p
-    Remember that we're now requiring a @hl.scala{html.Div} instead of a @hl.scala{html.Canvas} to be passed in when the JavaScript calls @hl.js{webpage.HelloWorld0().main(...)}. If you're coming to this point from the previous chapter, you'll need to update the on-page JavaScript's @hl.js{document.getElementById} to pick a @hl.xml{<div>} rather than the @hl.xml{<canvas>} we were using in the previous chapter.
+    You can see by the parameter to @hl.scala{main} that we're now requiring a @hl.scala{html.Div} instead of a @hl.scala{html.Canvas} to be passed by the JavaScript calls to our code. If you're coming to this point from the previous chapter, you may have also noticed that we changed the package from @hl.scala{example} to @hl.scala{webpage} and the object name from @hl.scala{ScalaJSExample} to @hl.scala{HelloWorld0}.  Any time these change, you will also need to update the JavaScript code that starts you Scala code.  In this case, we need to update the on-page JavaScript in @code{index-dev.html} from @hl.js{example.ScalaJSExample().main(document.getElementById('canvas'));} to @hl.js{webpage.HelloWorld0().main(document.getElementById('canvas').parentNode);} which selects the @hl.xml{<div>} containing the @hl.xml{<canvas>} we had been using.
 
   @p
-    This approach works, as the above example shows, but has a couple of disadvantages:
+    While the above example works, writing the HTML as a string in our @code{.scala} has a couple of disadvantages:
 
   @ul
     @li
@@ -33,7 +33,7 @@
       It is insecure: @lnk("Cross-site Scripting", "http://en.wikipedia.org/wiki/Cross-site_scripting") is a real thing, and it is easy to forget to escape the values you are putting into your HTML strings. Above they're constants like @hl.scala{"dog"}, but if they're user-defined, you may not notice there is a problem until something like @hl.scala{"<script>...</script>"} sneaks through and your users' accounts & data is compromised.
 
   @p
-    There are more, but we won't go deep into the intricacies of these problems. Suffice to say it makes mistakes easy to make and hard to catch, and we have something better...
+    There are more, but we won't go deep into the intricacies of these problems. Suffice to say it makes mistakes easy to make and hard to catch, and we have something better.
 
 @sect{ScalaTags}
   @p
@@ -43,7 +43,7 @@
   @hl.ref(wd/'examples/'demos/"build.sbt", "scalatags", "")
 
   @p
-    With that, the above snippet of code re-written using ScalaTags looks as follows:
+    With that, the above snippet of code re-written using ScalaTags follows.  We have again changed the object name so you will need to update @code{index-dev.html} to call the code.
 
   @split
     @more
@@ -133,7 +133,7 @@
   @p
     One half of the web application faces forwards towards the user, managing and rendering HTML or the canvas for the user to view and interact with. Another half faces backwards, talking to various web services or databases which turn the application from a standalone-widget into part of a greater whole. We've already seen how to make the front half, let's now talk about working with the back half.
 
-  @sect{Raw JavaScript}
+  @sect{JavaScript Ajax API}
     @split
       @more
         @hl.ref(webpage/"Weather0.scala", "val xhr")
@@ -141,7 +141,7 @@
       @less
         @example(div(height:="400px"), "webpage.Weather0().main")
     @p
-      The above snippet of code uses the raw JavaScript Ajax API in order to make a request to @lnk("openweathermap.org", "http://openweathermap.org/"), to get the weather data for the city of Singapore as a JSON blob. The part of the API that we'll be using is documented @lnk("here", "http://openweathermap.org/current"), and if you're interested you can read all about the various options that they provide. For now, we're unceremoniously dumping it in a @hl.scala{pre} so you can see the raw response data.
+      The above snippet of code uses the raw JavaScript Ajax API in Scala in order to make a request to @lnk("openweathermap.org", "http://openweathermap.org/"), to get the weather data for the city of Singapore as a JSON blob. The part of the API that we'll be using is documented @lnk("here", "http://openweathermap.org/current"), and if you're interested you can read all about the various options that they provide. For now, we're unceremoniously dumping it in a @hl.scala{pre} so you can see the raw response data.
 
     @p
       As you can see, using the raw JavaScript API to make the Ajax call looks almost identical to actually doing this in JavaScript, shown below:

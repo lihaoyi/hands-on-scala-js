@@ -6,7 +6,7 @@ import scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
 
 @JSExport
-object Inputs extends{
+object Inputs {
   @JSExport
   def main(target: html.Div) = {
     val box = input(

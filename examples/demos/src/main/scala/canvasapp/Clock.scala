@@ -6,7 +6,7 @@ import dom.html
 import scalajs.js
 import scalajs.js.annotation.JSExport
 @JSExport
-object Clock extends{
+object Clock {
   @JSExport
   def main(canvas: html.Canvas) = {
     /*setup*/

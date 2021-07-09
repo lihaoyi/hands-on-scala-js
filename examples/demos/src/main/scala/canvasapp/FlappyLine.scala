@@ -7,7 +7,7 @@ import scalajs.js.annotation.JSExport
 import scala.util.Random
 
 @JSExport
-object FlappyLine extends{
+object FlappyLine {
   @JSExport
   def main(canvas: html.Canvas) = {
     /*setup*/

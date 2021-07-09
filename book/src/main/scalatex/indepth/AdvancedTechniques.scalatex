@@ -191,7 +191,7 @@
         This is relatively straightforward, though maybe knottier than people would be used to. For example, we have to "construct" the Ajax call via calling mutating methods and setting properties on the @hl.scala{XMLHttpRequest} object, where it's easy to make a mistake. Furthermore, we need to manually aggregate the @hl.scala{results} and keep track ourselves whether or not the calls have all completed, which again is messy and error-prone.
 
       @p
-        This solution is basically equivalent to the initial code given in the @sect.ref{Raw JavaScript} section of @sect.ref{Interactive Web Pages}, with the additional code necessary for aggregation. As described in @sect.ref{dom.extensions}, we can make use of the @hl.scala{Ajax} object to make it slightly tidier.
+        This solution is basically equivalent to the initial code given in the @sect.ref{JavaScript Ajax API} section of @sect.ref{Interactive Web Pages}, with the additional code necessary for aggregation. As described in @sect.ref{dom.extensions}, we can make use of the @hl.scala{Ajax} object to make it slightly tidier.
 
     @sect{Using dom.extensions.Ajax}
       @example(exampleDiv, "advanced.Futures().main1")

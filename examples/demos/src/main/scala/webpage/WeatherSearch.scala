@@ -9,7 +9,7 @@ import scalatags.JsDom.all._
 import dom.html
 
 @JSExport
-object WeatherSearch extends{
+object WeatherSearch {
   @JSExport
   def main(target: html.Div) = {
 

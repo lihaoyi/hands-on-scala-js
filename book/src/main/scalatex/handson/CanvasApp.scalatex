@@ -72,7 +72,7 @@
       @book.BookData.example(canvas, "canvasapp.Clock().main")
 
   @p
-    As you can see, we're using more @lnk("Canvas APIs", "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D"), in this case dealing with rendering text on the canvas. Another thing we're using is the JavaScript @lnk("Date", "https://developer.mozilla.org/en-US/docs/Web/Javascript/Reference/Global_Objects/Date") class, in Scala.js under the full name @hl.scala{scala.scalajs.js.Date}, here imported as @hl.scala{js.Date}. Again, click on the link @i(cls:="fa fa-link ") icon to view the full-code if you're having trouble here.
+    As you can see, we're using more @lnk("Canvas APIs", "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D"), in this case dealing with rendering text on the canvas. Another thing we're using is the JavaScript @lnk("Date", "https://developer.mozilla.org/en-US/docs/Web/Javascript/Reference/Global_Objects/Date") class, in Scala.js under the full name @hl.scala{scala.scalajs.js.Date}, here imported as @hl.scala{js.Date} by adding @hl.scala{import scala.scalajs.js} at the top of the file. Again, click on the link @i(cls:="fa fa-link ") icon to view the full-code if you're having trouble here.
 
 @sect{Tying it together: Flappy Box}
 

@@ -5,7 +5,7 @@ import scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
 import dom.html
 @JSExport
-object Search1 extends{
+object Search1 {
   @JSExport
   def main(target: html.Div) = {
     val listings = Seq(
